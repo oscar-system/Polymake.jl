@@ -13,4 +13,6 @@ function __init__()
     Polymake.application("polytope")
 end
 
+include("functions.jl")
+
 end

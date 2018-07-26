@@ -26,8 +26,16 @@ void initialize_polymake(){
     std::cout << data.main_polymake_session->greeting() << std::endl;
 }
 
-polymake::perl::Object cube(int dim) {
-    return polymake::call_function("cube",dim);
+polymake::perl::Object call_func_0args(std::string func) {
+    return polymake::call_function(func);
+}
+
+polymake::perl::Object call_func_1args(std::string func, int arg1) {
+    return polymake::call_function(func, arg1);
+}
+
+polymake::perl::Object call_func_2args(std::string func, int arg1, int arg2) {
+    return polymake::call_function(func, arg1, arg2);
 }
 
 void application(std::string x){
@@ -50,17 +58,82 @@ int to_int(pm::perl::PropertyValue v){
     return static_cast<int>(v);
 }
 
+pm::Integer to_bigint(pm::perl::PropertyValue v){
+    pm::Integer integer = v;
+    return integer;
+}
+
+pm::Rational to_rational(pm::perl::PropertyValue v){
+    pm::Rational integer = v;
+    return integer;
+}
+
+bool to_bool(pm::perl::PropertyValue v){
+    return static_cast<bool>(v);
+}
+
+pm::Rational abs_func(pm::Rational r){
+    return abs(r);
+}
+
+pm::Integer get_numerator(pm::Rational r){
+    return numerator(r);
+}
+
+pm::Integer get_denominator(pm::Rational r){
+    return denominator(r);
+}
+
+pm::Matrix<pm::Rational> to_matrix(pm::perl::PropertyValue v){
+    pm::Matrix<pm::Rational> m = v;
+    return m;
+}
+
+int get_matrix_columns( pm::Matrix<pm::Rational> m){
+    return m.cols();
+}
+
+int get_matrix_rows( pm::Matrix<pm::Rational> m){
+    return m.rows();
+}
+
+pm::Rational get_matrix_entry(pm::Matrix<pm::Rational> m, int i, int j){
+    return m(i,j);
+}
+
+// pm::Integer get_matrix_entry_int(pm::Matrix<pm::Rational> m, int i, int j){
+//     return m(i,j);
+// }
+
 JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& polymake = registry.create_module("Polymake");
-  polymake.add_type<pm::perl::Object>("PolymakeObject");
-  polymake.add_type<pm::perl::PropertyValue>("PolymakeValue");
+  polymake.add_type<pm::perl::Object>("pm_perl_Object");
+  polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
+  polymake.add_type<pm::Integer>("pm_Integer");
+  polymake.add_type<pm::Rational>("pm_Rational");
+  polymake.add_type<pm::Matrix<pm::Rational> >("pm_Matrix_pm_Rational");
+
   polymake.method("init", &initialize_polymake);
-  polymake.method("cube",&cube);
+  polymake.method("call_func_0args",&call_func_0args);
+  polymake.method("call_func_1args",&call_func_1args);
+  polymake.method("call_func_2args",&call_func_2args);
   polymake.method("application",&application);
   polymake.method("give",&give);
   polymake.method("exists",&exists);
   polymake.method("properties",&properties);
+
   polymake.method("to_int",&to_int);
+  polymake.method("to_bigint",&to_bigint);
+  polymake.method("to_rational",&to_rational);
+  polymake.method("to_bool",&to_bool);
+  polymake.method("to_matrix",&to_matrix);
+
+  polymake.method("numerator",&get_numerator);
+  polymake.method("denominator",&get_denominator);
+  polymake.method("get_matrix_columns",&get_matrix_columns);
+  polymake.method("get_matrix_rows",&get_matrix_rows);
+  polymake.method("get_matrix_entry",&get_matrix_entry);
+//   polymake.method("get_matrix_entry_int",&get_matrix_entry_int);
 JULIA_CPP_MODULE_END
 
 // std::string greet()
