@@ -84,8 +84,13 @@ pm::Integer get_denominator(pm::Rational r){
     return denominator(r);
 }
 
-pm::Matrix<pm::Rational> to_matrix(pm::perl::PropertyValue v){
+pm::Matrix<pm::Rational> to_matrix_rational(pm::perl::PropertyValue v){
     pm::Matrix<pm::Rational> m = v;
+    return m;
+}
+
+pm::Matrix<pm::Integer> to_matrix_int(pm::perl::PropertyValue v){
+    pm::Matrix<pm::Integer> m = v;
     return m;
 }
 
@@ -97,13 +102,13 @@ int get_matrix_rows( pm::Matrix<pm::Rational> m){
     return m.rows();
 }
 
-pm::Rational get_matrix_entry(pm::Matrix<pm::Rational> m, int i, int j){
+pm::Rational get_matrix_entry_rational(pm::Matrix<pm::Rational> m, int i, int j){
     return m(i,j);
 }
 
-// pm::Integer get_matrix_entry_int(pm::Matrix<pm::Rational> m, int i, int j){
-//     return m(i,j);
-// }
+pm::Integer get_matrix_entry_int(pm::Matrix<pm::Integer> m, int i, int j){
+    return m(i,j);
+}
 
 JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& polymake = registry.create_module("Polymake");
@@ -112,6 +117,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.add_type<pm::Integer>("pm_Integer");
   polymake.add_type<pm::Rational>("pm_Rational");
   polymake.add_type<pm::Matrix<pm::Rational> >("pm_Matrix_pm_Rational");
+  polymake.add_type<pm::Matrix<pm::Integer> >("pm_Matrix_pm_Integer");
 
   polymake.method("init", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
@@ -126,14 +132,15 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("to_bigint",&to_bigint);
   polymake.method("to_rational",&to_rational);
   polymake.method("to_bool",&to_bool);
-  polymake.method("to_matrix",&to_matrix);
+  polymake.method("to_matrix_rational",&to_matrix_rational);
+  polymake.method("to_matrix_int",&to_matrix_int);
 
   polymake.method("numerator",&get_numerator);
   polymake.method("denominator",&get_denominator);
   polymake.method("get_matrix_columns",&get_matrix_columns);
   polymake.method("get_matrix_rows",&get_matrix_rows);
-  polymake.method("get_matrix_entry",&get_matrix_entry);
-//   polymake.method("get_matrix_entry_int",&get_matrix_entry_int);
+  polymake.method("get_matrix_entry_rational",&get_matrix_entry_rational);
+  polymake.method("get_matrix_entry_int",&get_matrix_entry_int);
 JULIA_CPP_MODULE_END
 
 // std::string greet()
