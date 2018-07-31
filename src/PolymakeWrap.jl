@@ -14,5 +14,6 @@ function __init__()
 end
 
 include("functions.jl")
+include("convert.jl")
 
 end

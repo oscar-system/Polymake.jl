@@ -116,8 +116,20 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
   polymake.add_type<pm::Integer>("pm_Integer");
   polymake.add_type<pm::Rational>("pm_Rational");
-  polymake.add_type<pm::Matrix<pm::Rational> >("pm_Matrix_pm_Rational");
-  polymake.add_type<pm::Matrix<pm::Integer> >("pm_Matrix_pm_Integer");
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix")
+    .apply<pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>>([](auto wrapped){
+        typedef typename decltype(wrapped)::type WrappedT;
+        wrapped.method([](WrappedT f, int i, int j){ return f(i,j);});
+        // wrapped.method("set_entry",[](WrappedT f, int i, int j, WrappedT::value_type r){
+        //     f(i,j)=r;
+        // });
+        wrapped.method("rows",&WrappedT::rows);
+        wrapped.method("cols",&WrappedT::cols);
+        wrapped.method("resize",[](WrappedT& T, int i, int j){ T.resize(i,j); });
+        // wrapped.constructor<int,int>();
+    });
+//   polymake.add_type<pm::Matrix<pm::Rational> >("pm_Matrix_pm_Rational");
+//   polymake.add_type<pm::Matrix<pm::Integer> >("pm_Matrix_pm_Integer");
 
   polymake.method("init", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
