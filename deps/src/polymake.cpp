@@ -114,19 +114,24 @@ JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& polymake = registry.create_module("Polymake");
   polymake.add_type<pm::perl::Object>("pm_perl_Object");
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
-  polymake.add_type<pm::Integer>("pm_Integer");
-  polymake.add_type<pm::Rational>("pm_Rational");
+  polymake.add_type<pm::Integer>("pm_Integer")
+    .constructor<int>()
+    .constructor<long>();
+  polymake.add_type<pm::Rational>("pm_Rational")
+    .constructor<int, int>()
+    .constructor<long, long>();
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix")
     .apply<pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>>([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
+        // typedef typename decltype(wrapped)::foo X;
         wrapped.method([](WrappedT f, int i, int j){ return f(i,j);});
-        // wrapped.method("set_entry",[](WrappedT f, int i, int j, WrappedT::value_type r){
-        //     f(i,j)=r;
-        // });
+        wrapped.method("set_entry",[](WrappedT f, int i, int j, typename WrappedT::value_type r){
+            f(i,j)=r;
+        });
         wrapped.method("rows",&WrappedT::rows);
         wrapped.method("cols",&WrappedT::cols);
         wrapped.method("resize",[](WrappedT& T, int i, int j){ T.resize(i,j); });
-        // wrapped.constructor<int,int>();
+        wrapped.template constructor<int, int>();
     });
 //   polymake.add_type<pm::Matrix<pm::Rational> >("pm_Matrix_pm_Rational");
 //   polymake.add_type<pm::Matrix<pm::Integer> >("pm_Matrix_pm_Integer");
