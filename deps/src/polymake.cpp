@@ -8,8 +8,11 @@
 #pragma clang diagnostic ignored "-Wshift-op-parentheses"
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
+#include <polymake/Vector.h>
 #include <polymake/IncidenceMatrix.h>
 #include <polymake/Rational.h>
+
+#include <polymake/perl/Value.h>
 #pragma clang diagnostic pop
 
 
@@ -55,6 +58,14 @@ pm::Rational to_pm_Rational(pm::perl::PropertyValue v){
 bool to_bool(pm::perl::PropertyValue v){
     return static_cast<bool>(v);
 }
+
+template<typename T>
+pm::Vector<T> to_vector_T(pm::perl::PropertyValue v){
+    pm::Vector<T> m = v;
+    return m;
+}
+pm::Vector<pm::Integer> (*to_vector_integer)(pm::perl::PropertyValue) = &to_vector_T<pm::Integer>;
+pm::Vector<pm::Rational> (*to_vector_rational)(pm::perl::PropertyValue) = &to_vector_T<pm::Rational>;
 
 template<typename T>
 pm::Matrix<T> to_matrix_T(pm::perl::PropertyValue v){
@@ -114,6 +125,22 @@ JULIA_CPP_MODULE_BEGIN(registry)
         });
     });
 
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector")
+    .apply<pm::Vector<pm::Integer>, pm::Vector<pm::Rational>>([](auto wrapped){
+        typedef typename decltype(wrapped)::type WrappedT;
+        // typedef typename decltype(wrapped)::foo X;
+        wrapped.method([](WrappedT f, int i){ return f[i];});
+        wrapped.method("set_entry",[](WrappedT f, int i, typename WrappedT::value_type r){
+            f[i]=r;
+        });
+        wrapped.method("dim",&WrappedT::dim);
+        wrapped.method("resize",[](WrappedT& T, int i){ T.resize(i); });
+        wrapped.template constructor<int>();
+        wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& T){
+            p.take(s) << T;
+        });
+    });
+
   polymake.method("init", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
   polymake.method("call_func_1args",&call_func_1args);
@@ -124,6 +151,8 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("to_pm_Integer",&to_pm_Integer);
   polymake.method("to_pm_Rational",&to_pm_Rational);
   polymake.method("to_bool",&to_bool);
+  polymake.method("to_vector_rational",to_vector_rational);
+  polymake.method("to_vector_int",to_vector_integer);
   polymake.method("to_matrix_rational",to_matrix_rational);
   polymake.method("to_matrix_int",to_matrix_integer);
   
