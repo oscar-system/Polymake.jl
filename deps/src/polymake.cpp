@@ -13,7 +13,48 @@
 #include <polymake/Rational.h>
 
 #include <polymake/perl/Value.h>
+#include <polymake/perl/calls.h>
 #pragma clang diagnostic pop
+
+using namespace polymake;
+
+namespace {
+
+class PropertyValueHelper : public pm::perl::PropertyValue {
+   public:
+      PropertyValueHelper(const pm::perl::PropertyValue& pv) : pm::perl::PropertyValue(pv) {};
+
+      std::string get_typename() {
+         switch (this->classify_number()) {
+
+         // primitives
+         case number_is_zero:
+         case number_is_int:
+            return "int";
+         case number_is_float:
+            return "double";
+
+         // with typeinfo ptr (nullptr for Objects)
+         case number_is_object:
+            // some non-primitive Scalar type with typeinfo (e.g. Rational)
+         case not_a_number:
+            // a c++ type with typeinfo or a perl Object
+            {
+               const std::type_info* ti = this->get_canned_typeinfo();
+               if (ti == nullptr) {
+                  // perl object
+                  return "perl::Object";
+               } else {
+                  return legible_typename(*ti);
+               }
+            }
+         default:
+            throw std::runtime_error("get_typename: could not determine property type");
+         }
+      }
+};
+
+}
 
 
 struct Polymake_Data {
@@ -41,8 +82,10 @@ polymake::perl::Object call_func_2args(std::string func, int arg1, int arg2) {
     return polymake::call_function(func, arg1, arg2);
 }
 
-int to_int(pm::perl::PropertyValue v){
-    return static_cast<int>(v);
+pm::perl::Object to_perl_object(pm::perl::PropertyValue v){
+    pm::perl::Object obj;
+    v >> obj;
+    return v;
 }
 
 pm::Integer to_pm_Integer(pm::perl::PropertyValue v){
@@ -81,6 +124,22 @@ pm::Integer new_integer_from_bigint(jl_value_t* integer){
     return *p;
 }
 
+// We can do better templating here
+template<typename T>
+std::string show_small_object(T obj){
+    std::ostringstream buffer;
+    wrap(buffer) << polymake::legible_typename(typeid(obj)) << pm::endl << obj;
+    return buffer.str();
+}
+
+std::string (*show_integer)(pm::Integer obj) = &show_small_object<pm::Integer>;
+std::string (*show_rational)(pm::Rational obj) = &show_small_object<pm::Rational>;
+std::string (*show_vec_integer)(pm::Vector<pm::Integer>  obj) = &show_small_object<pm::Vector<pm::Integer> >;
+std::string (*show_vec_rational)(pm::Vector<pm::Rational>  obj) = &show_small_object<pm::Vector<pm::Rational> >;
+std::string (*show_mat_integer)(pm::Matrix<pm::Integer>  obj) = &show_small_object<pm::Matrix<pm::Integer> >;
+std::string (*show_mat_rational)(pm::Matrix<pm::Rational>  obj) = &show_small_object<pm::Matrix<pm::Rational> >;
+
+
 JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& polymake = registry.create_module("Polymake");
 
@@ -105,15 +164,15 @@ JULIA_CPP_MODULE_BEGIN(registry)
     .constructor<long, long>()
     .constructor<long long, long long>()
     .template constructor<pm::Integer, pm::Integer>()
-    .method("numerator",[](pm::Rational r){ return numerator(r); })
-    .method("denominator",[](pm::Rational r){ return denominator(r); });
+    .method("numerator",[](pm::Rational r){ return pm::Integer(numerator(r)); })
+    .method("denominator",[](pm::Rational r){ return pm::Integer(denominator(r)); });
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix")
     .apply<pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>>([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         // typedef typename decltype(wrapped)::foo X;
-        wrapped.method([](WrappedT f, int i, int j){ return f(i,j);});
-        wrapped.method("set_entry",[](WrappedT f, int i, int j, typename WrappedT::value_type r){
+        wrapped.method([](WrappedT& f, int i, int j){ return typename WrappedT::value_type(f(i,j));});
+        wrapped.method("set_entry",[](WrappedT& f, int i, int j, typename WrappedT::value_type r){
             f(i,j)=r;
         });
         wrapped.method("rows",&WrappedT::rows);
@@ -129,8 +188,8 @@ JULIA_CPP_MODULE_BEGIN(registry)
     .apply<pm::Vector<pm::Integer>, pm::Vector<pm::Rational>>([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         // typedef typename decltype(wrapped)::foo X;
-        wrapped.method([](WrappedT f, int i){ return f[i];});
-        wrapped.method("set_entry",[](WrappedT f, int i, typename WrappedT::value_type r){
+        wrapped.method([](WrappedT& f, int i){ return typename WrappedT::value_type(f[i]);});
+        wrapped.method("set_entry",[](WrappedT& f, int i, typename WrappedT::value_type r){
             f[i]=r;
         });
         wrapped.method("dim",&WrappedT::dim);
@@ -147,13 +206,24 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("call_func_2args",&call_func_2args);
   polymake.method("application",[](const std::string x){ data.main_polymake_session->set_application(x); });
 
-  polymake.method("to_int",&to_int);
+  polymake.method("to_int",[](pm::perl::PropertyValue p){ return static_cast<long>(p);});
+  polymake.method("to_double",[](pm::perl::PropertyValue p){ return static_cast<double>(p);});
+  polymake.method("to_bool",[](pm::perl::PropertyValue p){ return static_cast<bool>(p);});
+  polymake.method("to_perl_object",&to_perl_object);
   polymake.method("to_pm_Integer",&to_pm_Integer);
   polymake.method("to_pm_Rational",&to_pm_Rational);
-  polymake.method("to_bool",&to_bool);
   polymake.method("to_vector_rational",to_vector_rational);
   polymake.method("to_vector_int",to_vector_integer);
   polymake.method("to_matrix_rational",to_matrix_rational);
   polymake.method("to_matrix_int",to_matrix_integer);
-  
+  polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){ PropertyValueHelper ph(p); return ph.get_typename(); });
+
+  polymake.method("show_small_obj",show_integer);
+  polymake.method("show_small_obj",show_rational);
+  polymake.method("show_small_obj",show_vec_integer);
+  polymake.method("show_small_obj",show_vec_rational);
+  polymake.method("show_small_obj",show_mat_integer);
+  polymake.method("show_small_obj",show_mat_rational);
+
+
 JULIA_CPP_MODULE_END

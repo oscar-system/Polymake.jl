@@ -42,7 +42,7 @@ function convert(::Type{Polymake.pm_Matrix{Polymake.pm_Integer}}, matrix::Array{
     for i in 1:rows
         for j in 1:cols
             converted = convert(Polymake.pm_Integer,matrix[i,j])
-            Polymake.set_entry(pm_matrix, i, j, converted )
+            Polymake.set_entry(pm_matrix, i-1, j-1, converted )
         end
     end
     return pm_matrix
@@ -54,11 +54,43 @@ function convert(::Type{Polymake.pm_Matrix{Polymake.pm_Rational}}, matrix::Array
     for i in 1:rows
         for j in 1:cols
             converted = convert(Polymake.pm_Rational,matrix[i,j])
-            Polymake.set_entry(pm_matrix, i, j, converted )
+            Polymake.set_entry(pm_matrix, i-1, j-1, converted )
         end
     end
     return pm_matrix
 end
+
+function convert(::Type{Polymake.pm_Vector{Polymake.pm_Integer}}, matrix::Array{S,1}) where S <:Integer
+    (dim,) = size(matrix)
+    pm_matrix = Polymake.pm_Vector{Polymake.pm_Integer}(dim)
+    for i in 1:dim
+        converted = convert(Polymake.pm_Integer,matrix[i])
+        Polymake.set_entry(pm_matrix, i-1, converted )
+    end
+    return pm_matrix
+end
+
+function convert(::Type{Polymake.pm_Vector{Polymake.pm_Rational}}, matrix::Array{Rational{S},1}) where S <:Integer
+    (dim,) = size(matrix)
+    pm_matrix = Polymake.pm_Vector{Polymake.pm_Rational}(dim)
+    for i in 1:dim
+        converted = convert(Polymake.pm_Rational,matrix[i])
+        Polymake.set_entry(pm_matrix, i-1, converted )
+    end
+    return pm_matrix
+end
+
+convert_to_pm(x::T) where T <:Integer = Base.convert(Polymake.pm_Integer,x)
+
+convert_to_pm(x::Rational{T}) where T <:Integer = Base.convert(Polymake.pm_Rational,x)
+
+convert_to_pm(x::Array{T,1}) where T <:Integer = Base.convert(Polymake.pm_Vector{Polymake.pm_Integer},x)
+
+convert_to_pm(x::Array{Rational{T},1}) where T <:Integer = Base.convert(Polymake.pm_Vector{Polymake.pm_Rational},x)
+
+convert_to_pm(x::Array{T,2}) where T <:Integer = Base.convert(Polymake.pm_Matrix{Polymake.pm_Integer},x)
+
+convert_to_pm(x::Array{Rational{T},2}) where T <:Integer = Base.convert(Polymake.pm_Matrix{Polymake.pm_Rational},x)
 
 function convert_matrix_rational(pmmatrix::Polymake.pm_perl_PropertyValue)
     return convert_matrix_rational(Polymake.to_matrix_rational(pmmatrix))

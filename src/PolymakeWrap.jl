@@ -13,6 +13,11 @@ function __init__()
     Polymake.application("polytope")
 end
 
+const SmallObject = Union{Polymake.pm_Integer,
+                          Polymake.pm_Rational,
+                          Polymake.pm_Matrix,
+                          Polymake.pm_Vector}
+
 include("functions.jl")
 include("convert.jl")
 
