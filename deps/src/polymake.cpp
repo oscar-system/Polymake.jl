@@ -154,15 +154,13 @@ JULIA_CPP_MODULE_BEGIN(registry)
                                                 });
 
   polymake.add_type<pm::Integer>("pm_Integer")
-    .constructor<int>()
-    .constructor<long>()
-    .constructor<long long>();
+    .constructor<int32_t>()
+    .constructor<int64_t>();
   polymake.method("new_pm_Integer",new_integer_from_bigint);
 
   polymake.add_type<pm::Rational>("pm_Rational")
-    .constructor<int, int>()
-    .constructor<long, long>()
-    .constructor<long long, long long>()
+    .constructor<int32_t, int32_t>()
+    .constructor<int64_t, int64_t>()
     .template constructor<pm::Integer, pm::Integer>()
     .method("numerator",[](pm::Rational r){ return pm::Integer(numerator(r)); })
     .method("denominator",[](pm::Rational r){ return pm::Integer(denominator(r)); });
