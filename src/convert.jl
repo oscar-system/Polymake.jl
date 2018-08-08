@@ -164,4 +164,4 @@ function convert_vector_integer(vector::Polymake.pm_Vector{Polymake.pm_Integer})
 end
 
 convert(::Type{Array{BigInt,1}},vector::Polymake.pm_perl_PropertyValue) = convert_vector_integer(vector)
-convert(::Type{Array{BigInt,1}},vector::Polymake.pm_Vector{Polymake.pm_Rational}) = convert_vector_integer(vector)
+convert(::Type{Array{BigInt,1}},vector::Polymake.pm_Vector{Polymake.pm_Integer}) = convert_vector_integer(vector)
