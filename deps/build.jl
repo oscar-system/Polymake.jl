@@ -4,7 +4,7 @@ using CxxWrap
 
 if ! haskey(ENV, "POLYMAKE_CONFIG")
     const oldwdir = pwd()
-    const pkgdir = Pkg.dir("Polymake")
+    const pkgdir = Pkg.dir("PolymakeWrap")
     const nemodir = Pkg.dir("Nemo")
 
     wdir = "$pkgdir/deps"
