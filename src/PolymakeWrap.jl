@@ -34,6 +34,7 @@ const SmallObject = Union{Polymake.pm_Integer,
                           Polymake.pm_Rational,
                           Polymake.pm_Matrix,
                           Polymake.pm_Vector,
+                          Polymake.pm_Set
                           }
 
 include("functions.jl")
