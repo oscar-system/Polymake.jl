@@ -45,6 +45,8 @@ function typename_func(typename::String)
         return Polymake.to_matrix_int
     elseif typename == "pm::Matrix<pm::Rational>"
         return Polymake.to_matrix_rational
+    elseif typename == "undefined"
+        return x -> nothing
     end
     return identity
 end

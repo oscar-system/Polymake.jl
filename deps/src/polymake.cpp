@@ -6,14 +6,22 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wlogical-op-parentheses"
 #pragma clang diagnostic ignored "-Wshift-op-parentheses"
+
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
 #include <polymake/Vector.h>
 #include <polymake/IncidenceMatrix.h>
 #include <polymake/Rational.h>
+#include <polymake/QuadraticExtension.h>
 
 #include <polymake/perl/Value.h>
 #include <polymake/perl/calls.h>
+
+#include <polymake/perl/macros.h>
+#include <polymake/perl/wrappers.h>
+
+// #include "/home/sebastian/Software/polymake_devel_git/apps/polytope/include/cube.h"
+
 #pragma clang diagnostic pop
 
 using namespace polymake;
@@ -24,7 +32,13 @@ class PropertyValueHelper : public pm::perl::PropertyValue {
    public:
       PropertyValueHelper(const pm::perl::PropertyValue& pv) : pm::perl::PropertyValue(pv) {};
 
+      bool check_defined() const noexcept{
+         return this->is_defined();
+      }
       std::string get_typename() {
+         if(!this->is_defined()){
+             return "undefined";
+         }
          switch (this->classify_number()) {
 
          // primitives
@@ -139,11 +153,19 @@ std::string (*show_vec_rational)(pm::Vector<pm::Rational>  obj) = &show_small_ob
 std::string (*show_mat_integer)(pm::Matrix<pm::Integer>  obj) = &show_small_object<pm::Matrix<pm::Integer> >;
 std::string (*show_mat_rational)(pm::Matrix<pm::Rational>  obj) = &show_small_object<pm::Matrix<pm::Rational> >;
 
+template<typename T>
+pm::perl::Value to_value(T obj){
+    pm::perl::Value val;
+    val << obj;
+    return val;
+}
 
 JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& polymake = registry.create_module("Polymake");
 
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
+  polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
+  polymake.add_type<pm::perl::Value>("pm_perl_Value");
 
   polymake.add_type<pm::perl::Object>("pm_perl_Object")
     .constructor<const std::string&>()
@@ -215,6 +237,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("to_matrix_rational",to_matrix_rational);
   polymake.method("to_matrix_int",to_matrix_integer);
   polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){ PropertyValueHelper ph(p); return ph.get_typename(); });
+  polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).check_defined();});
 
   polymake.method("show_small_obj",show_integer);
   polymake.method("show_small_obj",show_rational);
@@ -222,6 +245,17 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("show_small_obj",show_vec_rational);
   polymake.method("show_small_obj",show_mat_integer);
   polymake.method("show_small_obj",show_mat_rational);
+
+  polymake.method("to_value",to_value<int>);
+  polymake.method("to_value",to_value<pm::Integer>);
+  polymake.method("to_value",to_value<pm::Rational>);
+  polymake.method("to_value",to_value<pm::Vector<pm::Integer> >);
+  polymake.method("to_value",to_value<pm::Vector<pm::Rational> >);
+  polymake.method("to_value",to_value<pm::Matrix<pm::Integer> >);
+  polymake.method("to_value",to_value<pm::Matrix<pm::Rational> >);
+  polymake.method("to_value",to_value<pm::perl::OptionSet>);
+
+//   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2, pm::perl::Value a3, pm::perl::OptionSet opt){ return polymake::polytope::cube<pm::QuadraticExtension<pm::Rational> >(a1,a2,a3,opt); });
 
 
 JULIA_CPP_MODULE_END
