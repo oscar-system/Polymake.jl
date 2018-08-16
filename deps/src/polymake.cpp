@@ -24,6 +24,14 @@
 
 #pragma clang diagnostic pop
 
+namespace pm{
+   template <typename PointedT, typename CppT>
+   struct iterator_cross_const_helper<jlcxx::array_iterator_base<PointedT, CppT>,true>{
+      typedef jlcxx::array_iterator_base<std::remove_const_t<PointedT>, std::remove_const_t<CppT>> iterator;
+      typedef jlcxx::array_iterator_base<std::add_const_t<PointedT>, std::add_const_t<CppT>> const_iterator;
+   };
+}
+
 using namespace polymake;
 
 namespace {
