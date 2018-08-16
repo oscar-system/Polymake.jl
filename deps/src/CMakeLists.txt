@@ -6,7 +6,9 @@ find_package(JlCxx REQUIRED)
 
 include_directories(${JlCxx_DIR}/../../../include/)
 include_directories(${JuliaIncludeDir})
-include_directories(${polymake_includes})
+set(MY_LIST ${polymake_includes})
+separate_arguments(MY_LIST)
+include_directories(${MY_LIST})
 
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++14 ${polymake_cflags}" )
 SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -L${JULIA_LIB_DIR} -Wl,-rpath,${JULIA_LIB_DIR} ${polymake_ldflags}"$ )

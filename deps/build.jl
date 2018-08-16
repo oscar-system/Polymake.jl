@@ -44,7 +44,7 @@ end
 pm_includes = chomp(readstring(`$(ENV["POLYMAKE_CONFIG"]) --includes`))
 pm_includes = map(i->i[3:end], map(String,split(pm_includes)))
 push!(pm_includes,pm_includes[1]*"/../share/polymake")
-pm_includes=join(pm_includes)
+pm_includes=join(pm_includes," ")
 
 pm_cflags = chomp(readstring(`$(ENV["POLYMAKE_CONFIG"]) --cflags`))
 pm_ldflags = chomp(readstring(`$(ENV["POLYMAKE_CONFIG"]) --ldflags`))
