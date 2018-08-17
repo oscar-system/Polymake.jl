@@ -16,6 +16,10 @@ function convert(::Type{Polymake.pm_Integer},int::T) where T <: Union{Int128,Int
     return Polymake.pm_Integer(int)
 end
 
+function convert(::Type{Polymake.pm_Set}, A::Vector{T}) where T<:Signed
+    return Polymake.new_set_int64(A)
+end
+
 function convert(::Type{Rational{BigInt}},rat::Polymake.pm_Rational)
     num = Polymake.numerator(rat)
     denom = Polymake.denominator(rat)

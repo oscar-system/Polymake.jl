@@ -13,22 +13,29 @@ function __init__()
     Polymake.application("polytope")
 end
 
+for T in [
+    :pm_Integer,
+    :pm_Rational,
+    :pm_Matrix,
+    :pm_Vector,
+    :pm_Set,
+    :exists,
+    :new_pm_Integer,
+    :numerator,
+    :denominator,
+    :application,
+]
+    @eval begin
+        const $T = Polymake.$T
+    end
+end
+
 const SmallObject = Union{Polymake.pm_Integer,
                           Polymake.pm_Rational,
                           Polymake.pm_Matrix,
-                          Polymake.pm_Vector}
-
-const pm_Integer = Polymake.pm_Integer
-const pm_Rational = Polymake.pm_Rational
-const pm_Vector = Polymake.pm_Vector
-const pm_Matrix = Polymake.pm_Matrix
-
-const exists = Polymake.exists
-const new_pm_Integer = Polymake.new_pm_Integer
-const numerator = Polymake.numerator
-const denominator = Polymake.denominator
-
-const application = Polymake.application
+                          Polymake.pm_Vector,
+                          Polymake.pm_Set
+                          }
 
 include("functions.jl")
 include("convert.jl")
