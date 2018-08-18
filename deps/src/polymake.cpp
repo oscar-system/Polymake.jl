@@ -146,10 +146,13 @@ pm::Integer new_integer_from_bigint(jl_value_t* integer){
     return *p;
 }
 
-pm::Set<int64_t> new_set_int64(jlcxx::ArrayRef<int64_t> arr){
-   pm::Set<int64_t> s(arr.begin(), arr.end());
+template<typename T>
+pm::Set<T> set_T(jlcxx::ArrayRef<T> arr){
+   pm::Set<T> s(arr.begin(), arr.end());
    return s;
 }
+pm::Set<int64_t> (*new_set_int64)(jlcxx::ArrayRef<int64_t> arr) = &set_T<int64_t>;
+pm::Set<int32_t> (*new_set_int32)(jlcxx::ArrayRef<int32_t> arr) = &set_T<int32_t>;
 
 template<typename T, typename S>
 pm::Set<T, S> to_set_T(pm::perl::PropertyValue v){
@@ -173,7 +176,8 @@ std::string (*show_vec_integer)(pm::Vector<pm::Integer>  obj) = &show_small_obje
 std::string (*show_vec_rational)(pm::Vector<pm::Rational>  obj) = &show_small_object<pm::Vector<pm::Rational> >;
 std::string (*show_mat_integer)(pm::Matrix<pm::Integer>  obj) = &show_small_object<pm::Matrix<pm::Integer> >;
 std::string (*show_mat_rational)(pm::Matrix<pm::Rational>  obj) = &show_small_object<pm::Matrix<pm::Rational> >;
-std::string (*show_set_int64)(pm::Set<int64_t, pm::operations::cmp>  obj) = &show_small_object<pm::Set<int64_t, pm::operations::cmp> >;
+std::string (*show_set_int64)(pm::Set<int64_t>  obj) = &show_small_object<pm::Set<int64_t> >;
+std::string (*show_set_int32)(pm::Set<int32_t>  obj) = &show_small_object<pm::Set<int32_t> >;
 
 template<typename T>
 pm::perl::Value to_value(T obj){
@@ -242,8 +246,12 @@ JULIA_CPP_MODULE_BEGIN(registry)
         });
     });
 
-  polymake.add_type<pm::Set<int64_t> >("pm_Set");
+
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Set")
+    .apply<pm::Set<int32_t>, pm::Set<int64_t>>([](auto wrapped){
+     });
   polymake.method("new_set_int64", new_set_int64);
+  polymake.method("new_set_int32", new_set_int32);
 
   polymake.method("init", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
@@ -262,6 +270,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("to_matrix_rational",to_matrix_rational);
   polymake.method("to_matrix_int",to_matrix_integer);
   polymake.method("to_set_int64", to_set_int64);
+  polymake.method("to_set_int32", to_set_int32);
 
   polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){ PropertyValueHelper ph(p); return ph.get_typename(); });
   polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).check_defined();});
@@ -273,6 +282,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("show_small_obj",show_mat_integer);
   polymake.method("show_small_obj",show_mat_rational);
   polymake.method("show_small_obj",show_set_int64);
+  polymake.method("show_small_obj",show_set_int32);
 
   polymake.method("to_value",to_value<int>);
   polymake.method("to_value",to_value<pm::Integer>);
@@ -282,6 +292,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("to_value",to_value<pm::Matrix<pm::Integer> >);
   polymake.method("to_value",to_value<pm::Matrix<pm::Rational> >);
   polymake.method("to_value",to_value<pm::Set<int64_t> >);
+  polymake.method("to_value",to_value<pm::Set<int32_t> >);
   polymake.method("to_value",to_value<pm::perl::OptionSet>);
 
 //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2, pm::perl::Value a3, pm::perl::OptionSet opt){ return polymake::polytope::cube<pm::QuadraticExtension<pm::Rational> >(a1,a2,a3,opt); });
