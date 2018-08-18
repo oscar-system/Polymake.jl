@@ -24,6 +24,14 @@ for T in [
     :numerator,
     :denominator,
     :application,
+    :clear,
+    :reset,
+    :resize,
+    :swap,
+    :size,
+    :empty,
+    :contains,
+    :collect,
 ]
     @eval begin
         const $T = Polymake.$T

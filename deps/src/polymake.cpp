@@ -250,6 +250,19 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Set")
     .apply<pm::Set<int32_t>, pm::Set<int64_t>>([](auto wrapped){
+        typedef typename decltype(wrapped)::type Set;
+        wrapped.method("clear",   &Set::clear);
+        wrapped.method("resize",  &Set::resize);
+        wrapped.method("reset",   &Set::reset);
+        wrapped.method("swap",    &Set::swap);
+        wrapped.method("empty",   &Set::empty);
+        wrapped.method("size",    &Set::size);
+
+        wrapped.method("contains",[](Set&S, int64_t i){ return S.contains(i);});
+        wrapped.method("contains",[](Set&S, int32_t i){ return S.contains(i);});
+
+        wrapped.method("collect", [](Set&S, int64_t i){ return S.collect(i);});
+        wrapped.method("collect", [](Set&S, int32_t i){ return S.collect(i);});
      });
   polymake.method("new_set_int64", new_set_int64);
   polymake.method("new_set_int32", new_set_int32);
