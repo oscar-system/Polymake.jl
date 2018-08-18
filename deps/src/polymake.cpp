@@ -154,13 +154,14 @@ pm::Set<T> set_T(jlcxx::ArrayRef<T> arr){
 pm::Set<int64_t> (*new_set_int64)(jlcxx::ArrayRef<int64_t> arr) = &set_T<int64_t>;
 pm::Set<int32_t> (*new_set_int32)(jlcxx::ArrayRef<int32_t> arr) = &set_T<int32_t>;
 
-template<typename T, typename S>
-pm::Set<T, S> to_set_T(pm::perl::PropertyValue v){
-   pm::Set<T, S> s = v;
+template<typename T>
+pm::Set<T> to_set_T(pm::perl::PropertyValue v){
+   pm::Set<T> s = v;
    return s;
 }
 
-pm::Set<int64_t, pm::operations::cmp> (*to_set_int64)(pm::perl::PropertyValue) = &to_set_T<int64_t, pm::operations::cmp>;
+pm::Set<int64_t> (*to_set_int64)(pm::perl::PropertyValue) = &to_set_T<int64_t>;
+pm::Set<int32_t> (*to_set_int32)(pm::perl::PropertyValue) = &to_set_T<int32_t>;
 
 // We can do better templating here
 template<typename T>
