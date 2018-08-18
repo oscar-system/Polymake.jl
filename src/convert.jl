@@ -16,8 +16,12 @@ function convert(::Type{Polymake.pm_Integer},int::T) where T <: Union{Int128,Int
     return Polymake.pm_Integer(int)
 end
 
-function convert(::Type{Polymake.pm_Set}, A::Vector{T}) where T<:Signed
+function convert(::Type{Polymake.pm_Set}, A::Vector{Int64})
     return Polymake.new_set_int64(A)
+end
+
+function convert(::Type{Polymake.pm_Set}, A::Vector{Int32})
+    return Polymake.new_set_int32(A)
 end
 
 function convert(::Type{Rational{BigInt}},rat::Polymake.pm_Rational)
