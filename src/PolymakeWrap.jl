@@ -6,8 +6,6 @@ module Polymake
     wrap_module(pm_dir,Polymake)
 end
 
-import .Polymake
-
 function __init__()
     Polymake.init()
     Polymake.application("polytope")
