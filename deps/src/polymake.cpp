@@ -265,6 +265,10 @@ JULIA_CPP_MODULE_BEGIN(registry)
         wrapped.method("collect", [](Set&S, int32_t i){ return S.collect(i);});
 
         wrapped.method("==", [](Set&S, Set&T){return S == T;});
+        wrapped.method("union!", [](Set&S, Set&T){S += T; return S;});
+        wrapped.method("intersect!", [](Set&S, Set&T){S *= T; return S;});
+        wrapped.method("setdiff!", [](Set&S, Set&T){S -= T; return S;});
+        wrapped.method("symdiff!", [](Set&S, Set&T){S ^= T; return S;});
     })
     // comparison between non-compatibly typed sets is not defined in Polymake
     .method("==", [](pm::Set<int64_t>&S, pm::Set<int32_t>&T){return pm::incl(S, T) == 0;})

@@ -2,7 +2,7 @@ module PolymakeWrap
 
 module Polymake
 
-    import Base: ==
+    import Base: ==, union!, intersect!, setdiff!, symdiff!
 
     using CxxWrap
     pm_dir = Pkg.dir("PolymakeWrap", "deps", "src","libpolymake.so")
