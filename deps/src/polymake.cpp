@@ -263,7 +263,13 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
         wrapped.method("collect", [](Set&S, int64_t i){ return S.collect(i);});
         wrapped.method("collect", [](Set&S, int32_t i){ return S.collect(i);});
-     });
+
+        wrapped.method("==", [](Set&S, Set&T){return S == T;});
+    })
+    // comparison between non-compatibly typed sets is not defined in Polymake
+    .method("==", [](pm::Set<int64_t>&S, pm::Set<int32_t>&T){return pm::incl(S, T) == 0;})
+    .method("==", [](pm::Set<int32_t>&S, pm::Set<int64_t>&T){return pm::incl(S, T) == 0;});
+
   polymake.method("new_set_int64", new_set_int64);
   polymake.method("new_set_int32", new_set_int32);
 

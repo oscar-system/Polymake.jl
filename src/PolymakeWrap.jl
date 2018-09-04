@@ -1,6 +1,9 @@
 module PolymakeWrap
 
 module Polymake
+
+    import Base: ==
+
     using CxxWrap
     pm_dir = Pkg.dir("PolymakeWrap", "deps", "src","libpolymake.so")
     wrap_module(pm_dir,Polymake)
