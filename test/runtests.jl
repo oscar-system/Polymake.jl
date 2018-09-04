@@ -30,6 +30,8 @@ end
         for T in IntTypes, S in IntTypes
             @test pm_Set(T[1]) == pm_Set(S[1,1])
             @test pm_Set(T[2,2,1,1]) == pm_Set(S[1,2,1])
+            A = deepcopy(pm_Set(T[1]))
+            @test A == pm_Set(S[1])
         end
     end
 
@@ -40,10 +42,13 @@ end
 
             PolymakeWrap.swap(a, b)
             @test a == pm_Set(T[5,6])
+            @test b == pm_Set(T[1,2,3])
 
+            a1 = deepcopy(a)
             PolymakeWrap.clear(a)
             @test a == pm_Set{T}()
-            @test b == pm_Set(T[1, 2, 3])
+            @test a1 == pm_Set(T[5,6])
+
 
             @test PolymakeWrap.empty(a)
             @test !PolymakeWrap.empty(b)
