@@ -24,6 +24,26 @@ function convert(::Type{Polymake.pm_Set}, A::Vector{Int32})
     return Polymake.new_set_int32(A)
 end
 
+function convert(::Type{Vector}, set::Polymake.pm_Set{T}) where T<:Integer
+    return convert(Vector{T}, set)
+end
+
+function convert(::Type{Vector{Int32}}, set::Polymake.pm_Set{Int32})
+    A = Vector{Int32}(size(set))
+    Polymake.fill_jlarray_int32_from_set32(A, set)
+    return A
+end
+
+function convert(::Type{Vector{Int64}}, set::Polymake.pm_Set{Int64})
+    A = Vector{Int64}(size(set))
+    Polymake.fill_jlarray_int64_from_set64(A, set)
+    return A
+end
+
+function convert(::Type{Vector{I}}, set::Polymake.pm_Set{J}) where {I,J<:Integer}
+    return I.(convert(Vector{J}, set))
+end
+
 function convert(::Type{Rational{BigInt}},rat::Polymake.pm_Rational)
     num = Polymake.numerator(rat)
     denom = Polymake.denominator(rat)

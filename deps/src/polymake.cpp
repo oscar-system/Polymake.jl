@@ -163,6 +163,17 @@ pm::Set<T> to_set_T(pm::perl::PropertyValue v){
 pm::Set<int64_t> (*to_set_int64)(pm::perl::PropertyValue) = &to_set_T<int64_t>;
 pm::Set<int32_t> (*to_set_int32)(pm::perl::PropertyValue) = &to_set_T<int32_t>;
 
+template<typename T, typename S>
+void fill_jlarray_T_from_S(jlcxx::ArrayRef<T> arr, S itr){
+   int64_t index{0};
+   for(auto i = itr.begin(); i != itr.end(); ++i){
+      arr[index++] = reinterpret_cast<T>(*i);
+   }
+}
+
+void (*fill_jlarray_int32_from_set32)(jlcxx::ArrayRef<int32_t>, pm::Set<int32_t>) = &fill_jlarray_T_from_S<int32_t, pm::Set<int32_t>>;
+void (*fill_jlarray_int64_from_set64)(jlcxx::ArrayRef<int64_t>, pm::Set<int64_t>) = &fill_jlarray_T_from_S<int64_t, pm::Set<int64_t>>;
+
 // We can do better templating here
 template<typename T>
 std::string show_small_object(T obj){
@@ -276,6 +287,8 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   polymake.method("new_set_int64", new_set_int64);
   polymake.method("new_set_int32", new_set_int32);
+  polymake.method("fill_jlarray_int32_from_set32", fill_jlarray_int32_from_set32);
+  polymake.method("fill_jlarray_int64_from_set64", fill_jlarray_int64_from_set64);
 
   polymake.method("init", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);

@@ -7,7 +7,7 @@ end
 
 # write your own tests here
 @testset "pm_Set" begin
-    pm_Set = PolymakeWrap.Polymake.pm_Set
+    pm_Set = PolymakeWrap.pm_Set
     IntTypes = [Int32, Int64]
 
 
@@ -155,7 +155,23 @@ end
             A = deepcopy(A_orig)
 
             @test symdiff!(deepcopy(A), B) == symdiff!(deepcopy(B), A)
+        end
+    end
 
+    @testset "conversions" begin
+        for T in IntTypes, S in IntTypes
+            A = pm_Set(T[1,2,3,1,2,3])
+            B = pm_Set(S[2,3,4])
+
+            @test Vector(A) isa Vector{T}
+            @test Vector(B) isa Vector{S}
+            @test Vector{S}(A) isa Vector{S}
+            @test Vector{T}(B) isa Vector{T}
+
+            @test Vector(A) == [1,2,3]
+            @test Vector(B) == [2,3,4]
+
+            @test Vector{Float64}(A) == [1.0,2.0,3.0]
         end
     end
 end
