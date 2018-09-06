@@ -167,7 +167,7 @@ template<typename T, typename S>
 void fill_jlarray_T_from_S(jlcxx::ArrayRef<T> arr, S itr){
    int64_t index{0};
    for(auto i = itr.begin(); i != itr.end(); ++i){
-      arr[index++] = reinterpret_cast<T>(*i);
+      arr[index++] = static_cast<T>(*i);
    }
 }
 
