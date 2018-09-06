@@ -34,6 +34,11 @@ for T in [
 
     :swap,
     :incl,
+
+    :range,
+    :sequence,
+    :scalar2set,
+
 ]
     @eval begin
         const $T = Polymake.$T

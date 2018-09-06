@@ -305,6 +305,25 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.method("incl",
     [](pm::Set<int64_t> s1, pm::Set<int64_t> s2){ return pm::incl(s1,s2);});
 
+  polymake.method("range", [](int32_t a, int32_t b){
+     return pm::Set<int32_t>{pm::range(a,b)};
+  });
+  polymake.method("range", [](int64_t a, int64_t b){
+     return pm::Set<int64_t>{pm::range(a,b)};
+  });
+
+  polymake.method("sequence",
+    [](int32_t a, int32_t c){ return pm::Set<int32_t>{pm::sequence(a,c)};});
+  polymake.method("sequence",
+    [](int64_t a, int64_t c){ return pm::Set<int64_t>{pm::sequence(a,c)};});
+
+  polymake.method("scalar2set", [](int32_t s){
+    return pm::Set<int32_t>{pm::scalar2set(s)};
+  });
+  polymake.method("scalar2set", [](int64_t s){
+    return pm::Set<int32_t>{pm::scalar2set(s)};
+  });
+
   polymake.method("new_set_int64", new_set_int64);
   polymake.method("new_set_int32", new_set_int32);
   polymake.method("fill_jlarray_int32_from_set32", fill_jlarray_int32_from_set32);

@@ -209,4 +209,12 @@ end
             @test Vector{Float64}(A) == [1.0,2.0,3.0]
         end
     end
+
+    @testset "user_constructors" begin
+        for T in IntTypes
+            @test PolymakeWrap.range(T(-1), T(5)) == pm_Set(collect(-1:5))
+            @test PolymakeWrap.sequence(T(-1), T(5)) == pm_Set(collect(-1:3))
+            @test PolymakeWrap.scalar2set(T(-10)) == pm_Set([-10])
+        end
+    end
 end
