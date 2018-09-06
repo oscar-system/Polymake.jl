@@ -24,22 +24,36 @@ end
         end
     end
 
-    @testset "relations" begin
+    @testset "equality" begin
         for T in IntTypes, S in IntTypes
             @test pm_Set{S}() == pm_Set{T}()
-            @test pm_Set{S}() < pm_Set{T}()
-
             @test pm_Set(T[1]) == pm_Set(S[1,1])
-            @test pm_Set(T[1]) != pm_Set(S[2])
-
             @test pm_Set(T[2,2,1,1]) == pm_Set(S[1,2,1])
+            @test pm_Set(T[1]) != pm_Set(S[2])
 
             A = deepcopy(pm_Set(T[1]))
             @test A == pm_Set(S[1])
+        end
+    end
 
-            @test pm_Set{T}() < pm_Set(S[1])
-            @test pm_Set(S[1]) < pm_Set(T[1,2])
-            @test !(pm_Set(S[1,2]) < pm_Set(T[1]))
+    @testset "conversions" begin
+        for T in IntTypes
+            A = pm_Set(T[1,2,3,1,2,3])
+
+            @test Vector(A) isa Vector{T}
+            @test Vector(A) == [1,2,3]
+            @test Vector{Float64}(A) == [1.0,2.0,3.0]
+
+            @test Set(A) isa Set{T}
+            @test Set(A) == Set([1,2,3])
+            @test Set{Float64}(A) == Set([1.0,2.0,3.0])
+
+            for S in IntTypes
+                @test Vector{S}(A) isa Vector{S}
+                @test Set{S}(A) isa Set{S}
+            end
+        end
+    end
 
             @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1])) == 0
             @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1,2])) == -1
@@ -192,23 +206,6 @@ end
 
                 end
             end
-        end
-    end
-
-    @testset "conversions" begin
-        for T in IntTypes, S in IntTypes
-            A = pm_Set(T[1,2,3,1,2,3])
-            B = pm_Set(S[2,3,4])
-
-            @test Vector(A) isa Vector{T}
-            @test Vector(B) isa Vector{S}
-            @test Vector{S}(A) isa Vector{S}
-            @test Vector{T}(B) isa Vector{T}
-
-            @test Vector(A) == [1,2,3]
-            @test Vector(B) == [2,3,4]
-
-            @test Vector{Float64}(A) == [1.0,2.0,3.0]
         end
     end
 

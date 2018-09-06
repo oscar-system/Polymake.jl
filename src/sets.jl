@@ -1,3 +1,4 @@
+import Base: Set,
 
 ### convert TO polymake object
 
@@ -11,6 +12,8 @@ for (T, f) in [
         end
     end
 end
+
+convert(::Type{Polymake.pm_Set}, s::Set) = pm_Set(collect(s))
 
 ### convert FROM polymake object
 
@@ -34,3 +37,14 @@ for (T, f) in [
         end
     end
 end
+
+Set(s::Polymake.pm_Set{T}) where T = Set{T}(Vector(s))
+Set{T}(s::Polymake.pm_Set{S}) where {T, S} = Set{T}(Vector{S}(s))
+
+function convert(::Type{Set{T}}, set::Polymake.pm_Set{S}) where {T, S<:Integer}
+    return Set{T}(Vector(set))
+end
+
+convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set{T}) where T = s
+convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set) where T = s
+
