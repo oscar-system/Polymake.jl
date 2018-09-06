@@ -31,8 +31,7 @@ for T in [
     :numerator,
     :denominator,
     :application,
-    :reset,
-    :resize,
+
     :swap,
 ]
     @eval begin
