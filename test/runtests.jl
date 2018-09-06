@@ -12,13 +12,15 @@ end
 
 
     @testset "constructors" begin
-        @test pm_Set{Int32}() isa PolymakeWrap.Polymake.pm_Set
-        @test pm_Set{Int64}() isa PolymakeWrap.Polymake.pm_SetAllocated
+        @test pm_Set{Int32}() isa pm_Set
+        @test pm_Set{Int64}() isa pm_Set
         for T in IntTypes
-            @test pm_Set(T[1]) isa PolymakeWrap.Polymake.pm_Set
-            @test pm_Set(T[1,1]) isa PolymakeWrap.Polymake.pm_Set
-            @test pm_Set(T[2,1]) isa PolymakeWrap.Polymake.pm_Set
-            @test pm_Set(T[-1,0,-1]) isa PolymakeWrap.Polymake.pm_Set
+            @test pm_Set(T[1]) isa pm_Set{T}
+            @test pm_Set(T[1,1]) isa pm_Set{T}
+            @test pm_Set(T[-1,1]) isa pm_Set{T}
+        end
+        for T in IntTypes, S in IntTypes
+            @test pm_Set{T}(pm_Set(S[1,2])) isa pm_Set{T}
         end
     end
 

@@ -262,6 +262,8 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Set")
     .apply<pm::Set<int32_t>, pm::Set<int64_t>>([](auto wrapped){
         typedef typename decltype(wrapped)::type Set;
+        wrapped.template constructor<pm::Set<int32_t>>();
+        wrapped.template constructor<pm::Set<int64_t>>();
         wrapped.method("swap",    &Set::swap);
 
         wrapped.method("empty!",   &Set::clear);
