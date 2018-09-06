@@ -166,7 +166,7 @@ pm::Set<int32_t> (*to_set_int32)(pm::perl::PropertyValue) = &to_set_T<int32_t>;
 template<typename T, typename S>
 void fill_jlarray_T_from_S(jlcxx::ArrayRef<T> arr, S itr){
    int64_t index{0};
-   for(auto i = itr.begin(); i != itr.end(); ++i){
+   for(auto i = pm::entire(itr); !i.at_end(); ++i){
       arr[index++] = static_cast<T>(*i);
    }
 }
