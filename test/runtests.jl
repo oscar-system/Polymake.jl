@@ -55,10 +55,27 @@ end
         end
     end
 
+
+    @testset "relations" begin
+
+        for T in IntTypes, S in IntTypes
             @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1])) == 0
             @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1,2])) == -1
             @test PolymakeWrap.incl(pm_Set(S[1,2]), pm_Set(T[1])) == 1
             @test PolymakeWrap.incl(pm_Set(S[1,2]), pm_Set(T[1,3])) == 2
+
+            # <, <=, == are based on incl; just test that they agree with the julia versions
+            @test (pm_Set{S}() < pm_Set{T}()) == (Set{S}() < Set{T}())
+            @test (pm_Set{T}() < pm_Set(S[1])) == (Set{T}() < Set(S[1]))
+            @test (pm_Set(S[1]) < pm_Set(T[1,2])) == (Set(S[1]) < Set(T[1,2]))
+            @test (pm_Set(S[1,2]) < pm_Set(T[1])) == (Set(S[1,2]) < Set(T[1]))
+            @test (pm_Set(S[1,2]) < pm_Set(T[1,3]))==(Set(S[1,2]) < Set(T[1,3]))
+
+            @test (pm_Set{S}() <= pm_Set{T}()) == (Set{S}() <= Set{T}())
+            @test (pm_Set{T}() <= pm_Set(S[1])) == (Set{T}() <= Set(S[1]))
+            @test (pm_Set(S[1]) <= pm_Set(T[1,2])) == (Set(S[1]) <= Set(T[1,2]))
+            @test (pm_Set(S[1,2]) <= pm_Set(T[1])) == (Set(S[1,2]) <= Set(T[1]))
+            @test (pm_Set(S[1,2])<=pm_Set(T[1,3]))==(Set(S[1,2])<=Set(T[1,3]))
         end
     end
 

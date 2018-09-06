@@ -48,3 +48,11 @@ end
 convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set{T}) where T = s
 convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set) where T = s
 
+### julia functions for sets
+
+import Base: <, <=, ==
+
+<(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == -1
+<=(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) <= 0
+# comparison between not-equally typed sets is not defined in Polymake
+==(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == 0

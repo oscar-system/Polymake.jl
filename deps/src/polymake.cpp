@@ -271,7 +271,6 @@ JULIA_CPP_MODULE_BEGIN(registry)
         wrapped.method("length",   &Set::size);
 
         wrapped.method("==", [](Set&S, Set&T){return S == T;});
-        wrapped.method("<", [](Set&S, Set&T){return pm::incl(S, T) <= 0;});
         wrapped.method("in", [](int64_t i, Set&S){return S.contains(i);});
         wrapped.method("in", [](int32_t i, Set&S){return S.contains(i);});
 
@@ -287,16 +286,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
         wrapped.method("intersect", [](Set&S, Set&T){return Set{S*T};});
         wrapped.method("setdiff", [](Set&S, Set&T){return Set{S-T};});
         wrapped.method("symdiff", [](Set&S, Set&T){return Set{S^T};});
-    })
-  // comparison between not-equally typed sets is not defined in Polymake
-  polymake.method("==",
-    [](pm::Set<int64_t>&S, pm::Set<int32_t>&T){return pm::incl(S, T) == 0;});
-  polymake.method("==",
-    [](pm::Set<int32_t>&S, pm::Set<int64_t>&T){return pm::incl(S, T) == 0;});
-  polymake.method("<",
-    [](pm::Set<int32_t> s1, pm::Set<int64_t> s2){return pm::incl(s1,s2)<=0;});
-  polymake.method("<",
-    [](pm::Set<int64_t> s1, pm::Set<int32_t> s2){return pm::incl(s1,s2)<=0;});
+
 
   polymake.method("incl",
     [](pm::Set<int32_t> s1, pm::Set<int32_t> s2){ return pm::incl(s1,s2);});

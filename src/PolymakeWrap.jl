@@ -2,7 +2,7 @@ module PolymakeWrap
 
 module Polymake
 
-    import Base: ==, <,
+    import Base: ==,
         empty!,
         in, intersect, intersect!, isempty,
         length,
