@@ -262,24 +262,26 @@ JULIA_CPP_MODULE_BEGIN(registry)
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Set")
     .apply<pm::Set<int32_t>, pm::Set<int64_t>>([](auto wrapped){
         typedef typename decltype(wrapped)::type Set;
-        wrapped.method("clear",   &Set::clear);
         wrapped.method("resize",  &Set::resize);
         wrapped.method("reset",   &Set::reset);
         wrapped.method("swap",    &Set::swap);
-        wrapped.method("empty",   &Set::empty);
-        wrapped.method("size",    &Set::size);
 
-        wrapped.method("contains",[](Set&S, int64_t i){ return S.contains(i);});
-        wrapped.method("contains",[](Set&S, int32_t i){ return S.contains(i);});
-
-        wrapped.method("collect", [](Set&S, int64_t i){ return S.collect(i);});
-        wrapped.method("collect", [](Set&S, int32_t i){ return S.collect(i);});
+        wrapped.method("empty!",   &Set::clear);
+        wrapped.method("isempty",  &Set::empty);
+        wrapped.method("length",   &Set::size);
 
         wrapped.method("==", [](Set&S, Set&T){return S == T;});
-        wrapped.method("union!", [](Set&S, Set&T){S += T; return S;});
-        wrapped.method("intersect!", [](Set&S, Set&T){S *= T; return S;});
-        wrapped.method("setdiff!", [](Set&S, Set&T){S -= T; return S;});
-        wrapped.method("symdiff!", [](Set&S, Set&T){S ^= T; return S;});
+        wrapped.method("in", [](int64_t i, Set&S){return S.contains(i);});
+        wrapped.method("in", [](int32_t i, Set&S){return S.contains(i);});
+
+        wrapped.method("push!", [](Set&S, int64_t i){S+=i; return S;});
+        wrapped.method("push!", [](Set&S, int32_t i){S+=i; return S;});
+
+        wrapped.method("union!", [](Set&S, Set&T){return S += T;});
+        wrapped.method("intersect!", [](Set&S, Set&T){return S *= T;});
+        wrapped.method("setdiff!", [](Set&S, Set&T){return S -= T;});
+        wrapped.method("symdiff!", [](Set&S, Set&T){return S ^= T;});
+
     })
     // comparison between non-compatibly typed sets is not defined in Polymake
     .method("==", [](pm::Set<int64_t>&S, pm::Set<int32_t>&T){return pm::incl(S, T) == 0;})

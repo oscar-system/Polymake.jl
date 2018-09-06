@@ -2,7 +2,13 @@ module PolymakeWrap
 
 module Polymake
 
-    import Base: size, ==, union!, intersect!, setdiff!, symdiff!
+    import Base: ==,
+        empty!,
+        in, intersect!, isempty,
+        length,
+        push!,
+        setdiff!, symdiff!,
+        union!
 
     using CxxWrap
     pm_dir = Pkg.dir("PolymakeWrap", "deps", "src","libpolymake.so")
@@ -25,14 +31,9 @@ for T in [
     :numerator,
     :denominator,
     :application,
-    :clear,
     :reset,
     :resize,
     :swap,
-    :size,
-    :empty,
-    :contains,
-    :collect,
 ]
     @eval begin
         const $T = Polymake.$T

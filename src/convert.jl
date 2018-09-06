@@ -29,13 +29,13 @@ function convert(::Type{Vector}, set::Polymake.pm_Set{T}) where T<:Integer
 end
 
 function convert(::Type{Vector{Int32}}, set::Polymake.pm_Set{Int32})
-    A = Vector{Int32}(size(set))
+    A = Vector{Int32}(length(set))
     Polymake.fill_jlarray_int32_from_set32(A, set)
     return A
 end
 
 function convert(::Type{Vector{Int64}}, set::Polymake.pm_Set{Int64})
-    A = Vector{Int64}(size(set))
+    A = Vector{Int64}(length(set))
     Polymake.fill_jlarray_int64_from_set64(A, set)
     return A
 end
