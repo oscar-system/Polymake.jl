@@ -4,11 +4,11 @@ module Polymake
 
     import Base: ==,
         empty!,
-        in, intersect!, isempty,
+        in, intersect, intersect!, isempty,
         length,
         push!,
-        setdiff!, symdiff!,
-        union!
+        setdiff, setdiff!, symdiff, symdiff!,
+        union, union!
 
     using CxxWrap
     pm_dir = Pkg.dir("PolymakeWrap", "deps", "src","libpolymake.so")

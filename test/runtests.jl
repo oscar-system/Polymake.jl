@@ -104,67 +104,82 @@ end
     @testset "operations" begin
         for T in IntTypes
 
-            # union
-            A = pm_Set(T[1,2,2,2,3])
-            B = pm_Set(T[2,3,3,3,4])
+            A_orig, B_orig = pm_Set(T[1,2,3]), pm_Set(T[2,3,4])
 
-            A_orig, B_orig = deepcopy(A), deepcopy(B)
+            @testset "union $T" begin
+                let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
+                    @test union(A,A) == A
+                    @test union(A,B) == pm_Set([1,2,3,4])
+                    @test A == A_orig
 
-            union!(A,A)
-            @test A == pm_Set([1,2,3])
-            union!(B,B)
-            @test B == pm_Set([2,3,4])
+                    # union!
+                    union!(A,A)
+                    @test A == pm_Set([1,2,3])
+                    union!(B,B)
+                    @test B == pm_Set([2,3,4])
 
-            union!(A, B)
-            @test A == pm_Set([1,2,3,4])
-            @test B == pm_Set([2,3,4])
-            union!(B, A)
-            @test B == pm_Set([1,2,3,4])
-            @test A == B
+                    union!(A, B)
+                    @test A == pm_Set([1,2,3,4])
+                    @test B == pm_Set([2,3,4])
+                    union!(B, A)
+                    @test B == pm_Set([1,2,3,4])
+                    @test A == B
+                end
+            end
 
-            # intersection
-            A, B = deepcopy(A_orig), deepcopy(B_orig)
+            @testset "intersect $T" begin
+                let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
+                    @test A == intersect(A,A)
+                    @test intersect(A, B) == pm_Set([2,3])
+                    @test intersect(B, A) == pm_Set([2,3])
+                    @test A == A_orig && B == B_orig
 
-            @test A == intersect!(deepcopy(A),A)
+                    # intersect!
+                    intersect!(A, B)
+                    @test A == pm_Set([2,3])
+                    @test B == pm_Set([2,3,4])
+                    intersect!(B, A)
+                    @test B == pm_Set([2,3])
+                    @test A == B
+                end
+            end
 
-            intersect!(A, B)
-            @test A == pm_Set([2,3])
-            @test B == pm_Set([2,3,4])
-            intersect!(B, A)
-            @test B == pm_Set([2,3])
-            @test A == B
+            @testset "setdiff $T" begin
+                let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
+                    @test isempty(setdiff(A,A))
+                    @test A == A_orig
+                    @test setdiff(A, B) != setdiff(B, A)
+                    @test A == A_orig
 
-            # setdiff
-            A, B = deepcopy(A_orig), deepcopy(B_orig)
+                    setdiff!(A, B)
+                    @test A == pm_Set([1])
+                    @test B == pm_Set([2,3,4])
 
-            @test PolymakeWrap.empty(setdiff!(deepcopy(A),A))
+                    setdiff!(B, A)
+                    @test B == pm_Set([2,3,4])
 
-            setdiff!(A, B)
-            @test A == pm_Set([1])
-            @test B == pm_Set([2,3,4])
+                    A = deepcopy(A_orig)
+                    setdiff!(B,A)
+                    @test B == pm_Set([4])
+                    @test A == pm_Set([1,2,3])
+                end
+            end
 
-            setdiff!(B, A)
-            @test B == pm_Set([2,3,4])
+            @testset "symdiff $T" begin
+                let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
+                    @test isempty(symdiff(A,A))
+                    @test !isempty(symdiff(A,B))
+                    @test symdiff(A,B) == symdiff(B,A)
 
-            A = deepcopy(A_orig)
-            setdiff!(B,A)
-            @test B == pm_Set([4])
-            @test A == pm_Set([1,2,3])
+                    symdiff!(A, B)
+                    @test A == pm_Set([1,4])
+                    @test B == pm_Set([2,3,4])
 
-            # symdiff
-            A = pm_Set(T[1,2,2,2,3])
-            B = pm_Set(T[2,3,3,3,4])
+                    symdiff!(A, B)
+                    @test A == A_orig
 
-            @test PolymakeWrap.empty(symdiff!(deepcopy(A),A))
-
-            symdiff!(A, B)
-            @test A == pm_Set([1,4])
-            @test B == pm_Set([2,3,4])
-
-            symdiff!(A, B)
-            A = deepcopy(A_orig)
-
-            @test symdiff!(deepcopy(A), B) == symdiff!(deepcopy(B), A)
+                end
+            end
         end
     end
 
