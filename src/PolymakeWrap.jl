@@ -54,5 +54,6 @@ const SmallObject = Union{Polymake.pm_Integer,
 
 include("functions.jl")
 include("convert.jl")
+include("sets.jl")
 
 end
