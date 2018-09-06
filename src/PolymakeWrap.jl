@@ -2,7 +2,7 @@ module PolymakeWrap
 
 module Polymake
 
-    import Base: ==,
+    import Base: ==, <,
         empty!,
         in, intersect, intersect!, isempty,
         length,
@@ -33,6 +33,7 @@ for T in [
     :application,
 
     :swap,
+    :incl,
 ]
     @eval begin
         const $T = Polymake.$T

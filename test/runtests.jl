@@ -22,17 +22,27 @@ end
         end
     end
 
-    @testset "equality" begin
-        @test pm_Set{Int32}() == pm_Set{Int32}()
-        @test pm_Set{Int64}() == pm_Set{Int64}()
-
-        @test pm_Set{Int32}() == pm_Set{Int64}()
-
+    @testset "relations" begin
         for T in IntTypes, S in IntTypes
+            @test pm_Set{S}() == pm_Set{T}()
+            @test pm_Set{S}() < pm_Set{T}()
+
             @test pm_Set(T[1]) == pm_Set(S[1,1])
+            @test pm_Set(T[1]) != pm_Set(S[2])
+
             @test pm_Set(T[2,2,1,1]) == pm_Set(S[1,2,1])
+
             A = deepcopy(pm_Set(T[1]))
             @test A == pm_Set(S[1])
+
+            @test pm_Set{T}() < pm_Set(S[1])
+            @test pm_Set(S[1]) < pm_Set(T[1,2])
+            @test !(pm_Set(S[1,2]) < pm_Set(T[1]))
+
+            @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1])) == 0
+            @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1,2])) == -1
+            @test PolymakeWrap.incl(pm_Set(S[1,2]), pm_Set(T[1])) == 1
+            @test PolymakeWrap.incl(pm_Set(S[1,2]), pm_Set(T[1,3])) == 2
         end
     end
 
