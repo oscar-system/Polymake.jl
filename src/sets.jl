@@ -56,3 +56,14 @@ import Base: <, <=, ==
 <=(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) <= 0
 # comparison between not-equally typed sets is not defined in Polymake
 ==(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == 0
+
+function ==(S::Polymake.pm_Set, jlS::Set)
+    length(S) == length(jlS) || return false
+    for s in jlS
+        s in S || return false
+    end
+    return true
+end
+
+==(T, S::Polymake.pm_Set) = S == T
+

@@ -266,10 +266,10 @@ JULIA_CPP_MODULE_BEGIN(registry)
         wrapped.template constructor<pm::Set<int64_t>>();
         wrapped.method("swap",    &Set::swap);
 
-        wrapped.method("empty!",   &Set::clear);
         wrapped.method("isempty",  &Set::empty);
         wrapped.method("length",   &Set::size);
 
+        wrapped.method("empty!", [](Set&S){S.clear(); return S;});
         wrapped.method("==", [](Set&S, Set&T){return S == T;});
         wrapped.method("in", [](int64_t i, Set&S){return S.contains(i);});
         wrapped.method("in", [](int32_t i, Set&S){return S.contains(i);});

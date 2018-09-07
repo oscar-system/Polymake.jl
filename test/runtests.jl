@@ -81,66 +81,72 @@ end
 
     @testset "basic functionality" begin
         for T in IntTypes
-            a = pm_Set(T[1,2,3,1])
+            A = pm_Set(T[1,2,3,1])
+            B = pm_Set(T[5,6,6])
+
+            A1 = deepcopy(A)
+            PolymakeWrap.swap(A, B)
+
+            @test A == pm_Set([5,6])
+            @test B == pm_Set([1,2,3])
+            @test A1 == B
+
+            A = pm_Set(T[1,2,3,1])
+            jlA = Set(T[1,2,3,1])
+
+            B = pm_Set(T[5,6,6])
+            jlB = Set(T[5,6,6])
+
+            A1 = deepcopy(A)
+            jlA1 = deepcopy(jlA)
+            @test empty!(A) == empty!(jlA)
+
+            @test A == jlA
+            @test isempty(A) == isempty(jlA)
+            @test isempty(B) == isempty(jlB)
+            @test isempty(A1) == isempty(jlA1)
+
+            @test length(A) == length(jlA)
+            @test length(A1) == length(jlA1)
+            @test length(B) == length(jlB)
+
+            A = pm_Set(T[1,2,3,1,2,3])
             b = pm_Set(T[5,6,6])
-
-            a1 = deepcopy(a)
-            @test a1 == pm_Set([1,2,3])
-
-            PolymakeWrap.swap(a, b)
-            @test a == pm_Set(T[5,6])
-            @test b == pm_Set(T[1,2,3])
-            @test a1 == pm_Set(T[1,2,3])
-
-            a1 = deepcopy(a)
-            empty!(a)
-            @test a == pm_Set{T}()
-            @test isempty(a)
-            @test !isempty(b)
-
-            @test length(a) == 0
-            @test length(a1) == 2
-            @test length(b) == 3
-
-            a = pm_Set(T[1,2,3,1,2,3])
-            b = pm_Set(T[5,6,6])
-            @test length(a) == 3
-            @test length(b) == 2
+            @test length(A) == length(Set([1,2,3,1,2,3]))
+            @test length(B) == length(Set([5,6,6]))
         end
     end
 
     @testset "elements operations" begin
         for T in IntTypes, S in IntTypes
-            a = pm_Set(T[3,2,1,3,2,1])
-            b = pm_Set(T[5,6,6])
+            A = pm_Set(T[3,2,1,3,2,1])
+            B = pm_Set(T[5,6,6])
 
-            @test S(2) in a
-            @test !(S(5) in a)
+            @test S(2) in A
+            @test !(S(5) in A)
 
-            @test !(S(3) in b)
-            @test S(5) in b
+            @test !(S(3) in B)
+            @test S(5) in B
 
-            a = pm_Set(T[1,2,3,1,2,3])
-            b = pm_Set(T[5,6,6])
-            @test push!(a, S(3)) == pm_Set([1,2,3])
-            push!(a, S(-1))
-            @test -1 in a
-            @test push!(a, S(-1)) == pm_Set([1,2,3, -1])
+            A = pm_Set(T[1,2,3,1,2,3])
+            jlA = Set(T[1,2,3,1,2,3])
+            B = pm_Set(T[5,6,6])
+            jlB = Set(T[5,6,6])
 
-            @test length(a) == 4
-            @test a == pm_Set([1,2,3,-1])
+            @test push!(A, S(3)) == push!(jlA, S(3))
+            @test push!(A, S(-1)) == push!(jlA, S(-1))
+            @test (-1 in A) == (-1 in jlA)
+            @test push!(A, S(-1)) == push!(jlA, S(-1))
 
-            @test push!(b, S(6)) == pm_Set([5,6])
-            push!(b, S(-100))
-            @test -100 in b
-            @test push!(b, S(-100)) == pm_Set([5,6, -100])
-            @test length(b) == 3
-            @test b == pm_Set([-100,5,6])
+            @test length(A) == length(jlA)
+            @test A == jlA
 
             A = pm_Set(T[0])
+            jlA = Set(A)
             B = pm_Set(S[0,1])
-            push!(A, S(1))
-            @test A == B
+            jlB = Set(B)
+            @test Set(push!(A, S(1))) == push!(jlA, S(1))
+            @test (A == B) == (jlA == jlB)
         end
     end
 
@@ -151,76 +157,84 @@ end
 
             @testset "union $T" begin
                 let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
-                    @test union(A,A) == A
-                    @test union(A,B) == pm_Set([1,2,3,4])
-                    @test A == A_orig
+                    jlA, jlB = Set(A), Set(B)
+                    @test union(A,A) == union(jlA,jlA)
+                    @test union(A,B) == union(jlA,jlB) == Set([1,2,3,4])
+                    @test A == A_orig == jlA
 
                     # union!
-                    union!(A,A)
-                    @test A == pm_Set([1,2,3])
-                    union!(B,B)
-                    @test B == pm_Set([2,3,4])
+                    @test union!(A,A) == union!(jlA,jlA)
+                    @test A == jlA
 
-                    union!(A, B)
-                    @test A == pm_Set([1,2,3,4])
-                    @test B == pm_Set([2,3,4])
-                    union!(B, A)
-                    @test B == pm_Set([1,2,3,4])
-                    @test A == B
+                    @test union!(A,B) == union!(jlA, jlB)
+                    @test A == jlA
+                    @test B == jlB
+                    @test union!(B,A) == union!(jlB, jlA)
+                    @test B == jlB
+                    @test (A == B) == (jlA == jlB)
                 end
             end
 
             @testset "intersect $T" begin
                 let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
-                    @test A == intersect(A,A)
-                    @test intersect(A, B) == pm_Set([2,3])
-                    @test intersect(B, A) == pm_Set([2,3])
-                    @test A == A_orig && B == B_orig
+                    jlA, jlB = Set(A), Set(B)
+
+                    @test A == intersect(A,A) == intersect(jlA, jlA)
+                    @test intersect(A, B) == intersect(jlA, jlB)
+                    @test A == jlA
+                    @test B == jlB
 
                     # intersect!
-                    intersect!(A, B)
-                    @test A == pm_Set([2,3])
-                    @test B == pm_Set([2,3,4])
-                    intersect!(B, A)
-                    @test B == pm_Set([2,3])
-                    @test A == B
+                    @test_broken intersect!(A, B) == intersect!(jlA, jlB)
+                    @test A == Set([2,3])# == jlA
+                    @test B == jlB
+                    @test_broken intersect!(B, A) == intersect!(jlB, jlA)
+                    @test B == Set([2,3])# == jlB
+                    @test_broken (A == B) == (jlA == jlB)
                 end
             end
 
             @testset "setdiff $T" begin
                 let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
-                    @test isempty(setdiff(A,A))
-                    @test A == A_orig
-                    @test setdiff(A, B) != setdiff(B, A)
-                    @test A == A_orig
+                    jlA, jlB = Set(A), Set(B)
+                    @test isempty(setdiff(A,A)) == isempty(setdiff(jlA, jlA))
+                    @test A == jlA
+                    @test setdiff(A, B) == setdiff(jlA, jlB))
+                    @test setdiff(B, A) == setdiff(jlB, jlA))
+                    @test A == jlA
+                    @test B == jlB
 
-                    setdiff!(A, B)
-                    @test A == pm_Set([1])
-                    @test B == pm_Set([2,3,4])
+                    @test setdiff!(A, B) == setdiff!(jlA, jlB)
+                    @test A == jlA
+                    @test B == jlB
 
-                    setdiff!(B, A)
-                    @test B == pm_Set([2,3,4])
+                    @test setdiff!(B, A) == setdiff!(jlB,jlA)
+                    @test B == jlB
 
                     A = deepcopy(A_orig)
-                    setdiff!(B,A)
-                    @test B == pm_Set([4])
-                    @test A == pm_Set([1,2,3])
+                    jlA = Set(A)
+                    @test setdiff!(B,A) == setdiff!(jlB, jlA)
+                    @test B == jlB
+                    @test A == jlA
                 end
             end
 
             @testset "symdiff $T" begin
                 let A = pm_Set(T[1,2,3]), B = pm_Set(T[2,3,4])
-                    @test isempty(symdiff(A,A))
-                    @test !isempty(symdiff(A,B))
-                    @test symdiff(A,B) == symdiff(B,A)
+                    jlA, jlB = Set(A), Set(B)
+                    @test isempty(symdiff(A,A)) == isempty(symdiff(jlA,jlA))
+                    @test isempty(symdiff(A,B)) == isempty(symdiff(jlA,jlB))
+                    @test symdiff(A,B) == symdiff(jlA, jlB)
+                    @test symdiff(B,A) == symdiff(jlA, jlB)
 
-                    symdiff!(A, B)
-                    @test A == pm_Set([1,4])
-                    @test B == pm_Set([2,3,4])
+                    jlA1 = deepcopy(jlA)
 
-                    symdiff!(A, B)
-                    @test A == A_orig
+                    @test_broken symdiff!(A, B) == symdiff!(jlA, jlB)
+                    @test Set(A) == Set([1,4])# == jlA
+                    @test Set(B) == Set([2,3,4])# == jlB
 
+                    @test_broken symdiff!(A, B) == symdiff!(jlA, jlB)
+                    @test A == jlA1
                 end
             end
         end
