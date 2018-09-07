@@ -123,18 +123,10 @@ end
     @testset "elements operations" begin
         for T in IntTypes, S in IntTypes
             A = pm_Set(T[3,2,1,3,2,1])
-            B = pm_Set(T[5,6,6])
+            jlA = Set(T[1,2,3,1,2,3])
 
             @test S(2) in A
             @test !(S(5) in A)
-
-            @test !(S(3) in B)
-            @test S(5) in B
-
-            A = pm_Set(T[1,2,3,1,2,3])
-            jlA = Set(T[1,2,3,1,2,3])
-            B = pm_Set(T[5,6,6])
-            jlB = Set(T[5,6,6])
 
             @test push!(A, S(3)) == push!(jlA, S(3))
             @test push!(A, S(-1)) == push!(jlA, S(-1))
@@ -179,17 +171,17 @@ end
                     jlA, jlB = Set(A), Set(B)
                     @test union(A,A) == union(jlA,jlA)
                     @test union(A,B) == union(jlA,jlB) == Set([1,2,3,4])
-                    @test A == A_orig == jlA
+                    @test A == jlA && B == jlB
 
                     # union!
                     @test union!(A,A) == union!(jlA,jlA)
                     @test A == jlA
 
                     @test union!(A,B) == union!(jlA, jlB)
-                    @test A == jlA
-                    @test B == jlB
+                    @test A == jlA && B == jlB
                     @test union!(B,A) == union!(jlB, jlA)
                     @test B == jlB
+
                     @test (A == B) == (jlA == jlB)
                 end
             end
@@ -200,8 +192,7 @@ end
 
                     @test A == intersect(A,A) == intersect(jlA, jlA)
                     @test intersect(A, B) == intersect(jlA, jlB)
-                    @test A == jlA
-                    @test B == jlB
+                    @test A == jlA && B == jlB
 
                     # intersect!
                     @test_broken intersect!(A, B) == intersect!(jlA, jlB)
@@ -218,23 +209,22 @@ end
                     jlA, jlB = Set(A), Set(B)
                     @test isempty(setdiff(A,A)) == isempty(setdiff(jlA, jlA))
                     @test A == jlA
-                    @test setdiff(A, B) == setdiff(jlA, jlB))
-                    @test setdiff(B, A) == setdiff(jlB, jlA))
-                    @test A == jlA
-                    @test B == jlB
+                    @test setdiff(A, B) == setdiff(jlA, jlB)
+                    @test setdiff(B, A) == setdiff(jlB, jlA)
+                    @test A == jlA && B == jlB
 
                     @test setdiff!(A, B) == setdiff!(jlA, jlB)
-                    @test A == jlA
-                    @test B == jlB
+                    @test A == jlA && B == jlB
 
                     @test setdiff!(B, A) == setdiff!(jlB,jlA)
-                    @test B == jlB
+                    @test A == jlA && B == jlB
 
                     A = deepcopy(A_orig)
                     jlA = Set(A)
                     @test setdiff!(B,A) == setdiff!(jlB, jlA)
-                    @test B == jlB
-                    @test A == jlA
+                    @test A == jlA && B == jlB
+
+                    @test (A == B) == (jlA == jlB)
                 end
             end
 
@@ -253,7 +243,9 @@ end
                     @test Set(B) == Set([2,3,4])# == jlB
 
                     @test_broken symdiff!(A, B) == symdiff!(jlA, jlB)
-                    @test A == jlA1
+
+                    @test A == jlA && B == jlB
+                    @test (A == B) == (jlA == jlB)
                 end
             end
         end
