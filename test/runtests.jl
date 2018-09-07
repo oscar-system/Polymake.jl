@@ -144,12 +144,28 @@ end
             @test length(A) == length(jlA)
             @test A == jlA
 
-            A = pm_Set(T[0])
-            jlA = Set(A)
-            B = pm_Set(S[0,1])
-            jlB = Set(B)
-            @test Set(push!(A, S(1))) == push!(jlA, S(1))
-            @test (A == B) == (jlA == jlB)
+            A = pm_Set(T[1,2,3,1,2,3])
+            jlA = Set(T[1,2,3,1,2,3])
+
+            @test delete!(A, S(1)) == delete!(jlA, S(1))
+            @test delete!(A, S(1)) == delete!(jlA, S(1))
+
+            @test A == jlA
+
+            @test pop!(A, S(2)) == pop!(jlA, S(2))
+            @test pop!(A, S(2)) == pop!(jlA, S(2))
+
+            @test A == jlA
+            @test isempty(A) == isempty(jlA)
+            @test pop!(A, S(3)) == pop!(jlA, S(3))
+            @test isempty(A) == isempty(jlA)
+
+            @test push!(A, S(4)) == push!(jlA, S(4))
+            @test isempty(A) == isempty(jlA)
+
+            @test pop!(A, S(3), 2) == pop!(jlA, S(3), 2)
+            @test pop!(A, S(3), 2) != pop!(jlA, S(4), 2)
+            @test A != jlA
         end
     end
 

@@ -1,6 +1,7 @@
 import Base: Set
 
 import PolymakeWrap.Polymake.pm_Set
+
 ### convert TO polymake object
 
 for (T, f) in [
@@ -54,7 +55,7 @@ convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set) where T = s
 
 ### julia functions for sets
 
-import Base: <, <=, ==
+import Base: <, <=, ==, pop!
 
 <(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == -1
 <=(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) <= 0
@@ -71,3 +72,14 @@ end
 
 ==(T, S::Polymake.pm_Set) = S == T
 
+function pop!(s::Polymake.pm_Set{T}, x) where T
+    if x in s
+        delete!(s, x)
+        return x
+    else
+        throw(KeyError(x))
+    end
+end
+
+pop!(s::Polymake.pm_Set{T}, x, default) where T = (x in s ? pop!(s, x) : default)
+pop!(s::Polymake.pm_Set{T}) where T = (x = first(s); delete!(x, s); x)

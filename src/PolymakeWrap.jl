@@ -3,6 +3,7 @@ module PolymakeWrap
 module Polymake
 
     import Base: ==,
+        delete!,
         empty!,
         in, intersect, intersect!, isempty,
         length,

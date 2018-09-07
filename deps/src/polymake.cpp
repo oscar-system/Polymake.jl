@@ -277,6 +277,9 @@ JULIA_CPP_MODULE_BEGIN(registry)
         wrapped.method("push!", [](Set&S, int64_t i){S+=i; return S;});
         wrapped.method("push!", [](Set&S, int32_t i){S+=i; return S;});
 
+        wrapped.method("delete!", [](Set&S, int64_t i){S-=i; return S;});
+        wrapped.method("delete!", [](Set&S, int32_t i){S-=i; return S;});
+
         wrapped.method("union!", [](Set&S, Set&T){return S += T;});
         wrapped.method("intersect!", [](Set&S, Set&T){return S *= T;});
         wrapped.method("setdiff!", [](Set&S, Set&T){return S -= T;});
