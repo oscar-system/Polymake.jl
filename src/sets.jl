@@ -1,5 +1,6 @@
-import Base: Set,
+import Base: Set
 
+import PolymakeWrap.Polymake.pm_Set
 ### convert TO polymake object
 
 for (T, f) in [
@@ -12,6 +13,9 @@ for (T, f) in [
         end
     end
 end
+
+pm_Set{T}(v::Vector) where T <: Signed = pm_Set(Vector{T}(v))
+pm_Set(::Type{T}) where T = pm_Set{T}()
 
 convert(::Type{Polymake.pm_Set}, s::Set) = pm_Set(collect(s))
 
