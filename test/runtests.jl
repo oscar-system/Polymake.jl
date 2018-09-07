@@ -18,11 +18,11 @@ end
             @test pm_Set(T[1]) isa pm_Set{T}
             @test pm_Set(T[1,1]) isa pm_Set{T}
             @test pm_Set(T[-1,1]) isa pm_Set{T}
-            @test pm_Set(Set{T}[-1,1]) isa pm_Set{T}
+            @test pm_Set(Set{T}([-1,1])) isa pm_Set{T}
         end
         for T in IntTypes, S in IntTypes
             @test pm_Set{T}(S[-1,1]) isa pm_Set{T}
-            @test pm_Set{T}(Set{S}[-1,1]) isa pm_Set{T}
+            @test pm_Set{T}(Set(S[-1,1])) isa pm_Set{T}
             @test pm_Set{T}(pm_Set(S[1,2])) isa pm_Set{T}
         end
     end

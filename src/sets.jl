@@ -15,10 +15,12 @@ for (T, f) in [
     end
 end
 
-pm_Set{T}(v::Vector) where T <: Signed = pm_Set(Vector{T}(v))
-pm_Set(::Type{T}) where T = pm_Set{T}()
+convert(::Type{Polymake.pm_Set}, s::Set{S}) where S = pm_Set(collect(s))
 
-convert(::Type{Polymake.pm_Set}, s::Set) = pm_Set(collect(s))
+pm_Set{T}(v::Vector) where T = pm_Set(Vector{T}(v))
+pm_Set{T}(s::Set) where T = pm_Set{T}(collect(s))
+
+pm_Set(::Type{T}) where T = pm_Set{T}()
 
 ### convert FROM polymake object
 
