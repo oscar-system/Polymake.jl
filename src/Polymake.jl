@@ -1,6 +1,6 @@
-module PolymakeWrap
-
 module Polymake
+
+module CxxPM
     using CxxWrap
 
     @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.so"),
@@ -11,11 +11,11 @@ module Polymake
     end
 end
 
-import .Polymake
+import .CxxPM
 
 function __init__()
-    Polymake.init()
-    Polymake.application("polytope")
+    CxxPM.init()
+    CxxPM.application("polytope")
 end
 
 for T in [
@@ -31,15 +31,15 @@ for T in [
     :application,
 ]
     @eval begin
-        const $T = Polymake.$T
+        const $T = CxxPM.$T
     end
 end
 
-const SmallObject = Union{Polymake.pm_Integer,
-                          Polymake.pm_Rational,
-                          Polymake.pm_Matrix,
-                          Polymake.pm_Vector,
-                          Polymake.pm_Set
+const SmallObject = Union{CxxPM.pm_Integer,
+                          CxxPM.pm_Rational,
+                          CxxPM.pm_Matrix,
+                          CxxPM.pm_Vector,
+                          CxxPM.pm_Set
                           }
 
 include("functions.jl")

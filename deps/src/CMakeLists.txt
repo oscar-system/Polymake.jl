@@ -1,4 +1,4 @@
-project(PolymakeWrap)
+project(Polymake)
 
 cmake_minimum_required(VERSION 3.01)
 

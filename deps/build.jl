@@ -14,13 +14,13 @@ end
 
 if pm_config === nothing
     # TODO: Install polymake, for now just throw an error
-    error("Set `POLYMAKE_CONFIG` ENV variable. And rebuild PolymakeWrap by calling `import Pkg; Pkg.build(\"PolymakeWrap\")`.")
+    error("Set `POLYMAKE_CONFIG` ENV variable. And rebuild Polymake by calling `import Pkg; Pkg.build(\"Polymake\")`.")
 
     # This is the old Julia 0.6 script and doesnt work anymore.
     #
     # build polymake, using Nemo's GMP and MPFR
     # const oldwdir = pwd()
-    # const pkgdir = Pkg.dir("PolymakeWrap")
+    # const pkgdir = Pkg.dir("Polymake")
     # const nemodir = Pkg.dir("Nemo")
     #
     # wdir = "$pkgdir/deps"
