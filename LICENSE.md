@@ -1,4 +1,4 @@
-The PolymakeWrap.jl package is licensed under the Lesser GNU Public License, Version 2.1+:
+The Polymake.jl package is licensed under the Lesser GNU Public License, Version 2.1+:
 
 > Copyright (c) 2018: Sebastian Gutsche.
 > This library is free software; you can redistribute it and/or

@@ -182,9 +182,8 @@ pm::perl::Value to_value(T obj){
     return val;
 }
 
-JULIA_CPP_MODULE_BEGIN(registry)
-  jlcxx::Module& polymake = registry.create_module("Polymake");
-
+JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
+{
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
   polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
   polymake.add_type<pm::perl::Value>("pm_perl_Value");
@@ -286,5 +285,4 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
 //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2, pm::perl::Value a3, pm::perl::OptionSet opt){ return polymake::polytope::cube<pm::QuadraticExtension<pm::Rational> >(a1,a2,a3,opt); });
 
-
-JULIA_CPP_MODULE_END
+}
