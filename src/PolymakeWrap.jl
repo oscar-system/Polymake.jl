@@ -2,8 +2,13 @@ module PolymakeWrap
 
 module Polymake
     using CxxWrap
-    pm_dir = Pkg.dir("PolymakeWrap", "deps", "src","libpolymake.so")
-    wrap_module(pm_dir,Polymake)
+
+    @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.so"),
+        :define_module_polymake)
+
+    function __init__()
+        @initcxx
+    end
 end
 
 import .Polymake
