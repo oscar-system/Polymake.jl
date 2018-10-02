@@ -198,6 +198,16 @@ pm::perl::Value to_value(T obj){
     return val;
 }
 
+template<typename T>
+struct WrappedSetIterator
+{
+  typename pm::Set<T>::const_iterator iterator;
+  using value_type = T;
+  WrappedSetIterator<T>(pm::Set<T>& S){
+    iterator=pm::entire(S);
+  }
+};
+
 JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& polymake = registry.create_module("Polymake");
 
@@ -290,6 +300,27 @@ JULIA_CPP_MODULE_BEGIN(registry)
         wrapped.method("setdiff", [](Set&S, Set&T){return Set{S-T};});
         wrapped.method("symdiff", [](Set&S, Set&T){return Set{S^T};});
 
+
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("SetIterator")
+    .apply<
+      WrappedSetIterator<int32_t>,
+      WrappedSetIterator<int64_t>
+    >([](auto wrapped){
+      typedef typename decltype(wrapped)::type WrappedSetIter;
+      typedef typename decltype(wrapped)::type::value_type elemType;
+      wrapped.method("begin", [](pm::Set<elemType>& S){
+        auto result = WrappedSetIterator<elemType>{S};
+        return result;
+      });
+      wrapped.method("get_element", [](WrappedSetIter& state){
+        auto elt = *(state.iterator);
+        state.iterator++;
+        return elt;
+      });
+      wrapped.method("isdone", [](pm::Set<elemType>& S, WrappedSetIter& state){
+        return S.end() == state.iterator;
+      });
+    });
 
   polymake.method("incl",
     [](pm::Set<int32_t> s1, pm::Set<int32_t> s2){ return pm::incl(s1,s2);});
