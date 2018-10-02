@@ -7,3 +7,4 @@ deps/src/Makefile
 deps/src/cmake_install.cmake
 deps/src/libpolymake.so
 local
+Manifest.toml
