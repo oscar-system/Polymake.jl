@@ -5,7 +5,7 @@ import Pkg
 # test whether polymake config is available in path
 pm_config = nothing
 try
-    global pm_config = chomp(read(`which polymake-config`, String))
+    global pm_config = chomp(read(`command -v polymake-config`, String))
 catch
     if haskey(ENV, "POLYMAKE_CONFIG")
         global pm_config = ENV["POLYMAKE_CONFIG"]
