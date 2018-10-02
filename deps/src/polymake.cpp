@@ -208,9 +208,9 @@ struct WrappedSetIterator
   }
 };
 
-JULIA_CPP_MODULE_BEGIN(registry)
-  jlcxx::Module& polymake = registry.create_module("Polymake");
 
+JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
+{
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
   polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
   polymake.add_type<pm::perl::Value>("pm_perl_Value");
@@ -219,8 +219,8 @@ JULIA_CPP_MODULE_BEGIN(registry)
     .constructor<const std::string&>()
     .method("give",[](pm::perl::Object p, const std::string& s){ return p.give(s); })
     .method("exists",[](pm::perl::Object p, const std::string& s){ return p.exists(s); })
-    .method("properties",[](pm::perl::Object p){ std::string x = p.call_method("properties"); 
-                                                 return x; 
+    .method("properties",[](pm::perl::Object p){ std::string x = p.call_method("properties");
+                                                 return x;
                                                 });
 
   polymake.add_type<pm::Integer>("pm_Integer")
@@ -402,5 +402,4 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
 //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2, pm::perl::Value a3, pm::perl::OptionSet opt){ return polymake::polytope::cube<pm::QuadraticExtension<pm::Rational> >(a1,a2,a3,opt); });
 
-
-JULIA_CPP_MODULE_END
+}
