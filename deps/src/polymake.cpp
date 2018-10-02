@@ -268,16 +268,15 @@ JULIA_CPP_MODULE_BEGIN(registry)
         });
     });
 
-
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Set")
     .apply<pm::Set<int32_t>, pm::Set<int64_t>>([](auto wrapped){
         typedef typename decltype(wrapped)::type Set;
         wrapped.template constructor<pm::Set<int32_t>>();
         wrapped.template constructor<pm::Set<int64_t>>();
-        wrapped.method("swap",    &Set::swap);
+        wrapped.method("swap", &Set::swap);
 
-        wrapped.method("isempty",  &Set::empty);
-        wrapped.method("length",   &Set::size);
+        wrapped.method("isempty", &Set::empty);
+        wrapped.method("length", &Set::size);
 
         wrapped.method("empty!", [](Set&S){S.clear(); return S;});
         wrapped.method("==", [](Set&S, Set&T){return S == T;});
@@ -300,6 +299,10 @@ JULIA_CPP_MODULE_BEGIN(registry)
         wrapped.method("setdiff", [](Set&S, Set&T){return Set{S-T};});
         wrapped.method("symdiff", [](Set&S, Set&T){return Set{S^T};});
 
+        wrapped.method("getindex", [](Set&S, Set&T){
+          return Set{pm::select(pm::wary(S), T)};
+        });
+    });
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("SetIterator")
     .apply<

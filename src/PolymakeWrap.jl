@@ -5,6 +5,7 @@ module Polymake
     import Base: ==,
         delete!,
         empty!,
+        getindex,
         in, intersect, intersect!, isempty,
         length,
         push!,
