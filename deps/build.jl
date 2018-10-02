@@ -73,7 +73,7 @@ julia_include = joinpath(Sys.BINDIR, "..", "include")
 julia_lib = joinpath(Sys.BINDIR, "..", "lib")
 julia_exec = joinpath(Sys.BINDIR , "julia")
 
-cd("src")
+cd(joinpath(@__DIR__, "src"))
 
 run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_INSTALL_LIBDIR=lib .`)
 run(`make`)
