@@ -1,12 +1,21 @@
 module PolymakeWrap
 
 module Polymake
+
+    import Base: ==,
+        delete!,
+        empty!,
+        getindex,
+        in, intersect, intersect!, isempty,
+        length,
+        push!,
+        setdiff, setdiff!, symdiff, symdiff!,
+        union, union!
+
     using CxxWrap
     pm_dir = Pkg.dir("PolymakeWrap", "deps", "src","libpolymake.so")
     wrap_module(pm_dir,Polymake)
 end
-
-import .Polymake
 
 function __init__()
     Polymake.init()
@@ -24,6 +33,14 @@ for T in [
     :numerator,
     :denominator,
     :application,
+
+    :swap,
+    :incl,
+
+    :range,
+    :sequence,
+    :scalar2set,
+
 ]
     @eval begin
         const $T = Polymake.$T
@@ -39,5 +56,6 @@ const SmallObject = Union{Polymake.pm_Integer,
 
 include("functions.jl")
 include("convert.jl")
+include("sets.jl")
 
 end
