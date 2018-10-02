@@ -57,10 +57,11 @@ convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set) where T = s
 
 ### julia functions for sets
 
-import Base: <, <=, ==, pop!
 
-<(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == -1
-<=(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) <= 0
+import Base.promote_rule
+promote_rule(::Type{Set{S}}, ::Type{Polymake.pm_Set{T}}) where {S,T} = Set{promote_type(S,T)}
+
+import Base: ==, hash, copy, similar, promote_rule
 # comparison between not-equally typed sets is not defined in Polymake
 ==(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == 0
 
@@ -74,6 +75,44 @@ end
 
 ==(T, S::Polymake.pm_Set) = S == T
 
+hash(S::Polymake.pm_Set, h::UInt) = hash(Vector(S), h)
+
+copy(s::Polymake.pm_Set) = deepcopy(s)
+
+similar(S::Polymake.pm_Set{T}) where T = pm_Set(Vector{T}(length(S)))
+
+# Iteration protocol
+
+import Base: start, next, done, eltype
+
+Base.start(S::pm_Set) = Polymake.begin(S)
+
+function Base.next(S::pm_Set, state)
+    elt = Polymake.get_element(state)
+    return elt, state
+end
+
+Base.done(S::pm_Set, state) = Polymake.isdone(S, state)
+
+eltype(::Type{Polymake.pm_Set{T}}) where T = T
+
+# length : Defined on the C++ side
+
+# Utility functions:
+# isempty : Defined on the C++ side
+# in : Defined on the C++ side
+
+
+# Set operations:
+
+import Base: pop!, union, intersect, unique, allunique
+
+# push! : Defined on the C++ side
+# delete! : Defined on the C++ side
+# empty! : Defined on the C++ side
+
+#in doubt: sizehint!, rehash!
+
 function pop!(s::Polymake.pm_Set{T}, x) where T
     if x in s
         delete!(s, x)
@@ -85,3 +124,16 @@ end
 
 pop!(s::Polymake.pm_Set{T}, x, default) where T = (x in s ? pop!(s, x) : default)
 pop!(s::Polymake.pm_Set{T}) where T = (x = first(s); delete!(x, s); x)
+
+union(s::Polymake.pm_Set) = copy(s)
+intersect(s::Polymake.pm_Set) = copy(s)
+
+unique(s::Polymake.pm_Set) = copy(s)
+allunique(s::Polymake.pm_Set) = true
+
+# Ordering:
+
+import Base: <, <=
+
+<(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == -1
+<=(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) <= 0

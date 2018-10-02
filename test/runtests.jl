@@ -36,6 +36,8 @@ end
 
             A = deepcopy(pm_Set(T[1]))
             @test A == pm_Set(S[1])
+
+            @test Set([pm_Set(T[1,2,3]), pm_Set(T[1,2,3])]) == Set([Set([1,2,3]), Set([1,2,3])])
         end
     end
 
@@ -145,7 +147,8 @@ end
             @test A == jlA
 
             @test pop!(A, S(2)) == pop!(jlA, S(2))
-            @test pop!(A, S(2)) == pop!(jlA, S(2))
+            @test_throws KeyError pop!(A, S(2))
+            @test_throws KeyError pop!(jlA, S(2))
 
             @test A == jlA
             @test isempty(A) == isempty(jlA)
@@ -200,6 +203,7 @@ end
                     @test B == jlB
                     @test_broken intersect!(B, A) == intersect!(jlB, jlA)
                     @test B == Set([2,3])# == jlB
+
                     @test_broken (A == B) == (jlA == jlB)
                 end
             end
