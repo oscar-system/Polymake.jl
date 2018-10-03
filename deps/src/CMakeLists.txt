@@ -13,7 +13,7 @@ include_directories(${MY_LIST})
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++14 ${polymake_cflags}" )
 SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -L${JULIA_LIB_DIR} -Wl,-rpath,${JULIA_LIB_DIR} ${polymake_ldflags}" )
 
-add_library(polymake SHARED polymake.cpp)
+add_library(polymake SHARED polymake.cpp polymake_functions.cpp)
 target_link_libraries(polymake JlCxx::cxxwrap_julia  -ljulia "${polymake_libs}")
 
 install(TARGETS
