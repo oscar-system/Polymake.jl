@@ -214,6 +214,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
   polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
   polymake.add_type<pm::perl::Value>("pm_perl_Value");
+  polymake.add_type<pm::operations::cmp>("pm_operations_cmp");
 
   polymake.add_type<pm::perl::Object>("pm_perl_Object")
     .constructor<const std::string&>()
