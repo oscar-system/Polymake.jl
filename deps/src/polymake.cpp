@@ -6,13 +6,19 @@
 
 #include "polymake_sets.h"
 
+#include "polymake_caller.h"
+
 Polymake_Data data;
 
 JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 {
+
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_PropertyValue);
   polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_OptionSet);
   polymake.add_type<pm::perl::Value>("pm_perl_Value");
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_Value);
 
 
   polymake.add_type<pm::perl::Object>("pm_perl_Object")
@@ -22,10 +28,12 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     .method("properties",[](pm::perl::Object p){ std::string x = p.call_method("properties");
                                                  return x;
                                                 });
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_Object);
 
   polymake.add_type<pm::Integer>("pm_Integer")
     .constructor<int32_t>()
     .constructor<int64_t>();
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
   polymake.method("new_pm_Integer",new_integer_from_bigint);
 
   polymake.add_type<pm::Rational>("pm_Rational")
@@ -34,6 +42,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     .template constructor<pm::Integer, pm::Integer>()
     .method("numerator",[](pm::Rational r){ return pm::Integer(numerator(r)); })
     .method("denominator",[](pm::Rational r){ return pm::Integer(denominator(r)); });
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix")
     .apply<pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>>([](auto wrapped){
@@ -51,6 +60,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
             p.take(s) << T;
         });
     });
+  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Integer);
+  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector")
     .apply<pm::Vector<pm::Integer>, pm::Vector<pm::Rational>>([](auto wrapped){
@@ -67,6 +78,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
             p.take(s) << T;
         });
     });
+  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Integer);
+  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Rational);
 
   polymake.method("init", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
@@ -106,6 +119,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("to_value",to_value<pm::perl::OptionSet>);
 
   polymake_module_add_set(polymake);
+  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE_UNPREFIXED(pm_Set,Int64);
+  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE_UNPREFIXED(pm_Set,Int32);
+
+  polymake_module_add_caller(polymake);
 
 //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2, pm::perl::Value a3, pm::perl::OptionSet opt){ return polymake::polytope::cube<pm::QuadraticExtension<pm::Rational> >(a1,a2,a3,opt); });
 

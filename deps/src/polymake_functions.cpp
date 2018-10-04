@@ -1,5 +1,6 @@
 #include "polymake_includes.h"
 #include "polymake_tools.h"
+#include "polymake_caller.h"
 #include "polymake_functions.h"
 
 void initialize_polymake(){

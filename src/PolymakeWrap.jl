@@ -2,6 +2,8 @@ module PolymakeWrap
 
 module Polymake
 
+    const foo = 1
+
     import Base: ==,
         delete!,
         empty!,
@@ -16,15 +18,18 @@ module Polymake
 
     @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.so"),
         :define_module_polymake)
-
+    
     function __init__()
         @initcxx
     end
 end
 
+import .Polymake
+
 function __init__()
     Polymake.init()
     Polymake.application("polytope")
+    Polymake.set_julia_types(Polymake)
 end
 
 for T in [
