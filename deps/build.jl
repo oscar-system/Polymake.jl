@@ -67,13 +67,14 @@ pm_cflags = chomp(read(`$pm_config --cflags`, String))
 pm_ldflags = chomp(read(`$pm_config --ldflags`, String))
 pm_libraries = chomp(read(`$pm_config --libs`, String))
 
-jlcxx_cmake_dir = joinpath(dirname(pathof(CxxWrap)), "..",  "deps", "usr", "lib", "cmake", "JlCxx")
+jlcxx_cmake_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
 
 julia_include = joinpath(Sys.BINDIR, "..", "include")
 julia_lib = joinpath(Sys.BINDIR, "..", "lib")
 julia_exec = joinpath(Sys.BINDIR , "julia")
+julia_lib_so = joinpath(Sys.BINDIR, "..", "lib", "libjulia.so")
 
 cd(joinpath(@__DIR__, "src"))
 
-run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_INSTALL_LIBDIR=lib .`)
+run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_INSTALL_LIBDIR=lib -DJulia_LIBRARY=$julia_lib_so .`)
 run(`make`)
