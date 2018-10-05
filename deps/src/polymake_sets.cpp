@@ -56,9 +56,12 @@ void polymake_module_add_set(jlcxx::Module& polymake){
         auto result = WrappedSetIterator<elemType>{S};
         return result;
       });
+
+      wrapped.method("increment", [](WrappedSetIter& state){
+         state.iterator++;
+      });
       wrapped.method("get_element", [](WrappedSetIter& state){
         auto elt = *(state.iterator);
-        state.iterator++;
         return elt;
       });
       wrapped.method("isdone", [](pm::Set<elemType>& S, WrappedSetIter& state){
