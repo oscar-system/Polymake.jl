@@ -12,7 +12,7 @@ void set_julia_types(jl_value_t* module)
 {
     for(auto i = type_map_translator->begin();i!=type_map_translator->end();i++){
         // jl_value_t* current_type = jl_get_global( reinterpret_cast<jl_module_t*>(module), jl_symbol(i->first.c_str()) );
-        jl_value_t* current_type = jl_eval_string( ("Polymake." + i->first ).c_str)
+        jl_value_t* current_type = jl_eval_string( ("Polymake." + i->first ).c_str());
         if (jl_exception_occurred()) {
             jl_call2(jl_get_function(jl_base_module, "showerror"),jl_stderr_obj(),jl_exception_occurred());
             jl_printf(jl_stderr_stream(), "\n");
