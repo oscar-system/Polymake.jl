@@ -37,7 +37,9 @@ end
             A = deepcopy(pm_Set(T[1]))
             @test A == pm_Set(S[1])
 
-            @test Set([pm_Set(T[1,2,3]), pm_Set(T[1,2,3])]) == Set([Set([1,2,3]), Set([1,2,3])])
+            @test length(Set([pm_Set(T[1,2,3]), pm_Set(T[1,2,3])])) == 1
+            A = Set([pm_Set(T[1,2,3]), pm_Set(T[1,2,3])])
+            @test first(A) == Set([1,2,3])
         end
     end
 
@@ -198,13 +200,13 @@ end
                     @test A == jlA && B == jlB
 
                     # intersect!
-                    @test_broken intersect!(A, B) == intersect!(jlA, jlB)
+                    @test intersect!(A, B) == intersect!(jlA, jlB)
                     @test A == Set([2,3])# == jlA
                     @test B == jlB
-                    @test_broken intersect!(B, A) == intersect!(jlB, jlA)
+                    @test intersect!(B, A) == intersect!(jlB, jlA)
                     @test B == Set([2,3])# == jlB
 
-                    @test_broken (A == B) == (jlA == jlB)
+                    @test (A == B) == (jlA == jlB)
                 end
             end
 
@@ -242,11 +244,11 @@ end
 
                     jlA1 = deepcopy(jlA)
 
-                    @test_broken symdiff!(A, B) == symdiff!(jlA, jlB)
+                    @test symdiff!(A, B) == symdiff!(jlA, jlB)
                     @test Set(A) == Set([1,4])# == jlA
                     @test Set(B) == Set([2,3,4])# == jlB
 
-                    @test_broken symdiff!(A, B) == symdiff!(jlA, jlB)
+                    @test symdiff!(A, B) == symdiff!(jlA, jlB)
 
                     @test A == jlA && B == jlB
                     @test (A == B) == (jlA == jlB)

@@ -9,13 +9,11 @@ for (T, f) in [
     (Int64, :new_set_int64),
     ]
     @eval begin
-        function convert(::Type{Polymake.pm_Set}, v::Vector{$T})
-            return Polymake.$f(v)
-        end
+        Polymake.pm_Set(v::Vector{$T}) = Polymake.$f(v)
     end
 end
 
-convert(::Type{Polymake.pm_Set}, s::Set{S}) where S = pm_Set(collect(s))
+Polymake.pm_Set(s::AbstractSet{S}) where S = pm_Set(collect(s))
 
 pm_Set{T}(v::Vector) where T = pm_Set(Vector{T}(v))
 pm_Set{T}(s::Set) where T = pm_Set{T}(collect(s))
@@ -24,13 +22,11 @@ pm_Set(::Type{T}) where T = pm_Set{T}()
 
 ### convert FROM polymake object
 
-function convert(::Type{Vector}, s::Polymake.pm_Set{T}) where T<:Integer
-    return Vector{T}(s)
+function Vector{I}(s::Polymake.pm_Set{J}) where {I,J<:Integer}
+    return convert(Vector{I}, collect(s))
 end
 
-function convert(::Type{Vector{I}}, s::Polymake.pm_Set{J}) where {I,J<:Integer}
-    return convert(Vector{I}, Vector(s))
-end
+Vector(s::Polymake.pm_Set) = collect(s)
 
 for (T, f) in [
     (Int32, :fill_jlarray_int32_from_set32),
@@ -48,20 +44,18 @@ end
 Set(s::Polymake.pm_Set{T}) where T = Set{T}(Vector(s))
 Set{T}(s::Polymake.pm_Set{S}) where {T, S} = Set{T}(Vector{S}(s))
 
-function convert(::Type{Set{T}}, set::Polymake.pm_Set{S}) where {T, S<:Integer}
-    return Set{T}(Vector(set))
-end
+Set{T}(s::Polymake.pm_Set{S}) where {T, S<:Integer} = Set{T}(collect(s))
 
-convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set{T}) where T = s
-convert(::Polymake.pm_Set{T}, s::Polymake.pm_Set) where T = s
+Polymake.pm_Set{T}(s::Polymake.pm_Set{T}) where T = s
+
+### Promotion rules
+
+Base.promote_rule(::Type{Set{S}}, ::Type{Polymake.pm_Set{T}}) where {S,T} = Set{promote_type(S,T)}
 
 ### julia functions for sets
 
+import Base: ==
 
-import Base.promote_rule
-promote_rule(::Type{Set{S}}, ::Type{Polymake.pm_Set{T}}) where {S,T} = Set{promote_type(S,T)}
-
-import Base: ==, hash, copy, similar, promote_rule
 # comparison between not-equally typed sets is not defined in Polymake
 ==(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == 0
 
@@ -75,28 +69,36 @@ end
 
 ==(T, S::Polymake.pm_Set) = S == T
 
-hash(S::Polymake.pm_Set, h::UInt) = hash(Vector(S), h)
+Base.hash(S::Polymake.pm_Set, h::UInt) = hash(Vector(S), h)
 
-copy(s::Polymake.pm_Set) = deepcopy(s)
+Base.copy(S::Polymake.pm_Set) = deepcopy(S)
 
-similar(S::Polymake.pm_Set{T}) where T = pm_Set(Vector{T}(length(S)))
+Base.similar(S::Polymake.pm_Set{T}) where T = pm_Set(Vector{T}(length(S)))
 
 # Iteration protocol
 
-import Base: start, next, done, eltype
-
-Base.start(S::pm_Set) = Polymake.begin(S)
-
-function Base.next(S::pm_Set, state)
+function Base.iterate(S::pm_Set)
+    state = Polymake.begin(S)
     elt = Polymake.get_element(state)
+    Polymake.increment(state)
     return elt, state
 end
 
-Base.done(S::pm_Set, state) = Polymake.isdone(S, state)
+function Base.iterate(S::pm_Set, state)
+    if Polymake.isdone(S, state)
+        return nothing
+    else
+        elt = Polymake.get_element(state)
+        Polymake.increment(state)
+        return elt, state
+    end
+end
 
-eltype(::Type{Polymake.pm_Set{T}}) where T = T
+Base.eltype(::Type{Polymake.pm_SetAllocated{T}}) where T = T
 
 # length : Defined on the C++ side
+
+Base.size(S::Polymake.pm_Set) = (length(S),)
 
 # Utility functions:
 # isempty : Defined on the C++ side

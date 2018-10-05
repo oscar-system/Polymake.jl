@@ -18,7 +18,7 @@ module Polymake
 
     @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.so"),
         :define_module_polymake)
-    
+
     function __init__()
         @initcxx
     end
@@ -87,6 +87,6 @@ const SmallObject = Union{Polymake.pm_Integer,
 
 include("functions.jl")
 include("convert.jl")
-# include("sets.jl")
+include("sets.jl")
 
 end
