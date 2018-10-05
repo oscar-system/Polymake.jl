@@ -19,18 +19,16 @@ CreatePolymakeTypeVar(pm_Matrix_pm_Integer);
 CreatePolymakeTypeVar(pm_Matrix_pm_Rational);
 CreatePolymakeTypeVar(pm_Vector_pm_Integer);
 CreatePolymakeTypeVar(pm_Vector_pm_Rational);
-CreatePolymakeTypeVar(pm_Set_Int32);
 CreatePolymakeTypeVar(pm_Set_Int64);
+CreatePolymakeTypeVar(pm_Set_Int32);
 
 #define POLYMAKE_INSERT_TYPE_IN_MAP(type) insert_type_in_map(#type , &POLYMAKETYPE_ ## type )
 #define POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(outer,inner) \
-     insert_type_in_map( std::string( #outer ) + "{Polymake." + #inner + "}"  , &POLYMAKETYPE_ ## outer ## _ ## inner  )
-#define POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE_UNPREFIXED(outer,inner) \
-     insert_type_in_map( std::string( #outer ) + "{" + #inner + "}"  , &POLYMAKETYPE_ ## outer ## _ ## inner  )
+     insert_type_in_map( std::string( #outer ) + "_" + #inner  , &POLYMAKETYPE_ ## outer ## _ ## inner  )
 
 void insert_type_in_map(std::string&&, jl_value_t**);
 
-void set_julia_types(jl_value_t*);
+void set_julia_type(std::string, void*);
 
 void polymake_module_add_caller(jlcxx::Module&);
 
