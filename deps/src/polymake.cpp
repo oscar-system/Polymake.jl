@@ -119,8 +119,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("to_value",to_value<pm::perl::OptionSet>);
 
   polymake_module_add_set(polymake);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE_UNPREFIXED(pm_Set,Int64);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE_UNPREFIXED(pm_Set,Int32);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int32);
 
   polymake_module_add_caller(polymake);
 
