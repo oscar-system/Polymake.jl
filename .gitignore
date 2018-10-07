@@ -9,3 +9,4 @@ deps/src/libpolymake.*
 deps/build.log
 local
 Manifest.toml
+src/generated/*

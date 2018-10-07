@@ -65,5 +65,6 @@ include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("generated/includes.jl")
 
 end # of module Polymake
