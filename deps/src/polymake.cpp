@@ -85,7 +85,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("call_func_2args",&call_func_2args);
   polymake.method("application",[](const std::string x){ data.main_polymake_session->set_application(x); });
 
-  polymake.method("to_int",[](pm::perl::PropertyValue p){ return static_cast<long>(p);});
+  polymake.method("to_int",[](pm::perl::PropertyValue p){ return static_cast<int64_t>(p);});
   polymake.method("to_double",[](pm::perl::PropertyValue p){ return static_cast<double>(p);});
   polymake.method("to_bool",[](pm::perl::PropertyValue p){ return static_cast<bool>(p);});
   polymake.method("to_perl_object",&to_perl_object);
