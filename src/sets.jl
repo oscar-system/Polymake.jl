@@ -21,8 +21,8 @@ pm_Set{S}(n::T) where {S,T <: Integer} = Polymake.scalar2set(S(n))
 pm_Set{T}(itr) where T = union!(pm_Set{T}(), itr)
 
 function pm_Set(itr)
-    # use IteratorEltype(itr) trait?
-    T = typeof(first(itr))
+    T = Base.@default_eltype(itr)
+    (isconcretetype(T) || T === Union{}) || return pm_Set(collect(itr))
     return union!(pm_Set{T}(), itr)
 end
 
