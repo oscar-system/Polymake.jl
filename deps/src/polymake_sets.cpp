@@ -15,8 +15,10 @@ void polymake_module_add_set(jlcxx::Module& polymake){
       pm::Set<int64_t>
     >([](auto wrapped){
         typedef typename decltype(wrapped)::type Set;
-        wrapped.template constructor<pm::Set<int32_t>>();
-        wrapped.template constructor<pm::Set<int64_t>>();
+        typedef typename decltype(wrapped)::type::value_type elemType;
+
+        wrapped.template constructor<pm::Set<elemType>>();
+
         wrapped.method("swap", &Set::swap);
 
         wrapped.method("isempty", &Set::empty);
@@ -24,14 +26,11 @@ void polymake_module_add_set(jlcxx::Module& polymake){
 
         wrapped.method("empty!", [](Set&S){S.clear(); return S;});
         wrapped.method("==", [](Set&S, Set&T){return S == T;});
-        wrapped.method("in", [](int64_t i, Set&S){return S.contains(i);});
-        wrapped.method("in", [](int32_t i, Set&S){return S.contains(i);});
+        wrapped.method("in", [](elemType i, Set&S){return S.contains(i);});
 
-        wrapped.method("push!", [](Set&S, int64_t i){S+=i; return S;});
-        wrapped.method("push!", [](Set&S, int32_t i){S+=i; return S;});
+        wrapped.method("push!", [](Set&S, elemType i){S+=i; return S;});
 
-        wrapped.method("delete!", [](Set&S, int64_t i){S-=i; return S;});
-        wrapped.method("delete!", [](Set&S, int32_t i){S-=i; return S;});
+        wrapped.method("delete!", [](Set&S, elemType i){S-=i; return S;});
 
         wrapped.method("union!", [](Set&S, Set&T){return S += T;});
         wrapped.method("intersect!", [](Set&S, Set&T){return S *= T;});
@@ -45,6 +44,15 @@ void polymake_module_add_set(jlcxx::Module& polymake){
 
         wrapped.method("getindex", [](Set&S, Set&T){
           return Set{pm::select(pm::wary(S), T)};
+        });
+        wrapped.method("range", [](elemType a, elemType b){
+          return Set{pm::range(a,b)};
+        });
+        wrapped.method("sequence", [](elemType a, elemType c){
+          return Set{pm::sequence(a,c)};
+        });
+        wrapped.method("scalar2set", [](elemType s){
+          return Set{pm::scalar2set(s)};
         });
     });
 
@@ -80,25 +88,6 @@ void polymake_module_add_set(jlcxx::Module& polymake){
     [](pm::Set<int64_t> s1, pm::Set<int32_t> s2){ return pm::incl(s1,s2);});
   polymake.method("incl",
     [](pm::Set<int64_t> s1, pm::Set<int64_t> s2){ return pm::incl(s1,s2);});
-
-  polymake.method("range", [](int32_t a, int32_t b){
-     return pm::Set<int32_t>{pm::range(a,b)};
-  });
-  polymake.method("range", [](int64_t a, int64_t b){
-     return pm::Set<int64_t>{pm::range(a,b)};
-  });
-
-  polymake.method("sequence",
-    [](int32_t a, int32_t c){ return pm::Set<int32_t>{pm::sequence(a,c)};});
-  polymake.method("sequence",
-    [](int64_t a, int64_t c){ return pm::Set<int64_t>{pm::sequence(a,c)};});
-
-  polymake.method("scalar2set", [](int32_t s){
-    return pm::Set<int32_t>{pm::scalar2set(s)};
-  });
-  polymake.method("scalar2set", [](int64_t s){
-    return pm::Set<int32_t>{pm::scalar2set(s)};
-  });
 
   polymake.method("new_set_int64", new_set_int64);
   polymake.method("new_set_int32", new_set_int32);
