@@ -46,11 +46,4 @@ extern std::string (*show_mat_rational)(pm::Matrix<pm::Rational>);
 extern std::string (*show_set_int64)(pm::Set<int64_t>);
 extern std::string (*show_set_int32)(pm::Set<int32_t>);
 
-template<typename T>
-pm::perl::Value to_value(T obj){
-    pm::perl::Value val;
-    val << obj;
-    return val;
-}
-
 #endif

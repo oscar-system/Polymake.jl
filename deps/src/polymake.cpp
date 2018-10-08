@@ -17,8 +17,6 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_PropertyValue);
   polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_OptionSet);
-  polymake.add_type<pm::perl::Value>("pm_perl_Value");
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_Value);
 
 
   polymake.add_type<pm::perl::Object>("pm_perl_Object")
@@ -107,16 +105,6 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("show_small_obj",show_vec_rational);
   polymake.method("show_small_obj",show_mat_integer);
   polymake.method("show_small_obj",show_mat_rational);
-
-
-  polymake.method("to_value",to_value<int>);
-  polymake.method("to_value",to_value<pm::Integer>);
-  polymake.method("to_value",to_value<pm::Rational>);
-  polymake.method("to_value",to_value<pm::Vector<pm::Integer> >);
-  polymake.method("to_value",to_value<pm::Vector<pm::Rational> >);
-  polymake.method("to_value",to_value<pm::Matrix<pm::Integer> >);
-  polymake.method("to_value",to_value<pm::Matrix<pm::Rational> >);
-  polymake.method("to_value",to_value<pm::perl::OptionSet>);
 
   polymake_module_add_set(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);

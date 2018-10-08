@@ -27,7 +27,6 @@ end
 polymake_c_types = Array{Any,1}([
    ("pm_perl_PropertyValue",Polymake.pm_perl_PropertyValue),
    ("pm_perl_OptionSet",Polymake.pm_perl_OptionSet),
-   ("pm_perl_Value",Polymake.pm_perl_Value),
    ("pm_perl_Object",Polymake.pm_perl_Object),
    ("pm_Integer",Polymake.pm_Integer),
    ("pm_Rational",Polymake.pm_Rational),
