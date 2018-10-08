@@ -13,12 +13,18 @@ for (T, f) in [
     end
 end
 
-Polymake.pm_Set(s::AbstractSet{S}) where S = pm_Set(collect(s))
-
 pm_Set{T}(v::Vector) where T = pm_Set(Vector{T}(v))
 pm_Set{T}(s::Set) where T = pm_Set{T}(collect(s))
 
-pm_Set(::Type{T}) where T = pm_Set{T}()
+pm_Set{S}(n::T) where {S,T <: Integer} = Polymake.scalar2set(S(n))
+
+pm_Set{T}(itr) where T = union!(pm_Set{T}(), itr)
+
+function pm_Set(itr)
+    # use IteratorEltype(itr) trait?
+    T = typeof(first(itr))
+    return union!(pm_Set{T}(), itr)
+end
 
 ### convert FROM polymake object
 
