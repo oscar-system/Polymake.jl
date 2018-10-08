@@ -38,6 +38,8 @@ template<typename T>
 void polymake_call_function_feed_argument(T& function, jl_value_t* argument){
     jl_value_t* current_type = jl_typeof(argument);
     if(jl_is_int64(argument)){
+        //check size of long, to be sure
+        static_assert(sizeof(long)==8,"long must be 64 bit");
         function << static_cast<long> (jl_unbox_int64(argument));
         return;
     }
