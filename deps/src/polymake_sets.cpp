@@ -107,7 +107,4 @@ void polymake_module_add_set(jlcxx::Module& polymake){
 
   polymake.method("show_small_obj",show_set_int64);
   polymake.method("show_small_obj",show_set_int32);
-
-  polymake.method("to_value",to_value<pm::Set<int64_t> >);
-  polymake.method("to_value",to_value<pm::Set<int32_t> >);
 }

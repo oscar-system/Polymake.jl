@@ -17,7 +17,6 @@
 #include <polymake/Rational.h>
 #include <polymake/QuadraticExtension.h>
 
-#include <polymake/perl/Value.h>
 #include <polymake/perl/calls.h>
 
 #include <polymake/perl/macros.h>

@@ -11,7 +11,6 @@
 
 CreatePolymakeTypeVar(pm_perl_PropertyValue);
 CreatePolymakeTypeVar(pm_perl_OptionSet);
-CreatePolymakeTypeVar(pm_perl_Value);
 CreatePolymakeTypeVar(pm_perl_Object);
 CreatePolymakeTypeVar(pm_Integer);
 CreatePolymakeTypeVar(pm_Rational);
