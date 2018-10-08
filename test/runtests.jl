@@ -6,15 +6,14 @@ else
 end
 
 # write your own tests here
-@testset "pm_Set" begin
+@testset "pm_Set specific tests" begin
     pm_Set = PolymakeWrap.pm_Set
     IntTypes = [Int32, Int64]
 
-
     @testset "constructors" begin
-        @test pm_Set{Int32}() isa pm_Set
-        @test pm_Set{Int64}() isa pm_Set
         for T in IntTypes
+            @test pm_Set{T}() isa pm_Set
+            @test pm_Set{T}() isa AbstractSet
             @test pm_Set(T[1]) isa pm_Set{T}
             @test pm_Set(T[1,1]) isa pm_Set{T}
             @test pm_Set(T[-1,1]) isa pm_Set{T}
@@ -177,6 +176,8 @@ end
                     @test union(A,A) == union(jlA,jlA)
                     @test union(A,B) == union(jlA,jlB) == Set([1,2,3,4])
                     @test A == jlA && B == jlB
+                    @test union(jlA, A) isa Set
+                    @test union(A, jlA) isa Set
 
                     # union!
                     @test union!(A,A) == union!(jlA,jlA)
@@ -199,6 +200,9 @@ end
                     @test intersect(A, B) == intersect(jlA, jlB)
                     @test A == jlA && B == jlB
 
+                    @test intersect(jlA, A) isa Set
+                    @test intersect(A, jlA) isa Set
+
                     # intersect!
                     @test intersect!(A, B) == intersect!(jlA, jlB)
                     @test A == Set([2,3])# == jlA
@@ -218,6 +222,8 @@ end
                     @test setdiff(A, B) == setdiff(jlA, jlB)
                     @test setdiff(B, A) == setdiff(jlB, jlA)
                     @test A == jlA && B == jlB
+                    @test setdiff(jlA, A) isa Set
+                    @test setdiff(A, jlA) isa Set
 
                     @test setdiff!(A, B) == setdiff!(jlA, jlB)
                     @test A == jlA && B == jlB
@@ -241,6 +247,8 @@ end
                     @test isempty(symdiff(A,B)) == isempty(symdiff(jlA,jlB))
                     @test symdiff(A,B) == symdiff(jlA, jlB)
                     @test symdiff(B,A) == symdiff(jlA, jlB)
+                    @test symdiff(jlA, A) isa Set
+                    @test symdiff(A, jlA) isa Set
 
                     jlA1 = deepcopy(jlA)
 
@@ -257,7 +265,7 @@ end
         end
     end
 
-    @testset "user_constructors" begin
+    @testset "polymake constructors" begin
         for T in IntTypes
             @test PolymakeWrap.range(T(-1), T(5)) == pm_Set(collect(-1:5))
             @test PolymakeWrap.sequence(T(-1), T(5)) == pm_Set(collect(-1:3))
