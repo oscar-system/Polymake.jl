@@ -73,17 +73,34 @@ function ==(S::Polymake.pm_Set, jlS::Set)
     return true
 end
 
-==(T, S::Polymake.pm_Set) = S == T
+==(T::AbstractSet, S::Polymake.pm_Set) = S == T
 
-Base.hash(S::Polymake.pm_Set, h::UInt) = hash(Vector(S), h)
+Base.allunique(::Polymake.pm_Set) = true
 
 Base.copy(S::Polymake.pm_Set) = deepcopy(S)
 
-Base.similar(S::Polymake.pm_Set{T}) where T = pm_Set(Vector{T}(length(S)))
+# delete! : Defined on the C++ side
+Base.delete!(s::Polymake.pm_Set{T}, x) where T = delete!(s, T(x))
+# empty!  : Defined on the C++ side
 
-# Iteration protocol
+function Base.filter!(pred, s::Polymake.pm_Set{T}) where T
+    to_delete = Set{T}()
+    for x in s
+        !pred(x) && push!(to_delete, x)
+    end
+    for x in to_delete
+        delete!(s, x)
+    end
+    return s
+end
+
+# in      : Defined on the C++ side
+Base.in(x::Integer, s::Polymake.pm_Set{T}) where T<:Integer = T(x) in s
+
+# isempty : Defined on the C++
 
 function Base.iterate(S::pm_Set)
+    isempty(S) && return nothing
     state = Polymake.begin(S)
     elt = Polymake.get_element(state)
     Polymake.increment(state)
@@ -100,28 +117,9 @@ function Base.iterate(S::pm_Set, state)
     end
 end
 
-Base.eltype(::Type{Polymake.pm_SetAllocated{T}}) where T = T
+# length : Defined on the C++
 
-# length : Defined on the C++ side
-
-Base.size(S::Polymake.pm_Set) = (length(S),)
-
-# Utility functions:
-# isempty : Defined on the C++ side
-# in : Defined on the C++ side
-
-
-# Set operations:
-
-import Base: pop!, union, intersect, unique, allunique
-
-# push! : Defined on the C++ side
-# delete! : Defined on the C++ side
-# empty! : Defined on the C++ side
-
-#in doubt: sizehint!, rehash!
-
-function pop!(s::Polymake.pm_Set{T}, x) where T
+function Base.pop!(s::Polymake.pm_Set{T}, x) where T
     if x in s
         delete!(s, x)
         return x
@@ -130,16 +128,28 @@ function pop!(s::Polymake.pm_Set{T}, x) where T
     end
 end
 
-pop!(s::Polymake.pm_Set{T}, x, default) where T = (x in s ? pop!(s, x) : default)
-pop!(s::Polymake.pm_Set{T}) where T = (x = first(s); delete!(x, s); x)
+function Base.pop!(s::Polymake.pm_Set{T}, x, default) where T
+    if x in s
+        return pop!(s, x)
+    else
+        return default
+    end
+end
 
-union(s::Polymake.pm_Set) = copy(s)
-intersect(s::Polymake.pm_Set) = copy(s)
+function Base.pop!(s::Polymake.pm_Set{T}) where T
+    isempty(s) && throw(ArgumentError("set must be non-empty"))
+    return pop!(s, first(s))
+end
 
-unique(s::Polymake.pm_Set) = copy(s)
-allunique(s::Polymake.pm_Set) = true
+# push! : Defined on the C++ side
+Base.push!(s::Polymake.pm_Set{T}, x::Integer) where T<:Integer = push!(s, T(x))
+# show! : Defined on the C++ side
 
-# Ordering:
+Base.sizehint!(s::Polymake.pm_Set, newsz) = s
+
+
+
+# Auxillary functions:
 
 import Base: <, <=
 
