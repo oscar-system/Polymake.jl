@@ -9,8 +9,11 @@
 void polymake_module_add_set(jlcxx::Module& polymake){
   polymake.add_type<pm::operations::cmp>("pm_operations_cmp");
 
-  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Set")
-    .apply<pm::Set<int32_t>, pm::Set<int64_t>>([](auto wrapped){
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Set", jlcxx::julia_type("AbstractSet", "Base"))
+    .apply<
+      pm::Set<int32_t>,
+      pm::Set<int64_t>
+    >([](auto wrapped){
         typedef typename decltype(wrapped)::type Set;
         wrapped.template constructor<pm::Set<int32_t>>();
         wrapped.template constructor<pm::Set<int64_t>>();
