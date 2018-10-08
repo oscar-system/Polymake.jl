@@ -9,7 +9,7 @@ void insert_type_in_map(std::string&& ptr_name, jl_value_t** var_space){
 }
 
 void set_julia_type(std::string name, void* type_address)
-{   
+{
     jl_value_t** address;
     try{
         address = (*type_map_translator)[name];
@@ -38,7 +38,7 @@ template<typename T>
 void polymake_call_function_feed_argument(T& function, jl_value_t* argument){
     jl_value_t* current_type = jl_typeof(argument);
     if(jl_is_int64(argument)){
-        function << jl_unbox_int64(argument);
+        function << static_cast<long> (jl_unbox_int64(argument));
         return;
     }
     if(jl_is_bool(argument)){

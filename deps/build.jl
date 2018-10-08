@@ -72,7 +72,13 @@ jlcxx_cmake_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
 julia_include = joinpath(Sys.BINDIR, "..", "include")
 julia_lib = joinpath(Sys.BINDIR, "..", "lib")
 julia_exec = joinpath(Sys.BINDIR , "julia")
-julia_lib_so = joinpath(Sys.BINDIR, "..", "lib", "libjulia.so")
+if Sys.isapple()
+    julia_lib_so = joinpath(Sys.BINDIR, "..", "lib", "libjulia.dylib")
+elseif Sys.islinux()
+    julia_lib_so = joinpath(Sys.BINDIR, "..", "lib", "libjulia.so")
+else
+    error("System is not supported!")
+end
 
 cd(joinpath(@__DIR__, "src"))
 

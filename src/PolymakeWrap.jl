@@ -16,8 +16,15 @@ module Polymake
 
     using CxxWrap
 
-    @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.so"),
-        :define_module_polymake)
+    @static if Sys.isapple()
+        @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.dylib"),
+            :define_module_polymake)
+    elseif Sys.islinux()
+        @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.so"),
+            :define_module_polymake)
+    else
+        error("System is not supported!")
+    end
 
     function __init__()
         @initcxx
