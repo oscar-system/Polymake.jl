@@ -13,6 +13,7 @@
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
 #include <polymake/Vector.h>
+#include <polymake/Set.h>
 #include <polymake/IncidenceMatrix.h>
 #include <polymake/Rational.h>
 #include <polymake/QuadraticExtension.h>
