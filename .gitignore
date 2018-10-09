@@ -5,7 +5,7 @@ deps/src/CMakeCache.txt
 deps/src/CMakeFiles/*
 deps/src/Makefile
 deps/src/cmake_install.cmake
-deps/src/libpolymake.so
+deps/src/libpolymake.*
 deps/build.log
 local
 Manifest.toml
