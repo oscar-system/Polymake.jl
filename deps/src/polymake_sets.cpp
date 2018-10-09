@@ -14,45 +14,45 @@ void polymake_module_add_set(jlcxx::Module& polymake){
       pm::Set<int32_t>,
       pm::Set<int64_t>
     >([](auto wrapped){
-        typedef typename decltype(wrapped)::type Set;
+        typedef typename decltype(wrapped)::type pm_Set;
         typedef typename decltype(wrapped)::type::value_type elemType;
 
         wrapped.template constructor<pm::Set<elemType>>();
 
-        wrapped.method("swap", &Set::swap);
+        wrapped.method("swap", &pm_Set::swap);
 
-        wrapped.method("isempty", &Set::empty);
-        wrapped.method("length", &Set::size);
+        wrapped.method("isempty", &pm_Set::empty);
+        wrapped.method("length", &pm_Set::size);
 
-        wrapped.method("empty!", [](Set&S){S.clear(); return S;});
-        wrapped.method("==", [](Set&S, Set&T){return S == T;});
-        wrapped.method("in", [](elemType i, Set&S){return S.contains(i);});
+        wrapped.method("empty!", [](pm_Set&S){S.clear(); return S;});
+        wrapped.method("==", [](pm_Set&S, pm_Set&T){return S == T;});
+        wrapped.method("in", [](elemType i, pm_Set&S){return S.contains(i);});
 
-        wrapped.method("push!", [](Set&S, elemType i){S+=i; return S;});
+        wrapped.method("push!", [](pm_Set&S, elemType i){S+=i; return S;});
 
-        wrapped.method("delete!", [](Set&S, elemType i){S-=i; return S;});
+        wrapped.method("delete!", [](pm_Set&S, elemType i){S-=i; return S;});
 
-        wrapped.method("union!", [](Set&S, Set&T){return S += T;});
-        wrapped.method("intersect!", [](Set&S, Set&T){return S *= T;});
-        wrapped.method("setdiff!", [](Set&S, Set&T){return S -= T;});
-        wrapped.method("symdiff!", [](Set&S, Set&T){return S ^= T;});
+        wrapped.method("union!", [](pm_Set&S, pm_Set&T){return S += T;});
+        wrapped.method("intersect!", [](pm_Set&S, pm_Set&T){return S *= T;});
+        wrapped.method("setdiff!", [](pm_Set&S, pm_Set&T){return S -= T;});
+        wrapped.method("symdiff!", [](pm_Set&S, pm_Set&T){return S ^= T;});
 
-        wrapped.method("union", [](Set&S, Set&T){return Set{S+T};});
-        wrapped.method("intersect", [](Set&S, Set&T){return Set{S*T};});
-        wrapped.method("setdiff", [](Set&S, Set&T){return Set{S-T};});
-        wrapped.method("symdiff", [](Set&S, Set&T){return Set{S^T};});
+        wrapped.method("union", [](pm_Set&S, pm_Set&T){return pm_Set{S+T};});
+        wrapped.method("intersect", [](pm_Set&S, pm_Set&T){return pm_Set{S*T};});
+        wrapped.method("setdiff", [](pm_Set&S, pm_Set&T){return pm_Set{S-T};});
+        wrapped.method("symdiff", [](pm_Set&S, pm_Set&T){return pm_Set{S^T};});
 
-        wrapped.method("getindex", [](Set&S, Set&T){
-          return Set{pm::select(pm::wary(S), T)};
+        wrapped.method("getindex", [](pm_Set&S, pm_Set&T){
+          return pm_Set{pm::select(pm::wary(S), T)};
         });
         wrapped.method("range", [](elemType a, elemType b){
-          return Set{pm::range(a,b)};
+          return pm_Set{pm::range(a,b)};
         });
         wrapped.method("sequence", [](elemType a, elemType c){
-          return Set{pm::sequence(a,c)};
+          return pm_Set{pm::sequence(a,c)};
         });
         wrapped.method("scalar2set", [](elemType s){
-          return Set{pm::scalar2set(s)};
+          return pm_Set{pm::scalar2set(s)};
         });
     });
 
