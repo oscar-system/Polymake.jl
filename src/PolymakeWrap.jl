@@ -5,13 +5,15 @@ module Polymake
     const foo = 1
 
     import Base: ==,
-        delete!,
+        append!,
+        delete!, denominator,
         empty!,
         getindex,
         in, intersect, intersect!, isempty,
         length,
+        numerator,
         push!,
-        setdiff, setdiff!, symdiff, symdiff!,
+        setdiff, setdiff!, setindex!, symdiff, symdiff!,
         union, union!
 
     using CxxWrap
@@ -67,8 +69,6 @@ for T in [
     :pm_Set,
     :exists,
     :new_pm_Integer,
-    :numerator,
-    :denominator,
     :application,
 
     :swap,
@@ -95,4 +95,6 @@ include("functions.jl")
 include("convert.jl")
 include("sets.jl")
 
+Base.size(v::pm_Vector) = (length(v),)
+Base.size(m::pm_Matrix) = (Polymake.rows(m), Polymake.cols(m))
 end

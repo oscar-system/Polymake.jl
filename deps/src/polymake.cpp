@@ -52,17 +52,21 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
     .apply<pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>>([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
+        typedef typename decltype(wrapped)::type::value_type elemType;
         // typedef typename decltype(wrapped)::foo X;
-        wrapped.method([](WrappedT& f, int i, int j){ return typename WrappedT::value_type(f(i,j));});
-        wrapped.method("set_entry",[](WrappedT& f, int i, int j, typename WrappedT::value_type r){
-            f(i,j)=r;
+        wrapped.template constructor<int64_t, int64_t>();
+        
+        wrapped.method("getindex", [](WrappedT& f, int64_t i, int64_t j){ return elemType(f(i,j));});
+        wrapped.method("setindex!", [](WrappedT& M, int64_t i, int64_t j, elemType r){
+            M(i,j)=r;
         });
         wrapped.method("rows",&WrappedT::rows);
         wrapped.method("cols",&WrappedT::cols);
-        wrapped.method("resize",[](WrappedT& T, int i, int j){ T.resize(i,j); });
-        wrapped.template constructor<int, int>();
-        wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& T){
-            p.take(s) << T;
+        wrapped.method("resize",[](WrappedT& M, int64_t i, int64_t j){ M.resize(i,j); });
+        
+        wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& M){
+            p.take(s) << M;
+        });
         wrapped.method("show_small_obj", [](WrappedT& M){
           return show_small_object<WrappedT>(M);
         });
@@ -73,16 +77,23 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
     .apply<pm::Vector<pm::Integer>, pm::Vector<pm::Rational>>([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
+        typedef typename decltype(wrapped)::type::value_type elemType;
         // typedef typename decltype(wrapped)::foo X;
-        wrapped.method([](WrappedT& f, int i){ return typename WrappedT::value_type(f[i]);});
-        wrapped.method("set_entry",[](WrappedT& f, int i, typename WrappedT::value_type r){
-            f[i]=r;
+        wrapped.template constructor<int64_t>();
+        wrapped.method("getindex", [](WrappedT& V, int64_t n){
+          return elemType(V[n]);
         });
-        wrapped.method("dim",&WrappedT::dim);
-        wrapped.method("resize",[](WrappedT& T, int i){ T.resize(i); });
-        wrapped.template constructor<int>();
-        wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& T){
-            p.take(s) << T;
+        wrapped.method("setindex!",[](WrappedT& V, int64_t n, elemType v){
+            V[n]=v;
+        });
+        wrapped.method("length", &WrappedT::size);
+        wrapped.method("resize",[](WrappedT& V, int64_t sz){
+          V.resize(sz);
+        });
+        
+        wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& V){
+            p.take(s) << V;
+        });
         wrapped.method("show_small_obj", [](WrappedT& V){
           return show_small_object<WrappedT>(V);
         });
