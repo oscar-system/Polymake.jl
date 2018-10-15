@@ -99,7 +99,4 @@ void polymake_module_add_set(jlcxx::Module& polymake){
     [](pm::Set<int64_t> s1, pm::Set<int32_t> s2){ return pm::incl(s1,s2);});
   polymake.method("incl",
     [](pm::Set<int64_t> s1, pm::Set<int64_t> s2){ return pm::incl(s1,s2);});
-
-  polymake.method("fill_jlarray_int32_from_set32", fill_jlarray_int32_from_set32);
-  polymake.method("fill_jlarray_int64_from_set64", fill_jlarray_int64_from_set64);
 }

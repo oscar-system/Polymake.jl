@@ -27,19 +27,6 @@ end
 
 Vector(s::Polymake.pm_Set) = collect(s)
 
-for (T, f) in [
-    (Int32, :fill_jlarray_int32_from_set32),
-    (Int64, :fill_jlarray_int64_from_set64)
-    ]
-    @eval begin
-        function convert(::Type{Vector{$T}}, s::Polymake.pm_Set{$T})
-            v = Vector{$T}(length(s))
-            Polymake.$f(v, s)
-            return v
-        end
-    end
-end
-
 Set(s::Polymake.pm_Set{T}) where T = Set{T}(Vector(s))
 Set{T}(s::Polymake.pm_Set{S}) where {T, S} = Set{T}(Vector{S}(s))
 

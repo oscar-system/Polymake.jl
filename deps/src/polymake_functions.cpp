@@ -63,18 +63,6 @@ pm::Integer new_integer_from_bigint(jl_value_t* integer){
     return *p;
 }
 
-template<typename T, typename S>
-void fill_jlarray_T_from_S(jlcxx::ArrayRef<T> arr, S itr){
-   int64_t index{0};
-   for(auto i = pm::entire(itr); !i.at_end(); ++i){
-      arr[index++] = static_cast<T>(*i);
-   }
-}
-
-void (*fill_jlarray_int32_from_set32)(jlcxx::ArrayRef<int32_t>, pm::Set<int32_t>) = &fill_jlarray_T_from_S<int32_t, pm::Set<int32_t>>;
-void (*fill_jlarray_int64_from_set64)(jlcxx::ArrayRef<int64_t>, pm::Set<int64_t>) = &fill_jlarray_T_from_S<int64_t, pm::Set<int64_t>>;
-
-
 std::string (*show_integer)(const pm::Integer& obj) = &show_small_object<pm::Integer>;
 std::string (*show_rational)(const pm::Rational& obj) = &show_small_object<pm::Rational>;
 std::string (*show_vec_integer)(const pm::Vector<pm::Integer>&  obj) = &show_small_object<pm::Vector<pm::Integer> >;
