@@ -62,10 +62,3 @@ pm::Integer new_integer_from_bigint(jl_value_t* integer){
     p = reinterpret_cast<pm::Integer*>(integer);
     return *p;
 }
-
-std::string (*show_integer)(const pm::Integer& obj) = &show_small_object<pm::Integer>;
-std::string (*show_rational)(const pm::Rational& obj) = &show_small_object<pm::Rational>;
-std::string (*show_vec_integer)(const pm::Vector<pm::Integer>&  obj) = &show_small_object<pm::Vector<pm::Integer> >;
-std::string (*show_vec_rational)(const pm::Vector<pm::Rational>&  obj) = &show_small_object<pm::Vector<pm::Rational> >;
-std::string (*show_mat_integer)(const pm::Matrix<pm::Integer>&  obj) = &show_small_object<pm::Matrix<pm::Integer> >;
-std::string (*show_mat_rational)(const pm::Matrix<pm::Rational>&  obj) = &show_small_object<pm::Matrix<pm::Rational> >;

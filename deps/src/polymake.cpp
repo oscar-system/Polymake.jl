@@ -30,7 +30,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
   polymake.add_type<pm::Integer>("pm_Integer")
     .constructor<int32_t>()
-    .constructor<int64_t>();
+    .constructor<int64_t>()
+    .method("show_small_obj", [](pm::Integer& i){
+      return show_small_object<pm::Integer>(i);
+    });
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
   polymake.method("new_pm_Integer",new_integer_from_bigint);
 
@@ -39,7 +42,11 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     .constructor<int64_t, int64_t>()
     .template constructor<pm::Integer, pm::Integer>()
     .method("numerator",[](pm::Rational r){ return pm::Integer(numerator(r)); })
-    .method("denominator",[](pm::Rational r){ return pm::Integer(denominator(r)); });
+    .method("denominator",[](pm::Rational r){ return pm::Integer(denominator(r));})
+    .method("show_small_obj", [](pm::Rational& r){
+      return show_small_object<pm::Rational>(r);
+    });
+
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix")
@@ -56,6 +63,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         wrapped.template constructor<int, int>();
         wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& T){
             p.take(s) << T;
+        wrapped.method("show_small_obj", [](WrappedT& M){
+          return show_small_object<WrappedT>(M);
         });
     });
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Integer);
@@ -74,6 +83,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         wrapped.template constructor<int>();
         wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& T){
             p.take(s) << T;
+        wrapped.method("show_small_obj", [](WrappedT& V){
+          return show_small_object<WrappedT>(V);
         });
     });
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Integer);
@@ -98,13 +109,6 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
   polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){ PropertyValueHelper ph(p); return ph.get_typename(); });
   polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).check_defined();});
-
-  polymake.method("show_small_obj",show_integer);
-  polymake.method("show_small_obj",show_rational);
-  polymake.method("show_small_obj",show_vec_integer);
-  polymake.method("show_small_obj",show_vec_rational);
-  polymake.method("show_small_obj",show_mat_integer);
-  polymake.method("show_small_obj",show_mat_rational);
 
   polymake_module_add_set(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);
