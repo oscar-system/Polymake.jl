@@ -26,9 +26,6 @@ extern pm::Matrix<pm::Rational> (*to_matrix_rational)(pm::perl::PropertyValue);
 
 pm::Integer new_integer_from_bigint(jl_value_t*);
 
-extern void (*fill_jlarray_int32_from_set32)(jlcxx::ArrayRef<int32_t>, pm::Set<int32_t>);
-extern void (*fill_jlarray_int64_from_set64)(jlcxx::ArrayRef<int64_t>, pm::Set<int64_t>);
-
 // We can do better templating here
 template<typename T>
 std::string show_small_object(const T& obj){
