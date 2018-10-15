@@ -29,14 +29,19 @@ pm::Integer new_integer_from_bigint(jl_value_t*);
 extern void (*fill_jlarray_int32_from_set32)(jlcxx::ArrayRef<int32_t>, pm::Set<int32_t>);
 extern void (*fill_jlarray_int64_from_set64)(jlcxx::ArrayRef<int64_t>, pm::Set<int64_t>);
 
+// We can do better templating here
+template<typename T>
+std::string show_small_object(const T& obj){
+    std::ostringstream buffer;
+    wrap(buffer) << polymake::legible_typename(typeid(obj)) << pm::endl << obj;
+    return buffer.str();
+}
 
-extern std::string (*show_integer)(pm::Integer);
-extern std::string (*show_rational)(pm::Rational);
-extern std::string (*show_vec_integer)(pm::Vector<pm::Integer>);
-extern std::string (*show_vec_rational)(pm::Vector<pm::Rational>);
-extern std::string (*show_mat_integer)(pm::Matrix<pm::Integer>);
-extern std::string (*show_mat_rational)(pm::Matrix<pm::Rational>);
-extern std::string (*show_set_int64)(pm::Set<int64_t>);
-extern std::string (*show_set_int32)(pm::Set<int32_t>);
+extern std::string (*show_integer)(const pm::Integer&);
+extern std::string (*show_rational)(const pm::Rational&);
+extern std::string (*show_vec_integer)(const pm::Vector<pm::Integer>&);
+extern std::string (*show_vec_rational)(const pm::Vector<pm::Rational>&);
+extern std::string (*show_mat_integer)(const pm::Matrix<pm::Integer>&);
+extern std::string (*show_mat_rational)(const pm::Matrix<pm::Rational>&);
 
 #endif

@@ -83,19 +83,10 @@ void fill_jlarray_T_from_S(jlcxx::ArrayRef<T> arr, S itr){
 void (*fill_jlarray_int32_from_set32)(jlcxx::ArrayRef<int32_t>, pm::Set<int32_t>) = &fill_jlarray_T_from_S<int32_t, pm::Set<int32_t>>;
 void (*fill_jlarray_int64_from_set64)(jlcxx::ArrayRef<int64_t>, pm::Set<int64_t>) = &fill_jlarray_T_from_S<int64_t, pm::Set<int64_t>>;
 
-// We can do better templating here
-template<typename T>
-std::string show_small_object(T obj){
-    std::ostringstream buffer;
-    wrap(buffer) << polymake::legible_typename(typeid(obj)) << pm::endl << obj;
-    return buffer.str();
-}
 
-std::string (*show_integer)(pm::Integer obj) = &show_small_object<pm::Integer>;
-std::string (*show_rational)(pm::Rational obj) = &show_small_object<pm::Rational>;
-std::string (*show_vec_integer)(pm::Vector<pm::Integer>  obj) = &show_small_object<pm::Vector<pm::Integer> >;
-std::string (*show_vec_rational)(pm::Vector<pm::Rational>  obj) = &show_small_object<pm::Vector<pm::Rational> >;
-std::string (*show_mat_integer)(pm::Matrix<pm::Integer>  obj) = &show_small_object<pm::Matrix<pm::Integer> >;
-std::string (*show_mat_rational)(pm::Matrix<pm::Rational>  obj) = &show_small_object<pm::Matrix<pm::Rational> >;
-std::string (*show_set_int64)(pm::Set<int64_t>  obj) = &show_small_object<pm::Set<int64_t> >;
-std::string (*show_set_int32)(pm::Set<int32_t>  obj) = &show_small_object<pm::Set<int32_t> >;
+std::string (*show_integer)(const pm::Integer& obj) = &show_small_object<pm::Integer>;
+std::string (*show_rational)(const pm::Rational& obj) = &show_small_object<pm::Rational>;
+std::string (*show_vec_integer)(const pm::Vector<pm::Integer>&  obj) = &show_small_object<pm::Vector<pm::Integer> >;
+std::string (*show_vec_rational)(const pm::Vector<pm::Rational>&  obj) = &show_small_object<pm::Vector<pm::Rational> >;
+std::string (*show_mat_integer)(const pm::Matrix<pm::Integer>&  obj) = &show_small_object<pm::Matrix<pm::Integer> >;
+std::string (*show_mat_rational)(const pm::Matrix<pm::Rational>&  obj) = &show_small_object<pm::Matrix<pm::Rational> >;
