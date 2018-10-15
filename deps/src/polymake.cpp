@@ -28,7 +28,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
                                                 });
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_Object);
 
-  polymake.add_type<pm::Integer>("pm_Integer")
+  polymake.add_type<pm::Integer>("pm_Integer", jlcxx::julia_type("Integer", "Base"))
     .constructor<int32_t>()
     .constructor<int64_t>()
     .method("show_small_obj", [](pm::Integer& i){
@@ -37,7 +37,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
   polymake.method("new_pm_Integer",new_integer_from_bigint);
 
-  polymake.add_type<pm::Rational>("pm_Rational")
+  polymake.add_type<pm::Rational>("pm_Rational", jlcxx::julia_type("Real", "Base"))
     .constructor<int32_t, int32_t>()
     .constructor<int64_t, int64_t>()
     .template constructor<pm::Integer, pm::Integer>()
@@ -49,7 +49,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Rational);
 
-  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix")
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
     .apply<pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>>([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         // typedef typename decltype(wrapped)::foo X;
@@ -70,7 +70,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Integer);
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Rational);
 
-  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector")
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
     .apply<pm::Vector<pm::Integer>, pm::Vector<pm::Rational>>([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         // typedef typename decltype(wrapped)::foo X;
