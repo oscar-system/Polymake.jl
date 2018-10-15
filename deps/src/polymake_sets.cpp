@@ -59,6 +59,9 @@ void polymake_module_add_set(jlcxx::Module& polymake){
         wrapped.method("scalar2set", [](elemType s){
           return pm_Set{pm::scalar2set(s)};
         });
+        wrapped.method("show_small_obj", [](pm_Set &S){
+          return show_small_object<pm_Set>(S);
+        });
     });
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("SetIterator")
@@ -99,7 +102,4 @@ void polymake_module_add_set(jlcxx::Module& polymake){
 
   polymake.method("to_set_int64", to_set_int64);
   polymake.method("to_set_int32", to_set_int32);
-
-  polymake.method("show_small_obj",show_set_int64);
-  polymake.method("show_small_obj",show_set_int32);
 }
