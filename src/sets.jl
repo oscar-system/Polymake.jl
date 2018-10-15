@@ -4,14 +4,7 @@ import PolymakeWrap.Polymake.pm_Set
 
 ### convert TO polymake object
 
-for (T, f) in [
-    (Int32, :new_set_int32),
-    (Int64, :new_set_int64),
-    ]
-    @eval begin
-        Polymake.pm_Set(v::Vector{$T}) = Polymake.$f(v)
-    end
-end
+pm_Set(v::Vector{T}) where T<:Integer = Polymake._new_set(v)
 
 pm_Set{T}(v::Vector) where T = pm_Set(Vector{T}(v))
 pm_Set{T}(s::Set) where T = pm_Set{T}(collect(s))
