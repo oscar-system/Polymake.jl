@@ -16,8 +16,13 @@ void polymake_module_add_set(jlcxx::Module& polymake){
     >([](auto wrapped){
         typedef typename decltype(wrapped)::type pm_Set;
         typedef typename decltype(wrapped)::type::value_type elemType;
-
+        
         wrapped.template constructor<pm::Set<elemType>>();
+        
+        wrapped.method("_new_set", [](jlcxx::ArrayRef<elemType> A){
+          pm::Set<elemType> s{A.begin(), A.end()};
+          return s;
+        });
 
         wrapped.method("swap", &pm_Set::swap);
 
@@ -89,8 +94,6 @@ void polymake_module_add_set(jlcxx::Module& polymake){
   polymake.method("incl",
     [](pm::Set<int64_t> s1, pm::Set<int64_t> s2){ return pm::incl(s1,s2);});
 
-  polymake.method("new_set_int64", new_set_int64);
-  polymake.method("new_set_int32", new_set_int32);
   polymake.method("fill_jlarray_int32_from_set32", fill_jlarray_int32_from_set32);
   polymake.method("fill_jlarray_int64_from_set64", fill_jlarray_int64_from_set64);
 

@@ -26,13 +26,6 @@ extern pm::Matrix<pm::Rational> (*to_matrix_rational)(pm::perl::PropertyValue);
 
 pm::Integer new_integer_from_bigint(jl_value_t*);
 
-extern pm::Set<int64_t> (*new_set_int64)(jlcxx::ArrayRef<int64_t>);
-extern pm::Set<int32_t> (*new_set_int32)(jlcxx::ArrayRef<int32_t>);
-
-
-extern pm::Set<int64_t> (*to_set_int64)(pm::perl::PropertyValue);
-extern pm::Set<int32_t> (*to_set_int32)(pm::perl::PropertyValue);
-
 extern void (*fill_jlarray_int32_from_set32)(jlcxx::ArrayRef<int32_t>, pm::Set<int32_t>);
 extern void (*fill_jlarray_int64_from_set64)(jlcxx::ArrayRef<int64_t>, pm::Set<int64_t>);
 
