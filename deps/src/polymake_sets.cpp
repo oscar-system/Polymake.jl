@@ -62,6 +62,9 @@ void polymake_module_add_set(jlcxx::Module& polymake){
         wrapped.method("show_small_obj", [](pm_Set &S){
           return show_small_object<pm_Set>(S);
         });
+        wrapped.method("to_set", [](pm::perl::PropertyValue pv){
+          return to_set<pm_Set>(pv);
+        });
     });
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("SetIterator")
@@ -99,7 +102,4 @@ void polymake_module_add_set(jlcxx::Module& polymake){
 
   polymake.method("fill_jlarray_int32_from_set32", fill_jlarray_int32_from_set32);
   polymake.method("fill_jlarray_int64_from_set64", fill_jlarray_int64_from_set64);
-
-  polymake.method("to_set_int64", to_set_int64);
-  polymake.method("to_set_int32", to_set_int32);
 }

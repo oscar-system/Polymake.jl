@@ -44,4 +44,10 @@ extern std::string (*show_vec_rational)(const pm::Vector<pm::Rational>&);
 extern std::string (*show_mat_integer)(const pm::Matrix<pm::Integer>&);
 extern std::string (*show_mat_rational)(const pm::Matrix<pm::Rational>&);
 
+template<typename T>
+pm::Set<T> to_set(pm::perl::PropertyValue v){
+   pm::Set<T> s = v;
+   return s;
+}
+
 #endif

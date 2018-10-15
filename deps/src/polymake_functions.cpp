@@ -63,15 +63,6 @@ pm::Integer new_integer_from_bigint(jl_value_t* integer){
     return *p;
 }
 
-template<typename T>
-pm::Set<T> to_set_T(pm::perl::PropertyValue v){
-   pm::Set<T> s = v;
-   return s;
-}
-
-pm::Set<int64_t> (*to_set_int64)(pm::perl::PropertyValue) = &to_set_T<int64_t>;
-pm::Set<int32_t> (*to_set_int32)(pm::perl::PropertyValue) = &to_set_T<int32_t>;
-
 template<typename T, typename S>
 void fill_jlarray_T_from_S(jlcxx::ArrayRef<T> arr, S itr){
    int64_t index{0};
