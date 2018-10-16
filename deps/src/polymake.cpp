@@ -65,9 +65,11 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         // typedef typename decltype(wrapped)::foo X;
         wrapped.template constructor<int64_t, int64_t>();
         
-        wrapped.method("getindex", [](WrappedT& f, int64_t i, int64_t j){ return elemType(f(i,j));});
-        wrapped.method("setindex!", [](WrappedT& M, int64_t i, int64_t j, elemType r){
-            M(i,j)=r;
+        wrapped.method("_getindex", [](WrappedT& f, int64_t i, int64_t j){
+          return elemType(f(i-1,j-1));
+        });
+        wrapped.method("_setindex!", [](WrappedT& M, elemType r, int64_t i, int64_t j){
+            M(i-1,j-1)=r;
         });
         wrapped.method("rows",&WrappedT::rows);
         wrapped.method("cols",&WrappedT::cols);
@@ -95,12 +97,12 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         wrapped.method("_getindex", [](WrappedT& V, int64_t n){
           return elemType(V[n-1]);
         });
-        wrapped.method("_setindex!",[](WrappedT& V, elemType v, int64_t n){
-            V[n-1]=v;
-            return v;
+        wrapped.method("_setindex!",[](WrappedT& V, elemType val, int64_t n){
+            V[n-1]=val;
+            return elemType(V[n-1]);
         });
         wrapped.method("length", &WrappedT::size);
-        wrapped.method("resize",[](WrappedT& V, int64_t sz){
+        wrapped.method("resize!",[](WrappedT& V, int64_t sz){
           V.resize(sz);
         });
         

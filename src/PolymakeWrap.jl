@@ -96,17 +96,52 @@ include("convert.jl")
 include("sets.jl")
 # to be moved to Vectors/Matrices
 pm_Integer(b::BigInt) = new_pm_Integer(b)
-pm_Rational(num::BigInt, den::BigInt) = pm_Rational(pm_Integer(num), pm_Integer(den))
+pm_Rational(num::T, den::T) where T<:Integer = pm_Rational(pm_Integer(num), pm_Integer(den))
+pm_Rational(r::R) where R<:Rational = pm_Rational(numerator(r), denominator(r))
+
+for (pm_T, Abstract_T) in [
+            (:pm_Vector, :AbstractVector),
+            (:pm_Matrix, :AbstractMatrix),
+            ]
+    @eval begin
+        function $(pm_T)(v::$(Abstract_T){T}) where T<:Integer
+            res = $(pm_T){pm_Integer}(size(v)...)
+            res .= v
+            return res
+        end
+
+        function $(pm_T)(v::$(Abstract_T){T}) where T<:Rational
+            res = $(pm_T){pm_Rational}(size(v)...)
+            res .= v
+            return res
+        end
+    end
+end
 
 Base.size(v::pm_Vector) = (length(v),)
 Base.size(m::pm_Matrix) = (Polymake.rows(m), Polymake.cols(m))
 
-function Base.getindex(V::pmV, n::Integer) where pmV <: pm_Vector 
+function Base.getindex(V::pmV, n::Int) where pmV <: pm_Vector 
     1 <= n <= length(V) || throw(BoundsError(V, n))
-    Polymake._getindex(V, n)
+    return Polymake._getindex(V, n)
 end
+
 function Base.setindex!(V::pmV, val, n::Int) where {T, pmV <: pm_Vector{T}}
     1 <= n <= length(V) || throw(BoundsError(V, n))
     return Polymake._setindex!(V, T(val), n)
 end
+
+function Base.getindex(M::pmM, i::Integer, j::Integer) where pmM <: pm_Matrix 
+    1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
+    1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
+    Polymake._getindex(M, Int(i), Int(j))
 end
+
+function Base.setindex!(M::pmM, val, i::Integer, j::Integer) where {T, pmM <: pm_Matrix{T}}
+    1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
+    1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
+    return Polymake._setindex!(M, T(val), i, j)
+end
+
+
+end # of module PolymakeWrap
