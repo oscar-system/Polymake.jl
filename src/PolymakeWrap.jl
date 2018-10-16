@@ -96,8 +96,16 @@ include("convert.jl")
 include("sets.jl")
 # to be moved to Vectors/Matrices
 pm_Integer(b::BigInt) = new_pm_Integer(b)
-pm_Rational(num::T, den::T) where T<:Integer = pm_Rational(pm_Integer(num), pm_Integer(den))
+pm_Rational(num::T, den::T) where T<:Integer = 
+    pm_Rational(pm_Integer(num), pm_Integer(den))
 pm_Rational(r::R) where R<:Rational = pm_Rational(numerator(r), denominator(r))
+Base.one(i::T) where T <:pm_Integer = pm_Integer(1)
+pm_Rational(int::Integer) = pm_Rational(int, one(int))
+
+Base.promote_rule(::Type{T}, ::Type{Polymake.pm_IntegerAllocated}) where T<:Integer = pm_Integer
+Base.promote_rule(::Type{T}, ::Type{Polymake.pm_RationalAllocated}) where T <: Union{Integer, Rational} = pm_Rational
+
+convert(::Type{pm_Rational}, int::Integer) = pm_Rational(int)
 
 for (pm_T, Abstract_T) in [
             (:pm_Vector, :AbstractVector),
@@ -115,6 +123,8 @@ for (pm_T, Abstract_T) in [
             res .= v
             return res
         end
+        
+        $(pm_T){T}(v::$(Abstract_T)) where T = $(pm_T)(convert($(Abstract_T){T}, v))
     end
 end
 
