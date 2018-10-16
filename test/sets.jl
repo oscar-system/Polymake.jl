@@ -1,4 +1,4 @@
-@testset "pm_Set specific tests" begin
+@testset "pm_Set" begin
     pm_Set = PolymakeWrap.pm_Set
     IntTypes = [Int32, Int64]
 
