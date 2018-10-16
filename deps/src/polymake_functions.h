@@ -34,11 +34,4 @@ std::string show_small_object(const T& obj){
     return buffer.str();
 }
 
-
-template<typename T>
-pm::Set<T> to_set(pm::perl::PropertyValue v){
-   pm::Set<T> s = v;
-   return s;
-}
-
 #endif
