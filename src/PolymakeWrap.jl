@@ -121,26 +121,28 @@ end
 Base.size(v::pm_Vector) = (length(v),)
 Base.size(m::pm_Matrix) = (Polymake.rows(m), Polymake.cols(m))
 
-function Base.getindex(V::pmV, n::Int) where pmV <: pm_Vector 
+function Base.getindex(V::pmV, n::Integer) where pmV <: pm_Vector 
     1 <= n <= length(V) || throw(BoundsError(V, n))
-    return Polymake._getindex(V, n)
+    return Polymake._getindex(V, Int(n))
 end
 
-function Base.setindex!(V::pmV, val, n::Int) where {T, pmV <: pm_Vector{T}}
+function Base.setindex!(V::pmV, val, n::Integer) where {T, pmV <: pm_Vector{T}}
     1 <= n <= length(V) || throw(BoundsError(V, n))
-    return Polymake._setindex!(V, T(val), n)
+    Polymake._setindex!(V, T(val), Int(n))
+    return V
 end
 
 function Base.getindex(M::pmM, i::Integer, j::Integer) where pmM <: pm_Matrix 
     1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
     1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
-    Polymake._getindex(M, Int(i), Int(j))
+    return Polymake._getindex(M, Int(i), Int(j))
 end
 
 function Base.setindex!(M::pmM, val, i::Integer, j::Integer) where {T, pmM <: pm_Matrix{T}}
     1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
     1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
-    return Polymake._setindex!(M, T(val), i, j)
+    Polymake._setindex!(M, T(val), Int(i), Int(j))
+    return M
 end
 
 

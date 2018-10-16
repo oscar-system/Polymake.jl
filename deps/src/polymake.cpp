@@ -99,7 +99,6 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         });
         wrapped.method("_setindex!",[](WrappedT& V, elemType val, int64_t n){
             V[n-1]=val;
-            return elemType(V[n-1]);
         });
         wrapped.method("length", &WrappedT::size);
         wrapped.method("resize!",[](WrappedT& V, int64_t sz){
