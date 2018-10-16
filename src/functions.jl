@@ -61,6 +61,6 @@ function Base.show(io::IO,obj::Polymake.pm_perl_Object)
     print(io, Polymake.properties(obj))
 end
 
-function Base.show(io::IO,obj::SmallObject)
+function Base.show(io::IO, obj::SmallObject)
     print(io, Polymake.show_small_obj(obj))
 end

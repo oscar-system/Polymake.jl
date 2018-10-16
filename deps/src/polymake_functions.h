@@ -12,17 +12,21 @@ polymake::perl::Object call_func_2args(std::string, int, int);
 
 pm::perl::Object to_perl_object(pm::perl::PropertyValue);
 
-pm::Integer to_pm_Integer(pm::perl::PropertyValue);
+bool to_bool(pm::perl::PropertyValue v);
+pm::Integer to_pm_Integer(pm::perl::PropertyValue v);
+pm::Rational to_pm_Rational(pm::perl::PropertyValue v);
 
-pm::Rational to_pm_Rational(pm::perl::PropertyValue);
-
-bool to_bool(pm::perl::PropertyValue);
+template<typename T>
+T to_SmallObject(pm::perl::PropertyValue pv){
+    T obj = pv;
+    return obj;
+};
 
 extern pm::Vector<pm::Integer> (*to_vector_integer)(pm::perl::PropertyValue);
-extern pm::Vector<pm::Rational> (*to_vector_rational)(pm::perl::PropertyValue);
+extern pm::Vector<pm::Rational>(*to_vector_rational)(pm::perl::PropertyValue); 
 
 extern pm::Matrix<pm::Integer> (*to_matrix_integer)(pm::perl::PropertyValue);
-extern pm::Matrix<pm::Rational> (*to_matrix_rational)(pm::perl::PropertyValue);
+extern pm::Matrix<pm::Rational>(*to_matrix_rational)(pm::perl::PropertyValue);
 
 pm::Integer new_integer_from_bigint(jl_value_t*);
 
