@@ -31,7 +31,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.add_type<pm::Integer>("pm_Integer", jlcxx::julia_type("Integer", "Base"))
     .constructor<int32_t>()
     .constructor<int64_t>()
-    .method("show_small_obj", [](pm::Integer& i){
+    .method("==", [](const pm::Integer& a, const pm::Integer& b){
+      return a == b;
+    })
+    .method("show_small_obj", [](const pm::Integer& i){
       return show_small_object<pm::Integer>(i);
     });
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
@@ -41,16 +44,22 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     .constructor<int32_t, int32_t>()
     .constructor<int64_t, int64_t>()
     .template constructor<pm::Integer, pm::Integer>()
-    .method("numerator",[](pm::Rational r){ return pm::Integer(numerator(r)); })
-    .method("denominator",[](pm::Rational r){ return pm::Integer(denominator(r));})
-    .method("show_small_obj", [](pm::Rational& r){
+    .method("==", [](const pm::Rational& a, const pm::Rational& b){
+      return a == b;
+    })
+    .method("numerator",[](const pm::Rational& r){ return pm::Integer(numerator(r)); })
+    .method("denominator",[](const pm::Rational& r){ return pm::Integer(denominator(r));})
+    .method("show_small_obj", [](const pm::Rational& r){
       return show_small_object<pm::Rational>(r);
     });
 
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
-    .apply<pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>>([](auto wrapped){
+    .apply<
+      pm::Matrix<pm::Integer>,
+      pm::Matrix<pm::Rational>
+    >([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         typedef typename decltype(wrapped)::type::value_type elemType;
         // typedef typename decltype(wrapped)::foo X;
@@ -75,16 +84,20 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
-    .apply<pm::Vector<pm::Integer>, pm::Vector<pm::Rational>>([](auto wrapped){
+    .apply<
+      pm::Vector<pm::Integer>,
+      pm::Vector<pm::Rational>
+    >([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         typedef typename decltype(wrapped)::type::value_type elemType;
         // typedef typename decltype(wrapped)::foo X;
         wrapped.template constructor<int64_t>();
-        wrapped.method("getindex", [](WrappedT& V, int64_t n){
-          return elemType(V[n]);
+        wrapped.method("_getindex", [](WrappedT& V, int64_t n){
+          return elemType(V[n-1]);
         });
-        wrapped.method("setindex!",[](WrappedT& V, int64_t n, elemType v){
-            V[n]=v;
+        wrapped.method("_setindex!",[](WrappedT& V, elemType v, int64_t n){
+            V[n-1]=v;
+            return v;
         });
         wrapped.method("length", &WrappedT::size);
         wrapped.method("resize",[](WrappedT& V, int64_t sz){

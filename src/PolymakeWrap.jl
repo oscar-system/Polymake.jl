@@ -94,7 +94,19 @@ const SmallObject = Union{Polymake.pm_Integer,
 include("functions.jl")
 include("convert.jl")
 include("sets.jl")
+# to be moved to Vectors/Matrices
+pm_Integer(b::BigInt) = new_pm_Integer(b)
+pm_Rational(num::BigInt, den::BigInt) = pm_Rational(pm_Integer(num), pm_Integer(den))
 
 Base.size(v::pm_Vector) = (length(v),)
 Base.size(m::pm_Matrix) = (Polymake.rows(m), Polymake.cols(m))
+
+function Base.getindex(V::pmV, n::Integer) where pmV <: pm_Vector 
+    1 <= n <= length(V) || throw(BoundsError(V, n))
+    Polymake._getindex(V, n)
+end
+function Base.setindex!(V::pmV, val, n::Int) where {T, pmV <: pm_Vector{T}}
+    1 <= n <= length(V) || throw(BoundsError(V, n))
+    return Polymake._setindex!(V, T(val), n)
+end
 end
