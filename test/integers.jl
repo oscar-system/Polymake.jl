@@ -31,6 +31,7 @@
 
     @testset "Arithmetic" begin
         a = PolymakeWrap.pm_Integer(2)
+        @test -a == -2
         for b in [Int32(5), Int64(5), big(5), PolymakeWrap.pm_Integer(5)]
             # check promotion
             @test a + b isa PolymakeWrap.pm_Integer
