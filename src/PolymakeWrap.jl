@@ -95,10 +95,11 @@ include("functions.jl")
 include("convert.jl")
 include("sets.jl")
 # to be moved to Vectors/Matrices
+
 pm_Integer(b::BigInt) = new_pm_Integer(b)
 pm_Rational(num::T, den::T) where T<:Integer = 
     pm_Rational(pm_Integer(num), pm_Integer(den))
-pm_Rational(r::R) where R<:Rational = pm_Rational(numerator(r), denominator(r))
+pm_Rational(r::Rational) = pm_Rational(numerator(r), denominator(r))
 Base.one(i::T) where T <:pm_Integer = pm_Integer(1)
 pm_Rational(int::Integer) = pm_Rational(int, one(int))
 
@@ -131,26 +132,26 @@ end
 Base.size(v::pm_Vector) = (length(v),)
 Base.size(m::pm_Matrix) = (Polymake.rows(m), Polymake.cols(m))
 
-function Base.getindex(V::pmV, n::Integer) where pmV <: pm_Vector 
-    1 <= n <= length(V) || throw(BoundsError(V, n))
+Base.@propagate_inbounds function Base.getindex(V::pm_Vector, n::Integer)
+    @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
     return Polymake._getindex(V, Int(n))
 end
 
-function Base.setindex!(V::pmV, val, n::Integer) where {T, pmV <: pm_Vector{T}}
-    1 <= n <= length(V) || throw(BoundsError(V, n))
+Base.@propagate_inbounds function Base.setindex!(V::pm_Vector{T}, val, n::Integer) where T
+    @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
     Polymake._setindex!(V, T(val), Int(n))
     return V
 end
 
-function Base.getindex(M::pmM, i::Integer, j::Integer) where pmM <: pm_Matrix 
-    1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
-    1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
+Base.@propagate_inbounds function Base.getindex(M::pm_Matrix , i::Integer, j::Integer)
+    @boundscheck 1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck 1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
     return Polymake._getindex(M, Int(i), Int(j))
 end
 
-function Base.setindex!(M::pmM, val, i::Integer, j::Integer) where {T, pmM <: pm_Matrix{T}}
-    1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
-    1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
+Base.@propagate_inbounds function Base.setindex!(M::pm_Matrix{T}, val, i::Integer, j::Integer) where T
+    @boundscheck 1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck 1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
     Polymake._setindex!(M, T(val), Int(i), Int(j))
     return M
 end
