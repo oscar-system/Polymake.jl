@@ -46,9 +46,3 @@ pm::Vector<pm::Rational> (*to_vector_rational)(pm::perl::PropertyValue) = &to_Sm
 
 pm::Matrix<pm::Integer> (*to_matrix_integer)(pm::perl::PropertyValue) = &to_SmallObject<pm::Matrix<pm::Integer>>;
 pm::Matrix<pm::Rational> (*to_matrix_rational)(pm::perl::PropertyValue) = &to_SmallObject<pm::Matrix<pm::Rational>>;
-
-pm::Integer new_integer_from_bigint(jl_value_t* integer){
-    pm::Integer* p;
-    p = reinterpret_cast<pm::Integer*>(integer);
-    return *p;
-}

@@ -23,7 +23,7 @@ T to_SmallObject(pm::perl::PropertyValue pv){
 };
 
 extern pm::Vector<pm::Integer> (*to_vector_integer)(pm::perl::PropertyValue);
-extern pm::Vector<pm::Rational>(*to_vector_rational)(pm::perl::PropertyValue); 
+extern pm::Vector<pm::Rational>(*to_vector_rational)(pm::perl::PropertyValue);
 
 extern pm::Matrix<pm::Integer> (*to_matrix_integer)(pm::perl::PropertyValue);
 extern pm::Matrix<pm::Rational>(*to_matrix_rational)(pm::perl::PropertyValue);
@@ -32,9 +32,13 @@ pm::Integer new_integer_from_bigint(jl_value_t*);
 
 // We can do better templating here
 template<typename T>
-std::string show_small_object(const T& obj){
+std::string show_small_object(const T& obj, bool print_typename = true){
     std::ostringstream buffer;
-    wrap(buffer) << polymake::legible_typename(typeid(obj)) << pm::endl << obj;
+    auto wrapped_buffer = wrap(buffer);
+    if (print_typename) {
+        wrapped_buffer << polymake::legible_typename(typeid(obj)) << pm::endl;
+    }
+    wrapped_buffer << obj;
     return buffer.str();
 }
 

@@ -8,14 +8,6 @@ function convert(::Type{BigInt},int::Polymake.pm_perl_PropertyValue)
     return to_pm_Integer(int)
 end
 
-function convert(::Type{Polymake.pm_Integer},int::BigInt)
-    return Polymake.new_pm_Integer(int)
-end
-
-function convert(::Type{Polymake.pm_Integer},int::T) where T <: Union{Int128,Int64,Int32}
-    return Polymake.pm_Integer(int)
-end
-
 function convert(::Type{Rational{BigInt}},rat::Polymake.pm_Rational)
     num = Polymake.numerator(rat)
     denom = Polymake.denominator(rat)

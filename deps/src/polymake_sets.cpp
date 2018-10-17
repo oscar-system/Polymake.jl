@@ -16,9 +16,9 @@ void polymake_module_add_set(jlcxx::Module& polymake){
     >([](auto wrapped){
         typedef typename decltype(wrapped)::type pm_Set;
         typedef typename decltype(wrapped)::type::value_type elemType;
-        
+
         wrapped.template constructor<pm::Set<elemType>>();
-        
+
         wrapped.method("_new_set", [](jlcxx::ArrayRef<elemType> A){
           pm::Set<elemType> s{A.begin(), A.end()};
           return s;
@@ -63,7 +63,7 @@ void polymake_module_add_set(jlcxx::Module& polymake){
           return show_small_object<pm_Set>(S);
         });
     });
-    
+
   polymake.method("to_set_int32", [](pm::perl::PropertyValue v){
     return to_SmallObject<pm::Set<int32_t>>(v);
   });
