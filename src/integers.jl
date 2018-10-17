@@ -8,8 +8,10 @@ Polymake.pm_Integer(int::Int128) = Polymake.pm_Integer(big(int))
 Polymake.pm_Integer(int::BigInt) = Polymake.new_pm_Integer_from_bigint(int)
 Polymake.pm_Integer(int::Integer) = Polymake.pm_Integer(BigInt(int))
 
-Base.one(i::pm_Integer) = pm_Integer(1)
-Base.zero(i::pm_Integer) = pm_Integer(0)
+Base.one(i::Type{<:Polymake.pm_Integer}) = pm_Integer(1)
+Base.one(i::Polymake.pm_Integer) = pm_Integer(1)
+Base.zero(i::Polymake.pm_Integer) = pm_Integer(0)
+Base.zero(i::Type{<:Polymake.pm_Integer}) = pm_Integer(0)
 
 import Base: ==, <, <=
 # These are operations we delegate to gmp

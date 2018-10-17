@@ -16,6 +16,19 @@
         end
     end
 
+    @testset "zero / one" begin
+        a = PolymakeWrap.pm_Integer(0)
+        b = PolymakeWrap.pm_Integer(1)
+
+        @test one(a) isa PolymakeWrap.pm_Integer
+        @test zero(a) isa PolymakeWrap.pm_Integer
+        @test one(PolymakeWrap.pm_Integer) isa PolymakeWrap.pm_Integer
+        @test zero(PolymakeWrap.pm_Integer) isa PolymakeWrap.pm_Integer
+
+        @test one(PolymakeWrap.pm_Integer) == one(a) == 1
+        @test zero(PolymakeWrap.pm_Integer) == zero(a) == 0
+    end
+
     @testset "Arithmetic" begin
         a = PolymakeWrap.pm_Integer(2)
         for b in [Int32(5), Int64(5), big(5), PolymakeWrap.pm_Integer(5)]
