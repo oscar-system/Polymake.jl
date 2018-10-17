@@ -46,7 +46,7 @@ end
         @test pmR(3//4) == pmR(3, 4) == pmR(big(3)//4)== pmR(big(3), big(4))
 
         str(a::pmR) = PolymakeWrap.Polymake.show_small_obj(a)
-        @test str(x) == str(y) == str(y) == "pm::Rational\n4/3"
+        @test str(x) == str(y) == str(y) == "4/3"
 
         @test one(pmR) == one(pmI)
 

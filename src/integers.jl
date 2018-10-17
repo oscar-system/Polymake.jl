@@ -34,6 +34,6 @@ function Base.convert(::Type{<:Polymake.pm_Integer}, int::Integer)
 end
 Base.convert(::Type{<:Polymake.pm_Integer}, int::Polymake.pm_IntegerAllocated) = int
 # Convert from PM to Julia
-function Base.convert(::Type{T}, int::Polymake.pm_Integer) where {T<:Number}
+function Base.convert(::Type{T}, int::Polymake.pm_Integer) where {T<:Integer}
     convert(T, BigInt(int))
 end
