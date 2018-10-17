@@ -57,10 +57,11 @@ function give(obj::Polymake.pm_perl_Object,prop::String)
     return typename_func(type_name)(return_obj)
 end
 
-function Base.show(io::IO,obj::Polymake.pm_perl_Object)
+function Base.show(io::IO, obj::Polymake.pm_perl_Object)
     print(io, Polymake.properties(obj))
 end
 
-function Base.show(io::IO, obj::SmallObject)
+function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, Polymake.show_small_obj(obj))
 end
+Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
