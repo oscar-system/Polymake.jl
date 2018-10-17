@@ -33,8 +33,7 @@ function convert(::Type{Polymake.pm_Matrix{Polymake.pm_Integer}}, matrix::Array{
     pm_matrix = Polymake.pm_Matrix{Polymake.pm_Integer}(rows,cols)
     for i in 1:rows
         for j in 1:cols
-            converted = convert(Polymake.pm_Integer,matrix[i,j])
-            Polymake.set_entry(pm_matrix, i-1, j-1, converted )
+            pm_matrix[i,j] = matrix[i,j]
         end
     end
     return pm_matrix
@@ -45,8 +44,7 @@ function convert(::Type{Polymake.pm_Matrix{Polymake.pm_Rational}}, matrix::Array
     pm_matrix = Polymake.pm_Matrix{Polymake.pm_Rational}(rows,cols)
     for i in 1:rows
         for j in 1:cols
-            converted = convert(Polymake.pm_Rational,matrix[i,j])
-            Polymake.set_entry(pm_matrix, i-1, j-1, converted )
+            pm_matrix[i,j] = matrix[i,j]
         end
     end
     return pm_matrix
@@ -56,8 +54,7 @@ function convert(::Type{Polymake.pm_Vector{Polymake.pm_Integer}}, matrix::Array{
     (dim,) = size(matrix)
     pm_matrix = Polymake.pm_Vector{Polymake.pm_Integer}(dim)
     for i in 1:dim
-        converted = convert(Polymake.pm_Integer,matrix[i])
-        Polymake.set_entry(pm_matrix, i-1, converted )
+        pm_matrix[i] = matrix[i] 
     end
     return pm_matrix
 end
@@ -66,8 +63,7 @@ function convert(::Type{Polymake.pm_Vector{Polymake.pm_Rational}}, matrix::Array
     (dim,) = size(matrix)
     pm_matrix = Polymake.pm_Vector{Polymake.pm_Rational}(dim)
     for i in 1:dim
-        converted = convert(Polymake.pm_Rational,matrix[i])
-        Polymake.set_entry(pm_matrix, i-1, converted )
+        pm_matrix[i] = matrix[i]
     end
     return pm_matrix
 end
