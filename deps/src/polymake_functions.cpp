@@ -27,6 +27,10 @@ pm::perl::Object to_perl_object(pm::perl::PropertyValue v){
     return v;
 }
 
+bool to_bool(pm::perl::PropertyValue v){
+    return static_cast<bool>(v);
+}
+
 pm::Integer to_pm_Integer(pm::perl::PropertyValue v){
     pm::Integer integer = v;
     return integer;
@@ -37,25 +41,11 @@ pm::Rational to_pm_Rational(pm::perl::PropertyValue v){
     return integer;
 }
 
-bool to_bool(pm::perl::PropertyValue v){
-    return static_cast<bool>(v);
-}
+pm::Vector<pm::Integer> (*to_vector_integer)(pm::perl::PropertyValue) = &to_SmallObject<pm::Vector<pm::Integer>>;
+pm::Vector<pm::Rational> (*to_vector_rational)(pm::perl::PropertyValue) = &to_SmallObject<pm::Vector<pm::Rational>>;
 
-template<typename T>
-pm::Vector<T> to_vector_T(pm::perl::PropertyValue v){
-    pm::Vector<T> m = v;
-    return m;
-}
-pm::Vector<pm::Integer> (*to_vector_integer)(pm::perl::PropertyValue) = &to_vector_T<pm::Integer>;
-pm::Vector<pm::Rational> (*to_vector_rational)(pm::perl::PropertyValue) = &to_vector_T<pm::Rational>;
-
-template<typename T>
-pm::Matrix<T> to_matrix_T(pm::perl::PropertyValue v){
-    pm::Matrix<T> m = v;
-    return m;
-}
-pm::Matrix<pm::Integer> (*to_matrix_integer)(pm::perl::PropertyValue) = &to_matrix_T<pm::Integer>;
-pm::Matrix<pm::Rational> (*to_matrix_rational)(pm::perl::PropertyValue) = &to_matrix_T<pm::Rational>;
+pm::Matrix<pm::Integer> (*to_matrix_integer)(pm::perl::PropertyValue) = &to_SmallObject<pm::Matrix<pm::Integer>>;
+pm::Matrix<pm::Rational> (*to_matrix_rational)(pm::perl::PropertyValue) = &to_SmallObject<pm::Matrix<pm::Rational>>;
 
 pm::Integer new_integer_from_bigint(jl_value_t* integer){
     pm::Integer* p;
