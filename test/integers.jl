@@ -32,6 +32,11 @@
             @test a - b == -3
             @test b - a == 3
             @test a * b == b * a == 10
+
+            @test div(a, b) == 0
+            @test div(b, a) == 2
+            @test rem(a, b) == 2
+            @test rem(b, a) == 1
         end
     end
 

@@ -38,16 +38,32 @@ void polymake_module_add_integer(jlcxx::Module& polymake){
     .method("+",[](pm::Integer &a, pm::Integer &b){ return a + b; })
     .method("+",[](pm::Integer &a, int64_t b){ return a + static_cast<long>(b); })
     .method("+",[](pm::Integer &a, int32_t b){ return a + b; })
-    // the symmetric definitions are on the julia side
+    .method("+",[](int64_t a, pm::Integer &b){ return static_cast<long>(a) + b; })
+    .method("+",[](int32_t a, pm::Integer &b){ return a + b; })
+
     .method("*",[](pm::Integer &a, pm::Integer &b){ return a * b; })
     .method("*",[](pm::Integer &a, int64_t b){ return a * static_cast<long>(b); })
     .method("*",[](pm::Integer &a, int32_t b){ return a * b; })
+    .method("*",[](int64_t a, pm::Integer &b){ return static_cast<long>(a) * b; })
+    .method("*",[](int32_t a, pm::Integer &b){ return a * b; })
 
     .method("-",[](pm::Integer &a, pm::Integer &b){ return a - b; })
     .method("-",[](pm::Integer &a, int64_t b){ return a - static_cast<long>(b); })
     .method("-",[](pm::Integer &a, int32_t b){ return a - b; })
     .method("-",[](int64_t a, pm::Integer &b){ return static_cast<long>(a) - b; })
-    .method("-",[](int32_t a, pm::Integer &b){ return a - b; });
+    .method("-",[](int32_t a, pm::Integer &b){ return a - b; })
+
+    .method("div",[](pm::Integer &a, pm::Integer &b){ return a / b; })
+    .method("div",[](pm::Integer &a, int64_t b){ return a / static_cast<long>(b); })
+    .method("div",[](pm::Integer &a, int32_t b){ return a / b; })
+    .method("div",[](int64_t a, pm::Integer &b){ return static_cast<long>(a) / b; })
+    .method("div",[](int32_t a, pm::Integer &b){ return a / b; })
+
+    .method("rem",[](pm::Integer &a, pm::Integer &b){ return a % b; })
+    .method("rem",[](pm::Integer &a, int64_t b){ return a % static_cast<long>(b); })
+    .method("rem",[](pm::Integer &a, int32_t b){ return a % b; })
+    .method("rem",[](int64_t a, pm::Integer &b){ return static_cast<long>(a) % b; })
+    .method("rem",[](int32_t a, pm::Integer &b){ return a % b; });
 
   polymake.method("new_pm_Integer_from_bigint", new_integer_from_bigint);
 

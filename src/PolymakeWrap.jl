@@ -12,7 +12,8 @@ module Polymake
         numerator,
         push!,
         setdiff, setdiff!, setindex!, symdiff, symdiff!,
-        union, union!
+        union, union!,
+        div, rem
 
     using CxxWrap
 
