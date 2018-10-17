@@ -40,7 +40,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     .method("numerator",[](const pm::Rational& r){ return pm::Integer(numerator(r)); })
     .method("denominator",[](const pm::Rational& r){ return pm::Integer(denominator(r));})
     .method("show_small_obj", [](const pm::Rational& r){
-      return show_small_object<pm::Rational>(r);
+      return show_small_object<pm::Rational>(r, false);
     });
 
   polymake_module_add_integer(polymake);

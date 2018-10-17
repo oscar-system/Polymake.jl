@@ -32,7 +32,7 @@ void polymake_module_add_integer(jlcxx::Module& polymake){
     .method("<=", [](int32_t a, pm::Integer& b){ return a <= b; })
 
     .method("show_small_obj", [](pm::Integer& i){
-      return show_small_object<pm::Integer>(i);
+      return show_small_object<pm::Integer>(i, false);
     })
     // the symmetric definitions are on the julia side
     .method("+",[](pm::Integer &a, pm::Integer &b){ return a + b; })
