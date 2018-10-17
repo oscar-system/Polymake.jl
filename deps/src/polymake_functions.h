@@ -32,7 +32,7 @@ pm::Integer new_integer_from_bigint(jl_value_t*);
 
 // We can do better templating here
 template<typename T>
-std::string show_small_object(const T& obj, bool print_typename = false){
+std::string show_small_object(const T& obj, bool print_typename = true){
     std::ostringstream buffer;
     auto wrapped_buffer = wrap(buffer);
     if (print_typename) {
