@@ -23,7 +23,7 @@ T to_SmallObject(pm::perl::PropertyValue pv){
 };
 
 extern pm::Vector<pm::Integer> (*to_vector_integer)(pm::perl::PropertyValue);
-extern pm::Vector<pm::Rational>(*to_vector_rational)(pm::perl::PropertyValue); 
+extern pm::Vector<pm::Rational>(*to_vector_rational)(pm::perl::PropertyValue);
 
 extern pm::Matrix<pm::Integer> (*to_matrix_integer)(pm::perl::PropertyValue);
 extern pm::Matrix<pm::Rational>(*to_matrix_rational)(pm::perl::PropertyValue);

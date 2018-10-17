@@ -4,6 +4,8 @@
 
 #include "polymake_functions.h"
 
+#include "polymake_integers.h"
+
 #include "polymake_sets.h"
 
 #include "polymake_caller.h"
@@ -28,18 +30,6 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
                                                 });
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_Object);
 
-  polymake.add_type<pm::Integer>("pm_Integer", jlcxx::julia_type("Integer", "Base"))
-    .constructor<int32_t>()
-    .constructor<int64_t>()
-    .method("==", [](const pm::Integer& a, const pm::Integer& b){
-      return a == b;
-    })
-    .method("show_small_obj", [](const pm::Integer& i){
-      return show_small_object<pm::Integer>(i);
-    });
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
-  polymake.method("new_pm_Integer",new_integer_from_bigint);
-
   polymake.add_type<pm::Rational>("pm_Rational", jlcxx::julia_type("Real", "Base"))
     .constructor<int32_t, int32_t>()
     .constructor<int64_t, int64_t>()
@@ -53,6 +43,9 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
       return show_small_object<pm::Rational>(r);
     });
 
+  polymake_module_add_integer(polymake);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
+
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
@@ -64,7 +57,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         typedef typename decltype(wrapped)::type::value_type elemType;
         // typedef typename decltype(wrapped)::foo X;
         wrapped.template constructor<int64_t, int64_t>();
-        
+
         wrapped.method("_getindex", [](WrappedT& f, int64_t i, int64_t j){
           return elemType(f(i-1,j-1));
         });
@@ -74,7 +67,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         wrapped.method("rows",&WrappedT::rows);
         wrapped.method("cols",&WrappedT::cols);
         wrapped.method("resize",[](WrappedT& M, int64_t i, int64_t j){ M.resize(i,j); });
-        
+
         wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& M){
             p.take(s) << M;
         });
@@ -104,7 +97,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         wrapped.method("resize!",[](WrappedT& V, int64_t sz){
           V.resize(sz);
         });
-        
+
         wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& V){
             p.take(s) << V;
         });
