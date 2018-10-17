@@ -8,49 +8,7 @@ end
 # write your own tests here
 @testset "PolymakeWrap" begin
     include("integers.jl")
-
-    @testset "pm_Rational" begin
-        pmI = PolymakeWrap.pm_Integer
-        pmR = PolymakeWrap.pm_Rational
-
-        function test_rational(num, den)
-            @test pmR(num, den) isa Number
-            @test pmR(num, den) isa Real
-            @test pmR(num, den) isa pmR
-
-            @test pmR(num//den) isa Number
-            @test pmR(num//den) isa Real
-            @test pmR(num//den) isa pmR
-            x = pmR(num, den)
-            @test numerator(x) isa PolymakeWrap.pm_Integer
-            @test numerator(x) == PolymakeWrap.pm_Integer(num)
-            @test denominator(x) isa PolymakeWrap.pm_Integer
-            @test denominator(x) == PolymakeWrap.pm_Integer(den)
-
-            @test pmR(num) isa pmR
-            return x
-        end
-
-        x = test_rational(Int32(4), Int32(3))
-        y = test_rational(4,3)
-        z = test_rational(big(4), big(3))
-
-        @test x == y == z == 4//3
-        @test pmR(pmI(4), pmI(3)) == x
-        @test x != pmR(4,4)
-
-        @test pmR(2, 4) == pmR(1, 2)
-        @test pmR(2//4) == pmR(1//2)
-        @test pmR(2, 4) == 1//2
-
-        @test pmR(3//4) == pmR(3, 4) == pmR(big(3)//4)== pmR(big(3), big(4))
-
-        str(a::pmR) = PolymakeWrap.Polymake.show_small_obj(a)
-        @test str(x) == str(y) == str(y) == "4/3"
-
-        @test one(pmR) == one(pmI)
-
-    end
+    include("rationals.jl")
 
     @testset "pm_Vector" begin
         pmV = PolymakeWrap.pm_Vector
