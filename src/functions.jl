@@ -51,6 +51,8 @@ function typename_func(typename::String)
     return identity
 end
 
+Base.getproperty(obj::Polymake.pm_perl_Object, prop::Symbol) = give(obj, string(prop))
+
 function give(obj::Polymake.pm_perl_Object,prop::String)
     return_obj = Polymake.give(obj,prop)
     type_name = Polymake.typeinfo_string(return_obj)
