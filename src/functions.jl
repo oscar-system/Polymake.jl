@@ -16,14 +16,25 @@ function upper_bound_theorem(n,d)
     return Polymake.call_func_2args("upper_bound_theorem",n,d)
 end
 
-function perlobj(name::String,input_data::Dict{String,T}) where T
+function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
     polytope = Polymake.pm_perl_Object(name)
     for value in input_data
-        key = value[1]
+        key = string(value[1])
         val = convert_to_pm(value[2])
         Polymake.take(polytope,key,val)
     end
     return polytope
+end
+
+function perlobj(name::String, input_data::Pair{Symbol}...; kwargsdata...)
+    obj = Polymake.pm_perl_Object(name)
+    for (key, val) in input_data
+        setproperty!(obj, key, val)
+    end
+    for (key, val) in kwargsdata
+        setproperty!(obj, key, val)
+    end
+    return obj
 end
 
 function typename_func(typename::String)
@@ -51,6 +62,9 @@ function typename_func(typename::String)
     return identity
 end
 
+function Base.setproperty!(obj::Polymake.pm_perl_Object, prop::Symbol, val)
+    Polymake.take(obj,string(prop), convert_to_pm(val))
+end
 Base.getproperty(obj::Polymake.pm_perl_Object, prop::Symbol) = give(obj, string(prop))
 
 function give(obj::Polymake.pm_perl_Object,prop::String)
