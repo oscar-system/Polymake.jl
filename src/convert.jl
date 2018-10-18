@@ -54,7 +54,7 @@ function convert(::Type{Polymake.pm_Vector{Polymake.pm_Integer}}, matrix::Array{
     (dim,) = size(matrix)
     pm_matrix = Polymake.pm_Vector{Polymake.pm_Integer}(dim)
     for i in 1:dim
-        pm_matrix[i] = matrix[i] 
+        pm_matrix[i] = matrix[i]
     end
     return pm_matrix
 end

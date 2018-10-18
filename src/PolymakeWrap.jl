@@ -94,55 +94,7 @@ include("convert.jl")
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")
-# to be moved to Vectors/Matrices
-
-for (pm_T, Abstract_T) in [
-            (:pm_Vector, :AbstractVector),
-            (:pm_Matrix, :AbstractMatrix),
-            ]
-    @eval begin
-        function $(pm_T)(v::$(Abstract_T){T}) where T<:Integer
-            res = $(pm_T){pm_Integer}(size(v)...)
-            res .= v
-            return res
-        end
-
-        function $(pm_T)(v::$(Abstract_T){T}) where T<:Rational
-            res = $(pm_T){pm_Rational}(size(v)...)
-            res .= v
-            return res
-        end
-
-        $(pm_T){T}(v::$(Abstract_T)) where T = $(pm_T)(convert($(Abstract_T){T}, v))
-    end
-end
-
-Base.size(v::pm_Vector) = (length(v),)
-Base.size(m::pm_Matrix) = (Polymake.rows(m), Polymake.cols(m))
-
-Base.@propagate_inbounds function Base.getindex(V::pm_Vector, n::Integer)
-    @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
-    return Polymake._getindex(V, Int(n))
-end
-
-Base.@propagate_inbounds function Base.setindex!(V::pm_Vector{T}, val, n::Integer) where T
-    @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
-    Polymake._setindex!(V, T(val), Int(n))
-    return V
-end
-
-Base.@propagate_inbounds function Base.getindex(M::pm_Matrix , i::Integer, j::Integer)
-    @boundscheck 1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
-    return Polymake._getindex(M, Int(i), Int(j))
-end
-
-Base.@propagate_inbounds function Base.setindex!(M::pm_Matrix{T}, val, i::Integer, j::Integer) where T
-    @boundscheck 1 <= i <= Polymake.rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= Polymake.cols(M) || throw(BoundsError(M, [i,j]))
-    Polymake._setindex!(M, T(val), Int(i), Int(j))
-    return M
-end
-
+include("vectors.jl")
+include("matrices.jl")
 
 end # of module PolymakeWrap
