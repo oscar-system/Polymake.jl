@@ -46,7 +46,7 @@
     @test length(x) == 10
     @test size(x) == (5,2)
 
-    @test PolymakeWrap.Polymake.show_small_obj(x) == "pm::Matrix<pm::Rational>\n0 0\n0 0\n1/2 4\n0 0\n0 0\n"
+    @test PolymakeWrap.show_small_obj(x) == "pm::Matrix<pm::Rational>\n0 0\n0 0\n1/2 4\n0 0\n0 0\n"
 
     m = [1 2 3; 4 5 6]
     @test pmM(Int32.(m)) isa pmM{pmI}

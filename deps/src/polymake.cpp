@@ -98,7 +98,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Integer);
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Rational);
 
-  polymake.method("init", &initialize_polymake);
+  polymake.method("initialize_polymake", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
   polymake.method("call_func_1args",&call_func_1args);
   polymake.method("call_func_2args",&call_func_2args);

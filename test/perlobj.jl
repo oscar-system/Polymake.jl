@@ -1,7 +1,7 @@
 @testset "perlobj" begin
     input_dict_int = Dict( "POINTS" => [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ] )
     input_dict_rat = Dict( "POINTS" => Array{Rational{Int64},2}([ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]) )
-    pm_perl_Object = PolymakeWrap.Polymake.pm_perl_Object
+    pm_perl_Object = PolymakeWrap.pm_perl_Object
 
     @testset "constructors" begin
         @test PolymakeWrap.perlobj("Polytope", input_dict_int ) isa pm_perl_Object

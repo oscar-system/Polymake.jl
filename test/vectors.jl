@@ -50,7 +50,7 @@
     @test length(x) == 4
     @test size(x) == (4,)
 
-    @test PolymakeWrap.Polymake.show_small_obj(x) == "pm::Vector<pm::Rational>\n4 0 1/2 0"
+    @test PolymakeWrap.show_small_obj(x) == "pm::Vector<pm::Rational>\n4 0 1/2 0"
     v = [1,2,3]
     pm_v = pmV{pmI}(3)
     pm_v .= v
