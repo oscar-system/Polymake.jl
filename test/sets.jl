@@ -1,5 +1,4 @@
 @testset "pm_Set" begin
-    pm_Set = PolymakeWrap.pm_Set
     IntTypes = [Int32, Int64]
 
     @testset "constructors" begin
@@ -57,10 +56,10 @@
     @testset "relations" begin
 
         for T in IntTypes, S in IntTypes
-            @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1])) == 0
-            @test PolymakeWrap.incl(pm_Set(S[1]), pm_Set(T[1,2])) == -1
-            @test PolymakeWrap.incl(pm_Set(S[1,2]), pm_Set(T[1])) == 1
-            @test PolymakeWrap.incl(pm_Set(S[1,2]), pm_Set(T[1,3])) == 2
+            @test incl(pm_Set(S[1]), pm_Set(T[1])) == 0
+            @test incl(pm_Set(S[1]), pm_Set(T[1,2])) == -1
+            @test incl(pm_Set(S[1,2]), pm_Set(T[1])) == 1
+            @test incl(pm_Set(S[1,2]), pm_Set(T[1,3])) == 2
 
             # <, <=, == are based on incl; just test that they agree with the julia versions
             @test (pm_Set{S}() < pm_Set{T}()) == (Set{S}() < Set{T}())
@@ -83,7 +82,7 @@
             B = pm_Set(T[5,6,6])
 
             A1 = deepcopy(A)
-            PolymakeWrap.swap(A, B)
+            swap(A, B)
 
             @test A == pm_Set([5,6])
             @test B == pm_Set([1,2,3])
@@ -269,7 +268,6 @@ end
 @testset "julia Sets compatibility" begin
 
     @testset "Construction" begin
-        pm_Set = PolymakeWrap.pm_Set
         let f17741 = x -> x < 0 ? 0 : 1
             @test isa(pm_Set(x for x = 1:3), pm_Set{Int})
             @test isa(pm_Set(x for x = 1:3 for j = 1:1), pm_Set{Int})
@@ -292,7 +290,6 @@ end
     end
 
     @testset "hash" begin
-        pm_Set = PolymakeWrap.pm_Set
         s1 = pm_Set([1, 2, 1])
         s2 = pm_Set([2, 1, 1])
         s3 = pm_Set([3])
@@ -304,7 +301,6 @@ end
     end
 
     @testset "equality" for eq in (isequal, ==)
-        pm_Set = PolymakeWrap.pm_Set
         for T in [Int32, Int64]
             @test  eq(pm_Set{T}(), pm_Set{T}())
             @test !eq(pm_Set{T}(), pm_Set(T[1]))
@@ -325,7 +321,6 @@ end
     end
 
     @testset "eltype, empty" begin
-        pm_Set = PolymakeWrap.pm_Set
         s1 = empty(pm_Set([1,2]))
         @test isequal(s1, pm_Set{Int}())
         @test ===(eltype(s1), Int)
@@ -338,7 +333,6 @@ end
     end
 
     @testset "isempty, length, in, push, pop, delete" begin
-        pm_Set = PolymakeWrap.pm_Set
         # also test for no duplicates
         s = pm_Set{Int}(); push!(s,1); push!(s,2); push!(s,3)
         @test !isempty(s)
@@ -365,7 +359,7 @@ end
 
     @testset "copy" begin
         data_in = (1,2,9,8,4)
-        s = PolymakeWrap.pm_Set(data_in)
+        s = pm_Set(data_in)
         c = copy(s)
         @test isequal(s,c)
         v = pop!(s)
@@ -378,7 +372,6 @@ end
     end
 
     @testset "sizehint, empty" begin
-        pm_Set = PolymakeWrap.pm_Set
         s = pm_Set([1])
         @test isequal(sizehint!(s, 10), pm_Set([1]))
         @test isequal(empty!(s), pm_Set{Int}())
@@ -387,9 +380,9 @@ end
     @testset "iteration" begin
         x = (7, 8, 4, 5, 4, 8)
         for data_in = [x, Set(x), collect(x)]
-            s = PolymakeWrap.pm_Set(data_in)
+            s = pm_Set(data_in)
 
-            s_new = PolymakeWrap.pm_Set{Int}()
+            s_new = pm_Set{Int}()
             for el in s
                 push!(s_new, el)
             end
@@ -404,7 +397,7 @@ end
     end
 
     @testset "union" begin
-        S = PolymakeWrap.pm_Set{Int}
+        S = pm_Set{Int}
         s = ∪(S([1,2]), S([3,4]))
         @test s == S([1,2,3,4])
         s = union(S([5,6,7,8]), S([7,8,9]))
@@ -426,7 +419,7 @@ end
     end
 
     @testset "intersect" begin
-        S = PolymakeWrap.pm_Set{Int}
+        S = pm_Set{Int}
         s = S([1,2]) ∩ S([3,4])
         @test s == S()
         s = intersect(S([5,6,7,8]), S([7,8,9]))
@@ -446,7 +439,7 @@ end
     end
 
     @testset "setdiff" begin
-        S = PolymakeWrap.pm_Set{Int}
+        S = pm_Set{Int}
         @test setdiff(S([1,2,3]), S())        == S([1,2,3])
         @test setdiff(S([1,2,3]), S([1]))     == S([2,3])
         @test setdiff(S([1,2,3]), S([1,2]))   == S([3])
@@ -474,7 +467,7 @@ end
     end
 
     @testset "ordering" begin
-        S = PolymakeWrap.pm_Set{Int}
+        S = pm_Set{Int}
         @test S() < S([1])
         @test S([1]) < S([1,2])
         @test !(S([3]) < S([1,2]))
@@ -491,7 +484,7 @@ end
     end
 
     @testset "issubset, symdiff" begin
-        S = PolymakeWrap.pm_Set{Int}
+        S = pm_Set{Int}
         for (l,r) in ((S([1,2]),     S([3,4])),
                       (S([5,6,7,8]), S([7,8,9])),
                       (S([1,2]),     S([3,4])),
@@ -530,7 +523,7 @@ end
     end
 
     @testset "filter(f, ::pm_Set), first" begin
-        S = PolymakeWrap.pm_Set{Int}
+        S = pm_Set{Int}
         s = S([1,2,3,4])
         @test s !== filter( isodd, s) == S([1,3])
         @test s === filter!(isodd, s) == S([1,3])
@@ -539,7 +532,7 @@ end
     end
 
     @testset "pop!" begin
-        s = PolymakeWrap.pm_Set(1:5)
+        s = pm_Set(1:5)
         @test 2 in s
         @test pop!(s, 2) == 2
         @test !(2 in s)
@@ -552,7 +545,6 @@ end
     end
 
     @testset "replace! & replace" begin
-        pm_Set = PolymakeWrap.pm_Set
         s = pm_Set([1, 2, 3])
         @test replace(x -> x > 1 ? 2x : x, s) == pm_Set([1, 4, 6])
         for count = (1, 0x1, big(1))
@@ -569,7 +561,6 @@ end
     end
 
     @testset "⊆, ⊊, ⊈, ⊇, ⊋, ⊉, <, <=, issetequal" begin
-        pm_Set = PolymakeWrap.pm_Set
         a = [1, 2]
         b = [2, 1, 3]
         for C = (pm_Set{Int64}, pm_Set{Int32})

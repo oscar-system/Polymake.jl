@@ -1,3 +1,5 @@
+export incl, swap
+
 import Base: Set
 
 ### convert TO polymake object
