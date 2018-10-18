@@ -65,12 +65,10 @@ function typename_func(typename::String)
 end
 
 function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
-    take(obj,string(prop), convert_to_pm(val))
+    take(obj, string(prop), convert_to_pm(val))
 end
-Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
-
-function give(obj::pm_perl_Object,prop::String)
-    return_obj = give(obj,prop)
+function Base.getproperty(obj::pm_perl_Object, prop::Symbol)
+    return_obj = give(obj, string(prop))
     type_name = typeinfo_string(return_obj)
     return typename_func(type_name)(return_obj)
 end
