@@ -1,4 +1,4 @@
-module PolymakeWrap
+module Polymake
 
 export pm_Integer, pm_Matrix,
     pm_perl_Object, pm_perl_PropertyValue,
@@ -66,4 +66,4 @@ include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
 
-end # of module PolymakeWrap
+end # of module Polymake

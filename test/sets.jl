@@ -258,9 +258,9 @@
 
     @testset "polymake constructors" begin
         for T in IntTypes
-            @test PolymakeWrap.range(T(-1), T(5)) == pm_Set(collect(-1:5))
-            @test PolymakeWrap.sequence(T(-1), T(5)) == pm_Set(collect(-1:3))
-            @test PolymakeWrap.scalar2set(T(-10)) == pm_Set([-10])
+            @test Polymake.range(T(-1), T(5)) == pm_Set(collect(-1:5))
+            @test Polymake.sequence(T(-1), T(5)) == pm_Set(collect(-1:3))
+            @test Polymake.scalar2set(T(-10)) == pm_Set([-10])
         end
     end
 end
