@@ -6,6 +6,8 @@
 
 #include "polymake_integers.h"
 
+#include "polymake_rationals.h"
+
 #include "polymake_sets.h"
 
 #include "polymake_caller.h"
@@ -30,22 +32,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
                                                 });
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_Object);
 
-  polymake.add_type<pm::Rational>("pm_Rational", jlcxx::julia_type("Real", "Base"))
-    .constructor<int32_t, int32_t>()
-    .constructor<int64_t, int64_t>()
-    .template constructor<pm::Integer, pm::Integer>()
-    .method("==", [](const pm::Rational& a, const pm::Rational& b){
-      return a == b;
-    })
-    .method("numerator",[](const pm::Rational& r){ return pm::Integer(numerator(r)); })
-    .method("denominator",[](const pm::Rational& r){ return pm::Integer(denominator(r));})
-    .method("show_small_obj", [](const pm::Rational& r){
-      return show_small_object<pm::Rational>(r, false);
-    });
-
   polymake_module_add_integer(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
 
+  polymake_module_add_rational(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
