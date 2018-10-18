@@ -47,6 +47,10 @@ void polymake_call_function_feed_argument(T& function, jl_value_t* argument){
         function << jl_unbox_bool(argument);
         return;
     }
+    if(jl_is_string(argument)){
+        function << std::string(jl_string_data(argument));
+        return;
+    }
     TO_POLYMAKE_FUNCTION( pm_perl_PropertyValue, pm::perl::PropertyValue )
     TO_POLYMAKE_FUNCTION( pm_perl_OptionSet, pm::perl::OptionSet )
     TO_POLYMAKE_FUNCTION( pm_perl_Object, pm::perl::Object )
