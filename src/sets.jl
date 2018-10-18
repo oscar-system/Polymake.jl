@@ -1,15 +1,15 @@
-import Base: Set
+export incl, swap
 
-import PolymakeWrap.Polymake.pm_Set
+import Base: Set
 
 ### convert TO polymake object
 
-pm_Set(v::Vector{T}) where T<:Integer = Polymake._new_set(v)
+pm_Set(v::Vector{T}) where T<:Integer = _new_set(v)
 
 pm_Set{T}(v::Vector) where T = pm_Set(Vector{T}(v))
 pm_Set{T}(s::Set) where T = pm_Set{T}(collect(s))
 
-pm_Set{S}(n::T) where {S,T <: Integer} = Polymake.scalar2set(S(n))
+pm_Set{S}(n::T) where {S,T <: Integer} = scalar2set(S(n))
 
 pm_Set{T}(itr) where T = union!(pm_Set{T}(), itr)
 
@@ -21,31 +21,29 @@ end
 
 ### convert FROM polymake object
 
-function Vector{I}(s::Polymake.pm_Set{J}) where {I,J<:Integer}
+function Vector{I}(s::pm_Set{J}) where {I,J<:Integer}
     return convert(Vector{I}, collect(s))
 end
 
-Vector(s::Polymake.pm_Set) = collect(s)
+Vector(s::pm_Set) = collect(s)
 
-Set(s::Polymake.pm_Set{T}) where T = Set{T}(Vector(s))
-Set{T}(s::Polymake.pm_Set{S}) where {T, S} = Set{T}(Vector{S}(s))
+Set(s::pm_Set{T}) where T = Set{T}(Vector(s))
+Set{T}(s::pm_Set{S}) where {T, S} = Set{T}(Vector{S}(s))
 
-Set{T}(s::Polymake.pm_Set{S}) where {T, S<:Integer} = Set{T}(collect(s))
+Set{T}(s::pm_Set{S}) where {T, S<:Integer} = Set{T}(collect(s))
 
-Polymake.pm_Set{T}(s::Polymake.pm_Set{T}) where T = s
+pm_Set{T}(s::pm_Set{T}) where T = s
 
 ### Promotion rules
 
-Base.promote_rule(::Type{Set{S}}, ::Type{Polymake.pm_Set{T}}) where {S,T} = Set{promote_type(S,T)}
+Base.promote_rule(::Type{Set{S}}, ::Type{pm_Set{T}}) where {S,T} = Set{promote_type(S,T)}
 
 ### julia functions for sets
 
-import Base: ==
-
 # comparison between not-equally typed sets is not defined in Polymake
-==(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == 0
+==(S::pm_Set, T::pm_Set) = incl(S,T) == 0
 
-function ==(S::Polymake.pm_Set, jlS::Set)
+function ==(S::pm_Set, jlS::Set)
     length(S) == length(jlS) || return false
     for s in jlS
         s in S || return false
@@ -53,17 +51,17 @@ function ==(S::Polymake.pm_Set, jlS::Set)
     return true
 end
 
-==(T::AbstractSet, S::Polymake.pm_Set) = S == T
+==(T::AbstractSet, S::pm_Set) = S == T
 
-Base.allunique(::Polymake.pm_Set) = true
+Base.allunique(::pm_Set) = true
 
-Base.copy(S::Polymake.pm_Set) = deepcopy(S)
+Base.copy(S::pm_Set) = deepcopy(S)
 
 # delete! : Defined on the C++ side
-Base.delete!(s::Polymake.pm_Set{T}, x) where T = delete!(s, T(x))
+Base.delete!(s::pm_Set{T}, x) where T = delete!(s, T(x))
 # empty!  : Defined on the C++ side
-
-function Base.filter!(pred, s::Polymake.pm_Set{T}) where T
+#
+function Base.filter!(pred, s::pm_Set{T}) where T
     to_delete = Set{T}()
     for x in s
         !pred(x) && push!(to_delete, x)
@@ -75,31 +73,34 @@ function Base.filter!(pred, s::Polymake.pm_Set{T}) where T
 end
 
 # in      : Defined on the C++ side
-Base.in(x::Integer, s::Polymake.pm_Set{T}) where T<:Integer = T(x) in s
-
-# isempty : Defined on the C++
+function Base.in(x::Integer, s::pm_Set{T}) where T<:Integer
+    in(T(x), s)
+end
+#
+# # isempty : Defined on the C++
 
 function Base.iterate(S::pm_Set)
-    isempty(S) && return nothing
-    state = Polymake.begin(S)
-    elt = Polymake.get_element(state)
-    Polymake.increment(state)
+    isempty(S) &&  return nothing
+    state = beginiterator(S)
+    elt = get_element(state)
+    increment(state)
     return elt, state
 end
 
+
 function Base.iterate(S::pm_Set, state)
-    if Polymake.isdone(S, state)
+    if isdone(S, state)
         return nothing
     else
-        elt = Polymake.get_element(state)
-        Polymake.increment(state)
+        elt = get_element(state)
+        increment(state)
         return elt, state
     end
 end
 
 # length : Defined on the C++
 
-function Base.pop!(s::Polymake.pm_Set{T}, x) where T
+function Base.pop!(s::pm_Set{T}, x) where T
     if x in s
         delete!(s, x)
         return x
@@ -108,7 +109,7 @@ function Base.pop!(s::Polymake.pm_Set{T}, x) where T
     end
 end
 
-function Base.pop!(s::Polymake.pm_Set{T}, x, default) where T
+function Base.pop!(s::pm_Set{T}, x, default) where T
     if x in s
         return pop!(s, x)
     else
@@ -116,22 +117,19 @@ function Base.pop!(s::Polymake.pm_Set{T}, x, default) where T
     end
 end
 
-function Base.pop!(s::Polymake.pm_Set{T}) where T
+function Base.pop!(s::pm_Set{T}) where T
     isempty(s) && throw(ArgumentError("set must be non-empty"))
     return pop!(s, first(s))
 end
 
 # push! : Defined on the C++ side
-Base.push!(s::Polymake.pm_Set{T}, x::Integer) where T<:Integer = push!(s, T(x))
+Base.push!(s::pm_Set{T}, x::Integer) where T<:Integer = push!(s, T(x))
 # show! : Defined on the C++ side
 
-Base.sizehint!(s::Polymake.pm_Set, newsz) = s
-
+Base.sizehint!(s::pm_Set, newsz) = s
 
 
 # Auxillary functions:
 
-import Base: <, <=
-
-<(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) == -1
-<=(S::Polymake.pm_Set, T::Polymake.pm_Set) = incl(S,T) <= 0
+<(S::pm_Set, T::pm_Set) = incl(S,T) == -1
+<=(S::pm_Set, T::pm_Set) = incl(S,T) <= 0

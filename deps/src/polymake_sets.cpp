@@ -78,7 +78,7 @@ void polymake_module_add_set(jlcxx::Module& polymake){
     >([](auto wrapped){
       typedef typename decltype(wrapped)::type WrappedSetIter;
       typedef typename decltype(wrapped)::type::value_type elemType;
-      wrapped.method("begin", [](pm::Set<elemType>& S){
+      wrapped.method("beginiterator", [](pm::Set<elemType>& S){
         auto result = WrappedSetIterator<elemType>{S};
         return result;
       });

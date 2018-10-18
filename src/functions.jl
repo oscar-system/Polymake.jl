@@ -1,33 +1,35 @@
+export cube, cross, perlobj
+
 import Base: convert, show
 
 function cube(dim)
-    return Polymake.call_func_1args("cube",dim)
+    return call_func_1args("cube",dim)
 end
 
 function cross(dim)
-    return Polymake.call_func_1args("cross",dim)
+    return call_func_1args("cross",dim)
 end
 
 function rand_sphere(n,d)
-    return Polymake.call_func_2args("rand_sphere",n,d)
+    return call_func_2args("rand_sphere",n,d)
 end
 
 function upper_bound_theorem(n,d)
-    return Polymake.call_func_2args("upper_bound_theorem",n,d)
+    return call_func_2args("upper_bound_theorem",n,d)
 end
 
 function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
-    polytope = Polymake.pm_perl_Object(name)
+    polytope = pm_perl_Object(name)
     for value in input_data
         key = string(value[1])
         val = convert_to_pm(value[2])
-        Polymake.take(polytope,key,val)
+        take(polytope,key,val)
     end
     return polytope
 end
 
 function perlobj(name::String, input_data::Pair{Symbol}...; kwargsdata...)
-    obj = Polymake.pm_perl_Object(name)
+    obj = pm_perl_Object(name)
     for (key, val) in input_data
         setproperty!(obj, key, val)
     end
@@ -39,45 +41,43 @@ end
 
 function typename_func(typename::String)
     if typename == "int"
-        return Polymake.to_int
+        return to_int
     elseif typename == "double"
-        return Polymake.to_double
+        return to_double
     elseif typename == "perl::Object"
-        return Polymake.to_perl_object
+        return to_perl_object
     elseif typename == "pm::Rational"
-        return Polymake.to_pm_Rational
+        return to_pm_Rational
     elseif typename == "pm::Integer"
-        return Polymake.to_pm_Integer
+        return to_pm_Integer
     elseif typename == "pm::Vector<pm::Integer>"
-        return Polymake.to_vector_int
+        return to_vector_int
     elseif typename == "pm::Vector<pm::Rational>"
-        return Polymake.to_vector_rational
+        return to_vector_rational
     elseif typename == "pm::Matrix<pm::Integer>"
-        return Polymake.to_matrix_int
+        return to_matrix_int
     elseif typename == "pm::Matrix<pm::Rational>"
-        return Polymake.to_matrix_rational
+        return to_matrix_rational
     elseif typename == "undefined"
         return x -> nothing
     end
     return identity
 end
 
-function Base.setproperty!(obj::Polymake.pm_perl_Object, prop::Symbol, val)
-    Polymake.take(obj,string(prop), convert_to_pm(val))
+function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
+    take(obj, string(prop), convert_to_pm(val))
 end
-Base.getproperty(obj::Polymake.pm_perl_Object, prop::Symbol) = give(obj, string(prop))
-
-function give(obj::Polymake.pm_perl_Object,prop::String)
-    return_obj = Polymake.give(obj,prop)
-    type_name = Polymake.typeinfo_string(return_obj)
+function Base.getproperty(obj::pm_perl_Object, prop::Symbol)
+    return_obj = give(obj, string(prop))
+    type_name = typeinfo_string(return_obj)
     return typename_func(type_name)(return_obj)
 end
 
-function Base.show(io::IO, obj::Polymake.pm_perl_Object)
-    print(io, Polymake.properties(obj))
+function Base.show(io::IO, obj::pm_perl_Object)
+    print(io, properties(obj))
 end
 
 function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
-    print(io, Polymake.show_small_obj(obj))
+    print(io, show_small_obj(obj))
 end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
