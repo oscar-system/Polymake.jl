@@ -19,13 +19,13 @@ function upper_bound_theorem(n,d)
 end
 
 function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
-    polytope = pm_perl_Object(name)
+    perl_obj = pm_perl_Object(name)
     for value in input_data
         key = string(value[1])
         val = convert_to_pm(value[2])
-        take(polytope,key,val)
+        take(perl_obj,key,val)
     end
-    return polytope
+    return perl_obj
 end
 
 function perlobj(name::String, input_data::Pair{Symbol}...; kwargsdata...)
@@ -54,10 +54,18 @@ function typename_func(typename::String)
         return to_vector_int
     elseif typename == "pm::Vector<pm::Rational>"
         return to_vector_rational
-    elseif typename == "pm::Matrix<pm::Integer>"
-        return to_matrix_int
-    elseif typename == "pm::Matrix<pm::Rational>"
-        return to_matrix_rational
+    elseif typename == "pm::Set<int, pm::operations::cmp>"
+        return to_set_int32
+    elseif typename == "pm::Set<long, pm::operations::cmp>"
+        return to_set_int64
+    elseif typename == "pm::Array<int>"
+        return to_array_int32
+    elseif typename == "pm::Array<long>"
+        return to_array_int64
+    elseif typename == "pm::Array<pm::Set<int, pm::operations::cmp>>"
+        return to_array_set_int32
+    elseif typename == "pm::Array<pm::Matrix<pm::Integer>>"
+        return to_array_matrix_integer
     elseif typename == "undefined"
         return x -> nothing
     end
