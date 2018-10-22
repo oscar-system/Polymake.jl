@@ -67,6 +67,13 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
           return show_small_object<WrappedT>(M);
         });
     });
+  polymake.method("to_matrix_Integer", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Matrix<pm::Integer>>(pv);
+  });
+  polymake.method("to_matrix_Rational", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Matrix<pm::Rational>>(pv);
+  });
+    
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Integer);
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Rational);
 
@@ -97,6 +104,13 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
           return show_small_object<WrappedT>(V);
         });
     });
+  polymake.method("to_vector_Integer", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Vector<pm::Integer>>(pv);
+  });
+  polymake.method("to_vector_Rational", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Vector<pm::Rational>>(pv);
+  });
+    
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Integer);
   POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Rational);
 
@@ -106,16 +120,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("call_func_2args",&call_func_2args);
   polymake.method("application",[](const std::string x){ data.main_polymake_session->set_application(x); });
 
+  polymake.method("to_bool",[](pm::perl::PropertyValue p){ return static_cast<bool>(p);});
   polymake.method("to_int",[](pm::perl::PropertyValue p){ return static_cast<int64_t>(p);});
   polymake.method("to_double",[](pm::perl::PropertyValue p){ return static_cast<double>(p);});
-  polymake.method("to_bool",[](pm::perl::PropertyValue p){ return static_cast<bool>(p);});
   polymake.method("to_perl_object",&to_perl_object);
-  polymake.method("to_pm_Integer",&to_pm_Integer);
-  polymake.method("to_pm_Rational",&to_pm_Rational);
-  polymake.method("to_vector_rational",to_vector_rational);
-  polymake.method("to_vector_int",to_vector_integer);
-  polymake.method("to_matrix_rational",to_matrix_rational);
-  polymake.method("to_matrix_int",to_matrix_integer);
 
   polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){ PropertyValueHelper ph(p); return ph.get_typename(); });
   polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).check_defined();});

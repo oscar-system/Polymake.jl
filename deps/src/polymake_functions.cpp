@@ -26,23 +26,3 @@ pm::perl::Object to_perl_object(pm::perl::PropertyValue v){
     v >> obj;
     return v;
 }
-
-bool to_bool(pm::perl::PropertyValue v){
-    return static_cast<bool>(v);
-}
-
-pm::Integer to_pm_Integer(pm::perl::PropertyValue v){
-    pm::Integer integer = v;
-    return integer;
-}
-
-pm::Rational to_pm_Rational(pm::perl::PropertyValue v){
-    pm::Rational integer = v;
-    return integer;
-}
-
-pm::Vector<pm::Integer> (*to_vector_integer)(pm::perl::PropertyValue) = &to_SmallObject<pm::Vector<pm::Integer>>;
-pm::Vector<pm::Rational> (*to_vector_rational)(pm::perl::PropertyValue) = &to_SmallObject<pm::Vector<pm::Rational>>;
-
-pm::Matrix<pm::Integer> (*to_matrix_integer)(pm::perl::PropertyValue) = &to_SmallObject<pm::Matrix<pm::Integer>>;
-pm::Matrix<pm::Rational> (*to_matrix_rational)(pm::perl::PropertyValue) = &to_SmallObject<pm::Matrix<pm::Rational>>;

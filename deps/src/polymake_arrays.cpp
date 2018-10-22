@@ -66,7 +66,7 @@ void polymake_module_add_array(jlcxx::Module& polymake){
     polymake.method("to_array_set_int32", [](pm::perl::PropertyValue pv){
       return to_SmallObject<pm::Array<pm::Set<int32_t>>>(pv);
     });
-    polymake.method("to_array_matrix_integer", [](pm::perl::PropertyValue pv){
+    polymake.method("to_array_matrix_Integer", [](pm::perl::PropertyValue pv){
       return to_SmallObject<pm::Array<pm::Matrix<pm::Integer>>>(pv);
     });
 }

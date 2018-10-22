@@ -51,9 +51,13 @@ function typename_func(typename::String)
     elseif typename == "pm::Integer"
         return to_pm_Integer
     elseif typename == "pm::Vector<pm::Integer>"
-        return to_vector_int
+        return to_vector_Integer
     elseif typename == "pm::Vector<pm::Rational>"
-        return to_vector_rational
+        return to_vector_Rational
+    elseif typename == "pm::Matrix<pm::Integer>"
+        return to_matrix_Integer
+    elseif typename == "pm::Matrix<pm::Rational>"
+        return to_matrix_Rational
     elseif typename == "pm::Set<int, pm::operations::cmp>"
         return to_set_int32
     elseif typename == "pm::Set<long, pm::operations::cmp>"
@@ -65,7 +69,7 @@ function typename_func(typename::String)
     elseif typename == "pm::Array<pm::Set<int, pm::operations::cmp>>"
         return to_array_set_int32
     elseif typename == "pm::Array<pm::Matrix<pm::Integer>>"
-        return to_array_matrix_integer
+        return to_array_matrix_Integer
     elseif typename == "undefined"
         return x -> nothing
     end
