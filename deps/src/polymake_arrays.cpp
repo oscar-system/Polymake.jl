@@ -9,7 +9,7 @@
 
 void polymake_module_add_array(jlcxx::Module& polymake){
 
-  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Array", jlcxx::julia_type("AbstractArray", "Base"))
+  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Array", jlcxx::julia_type("AbstractVector", "Base"))
     .apply<
       pm::Array<int32_t>,
       pm::Array<int64_t>,
