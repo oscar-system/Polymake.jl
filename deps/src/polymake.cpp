@@ -74,8 +74,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     return to_SmallObject<pm::Matrix<pm::Rational>>(pv);
   });
     
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Rational);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Integer);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
     .apply<
@@ -111,22 +111,26 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     return to_SmallObject<pm::Vector<pm::Rational>>(pv);
   });
     
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Rational);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Integer);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Rational);
 
   polymake.method("initialize_polymake", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
   polymake.method("call_func_1args",&call_func_1args);
   polymake.method("call_func_2args",&call_func_2args);
-  polymake.method("application",[](const std::string x){ data.main_polymake_session->set_application(x); });
+  polymake.method("application",[](const std::string x){
+    data.main_polymake_session->set_application(x);
+  });
 
   polymake.method("to_bool",[](pm::perl::PropertyValue p){ return static_cast<bool>(p);});
   polymake.method("to_int",[](pm::perl::PropertyValue p){ return static_cast<int64_t>(p);});
   polymake.method("to_double",[](pm::perl::PropertyValue p){ return static_cast<double>(p);});
   polymake.method("to_perl_object",&to_perl_object);
 
-  polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){ PropertyValueHelper ph(p); return ph.get_typename(); });
-  polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).check_defined();});
+  polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){
+    PropertyValueHelper ph(p); 
+    return ph.get_typename();
+  });
 
   polymake_module_add_set(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);
@@ -135,8 +139,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake_module_add_array(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int32);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int64);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Array, pm_Set_Int32);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Array, pm_Matrix_pm_Integer);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Set_Int32);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Matrix_pm_Integer);
 
   polymake_module_add_caller(polymake);
 

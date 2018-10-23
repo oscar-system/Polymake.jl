@@ -60,6 +60,12 @@ void polymake_call_function_feed_argument(T& function, jl_value_t* argument){
     TO_POLYMAKE_FUNCTION( pm_Matrix_pm_Rational, pm::Matrix<pm::Rational> )
     TO_POLYMAKE_FUNCTION( pm_Vector_pm_Integer, pm::Vector<pm::Integer> )
     TO_POLYMAKE_FUNCTION( pm_Vector_pm_Rational, pm::Vector<pm::Rational> )
+    TO_POLYMAKE_FUNCTION( pm_Set_Int32, pm::Set<int32_t> )
+    TO_POLYMAKE_FUNCTION( pm_Set_Int64, pm::Set<int64_t> )
+    TO_POLYMAKE_FUNCTION( pm_Array_Int32, pm::Array<int32_t> )
+    TO_POLYMAKE_FUNCTION( pm_Array_Int64, pm::Array<int64_t> )
+    TO_POLYMAKE_FUNCTION( pm_Array_pm_Set_Int32, pm::Array<pm::Set<int32_t>> )
+    TO_POLYMAKE_FUNCTION( pm_Array_pm_Matrix_pm_Integer, pm::Array<pm::Matrix<pm::Integer>> )
 }
 
 pm::perl::PropertyValue polymake_call_function(std::string function_name, jlcxx::ArrayRef<jl_value_t*> arguments)
