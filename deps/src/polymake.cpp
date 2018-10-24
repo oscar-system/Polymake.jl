@@ -25,7 +25,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
   polymake.add_type<pm::perl::Object>("pm_perl_Object")
     .constructor<const std::string&>()
-    .method("give",[](pm::perl::Object p, const std::string& s){ return p.give(s); })
+    .method("internal_give",[](pm::perl::Object p, const std::string& s){ return p.give(s); })
     .method("exists",[](pm::perl::Object p, const std::string& s){ return p.exists(s); })
     .method("properties",[](pm::perl::Object p){ std::string x = p.call_method("properties");
                                                  return x;
