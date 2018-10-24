@@ -1,0 +1,38 @@
+{
+    "app": "polytope",
+    "functions": [
+        { "name": "cube",
+          "args": [ "Anything", "Anything", "Anything", "OptionSet" ],
+          "mandatory": 1,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
+          },
+        { "name": "placing_triangulation",
+          "args": [ "Matrix", "OptionSet" ],
+          "mandatory": 1,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
+          },
+        { "name": "bipyramid",
+          "args": [ "BigObject<Polytope>", "Anything", "Anything", "OptionSet" ],
+          "mandatory": 1,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
+          },
+        { "name": "CD_INDEX",
+          "method_of": "BigObject<Polytope>",
+          "args": [],
+          "mandatory": 0,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
+          },
+        { "name": "MINKOWSKI_CONE_COEFF",
+          "method_of": "BigObject<Polytope>",
+          "args": [ "Vector" ],
+          "mandatory": 1,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
+        }
+    ],
+    "version": "dev"
+}
