@@ -69,7 +69,7 @@ function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
 end
 
 function Base.getproperty(obj::pm_perl_Object, prop::Symbol)
-    return_obj = give(obj, string(prop))
+    return_obj = internal_give(obj, string(prop))
     type_name = typeinfo_string(return_obj)
     return typename_func(type_name)(return_obj)
 end
@@ -80,7 +80,7 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
 end
 
 function give(obj::Polymake.pm_perl_Object,prop::String)
-    return_obj = Polymake.give(obj,prop)
+    return_obj = internal_give(obj,prop)
     return convert_from_property_value(return_obj)
 end
 
