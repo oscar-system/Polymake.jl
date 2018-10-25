@@ -1,6 +1,8 @@
 ### convert TO polymake object
 
 pm_Array{T}(v::AbstractVector) where T = pm_Array(convert(AbstractVector{T}, v))
+pm_Array{T}(n::Integer, elt) where T = pm_Array{T}(Int64(n), T(elt))
+
 function pm_Array(v::AbstractVector{T}) where T 
     arr = pm_Array{T}(length(v))
     @inbounds for i in 1:length(v)
