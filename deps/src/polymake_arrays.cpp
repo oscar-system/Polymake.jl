@@ -24,11 +24,6 @@ void polymake_module_add_array(jlcxx::Module& polymake){
       wrapped.template constructor<int64_t>();
       wrapped.template constructor<int64_t, elemType>();
       
-      wrapped.method("_new_array", [](jlcxx::ArrayRef<elemType> A){
-        pm::Array<elemType> a{(int32_t) A.size(), A.begin()};
-        return a;
-      });
-      
       wrapped.method("_getindex", [](WrappedT& A, int64_t n){
         return elemType(A[n-1]);
       });
@@ -43,10 +38,6 @@ void polymake_module_add_array(jlcxx::Module& polymake){
       wrapped.method("append!", [](WrappedT& A, WrappedT& B){
         A.append(B);
         return A;
-      });
-      wrapped.method("append!", [](WrappedT& A, jlcxx::ArrayRef<elemType> B){
-          A.append((int32_t) B.size(), B.begin());
-          return A;
       });
       wrapped.method("fill!", [](WrappedT& A, elemType& x){
         A.fill(x);

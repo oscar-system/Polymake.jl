@@ -9,7 +9,7 @@ export pm_Integer, pm_Rational,
 import Base: ==, <, <=, *, -, +, /, div, rem,
     append!, delete!, numerator, denominator,
     empty!, getindex, in, intersect, intersect!, isempty,
-    length, numerator, push!,
+    length, numerator, push!, resize!,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
