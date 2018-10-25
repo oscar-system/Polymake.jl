@@ -47,7 +47,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     >([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         typedef typename decltype(wrapped)::type::value_type elemType;
-        // typedef typename decltype(wrapped)::foo X;
+        wrapped.template constructor<int32_t, int32_t>();
         wrapped.template constructor<int64_t, int64_t>();
 
         wrapped.method("_getindex", [](WrappedT& f, int64_t i, int64_t j){
@@ -84,7 +84,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     >([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         typedef typename decltype(wrapped)::type::value_type elemType;
-        // typedef typename decltype(wrapped)::foo X;
+        wrapped.template constructor<int32_t>();
         wrapped.template constructor<int64_t>();
         wrapped.method("_getindex", [](WrappedT& V, int64_t n){
           return elemType(V[n-1]);

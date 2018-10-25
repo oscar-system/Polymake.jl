@@ -33,6 +33,11 @@ void polymake_module_add_array(jlcxx::Module& polymake){
       wrapped.method("length", &WrappedT::size);
       wrapped.method("resize!", [](WrappedT& A, int64_t newsz){
         A.resize(newsz);
+        return A;
+      });
+      wrapped.method("resize!", [](WrappedT& A, int32_t newsz){
+        A.resize(newsz);
+        return A;
       });
       
       wrapped.method("append!", [](WrappedT& A, WrappedT& B){
