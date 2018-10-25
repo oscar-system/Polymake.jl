@@ -12,5 +12,6 @@ end
     include("vectors.jl")
     include("matrices.jl")
     include("sets.jl")
+    include("arrays.jl")
     include("perlobj.jl")
 end
