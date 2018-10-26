@@ -25,18 +25,18 @@ void polymake_module_add_array(jlcxx::Module& polymake){
       wrapped.template constructor<int64_t, elemType>();
       
       wrapped.method("_getindex", [](WrappedT& A, int64_t n){
-        return elemType(A[n-1]);
+        return elemType(A[static_cast<long>(n) - 1]);
       });
       wrapped.method("_setindex!",[](WrappedT& A, elemType val, int64_t n){
-          A[n-1] = val;
+          A[static_cast<long>(n) - 1] = val;
       });
       wrapped.method("length", &WrappedT::size);
       wrapped.method("resize!", [](WrappedT& A, int64_t newsz){
-        A.resize(newsz);
+        A.resize(static_cast<long>(newsz));
         return A;
       });
       wrapped.method("resize!", [](WrappedT& A, int32_t newsz){
-        A.resize(newsz);
+        A.resize(static_cast<long>(newsz));
         return A;
       });
       
