@@ -47,6 +47,8 @@ const C_TYPES = [
 function __init__()
     @initcxx
     initialize_polymake()
+    application("common")
+    shell_execute("include(\"$(joinpath(@__DIR__, "..", "deps", "rules", "julia.rules"))\");")
     application("polytope")
 
     # We need to set the Julia types as c types for polymake
@@ -65,6 +67,7 @@ include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("shell_helpers.jl")
 include("generated/includes.jl")
 
 end # of module Polymake
