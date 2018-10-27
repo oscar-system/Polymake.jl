@@ -14,6 +14,8 @@
 
 #include "polymake_caller.h"
 
+#include <cxxabi.h>
+
 Polymake_Data data;
 
 JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
@@ -127,10 +129,47 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("to_double",[](pm::perl::PropertyValue p){ return static_cast<double>(p);});
   polymake.method("to_perl_object",&to_perl_object);
 
-  polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){
-    PropertyValueHelper ph(p); 
-    return ph.get_typename();
-  });
+  polymake.method("typeinfo_string", [](pm::perl::PropertyValue p, bool demangle) -> std::string
+    {
+      PropertyValueHelper ph(p);
+
+      if (!ph.is_defined()) {
+        return "undefined";
+      }
+      if (ph.is_boolean()) {
+        return "bool";
+      }
+      switch (ph.classify_number()) {
+      // primitives
+      case PropertyValueHelper::number_is_zero:
+      case PropertyValueHelper::number_is_int:
+        return "int";
+      case PropertyValueHelper::number_is_float:
+        return "double";
+
+      // with typeinfo ptr (nullptr for Objects)
+      case PropertyValueHelper::number_is_object:
+        // some non-primitive Scalar type with typeinfo (e.g. Rational)
+      case PropertyValueHelper::not_a_number:
+        // a c++ type with typeinfo or a perl Object
+        {
+          const std::type_info* ti = ph.get_canned_typeinfo();
+          if (ti == nullptr) {
+            return "perl::Object";
+          }
+          // demangle:
+          int status = -1;
+          std::unique_ptr<char, void(*)(void*)> res {
+            abi::__cxa_demangle(ti->name(), NULL, NULL, &status),
+            std::free
+          };
+          return (status==0 && demangle) ? res.get() : ti->name();
+        }
+      }
+      return "unknown";
+    });
+  polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).is_defined(); });
+
 
   polymake_module_add_set(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);

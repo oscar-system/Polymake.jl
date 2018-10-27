@@ -41,6 +41,7 @@ end
 
 const WrappedTypes = Dict(
     Symbol("int") => to_int,
+    Symbol("bool") => to_bool,
     Symbol("double") => to_double, 
     Symbol("perl::Object") => to_perl_object,
     Symbol("pm::Integer") => to_pm_Integer,
@@ -64,7 +65,7 @@ function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
 end
 
 function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
-    type_name = Polymake.typeinfo_string(obj)
+    type_name = Polymake.typeinfo_string(obj,true)
     f = get(WrappedTypes, Symbol(type_name), identity)
     return f(obj)
 end

@@ -17,40 +17,21 @@ class PropertyValueHelper : public pm::perl::PropertyValue {
    public:
       PropertyValueHelper(const pm::perl::PropertyValue& pv) : pm::perl::PropertyValue(pv) {};
 
-      bool check_defined() const noexcept{
-         return this->is_defined();
-      }
-      std::string get_typename() {
-         if(!this->is_defined()){
-             return "undefined";
-         }
-         switch (this->classify_number()) {
+   // in some form these will be moved to the polymake code
+   bool is_boolean() const
+   {
+      return call_function("is_boolean",*this);
+   };
 
-         // primitives
-         case number_is_zero:
-         case number_is_int:
-            return "int";
-         case number_is_float:
-            return "double";
+   using Value::is_defined;
+   using Value::get_canned_typeinfo;
+   using Value::classify_number;
+   using Value::number_is_zero;
+   using Value::number_is_int;
+   using Value::number_is_float;
+   using Value::number_is_object;
+   using Value::not_a_number;
 
-         // with typeinfo ptr (nullptr for Objects)
-         case number_is_object:
-            // some non-primitive Scalar type with typeinfo (e.g. Rational)
-         case not_a_number:
-            // a c++ type with typeinfo or a perl Object
-            {
-               const std::type_info* ti = this->get_canned_typeinfo();
-               if (ti == nullptr) {
-                  // perl object
-                  return "perl::Object";
-               } else {
-                  return legible_typename(*ti);
-               }
-            }
-         default:
-            throw std::runtime_error("get_typename: could not determine property type");
-         }
-      }
 };
 
 }
