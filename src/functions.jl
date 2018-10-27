@@ -66,6 +66,8 @@ function typename_func(typename::String)
         return to_array_int32
     elseif typename == "pm::Array<long>"
         return to_array_int64
+    elseif typename == "pm::Array<std::basic_string<char, std::char_traits<char>, std::allocator<char> >>"
+        return to_array_string
     elseif typename == "pm::Array<pm::Set<int, pm::operations::cmp>>"
         return to_array_set_int32
     elseif typename == "pm::Array<pm::Matrix<pm::Integer>>"

@@ -139,6 +139,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake_module_add_array(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int32);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int64);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_String);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Set_Int32);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Matrix_pm_Integer);
 
