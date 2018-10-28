@@ -1,7 +1,8 @@
 @testset "pm_Array" begin
     @testset "pm_Array generics: $T " for (T, elt) in [
         (Int32, 2), 
-        (Int64, 2), 
+        (Int64, 2),
+        (AbstractString, "a"),
         (pm_Set{Int32}, pm_Set{Int32}([1,2,1])), 
         (pm_Matrix{pm_Integer}, pm_Matrix{pm_Integer}([1 0; 2 1])),
         ]

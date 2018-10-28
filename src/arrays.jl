@@ -2,6 +2,7 @@
 
 pm_Array{T}(v::AbstractVector) where T = pm_Array(convert(AbstractVector{T}, v))
 pm_Array{T}(n::Integer, elt) where T = pm_Array{T}(Int64(n), T(elt))
+pm_Array(n::Integer, elt::T) where T = pm_Array{T}(Int64(n), elt)
 
 function pm_Array(v::AbstractVector{T}) where T 
     arr = pm_Array{T}(length(v))
@@ -31,5 +32,16 @@ function Base.append!(A::pm_Array{T}, itr) where T
     for i in 1:m
         A[n+i] = itr[i]
     end
+    return A
+end
+
+# workarounds for pm_Array{String}
+pm_Array{T}(n::Integer) where T<:AbstractString = pm_Array{AbstractString}(Int64(n))
+pm_Array{T}(n::Integer, elt::T) where T<:AbstractString = 
+pm_Array{AbstractString}(Int64(n), elt)
+
+Base.@propagate_inbounds function Base.setindex!(A::pm_Array{S}, val, n::Integer) where {S<:AbstractString}
+    @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
+    _setindex!(A, string(val), Int(n))
     return A
 end
