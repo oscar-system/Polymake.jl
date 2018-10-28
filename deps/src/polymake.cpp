@@ -126,15 +126,13 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     {
       // FIXME: tuples with strings are broken in cxxwrap
       // return res;
-      // instead we return one long string now
+      // instead we return an array of strings now
       auto res = data.main_polymake_session->shell_execute(x);
-      std::ostringstream output;
-      output << std::get<1>(res);
-      if (std::get<2>(res).length() > 0)
-         output << "ERR: " << std::get<2>(res);
-      if (std::get<3>(res).length() > 0)
-         output << "EXC: " << std::get<3>(res);
-      return output.str();
+      jl_value_t** output = new jl_value_t*[3]; 
+      output[0] = jl_cstr_to_string(std::get<1>(res).c_str());
+      output[1] = jl_cstr_to_string(std::get<2>(res).c_str());
+      output[2] = jl_cstr_to_string(std::get<3>(res).c_str());
+      return jlcxx::make_julia_array(output,3);
     });
 
   polymake_module_add_caller(polymake);
