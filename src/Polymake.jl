@@ -74,6 +74,11 @@ include("vectors.jl")
 include("matrices.jl")
 include("arrays.jl")
 include("shell_helpers.jl")
-include("generated/includes.jl")
+includes = joinpath("generated", "includes.jl")
+if isfile(joinpath("src", includes))
+    include(includes)
+else
+    @warn("You need to run '] build Polymake' first.")
+end
 
 end # of module Polymake
