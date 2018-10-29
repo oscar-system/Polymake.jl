@@ -143,6 +143,19 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Set_Int32);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Matrix_pm_Integer);
 
+  polymake.method("shell_execute",[](const std::string x)
+    {
+      // FIXME: tuples with strings are broken in cxxwrap
+      // return res;
+      // instead we return an array of strings now
+      auto res = data.main_polymake_session->shell_execute(x);
+      jl_value_t** output = new jl_value_t*[3]; 
+      output[0] = jl_cstr_to_string(std::get<1>(res).c_str());
+      output[1] = jl_cstr_to_string(std::get<2>(res).c_str());
+      output[2] = jl_cstr_to_string(std::get<3>(res).c_str());
+      return jlcxx::make_julia_array(output,3);
+    });
+
   polymake_module_add_caller(polymake);
 
 //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2, pm::perl::Value a3, pm::perl::OptionSet opt){ return polymake::polytope::cube<pm::QuadraticExtension<pm::Rational> >(a1,a2,a3,opt); });

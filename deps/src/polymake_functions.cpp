@@ -5,7 +5,9 @@
 
 void initialize_polymake(){
     data.main_polymake_session = new polymake::Main;
+    data.main_polymake_session->shell_enable();
     data.main_polymake_scope = new polymake::perl::Scope(data.main_polymake_session->newScope());
+
     std::cout << data.main_polymake_session->greeting() << std::endl;
 }
 

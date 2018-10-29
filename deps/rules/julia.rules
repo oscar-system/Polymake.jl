@@ -1,0 +1,6 @@
+
+function complete_property($$) {
+   my ($po,$prefix) = @_;
+   return new Array<String>(Core::Shell::Helper::try_property_completion($po->type,$prefix));
+}
+
