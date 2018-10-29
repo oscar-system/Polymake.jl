@@ -12,6 +12,8 @@ polymake::perl::Object call_func_2args(std::string, int, int);
 
 pm::perl::Object to_perl_object(pm::perl::PropertyValue);
 
+std::string typeinfo_helper(pm::perl::PropertyValue p, bool demangle);
+
 template<typename T>
 T to_SmallObject(pm::perl::PropertyValue pv){
     T obj = pv;
