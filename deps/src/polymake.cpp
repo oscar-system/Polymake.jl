@@ -10,6 +10,8 @@
 
 #include "polymake_sets.h"
 
+#include "polymake_arrays.h"
+
 #include "polymake_caller.h"
 
 Polymake_Data data;
@@ -45,7 +47,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     >([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         typedef typename decltype(wrapped)::type::value_type elemType;
-        // typedef typename decltype(wrapped)::foo X;
+        wrapped.template constructor<int32_t, int32_t>();
         wrapped.template constructor<int64_t, int64_t>();
 
         wrapped.method("_getindex", [](WrappedT& f, int64_t i, int64_t j){
@@ -65,8 +67,15 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
           return show_small_object<WrappedT>(M);
         });
     });
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Matrix,pm_Rational);
+  polymake.method("to_matrix_Integer", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Matrix<pm::Integer>>(pv);
+  });
+  polymake.method("to_matrix_Rational", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Matrix<pm::Rational>>(pv);
+  });
+    
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Integer);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
     .apply<
@@ -75,7 +84,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     >([](auto wrapped){
         typedef typename decltype(wrapped)::type WrappedT;
         typedef typename decltype(wrapped)::type::value_type elemType;
-        // typedef typename decltype(wrapped)::foo X;
+        wrapped.template constructor<int32_t>();
         wrapped.template constructor<int64_t>();
         wrapped.method("_getindex", [](WrappedT& V, int64_t n){
           return elemType(V[n-1]);
@@ -95,32 +104,44 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
           return show_small_object<WrappedT>(V);
         });
     });
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(pm_Vector,pm_Rational);
+  polymake.method("to_vector_Integer", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Vector<pm::Integer>>(pv);
+  });
+  polymake.method("to_vector_Rational", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Vector<pm::Rational>>(pv);
+  });
+    
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Integer);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Rational);
 
   polymake.method("initialize_polymake", &initialize_polymake);
   polymake.method("call_func_0args",&call_func_0args);
   polymake.method("call_func_1args",&call_func_1args);
   polymake.method("call_func_2args",&call_func_2args);
-  polymake.method("application",[](const std::string x){ data.main_polymake_session->set_application(x); });
+  polymake.method("application",[](const std::string x){
+    data.main_polymake_session->set_application(x);
+  });
 
+  polymake.method("to_bool",[](pm::perl::PropertyValue p){ return static_cast<bool>(p);});
   polymake.method("to_int",[](pm::perl::PropertyValue p){ return static_cast<int64_t>(p);});
   polymake.method("to_double",[](pm::perl::PropertyValue p){ return static_cast<double>(p);});
-  polymake.method("to_bool",[](pm::perl::PropertyValue p){ return static_cast<bool>(p);});
   polymake.method("to_perl_object",&to_perl_object);
-  polymake.method("to_pm_Integer",&to_pm_Integer);
-  polymake.method("to_pm_Rational",&to_pm_Rational);
-  polymake.method("to_vector_rational",to_vector_rational);
-  polymake.method("to_vector_int",to_vector_integer);
-  polymake.method("to_matrix_rational",to_matrix_rational);
-  polymake.method("to_matrix_int",to_matrix_integer);
 
-  polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){ PropertyValueHelper ph(p); return ph.get_typename(); });
-  polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).check_defined();});
+  polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){
+    PropertyValueHelper ph(p); 
+    return ph.get_typename();
+  });
 
   polymake_module_add_set(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int32);
+  
+  polymake_module_add_array(polymake);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int32);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int64);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_String);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Set_Int32);
+  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Matrix_pm_Integer);
 
   polymake.method("shell_execute",[](const std::string x)
     {

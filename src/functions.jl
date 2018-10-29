@@ -19,13 +19,13 @@ function upper_bound_theorem(n,d)
 end
 
 function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
-    polytope = pm_perl_Object(name)
+    perl_obj = pm_perl_Object(name)
     for value in input_data
         key = string(value[1])
         val = convert_to_pm(value[2])
-        take(polytope,key,val)
+        take(perl_obj,key,val)
     end
-    return polytope
+    return perl_obj
 end
 
 function perlobj(name::String, input_data::Pair{Symbol}...; kwargsdata...)
@@ -51,13 +51,27 @@ function typename_func(typename::String)
     elseif typename == "pm::Integer"
         return to_pm_Integer
     elseif typename == "pm::Vector<pm::Integer>"
-        return to_vector_int
+        return to_vector_Integer
     elseif typename == "pm::Vector<pm::Rational>"
-        return to_vector_rational
+        return to_vector_Rational
     elseif typename == "pm::Matrix<pm::Integer>"
-        return to_matrix_int
+        return to_matrix_Integer
     elseif typename == "pm::Matrix<pm::Rational>"
-        return to_matrix_rational
+        return to_matrix_Rational
+    elseif typename == "pm::Set<int, pm::operations::cmp>"
+        return to_set_int32
+    elseif typename == "pm::Set<long, pm::operations::cmp>"
+        return to_set_int64
+    elseif typename == "pm::Array<int>"
+        return to_array_int32
+    elseif typename == "pm::Array<long>"
+        return to_array_int64
+    elseif typename == "pm::Array<std::basic_string<char, std::char_traits<char>, std::allocator<char> >>"
+        return to_array_string
+    elseif typename == "pm::Array<pm::Set<int, pm::operations::cmp>>"
+        return to_array_set_int32
+    elseif typename == "pm::Array<pm::Matrix<pm::Integer>>"
+        return to_array_matrix_Integer
     elseif typename == "undefined"
         return x -> nothing
     end

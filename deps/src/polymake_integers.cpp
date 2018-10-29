@@ -70,5 +70,7 @@ void polymake_module_add_integer(jlcxx::Module& polymake){
     .method("rem",[](int32_t a, pm::Integer &b){ return a % b; });
 
   polymake.method("new_pm_Integer_from_bigint", new_integer_from_bigint);
-
+  polymake.method("to_pm_Integer",[](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Integer>(pv);
+  });
 }

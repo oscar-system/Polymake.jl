@@ -77,5 +77,8 @@ void polymake_module_add_rational(jlcxx::Module& polymake){
     .method("/",[](pm::Integer &a, pm::Rational &b){ return a / b; })
     .method("/",[](int64_t a, pm::Rational &b){ return static_cast<long>(a) / b; })
     .method("/",[](int32_t a, pm::Rational &b){ return a / b; });
-
+  
+  polymake.method("to_pm_Rational",[](pm::perl::PropertyValue pv){
+    return to_SmallObject<pm::Rational>(pv);
+  });
 }
