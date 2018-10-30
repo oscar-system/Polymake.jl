@@ -81,7 +81,7 @@ include("matrices.jl")
 include("arrays.jl")
 
 includes = joinpath("generated", "includes.jl")
-if isfile(joinpath("src", includes))
+if isfile(joinpath(@__DIR__, includes))
     include(includes)
 else
     @warn("You need to run '] build Polymake' first.")
