@@ -1,6 +1,25 @@
+# polymake helper functions returning various information for julia
 
+
+# list completions for property names for a given perl::Object
+# (does not show any user_methods!)
 function complete_property($$) {
    my ($po,$prefix) = @_;
    return new Array<String>(Core::Shell::Helper::try_property_completion($po->type,$prefix));
 }
 
+# all loaded applications
+function list_applications() {
+   return new Array<String>(map { $_->name }Polymake::Core::Application::list_loaded());
+}
+
+# polymake shell startup applications
+function startup_applications() {
+   return new Array<String>(@User::start_applications)
+}
+
+# list all big objects in given application
+function list_big_objects($) {
+   my ($app) = @_;
+   return new Array<String>(uniq(map {$_->name} @{User::application($app)->object_types}));
+}

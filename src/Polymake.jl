@@ -54,6 +54,10 @@ function __init__()
     initialize_polymake()
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "..", "deps", "rules", "julia.rules"))\");")
+    startup_apps = convert_from_property_value(call_function("startup_applications",Array{Any,1}([])))
+    for app in startup_apps
+        application(app)
+    end
     application("polytope")
 
     # We need to set the Julia types as c types for polymake
@@ -67,15 +71,17 @@ const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set,
 
 include("functions.jl")
 include("convert.jl")
+include("object_helpers.jl")
+
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
 include("arrays.jl")
-include("shell_helpers.jl")
+
 includes = joinpath("generated", "includes.jl")
-if isfile(joinpath("src", includes))
+if isfile(joinpath(@__DIR__, includes))
     include(includes)
 else
     @warn("You need to run '] build Polymake' first.")
