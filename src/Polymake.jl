@@ -67,13 +67,15 @@ const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set,
 
 include("functions.jl")
 include("convert.jl")
+include("object_helpers.jl")
+
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
 include("arrays.jl")
-include("shell_helpers.jl")
+
 includes = joinpath("generated", "includes.jl")
 if isfile(joinpath("src", includes))
     include(includes)
