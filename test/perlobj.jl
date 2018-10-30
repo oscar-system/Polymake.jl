@@ -29,6 +29,18 @@
         @test test_polytope.FAR_FACE == Set([1])
     end
     
-    
-    
+    @testset "tab-completion" begin
+        test_polytope = perlobj("Polytope", input_dict_int )
+        
+        @test Base.propertynames(test_polytope) isa Vector{Symbol}
+        names = Base.propertynames(test_polytope)
+        
+        @test :VERTICES in names
+        @test :FAR_FACE in names
+        @test :GRAPH in names
+        @test test_polytope.GRAPH isa pm_perl_Object
+        @test allunique(Base.propertynames(test_polytope))
+        g = test_polytope.GRAPH
+        @test Base.propertynames(g) isa Vector{Symbol}
+    end
 end

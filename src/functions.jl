@@ -59,6 +59,8 @@ const WrappedTypes = Dict(
     Symbol("undefined") => x -> nothing,
 )
 
+Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
+
 function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
     take(obj, string(prop), convert_to_pm(val))
 end
