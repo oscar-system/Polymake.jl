@@ -54,6 +54,10 @@ function __init__()
     initialize_polymake()
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "..", "deps", "rules", "julia.rules"))\");")
+    startup_apps = convert_from_property_value(call_function("startup_applications",Array{Any,1}([])))
+    for app in startup_apps
+        application(app)
+    end
     application("polytope")
 
     # We need to set the Julia types as c types for polymake
