@@ -73,6 +73,18 @@ include("functions.jl")
 include("convert.jl")
 include("object_helpers.jl")
 
+include("repl.jl")
+
+module PolymakeREPLInit
+    using Polymake
+    using Polymake.PolymakeREPL
+    function __init__()
+        if isdefined(Base, :active_repl)
+            PolymakeREPL.RunPolymakeREPL()
+        end
+    end
+end
+
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")
