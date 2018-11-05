@@ -77,7 +77,11 @@ function Base.getproperty(obj::pm_perl_Object, prop::Symbol)
 end
 
 function give(obj::Polymake.pm_perl_Object,prop::String)
-    return_obj = internal_give(obj,prop)
+    return_obj = try
+        internal_give(obj, prop)
+    catch ex
+        throw(PolymakeError(ex.msg))
+    end 
     return convert_from_property_value(return_obj)
 end
 

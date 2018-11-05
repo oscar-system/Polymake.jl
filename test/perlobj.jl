@@ -19,6 +19,12 @@
             [ 1 1 1 ; 1 1 2 ; 1 2 1 ; 1 2 2 ]
     end
     
+    @testset "PolymakeException" begin
+        test_polytope = perlobj("Polytope", input_dict_int )
+        @test !(:STH in Base.propertynames(test_polytope))
+        @test_throws PolymakeError test_polytope.STH
+    end
+    
     @testset "lattice points" begin
         test_polytope = perlobj("Polytope", input_dict_int )
         @test test_polytope.LATTICE_POINTS_GENERATORS isa pm_Array

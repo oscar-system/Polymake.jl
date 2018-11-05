@@ -2,7 +2,8 @@ module Polymake
 
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
-    pm_Set, pm_Vector, pm_Array, pm_Matrix
+    pm_Set, pm_Vector, pm_Array, pm_Matrix,
+    PolymakeError
 
 
 # We need to import all functions which will be extended on the Cxx side
@@ -15,6 +16,13 @@ import Base: ==, <, <=, *, -, +, /, div, rem,
 
 using CxxWrap
 
+struct PolymakeError <: Exception
+    msg
+end
+
+function Base.showerror(io::IO, ex::PolymakeError)
+    print(io, "Exception occured at Polymake side:\n$(ex.msg)")
+end
 
 ###########################
 # Load Cxx stuff and init
