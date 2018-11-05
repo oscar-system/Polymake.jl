@@ -67,13 +67,14 @@ end
 
 function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
     type_name = Polymake.typeinfo_string(obj)
-    f = get(WrappedTypes, Symbol(type_name), identity)
-    return f(obj)
-end
-
-function Base.getproperty(obj::pm_perl_Object, prop::Symbol)
-    return_obj = internal_give(obj, string(prop))
-    return convert_from_property_value(return_obj)
+    T = Symbol(type_name)
+    if haskey(WrappedTypes, T)
+        f = WrappedTypes[T]
+        return f(obj)
+    else    
+        @warn("The return value contains $(typeinfo_string(obj)) which has not been wrapped yet")
+        return obj
+    end
 end
 
 function give(obj::Polymake.pm_perl_Object,prop::String)
@@ -84,6 +85,8 @@ function give(obj::Polymake.pm_perl_Object,prop::String)
     end 
     return convert_from_property_value(return_obj)
 end
+
+Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
 
 function Base.show(io::IO, obj::pm_perl_Object)
     print(io, properties(obj))
