@@ -59,7 +59,11 @@ const C_TYPES = [
 
 function __init__()
     @initcxx
-    initialize_polymake()
+    try
+        initialize_polymake()
+    catch ex # initialize_polymake throws jl_error
+        throw(PolymakeError(ex.msg))
+    end
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "..", "deps", "rules", "julia.rules"))\");")
     startup_apps = convert_from_property_value(call_function("startup_applications",Array{Any,1}([])))
