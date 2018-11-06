@@ -39,6 +39,13 @@
           "mandatory": 0,
           "type_params": 0,
           "include": [ "Obsolete" ]
+        },
+        { "name": "DIM",
+          "method_of": "BigObject<Polytope>",
+          "args" : [],
+          "mandatory": 0,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
         }
     ],
     "version": "dev"
