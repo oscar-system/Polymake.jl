@@ -49,12 +49,12 @@ const WrappedTypes = Dict(
     Symbol("pm::Vector<pm::Rational>") => to_vector_Rational,
     Symbol("pm::Matrix<pm::Integer>") => to_matrix_Integer,
     Symbol("pm::Matrix<pm::Rational>") => to_matrix_Rational,
-    Symbol("pm::Set<int, pm::operations::cmp>") => to_set_int32,
-    Symbol("pm::Set<long, pm::operations::cmp>") => to_set_int64,
+    Symbol("pm::Set<int,pm::operations::cmp>") => to_set_int32,
+    Symbol("pm::Set<long,pm::operations::cmp>") => to_set_int64,
     Symbol("pm::Array<int>") => to_array_int32,
     Symbol("pm::Array<long>") => to_array_int64,
-    Symbol("pm::Array<std::basic_string<char, std::char_traits<char>, std::allocator<char> >>") => to_array_string,
-    Symbol("pm::Array<pm::Set<int, pm::operations::cmp>>") => to_array_set_int32,
+    Symbol("pm::Array<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>") => to_array_string,
+    Symbol("pm::Array<pm::Set<int,pm::operations::cmp>>") => to_array_set_int32,
     Symbol("pm::Array<pm::Matrix<pm::Integer>>") => to_array_matrix_Integer, 
     Symbol("undefined") => x -> nothing,
 )
@@ -67,7 +67,7 @@ end
 
 function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
     type_name = Polymake.typeinfo_string(obj)
-    T = Symbol(type_name)
+    T = Symbol(replace(type_name," "=>""))
     if haskey(WrappedTypes, T)
         f = WrappedTypes[T]
         return f(obj)
