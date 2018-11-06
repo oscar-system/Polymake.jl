@@ -19,6 +19,16 @@
             [ 1 1 1 ; 1 1 2 ; 1 2 1 ; 1 2 2 ]
     end
     
+    @testset "PolymakeException" begin
+        test_polytope = perlobj("Polytope", input_dict_int )
+        @test !(:STH in Base.propertynames(test_polytope))
+        @test_throws PolymakeError test_polytope.STH
+        @test test_polytope.GRAPH isa pm_perl_Object
+        test_graph = test_polytope.GRAPH
+        @test :ADJACENCY in Base.propertynames(test_graph)
+        @test_logs (:warn, "The return value contains pm::graph::Graph<pm::graph::Undirected> which has not been wrapped yet") test_graph.ADJACENCY isa Polymake.pm_perl_PropertyValue
+    end
+    
     @testset "lattice points" begin
         test_polytope = perlobj("Polytope", input_dict_int )
         @test test_polytope.LATTICE_POINTS_GENERATORS isa pm_Array
