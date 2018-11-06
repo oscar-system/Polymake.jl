@@ -14,7 +14,7 @@
 
 #include "polymake_caller.h"
 
-Polymake_Data data;
+Polymake_Data data{nullptr, nullptr};
 
 JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 {
