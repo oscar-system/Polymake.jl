@@ -57,6 +57,8 @@ const C_TYPES = [
    ("pm_Array_pm_Matrix_pm_Integer", pm_Array{pm_Matrix{pm_Integer}}),
 ]
 
+include("repl.jl")
+
 function __init__()
     @initcxx
     try
@@ -77,6 +79,10 @@ function __init__()
         current_type = Ptr{Cvoid}(pointer_from_objref(c_type))
         set_julia_type(name, current_type)
     end
+
+    if isdefined(Base, :active_repl)
+        run_polymake_repl()
+    end
 end
 
 const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
@@ -84,7 +90,6 @@ const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set,
 include("functions.jl")
 include("convert.jl")
 include("object_helpers.jl")
-
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")

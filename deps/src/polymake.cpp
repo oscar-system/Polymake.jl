@@ -147,13 +147,25 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     {
       // FIXME: tuples with strings are broken in cxxwrap
       // return res;
-      // instead we return an array of strings now
+      // instead we return an array of a bool and three strings now
       auto res = data.main_polymake_session->shell_execute(x);
-      jl_value_t** output = new jl_value_t*[3]; 
-      output[0] = jl_cstr_to_string(std::get<1>(res).c_str());
-      output[1] = jl_cstr_to_string(std::get<2>(res).c_str());
-      output[2] = jl_cstr_to_string(std::get<3>(res).c_str());
-      return jlcxx::make_julia_array(output,3);
+      jl_value_t** output = new jl_value_t*[4];
+      output[0] = jl_box_bool(std::get<0>(res));
+      output[1] = jl_cstr_to_string(std::get<1>(res).c_str());
+      output[2] = jl_cstr_to_string(std::get<2>(res).c_str());
+      output[3] = jl_cstr_to_string(std::get<3>(res).c_str());
+      return jlcxx::make_julia_array(output,4);
+    });
+
+  polymake.method("shell_complete",[](const std::string x)
+    {
+      auto res = data.main_polymake_session->shell_complete(x);
+      std::vector<std::string> props = std::get<2>(res);
+      jl_value_t** output = new jl_value_t*[props.size()+1];
+      output[0] = jl_box_int64(std::get<0>(res));
+      for (int i = 0; i < props.size(); ++i)
+         output[i+1] = jl_cstr_to_string(props[i].c_str());
+      return jlcxx::make_julia_array(output,props.size()+1);
     });
 
   polymake_module_add_caller(polymake);
