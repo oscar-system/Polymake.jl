@@ -41,7 +41,7 @@ end
 
 const WrappedTypes = Dict(
     Symbol("int") => to_int,
-    Symbol("double") => to_double, 
+    Symbol("double") => to_double,
     Symbol("perl::Object") => to_perl_object,
     Symbol("pm::Integer") => to_pm_Integer,
     Symbol("pm::Rational") => to_pm_Rational,
@@ -55,7 +55,7 @@ const WrappedTypes = Dict(
     Symbol("pm::Array<long>") => to_array_int64,
     Symbol("pm::Array<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>") => to_array_string,
     Symbol("pm::Array<pm::Set<int,pm::operations::cmp>>") => to_array_set_int32,
-    Symbol("pm::Array<pm::Matrix<pm::Integer>>") => to_array_matrix_Integer, 
+    Symbol("pm::Array<pm::Matrix<pm::Integer>>") => to_array_matrix_Integer,
     Symbol("undefined") => x -> nothing,
 )
 
@@ -71,7 +71,7 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
     if haskey(WrappedTypes, T)
         f = WrappedTypes[T]
         return f(obj)
-    else    
+    else
         @warn("The return value contains $(typeinfo_string(obj)) which has not been wrapped yet")
         return obj
     end
@@ -82,7 +82,7 @@ function give(obj::Polymake.pm_perl_Object,prop::String)
         internal_give(obj, prop)
     catch ex
         throw(PolymakeError(ex.msg))
-    end 
+    end
     return convert_from_property_value(return_obj)
 end
 
@@ -96,3 +96,11 @@ function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, show_small_obj(obj))
 end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
+
+function Base.getindex(obj::pm_perl_Object, method::Symbol)
+    (args...) -> begin
+        convert_from_property_value(
+            call_method(string(method), obj, Array{Any,1}([args...]) )
+        )
+    end
+end
