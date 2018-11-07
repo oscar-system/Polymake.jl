@@ -97,7 +97,6 @@ void polymake_call_method_void(std::string function_name, pm::perl::Object objec
         polymake_call_function_feed_argument(function, arguments[i]);
     }
     function();
-    return;
 }
 
 
