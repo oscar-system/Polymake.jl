@@ -1,1 +1,3 @@
+# TODO: for now, disable comments, as CI and hence coverage computation
+# does not yet work. Update this file once Travis builds start passing!
 comment: false

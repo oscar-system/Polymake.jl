@@ -1,5 +1,5 @@
 using CxxWrap
-import Pkg
+#import Pkg # invalid in Julia 1.0, unless you add it to Project.toml
 
 
 # test whether polymake config is available in path

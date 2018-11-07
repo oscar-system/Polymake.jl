@@ -1,15 +1,17 @@
-## Documentation: http://docs.travis-ci.com/user/languages/julia/
+## Documentation: https://docs.travis-ci.com/user/languages/julia/
+## Technical details: https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/script/julia.rb
 language: julia
 os:
   - linux
-  - osx
+  #- osx
 julia:
-  - 0.6
+  - 1.0
   - nightly
 notifications:
   email: false
-git:
-  depth: 99999999
+
+codecov: true   # Note: this applies to Julia only; for C++ code in Polymake, more will need to be done
+coveralls: true  # Note: this applies to Julia only; for C++ code in Polymake, more will need to be done
 
 ## uncomment the following lines to allow failures on nightly julia
 ## (tests will run but not make your overall status red)
@@ -28,8 +30,10 @@ git:
 ## uncomment the following lines to override the default test script
 #script:
 #  - julia -e 'Pkg.clone(pwd()); Pkg.build("Polymake"); Pkg.test("Polymake"; coverage=true)'
-after_success:
-  # push coverage results to Coveralls
-  - julia -e 'cd(Pkg.dir("Polymake")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
-  # push coverage results to Codecov
-  - julia -e 'cd(Pkg.dir("Polymake")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+
+#
+#after_success:
+#  # push coverage results to Coveralls
+#  - julia -e 'cd(Pkg.dir("Polymake")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+#  # push coverage results to Codecov
+#  - julia -e 'cd(Pkg.dir("Polymake")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
