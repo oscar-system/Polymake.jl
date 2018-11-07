@@ -96,3 +96,34 @@ function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, show_small_obj(obj))
 end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
+
+
+
+struct PolymakeFunctionType
+end
+
+const func = PolymakeFunctionType()
+
+Base.show(io::IO,obj::PolymakeFunctionType) = "Polymake functions"
+
+function Base.getproperty(obj::PolymakeFunctionType,name::Symbol)
+    (args...) -> begin
+        return convert_from_property_value(
+            call_function(string(name), Array{Any,1}([args...]) ))
+    end
+end
+
+
+struct PolymakeMethodType
+end
+
+const method = PolymakeMethodType()
+
+Base.show(io::IO,obj::PolymakeMethodType) = "Polymake functions"
+
+function Base.getproperty(obj::PolymakeMethodType,name::Symbol)
+    (method_of,args...) -> begin
+        return convert_from_property_value(
+            call_method(string(name),method_of, Array{Any,1}([args...]) ))
+    end
+end
