@@ -89,8 +89,20 @@ pm::perl::PropertyValue polymake_call_method(std::string function_name, pm::perl
     return function();
 }
 
+void polymake_call_method_void(std::string function_name, pm::perl::Object object, jlcxx::ArrayRef<jl_value_t*> arguments)
+{
+    size_t argument_list = arguments.size();
+    auto function = object.prepare_call_method(function_name);
+    for(size_t i = 0;i<argument_list;i++){
+        polymake_call_function_feed_argument(function, arguments[i]);
+    }
+    function();
+}
+
+
 void polymake_module_add_caller(jlcxx::Module& polymake){
     polymake.method("call_function",&polymake_call_function);
     polymake.method("call_method",&polymake_call_method);
+    polymake.method("call_method_void",&polymake_call_method_void);
     polymake.method("set_julia_type",&set_julia_type);
 }
