@@ -1,4 +1,4 @@
-export cube, cross, perlobj
+export cube, cross, perlobj, rand_sphere, upper_bound_theorem
 
 import Base: convert, show
 
