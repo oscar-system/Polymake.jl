@@ -95,4 +95,9 @@ end
 function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, show_small_obj(obj))
 end
+
+# fallback for non-wrapped types
+function Base.show(io::IO, ::MIME"text/plain", pv::pm_perl_PropertyValue)
+    print(io, to_string(pv))
+end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
