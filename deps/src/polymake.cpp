@@ -73,6 +73,9 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("to_matrix_Rational", [](pm::perl::PropertyValue pv){
     return to_SmallObject<pm::Matrix<pm::Rational>>(pv);
   });
+  polymake.method("to_string", [](pm::perl::PropertyValue pv){
+    return to_SmallObject<std::string>(pv);
+  });
     
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Integer);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Rational);
