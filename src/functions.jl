@@ -1,21 +1,21 @@
-export cube, cross, perlobj, rand_sphere, upper_bound_theorem
+export cube, cross, perlobj, rand_sphere, upper_bound_theorem, call_func
 
 import Base: convert, show
 
 function cube(dim)
-    return call_func_1args("cube",dim)
+    return call_func(:cube, dim)
 end
 
 function cross(dim)
-    return call_func_1args("cross",dim)
+    return call_func(:cross, dim)
 end
 
 function rand_sphere(n,d)
-    return call_func_2args("rand_sphere",n,d)
+    return call_func(:rand_sphere, n, d)
 end
 
 function upper_bound_theorem(n,d)
-    return call_func_2args("upper_bound_theorem",n,d)
+    return call_func(:upper_bound_theorem, n, d)
 end
 
 function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
@@ -41,7 +41,7 @@ end
 
 const WrappedTypes = Dict(
     Symbol("int") => to_int,
-    Symbol("double") => to_double, 
+    Symbol("double") => to_double,
     Symbol("perl::Object") => to_perl_object,
     Symbol("pm::Integer") => to_pm_Integer,
     Symbol("pm::Rational") => to_pm_Rational,
@@ -55,7 +55,7 @@ const WrappedTypes = Dict(
     Symbol("pm::Array<long>") => to_array_int64,
     Symbol("pm::Array<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>") => to_array_string,
     Symbol("pm::Array<pm::Set<int,pm::operations::cmp>>") => to_array_set_int32,
-    Symbol("pm::Array<pm::Matrix<pm::Integer>>") => to_array_matrix_Integer, 
+    Symbol("pm::Array<pm::Matrix<pm::Integer>>") => to_array_matrix_Integer,
     Symbol("undefined") => x -> nothing,
 )
 
@@ -71,10 +71,19 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
     if haskey(WrappedTypes, T)
         f = WrappedTypes[T]
         return f(obj)
-    else    
+    else
         @warn("The return value contains $(typeinfo_string(obj)) which has not been wrapped yet")
         return obj
     end
+end
+
+"""
+    call_func(func::Symbol, args...)
+
+Call a polymake function with the given `func` name and given arguemnts `args`.
+"""
+function call_func(func::Symbol, args...)
+    call_function(string(func), Any[args...]) |> convert_from_property_value
 end
 
 function give(obj::Polymake.pm_perl_Object,prop::String)
@@ -82,7 +91,7 @@ function give(obj::Polymake.pm_perl_Object,prop::String)
         internal_give(obj, prop)
     catch ex
         throw(PolymakeError(ex.msg))
-    end 
+    end
     return convert_from_property_value(return_obj)
 end
 
