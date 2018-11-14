@@ -76,7 +76,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("to_string", [](pm::perl::PropertyValue pv){
     return to_SmallObject<std::string>(pv);
   });
-    
+
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Integer);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Rational);
 
@@ -113,14 +113,11 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("to_vector_Rational", [](pm::perl::PropertyValue pv){
     return to_SmallObject<pm::Vector<pm::Rational>>(pv);
   });
-    
+
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Integer);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Rational);
 
   polymake.method("initialize_polymake", &initialize_polymake);
-  polymake.method("call_func_0args",&call_func_0args);
-  polymake.method("call_func_1args",&call_func_1args);
-  polymake.method("call_func_2args",&call_func_2args);
   polymake.method("application",[](const std::string x){
     data.main_polymake_session->set_application(x);
   });
@@ -131,14 +128,14 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   polymake.method("to_perl_object",&to_perl_object);
 
   polymake.method("typeinfo_string", [](pm::perl::PropertyValue p){
-    PropertyValueHelper ph(p); 
+    PropertyValueHelper ph(p);
     return ph.get_typename();
   });
 
   polymake_module_add_set(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int32);
-  
+
   polymake_module_add_array(polymake);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int32);
   POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int64);
