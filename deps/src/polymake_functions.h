@@ -4,12 +4,6 @@
 
 void initialize_polymake();
 
-polymake::perl::Object call_func_0args(std::string);
-
-polymake::perl::Object call_func_1args(std::string, int);
-
-polymake::perl::Object call_func_2args(std::string, int, int);
-
 pm::perl::Object to_perl_object(pm::perl::PropertyValue);
 
 template<typename T>
