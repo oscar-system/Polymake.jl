@@ -1,22 +1,14 @@
-export cube, cross, perlobj, rand_sphere, upper_bound_theorem, call_func
-
 import Base: convert, show
 
-function cube(dim)
-    return call_func(:cube, dim)
-end
+# application polytope
+cube(dim::Int) = call_func(:cube, dim)
+cross(dim::Int) = call_func(:cross, dim)
+rand_sphere(n::Int, d::Int) = call_func(:rand_sphere, n, d)
+upper_bound_theorem(n::Int, d::Int) = call_func(:upper_bound_theorem, n, d)
 
-function cross(dim)
-    return call_func(:cross, dim)
-end
-
-function rand_sphere(n,d)
-    return call_func(:rand_sphere, n, d)
-end
-
-function upper_bound_theorem(n,d)
-    return call_func(:upper_bound_theorem, n, d)
-end
+# application common
+pseudopower(a::pm_Integer, b) = call_func(:pseudopower, a, b)
+pseudopower(a::Int, b) = pseudopower(pm_Integer(a), b)
 
 function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
     perl_obj = pm_perl_Object(name)
