@@ -8,7 +8,7 @@ upper_bound_theorem(n::Int, d::Int) = call_func(:upper_bound_theorem, n, d)
 
 # application common
 pseudopower(a::pm_Integer, b) = call_func(:pseudopower, a, b)
-pseudopower(a::Int, b) = pseudopower(pm_Integer(a), b)
+pseudopower(a::Integer, b) = pseudopower(pm_Integer(a), b)
 
 function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
     perl_obj = pm_perl_Object(name)
