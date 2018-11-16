@@ -1,22 +1,6 @@
-export cube, cross, perlobj, rand_sphere, upper_bound_theorem, call_func
+export perlobj, call_func
 
 import Base: convert, show
-
-function cube(dim)
-    return call_func(:cube, dim)
-end
-
-function cross(dim)
-    return call_func(:cross, dim)
-end
-
-function rand_sphere(n,d)
-    return call_func(:rand_sphere, n, d)
-end
-
-function upper_bound_theorem(n,d)
-    return call_func(:upper_bound_theorem, n, d)
-end
 
 function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
     perl_obj = pm_perl_Object(name)

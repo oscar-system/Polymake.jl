@@ -46,6 +46,24 @@
           "mandatory": 0,
           "type_params": 0,
           "include": [ "Obsolete" ]
+        },
+        { "name": "upper_bound_theorem",
+          "args" : ["Anything","Anything"],
+          "mandatory": 2,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
+        },
+        { "name": "rand_sphere",
+          "args" : ["Anything","Anything","OptionSet"],
+          "mandatory": 2,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
+        },
+        { "name": "cross",
+          "args" : ["Anything","Anything","OptionSet"],
+          "mandatory": 1,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
         }
     ],
     "version": "dev"
