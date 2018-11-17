@@ -54,5 +54,11 @@
         end
     end
 
+    @testset "Promotions/Conversions" begin
+        a = pm_Integer(1)
+        @test convert(Integer,a) === a
+        @test typeof(Array{Any,1}([a,1])[1]) <: pm_Integer
+    end
+
 
 end
