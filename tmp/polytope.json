@@ -64,7 +64,14 @@
           "mandatory": 1,
           "type_params": 0,
           "include": [ "Obsolete" ]
+        },
+        { "name": "pseudopower",
+          "args" : ["Anything","Anything"],
+          "mandatory": 2,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
         }
+
     ],
     "version": "dev"
 }
