@@ -35,7 +35,7 @@ function julia_function_string(julia_name::String, polymake_name::String, app_na
     return """
 function $julia_name( $julia_args, ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
-    return_value = call_function( "$polymake_name$parameter_string", Array{Any,1}([ $call_args ]) )
+    return_value = call_function( "$polymake_name$parameter_string", Any[ $call_args ] )
     if Convert
         return convert_from_property_value(return_value)
     else
@@ -50,7 +50,7 @@ function julia_method_string(julia_name::String, polymake_name::String, app_name
     return """
 function $julia_name( $julia_args, ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
-    return_value = call_method( "$polymake_name$parameter_string", dispatch_obj, Array{Any,1}([ $call_args ]) )
+    return_value = call_method( "$polymake_name$parameter_string", dispatch_obj, Any[ $call_args ] )
     if Convert
         convert_from_property_value(return_value)
     else
