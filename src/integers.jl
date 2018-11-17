@@ -34,8 +34,10 @@ Base.promote_rule(::Type{BigInt}, ::Type{<:pm_Integer}) = pm_Integer
 function Base.convert(::Type{<:pm_Integer}, int::Integer)
     return pm_Integer(int)
 end
-Base.convert(::Type{<:pm_Integer}, int::pm_IntegerAllocated) = int
+Base.convert(::Type{<:pm_Integer}, int::T) where T <: pm_Integer = int
 # Convert from PM to Julia
 function Base.convert(::Type{T}, int::pm_Integer) where {T<:Integer}
     convert(T, BigInt(int))
 end
+
+Base.convert(::Type{Integer},int::pm_Integer) = int
