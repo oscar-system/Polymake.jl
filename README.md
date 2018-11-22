@@ -5,7 +5,9 @@ This package is developed as part of the [OSCAR](https://oscar.computeralgebra.d
 
 ## Installation
 
-The current version relies on an unreleased version of polymake. A compatible version is available at [polymake/polymake#snapshots](https://github.com/polymake/polymake/tree/Snapshots) and it can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folder.
+The current version relies on an unreleased version of polymake. A compatible version is available at [polymake/polymake#snapshots](https://github.com/polymake/polymake/tree/Snapshots).
+It can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folder.
+Also make sure to check [the necessary dependencies](https://polymake.org/doku.php/howto/install) as well as the [additional instructions for Macs](https://polymake.org/doku.php/howto/mac).
 ```sh
 export POLYMAKE_GIT=GIT_FOLDER
 export POLYMAKE_INSTALL=INSTALL_FOLDER
@@ -17,7 +19,6 @@ ninja -C build/Opt
 ninja -C build/Opt install
 export POLYMAKE_CONFIG=$POLYMAKE_INSTALL/bin/polymake-config
 ```
-
 Note that polymake might take some time to compile.
 
 If you already have a recent enough version of polymake on your system and skipped the above instructions you still need to either have `polymake-config` available in your PATH or the environment variable `POLYMAKE_CONFIG` needs to point to the correct `polymake-config` file.
