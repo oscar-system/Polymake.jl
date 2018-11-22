@@ -18,7 +18,7 @@ ninja -C build/Opt install
 export POLYMAKE_CONFIG=$POLYMAKE_INSTALL/bin/polymake-config
 ```
 
-Note that the compilation can take.
+Note that polymake might take some time to compile.
 
 If you already have a recent enough version of polymake on your system and skipped the above instructions you still need to either have `polymake-config` available in your PATH or the environment variable `POLYMAKE_CONFIG` needs to point to the correct `polymake-config` file.
 
