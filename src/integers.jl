@@ -1,8 +1,3 @@
-function BigInt(int::pm_IntegerAllocated)
-    deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
-end
-
-
 # Int32, Int64 constructors handled by Cxx side
 pm_Integer(int::Int128) = pm_Integer(big(int))
 pm_Integer(int::BigInt) = new_pm_Integer_from_bigint(int)
@@ -36,8 +31,15 @@ function Base.convert(::Type{<:pm_Integer}, int::Integer)
 end
 Base.convert(::Type{<:pm_Integer}, int::T) where T <: pm_Integer = int
 # Convert from PM to Julia
-function Base.convert(::Type{T}, int::pm_Integer) where {T<:Integer}
+function Base.convert(::Type{T}, int::pm_Integer) where {T<:Number}
     convert(T, BigInt(int))
 end
+function Base.BigInt(int::pm_IntegerAllocated)
+    deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
+end
 
-Base.convert(::Type{Integer},int::pm_Integer) = int
+for T in [:Int8, :Int16, :Int32, :Int64, :UInt8, :UInt16, :UInt32, :UInt64]
+    @eval Base.$T(x::pm_Integer) = $T(BigInt(x))
+end
+
+Base.convert(::Type{Integer}, int::pm_Integer) = int
