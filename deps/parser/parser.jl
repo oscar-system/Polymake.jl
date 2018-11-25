@@ -73,7 +73,7 @@ function create_argument_string_from_type( type_string::String, number::Int64 )
     return "arg" * string(number) * "::" * type_translate_list[type_string]
 end
 
-function parse_definition(method_dict::Dict, app_name::String)
+function parse_definition(method_dict::Dict, app_name::String,method_symbol_list::Array{Symbol,1})
     name = method_dict["name"]
     arguments = method_dict["args"]
     mandatory = method_dict["mandatory"]
@@ -82,6 +82,10 @@ function parse_definition(method_dict::Dict, app_name::String)
     ## for now, we use the same name for Julia and Polymake
     julia_name = name
     polymake_name = name
+
+    if is_method
+        push!(method_symbol_list,Symbol(name))
+    end
 
     ## Check for option set
     has_option_set = length(arguments) > 0 && last(arguments) == "OptionSet"
@@ -185,7 +189,7 @@ import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
 
 """
 
-function parse_app_definitions(filename::String,outputfileposition::String,include_file::String,method_file::String,module_string_includes::String)
+function parse_app_definitions(filename::String,outputfileposition::String,include_file::String,method_file::String,module_string_includes::String,method_symbol_list::Array{Symbol,1})
     println("Parsing "*filename)
     parsed_dict = JSON.Parser.parsefile(filename)
     app_name = parsed_dict["app"]
@@ -200,7 +204,7 @@ $module_string_includes
         function_string = ""
         method_string = ""
         try
-            function_string,method_string = parse_definition(current_function,app_name)
+            function_string,method_string = parse_definition(current_function,app_name,method_symbol_list)
         catch exception
             if exception isa UnparsablePolymakeFunction
                 @warn(exception.msg)
@@ -241,11 +245,13 @@ open(abspath(method_file),"w") do outputfile
     print(outputfile,module_string)
 end
 
+method_symbol_list = Symbol[]
 
 for current_file in filenames_list
-    parse_app_definitions(current_file, outputfolder, include_file, method_file, module_string_includes)
+    parse_app_definitions(current_file, outputfolder, include_file, method_file, module_string_includes, method_symbol_list)
 end
 
 open(abspath(method_file),"a") do outputfile
+    print(outputfile,"method_symbol_list = $(string(method_symbol_list))")
     print(outputfile,"\nend\nexport methods\n")
 end
