@@ -1,7 +1,6 @@
-function Rational(frac::pm_RationalAllocated)
+function Base.Rational(frac::pm_RationalAllocated)
     Rational(BigInt(numerator(frac)), BigInt(denominator(frac)))
 end
-
 
 # Int32, Int64 constructors handled by Cxx side
 pm_Rational(a::Int128, b::Int128) = pm_Rational(big(a), big(b))
