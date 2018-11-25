@@ -79,6 +79,8 @@ function give(obj::Polymake.pm_perl_Object,prop::String)
     return convert_from_property_value(return_obj)
 end
 
+Base.getindex(obj::pm_perl_Object, prop::Symbol) = give(obj,string(prop))
+
 function Base.getproperty(obj::pm_perl_Object, prop::Symbol)
     if prop in Polymake.methods.method_symbol_list
         return getfield(Polymake.methods,prop)(obj)
