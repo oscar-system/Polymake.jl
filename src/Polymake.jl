@@ -3,7 +3,7 @@ module Polymake
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
     pm_Set, pm_Vector, pm_Array, pm_Matrix,
-    PolymakeError
+    PolymakeError, application
 
 
 # We need to import all functions which will be extended on the Cxx side
