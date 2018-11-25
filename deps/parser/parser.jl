@@ -147,13 +147,8 @@ function parse_definition(method_dict::Dict, app_name::String)
         max_argument_number = actual_arguments
     end
 
-    return_string = ""
-
-    if is_method
-        function_string_creator = julia_method_string
-    else
-        function_string_creator = julia_function_string
-    end
+    function_string = ""
+    method_string = ""
 
     julia_argument_list = vcat(param_list_header,argument_list_header)
     for number_arguments in min_argument_number:max_argument_number
@@ -163,22 +158,25 @@ function parse_definition(method_dict::Dict, app_name::String)
         else
             call_args = join(argument_list[1:number_arguments],",")
         end
-        return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+        if is_method
+            method_string = method_string * julia_method_string(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+        else
+            function_string = function_string * julia_function_string(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+        end
         if has_option_set
             julia_args = julia_args * "," * option_set_argument
             call_args = call_args * "," * option_set_parameter
-            return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+            if is_method
+                method_string = method_string * julia_method_string(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+            else
+                function_string = function_string * julia_function_string(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+            end
         end
     end
-    return return_string
+    return function_string,method_string
 end
 
-function parse_app_definitions(filename::String,outputfileposition::String,include_file::String)
-    println("Parsing "*filename)
-    parsed_dict = JSON.Parser.parsefile(filename)
-    app_name = parsed_dict["app"]
-    return_string = """
-module $app_name
+module_string_includes = """
 
 import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
        ..pm_perl_Object, ..pm_perl_OptionSet, ..pm_perl_PropertyValue,
@@ -186,20 +184,37 @@ import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
        ..convert_from_property_value
 
 """
+
+function parse_app_definitions(filename::String,outputfileposition::String,include_file::String,method_file::String,module_string_includes::String)
+    println("Parsing "*filename)
+    parsed_dict = JSON.Parser.parsefile(filename)
+    app_name = parsed_dict["app"]
+    return_string = """
+module $app_name
+
+$module_string_includes
+
+"""
+    complete_method_string = ""
     for current_function in parsed_dict["functions"]
-        return_value = ""
+        function_string = ""
+        method_string = ""
         try
-            return_value = parse_definition(current_function,app_name)
+            function_string,method_string = parse_definition(current_function,app_name)
         catch exception
             if exception isa UnparsablePolymakeFunction
                 @warn(exception.msg)
             end
         end
-        return_string = return_string * return_value
+        return_string = return_string * function_string
+        complete_method_string = complete_method_string * method_string
     end
     return_string = return_string * "\n\nend\nexport $app_name\n"
     open(abspath(joinpath(outputfileposition, app_name * ".jl" )),"w") do outputfile
         print(outputfile,return_string)
+    end
+    open(abspath(method_file),"a") do outputfile
+        print(outputfile,complete_method_string)
     end
     open(abspath(include_file),"a") do outputfile
         print(outputfile,"include(\"$app_name.jl\")\n")
@@ -207,10 +222,30 @@ import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
 end
 
 outputfolder = abspath(joinpath(@__DIR__, "..", "..", "src","generated"))
-include_file = abspath(joinpath(@__DIR__, "..", "..", "src","generated","includes.jl"))
+include_file = abspath(joinpath(outputfolder,"includes.jl"))
 isfile(include_file) && rm(include_file)
+method_file = abspath(joinpath(outputfolder,"methods.jl"))
+isfile(method_file) && rm(method_file)
+
+open(abspath(include_file),"w") do outputfile
+    print(outputfile,"include(\"methods.jl\")\n")
+end
+
+module_string = """
+module methods
+
+$module_string_includes
+"""
+
+open(abspath(method_file),"w") do outputfile
+    print(outputfile,module_string)
+end
 
 
 for current_file in filenames_list
-    parse_app_definitions(current_file, outputfolder, include_file)
+    parse_app_definitions(current_file, outputfolder, include_file, method_file, module_string_includes)
+end
+
+open(abspath(method_file),"a") do outputfile
+    print(outputfile,"\nend\nexport methods\n")
 end
