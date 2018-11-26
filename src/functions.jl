@@ -1,4 +1,4 @@
-export perlobj, call_func
+export perlobj, call_func, call_method
 
 import Base: convert, show
 
@@ -74,7 +74,25 @@ function call_func(func::Symbol, args...)
     call_function(string(func), Any[args...]) |> convert_from_property_value
 end
 
-function give(obj::Polymake.pm_perl_Object,prop::String)
+const VISUALIZATION_METHODS = [:VISUAL, :GALE, :SCHLEGEL, :VISUAL,
+    :VISUAL_BOUNDED_GRAPH, :VISUAL_DUAL, :VISUAL_DUAL_FACE_LATTICE,
+    :VISUAL_DUAL_GRAPH, :VISUAL_FACE_LATTICE,
+    :VISUAL_GRAPH, :VISUAL_ORBIT_COLORED_GRAPH];
+
+"""
+    call_method(func::Symbol, args...)
+
+Call a polymake function with the given `func` name and given arguemnts `args`.
+"""
+function call_method(obj::Polymake.pm_perl_Object, meth::Symbol, args...)
+    if meth in VISUALIZATION_METHODS
+        call_method_void(string(meth), obj, Any[args...])
+    else
+        convert_from_property_value(call_method(string(meth), obj, Any[args...]))
+    end
+end
+
+function give(obj::Polymake.pm_perl_Object, prop::String)
     return_obj = try
         internal_give(obj, prop)
     catch ex
