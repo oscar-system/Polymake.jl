@@ -9,26 +9,7 @@
     #define CreatePolymakeTypeVar(type) extern jl_value_t* POLYMAKETYPE_ ## type
 #endif
 
-CreatePolymakeTypeVar(pm_perl_PropertyValue);
-CreatePolymakeTypeVar(pm_perl_OptionSet);
-CreatePolymakeTypeVar(pm_perl_Object);
-CreatePolymakeTypeVar(pm_Integer);
-CreatePolymakeTypeVar(pm_Rational);
-CreatePolymakeTypeVar(pm_Matrix_pm_Integer);
-CreatePolymakeTypeVar(pm_Matrix_pm_Rational);
-CreatePolymakeTypeVar(pm_Vector_pm_Integer);
-CreatePolymakeTypeVar(pm_Vector_pm_Rational);
-CreatePolymakeTypeVar(pm_Set_Int64);
-CreatePolymakeTypeVar(pm_Set_Int32);
-CreatePolymakeTypeVar(pm_Array_Int32);
-CreatePolymakeTypeVar(pm_Array_Int64);
-CreatePolymakeTypeVar(pm_Array_pm_Integer);
-CreatePolymakeTypeVar(pm_Array_String);
-CreatePolymakeTypeVar(pm_Array_pm_Set_Int32);
-CreatePolymakeTypeVar(pm_Array_pm_Array_Int32);
-CreatePolymakeTypeVar(pm_Array_pm_Array_Int64);
-CreatePolymakeTypeVar(pm_Array_pm_Array_pm_Integer);
-CreatePolymakeTypeVar(pm_Array_pm_Matrix_pm_Integer);
+#include "generated/type_vars.h"
 
 #define POLYMAKE_INSERT_TYPE_IN_MAP(type) insert_type_in_map(#type , &POLYMAKETYPE_ ## type )
 #define POLYMAKE_INSERT_TYPE_IN_MAP_SINGLE_TEMPLATE(outer,inner) \

@@ -82,6 +82,8 @@ end
 
 cd(joinpath(@__DIR__, "src"))
 
+include("parser/type_setup.jl")
+
 run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_INSTALL_LIBDIR=lib -DJulia_LIBRARY=$julia_lib_so .`)
 run(`make -j$(div(Sys.CPU_THREADS,2))`)
 

@@ -51,22 +51,7 @@ void polymake_call_function_feed_argument(T& function, jl_value_t* argument){
         function << std::string(jl_string_data(argument));
         return;
     }
-    TO_POLYMAKE_FUNCTION( pm_perl_PropertyValue, pm::perl::PropertyValue )
-    TO_POLYMAKE_FUNCTION( pm_perl_OptionSet, pm::perl::OptionSet )
-    TO_POLYMAKE_FUNCTION( pm_perl_Object, pm::perl::Object )
-    TO_POLYMAKE_FUNCTION( pm_Integer, pm::Integer )
-    TO_POLYMAKE_FUNCTION( pm_Rational, pm::Rational )
-    TO_POLYMAKE_FUNCTION( pm_Matrix_pm_Integer, pm::Matrix<pm::Integer> )
-    TO_POLYMAKE_FUNCTION( pm_Matrix_pm_Rational, pm::Matrix<pm::Rational> )
-    TO_POLYMAKE_FUNCTION( pm_Vector_pm_Integer, pm::Vector<pm::Integer> )
-    TO_POLYMAKE_FUNCTION( pm_Vector_pm_Rational, pm::Vector<pm::Rational> )
-    TO_POLYMAKE_FUNCTION( pm_Set_Int32, pm::Set<int32_t> )
-    TO_POLYMAKE_FUNCTION( pm_Set_Int64, pm::Set<long> )
-    TO_POLYMAKE_FUNCTION( pm_Array_Int32, pm::Array<int32_t> )
-    TO_POLYMAKE_FUNCTION( pm_Array_Int64, pm::Array<long> )
-    TO_POLYMAKE_FUNCTION( pm_Array_String, pm::Array<std::string> )
-    TO_POLYMAKE_FUNCTION( pm_Array_pm_Set_Int32, pm::Array<pm::Set<int32_t>> )
-    TO_POLYMAKE_FUNCTION( pm_Array_pm_Matrix_pm_Integer, pm::Array<pm::Matrix<pm::Integer>> )
+    #include "generated/to_polymake_function.h"
 }
 
 pm::perl::PropertyValue polymake_call_function(std::string function_name, jlcxx::ArrayRef<jl_value_t*> arguments)
