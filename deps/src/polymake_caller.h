@@ -22,8 +22,12 @@ CreatePolymakeTypeVar(pm_Set_Int64);
 CreatePolymakeTypeVar(pm_Set_Int32);
 CreatePolymakeTypeVar(pm_Array_Int32);
 CreatePolymakeTypeVar(pm_Array_Int64);
+CreatePolymakeTypeVar(pm_Array_pm_Integer);
 CreatePolymakeTypeVar(pm_Array_String);
 CreatePolymakeTypeVar(pm_Array_pm_Set_Int32);
+CreatePolymakeTypeVar(pm_Array_pm_Array_Int32);
+CreatePolymakeTypeVar(pm_Array_pm_Array_Int64);
+CreatePolymakeTypeVar(pm_Array_pm_Array_pm_Integer);
 CreatePolymakeTypeVar(pm_Array_pm_Matrix_pm_Integer);
 
 #define POLYMAKE_INSERT_TYPE_IN_MAP(type) insert_type_in_map(#type , &POLYMAKETYPE_ ## type )

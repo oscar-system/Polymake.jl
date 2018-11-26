@@ -52,7 +52,11 @@ const C_TYPES = [
    ("pm_Set_Int32", pm_Set{Int32}),
    ("pm_Array_Int32", pm_Array{Int32}),
    ("pm_Array_Int64", pm_Array{Int64}),
+   ("pm_Array_pm_Integer", pm_Array{pm_Integer}),
    ("pm_Array_String", pm_Array{String}),
+   ("pm_Array_pm_Array_Int32", pm_Array{pm_Array{Int32}}),
+   ("pm_Array_pm_Array_Int64", pm_Array{pm_Array{Int64}}),
+   ("pm_Array_pm_Array_pm_Integer", pm_Array{pm_Array{pm_Integer}}),
    ("pm_Array_pm_Set_Int32", pm_Matrix{pm_Set{Int32}}),
    ("pm_Array_pm_Matrix_pm_Integer", pm_Array{pm_Matrix{pm_Integer}}),
 ]

@@ -68,19 +68,32 @@ function convert(::Type{pm_Vector{pm_Rational}}, matrix::Array{Rational{S},1}) w
     return pm_matrix
 end
 
-convert_to_pm(x::pm_perl_PropertyValue) = x
+function convert(::Type{pm_Array{pm_Array{T}}}, vectors::Vector{<:Vector{<:Integer}}) where T
+    n = length(vectors)
+    pm_array = pm_Array{pm_Array{T}}(n)
+    for (i, v_i) in enumerate(vectors)
+        pm_array_i = pm_Array{T}(length(v_i))
+        for j=1:length(v_i)
+            pm_array_i[j] = T(v_i[j])
+        end
+        pm_array[i] = pm_array_i
+    end
+    return pm_array
+end
+
 convert_to_pm(x::String) = x
 convert_to_pm(x::T) where T <:Integer = Base.convert(pm_Integer,x)
-
 convert_to_pm(x::Rational{T}) where T <:Integer = Base.convert(pm_Rational,x)
-
 convert_to_pm(x::Array{T,1}) where T <:Integer = Base.convert(pm_Vector{pm_Integer},x)
-
 convert_to_pm(x::Array{Rational{T},1}) where T <:Integer = Base.convert(pm_Vector{pm_Rational},x)
-
 convert_to_pm(x::Array{T,2}) where T <:Integer = Base.convert(pm_Matrix{pm_Integer},x)
-
 convert_to_pm(x::Array{Rational{T},2}) where T <:Integer = Base.convert(pm_Matrix{pm_Rational},x)
+convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} =  Base.convert(pm_Array{pm_Array{T}},x)
+convert_to_pm(x::Vector{<:Vector{<:Integer}}) =  Base.convert(pm_Array{pm_Array{pm_Integer}},x)
+for (_, T) in C_TYPES
+    @eval convert_to_pm(x::$T) = x
+end
+
 
 function convert_matrix_rational(pmmatrix::pm_perl_PropertyValue)
     return convert_matrix_rational(to_matrix_rational(pmmatrix))
