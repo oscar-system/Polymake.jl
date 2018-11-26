@@ -68,6 +68,8 @@ function convert(::Type{pm_Vector{pm_Rational}}, matrix::Array{Rational{S},1}) w
     return pm_matrix
 end
 
+convert_to_pm(x::pm_perl_PropertyValue) = x
+convert_to_pm(x::String) = x
 convert_to_pm(x::T) where T <:Integer = Base.convert(pm_Integer,x)
 
 convert_to_pm(x::Rational{T}) where T <:Integer = Base.convert(pm_Rational,x)

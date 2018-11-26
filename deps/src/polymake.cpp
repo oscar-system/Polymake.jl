@@ -168,6 +168,14 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
       return jlcxx::make_julia_array(output,props.size()+1);
     });
 
+  polymake.method("take",[](pm::perl::Object p, const std::string& s, const std::string& t){
+      p.take(s) << t;
+  });
+  polymake.method("take",[](pm::perl::Object p, const std::string& s, const pm::perl::PropertyValue& v){
+      p.take(s) << v;
+  });
+
+
   polymake_module_add_caller(polymake);
 
 //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2, pm::perl::Value a3, pm::perl::OptionSet opt){ return polymake::polytope::cube<pm::QuadraticExtension<pm::Rational> >(a1,a2,a3,opt); });
