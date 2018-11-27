@@ -34,8 +34,6 @@
         @test test_polytope.LATTICE_POINTS_GENERATORS isa pm_Array
         
         test_polytope = perlobj("Polytope", input_dict_unbounded )
-        @test_broken test_polytope.LATTICE_POINTS_GENERATORS ==
-            [[ 1 0 0;], [ 0 1 1;], Matrix{Int}(undef, 0,3)]
         @test test_polytope.FAR_FACE == Set([1])
     end
     
