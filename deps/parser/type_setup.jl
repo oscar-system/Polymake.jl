@@ -8,15 +8,15 @@ type_tuples = [
 ( "pm_Matrix_pm_Rational",         "pm::Matrix<pm::Rational>",           "pm_Matrix{pm_Rational}" ),
 ( "pm_Vector_pm_Integer",          "pm::Vector<pm::Integer>",            "pm_Vector{pm_Integer}" ),
 ( "pm_Vector_pm_Rational",         "pm::Vector<pm::Rational>",           "pm_Vector{pm_Rational}" ),
-( "pm_Set_Int32",                  "pm::Set<int32_t>",                   "pm_Set{Int64}" ),
-( "pm_Set_Int64",                  "pm::Set<long>",                      "pm_Set{Int32}" ),
+( "pm_Set_Int32",                  "pm::Set<int32_t>",                   "pm_Set{Int32}" ),
+( "pm_Set_Int64",                  "pm::Set<long>",                      "pm_Set{Int64}" ),
 ( "pm_Array_Int32",                "pm::Array<int32_t>",                 "pm_Array{Int32}" ),
 ( "pm_Array_Int64",                "pm::Array<long>",                    "pm_Array{Int64}" ),
 ( "pm_Array_pm_Integer",           "pm::Array<pm::Integer>",             "pm_Array{pm_Integer}" ),
 ( "pm_Array_String",               "pm::Array<std::string>",             "pm_Array{String}" ),
 ( "pm_Array_pm_Set_Int32",         "pm::Array<pm::Set<int32_t>>",        "pm_Array{pm_Set{Int32}}" ),
 ( "pm_Array_pm_Array_Int32",       "pm::Array<pm::Array<int32_t>>",      "pm_Array{pm_Array{Int32}}" ),
-( "pm_Array_pm_Array_Int64",       "pm::Array<pm::Array<int64_t>>",      "pm_Array{pm_Array{Int64}}" ),
+( "pm_Array_pm_Array_Int64",       "pm::Array<pm::Array<long>>",         "pm_Array{pm_Array{Int64}}" ),
 ( "pm_Array_pm_Array_pm_Integer",  "pm::Array<pm::Array<pm::Integer>>",  "pm_Array{pm_Array{pm_Integer}}" ),
 ( "pm_Array_pm_Matrix_pm_Integer", "pm::Array<pm::Matrix<pm::Integer>>", "pm_Array{pm_Matrix{pm_Integer}}" )
 ]
