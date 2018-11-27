@@ -10,3 +10,4 @@ deps/build.log
 local
 Manifest.toml
 src/generated/*
+deps/src/generated/*

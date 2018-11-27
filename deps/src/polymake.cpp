@@ -20,9 +20,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 {
 
   polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_PropertyValue);
   polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_OptionSet);
 
 
   polymake.add_type<pm::perl::Object>("pm_perl_Object")
@@ -32,13 +30,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     .method("properties",[](pm::perl::Object p){ std::string x = p.call_method("properties");
                                                  return x;
                                                 });
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_perl_Object);
 
   polymake_module_add_integer(polymake);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Integer);
 
   polymake_module_add_rational(polymake);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
     .apply<
@@ -77,8 +72,6 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     return to_SmallObject<std::string>(pv);
   });
 
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Matrix_pm_Rational);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
     .apply<
@@ -114,9 +107,6 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     return to_SmallObject<pm::Vector<pm::Rational>>(pv);
   });
 
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Vector_pm_Rational);
-
   polymake.method("initialize_polymake", &initialize_polymake);
   polymake.method("application",[](const std::string x){
     data.main_polymake_session->set_application(x);
@@ -133,19 +123,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
   });
 
   polymake_module_add_set(polymake);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int64);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Set_Int32);
 
   polymake_module_add_array(polymake);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int32);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_Int64);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_String);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Set_Int32);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Array_Int32);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Array_Int64);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Array_pm_Integer);
-  POLYMAKE_INSERT_TYPE_IN_MAP(pm_Array_pm_Matrix_pm_Integer);
 
   polymake.method("shell_execute",[](const std::string x)
     {
@@ -179,6 +158,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
       p.take(s) << v;
   });
 
+  #include "generated/map_inserts.h"
 
   polymake_module_add_caller(polymake);
 
