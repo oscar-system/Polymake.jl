@@ -69,22 +69,13 @@ pm_libraries = chomp(read(`$pm_config --libs`, String))
 
 jlcxx_cmake_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
 
-julia_include = joinpath(Sys.BINDIR, "..", "include")
-julia_lib = joinpath(Sys.BINDIR, "..", "lib")
 julia_exec = joinpath(Sys.BINDIR , "julia")
-if Sys.isapple()
-    julia_lib_so = joinpath(Sys.BINDIR, "..", "lib", "libjulia.dylib")
-elseif Sys.islinux()
-    julia_lib_so = joinpath(Sys.BINDIR, "..", "lib", "libjulia.so")
-else
-    error("System is not supported!")
-end
 
 cd(joinpath(@__DIR__, "src"))
 
 include("parser/type_setup.jl")
 
-run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_INSTALL_LIBDIR=lib -DJulia_LIBRARY=$julia_lib_so .`)
+run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
 run(`make -j$(div(Sys.CPU_THREADS,2))`)
 
 include("parser/parser.jl")
