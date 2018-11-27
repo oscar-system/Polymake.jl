@@ -12,7 +12,8 @@ include_directories(${MY_LIST})
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++14 ${polymake_cflags}" )
 SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${polymake_ldflags}" )
 
-add_library(polymake SHARED polymake.cpp polymake_functions.cpp polymake_integers.cpp polymake_rationals.cpp polymake_sets.cpp polymake_arrays.cpp polymake_caller.cpp)
+file(GLOB polymake_SRC "*.cpp")
+add_library(polymake SHARED ${polymake_SRC})
 target_link_libraries(polymake JlCxx::cxxwrap_julia "${polymake_libs}")
 
 install(TARGETS
