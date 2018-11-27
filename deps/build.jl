@@ -48,8 +48,8 @@ bin_prefix = "https://github.com/benlorenz/polymakeBuilder/releases/download/v3.
 download_info = Dict(
     Linux(:x86_64, libc=:glibc, compiler_abi=CompilerABI(:gcc8)) => ("$bin_prefix/polymake.v3.2.0-dev-46e2f53417.x86_64-linux-gnu-gcc8.tar.gz", "0b7bdb16fb9ed95f622c6e535e576d8f5a3025dc6ca5bcd75fe7a85aac2109f7"),
     Linux(:x86_64, libc=:glibc, compiler_abi=CompilerABI(:gcc7)) => ("$bin_prefix/polymake.v3.2.0-dev-46e2f53417.x86_64-linux-gnu-gcc7.tar.gz", "cfed572b0a90906a7525699efab93fd993e28249e24a67e5559e9ee8c42c6db0"),
-    Linux(:i686, libc=:glibc, compiler_abi=CompilerABI(:gcc8)) => ("$bin_prefix/polymake.v3.2.0-dev-46e2f53417.i686-linux-gnu-gcc8.tar.gz", ""),
-    Linux(:i686, libc=:glibc, compiler_abi=CompilerABI(:gcc7)) => ("$bin_prefix/polymake.v3.2.0-dev-46e2f53417.i686-linux-gnu-gcc7.tar.gz", ""),
+    Linux(:i686, libc=:glibc, compiler_abi=CompilerABI(:gcc8)) => ("$bin_prefix/polymake.v3.2.0-dev-46e2f53417.i686-linux-gnu-gcc8.tar.gz", "b391811135429c220c6bc12482d8ad9eb5ec48bcae43c1b747e53a0b7464a7ca"),
+    Linux(:i686, libc=:glibc, compiler_abi=CompilerABI(:gcc7)) => ("$bin_prefix/polymake.v3.2.0-dev-46e2f53417.i686-linux-gnu-gcc7.tar.gz", "ff7ce55e1b3375239a3a2d72f3d5ab8175b6436730b4129f3f7fc74acb7ba3ca"),
 )
 
 if use_binary
