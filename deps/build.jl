@@ -56,6 +56,7 @@ if use_binary
     # Install unsatisfied or updated dependencies:
     unsatisfied = any(!satisfied(p; verbose=verbose) for p in products)
     dl_info = choose_download(download_info, platform_key_abi())
+    @info platform_key_abi()
     if dl_info === nothing && unsatisfied
         # If we don't have a BinaryProvider-compatible .tar.gz to download, complain.
         # Alternatively, you could attempt to install from a separate provider,
@@ -68,7 +69,7 @@ if use_binary
             download(dependency,basename(dependency))
             evalfile(basename(dependency))
         end
-        install(dl_info...; prefix=prefix, force=true, verbose=verbose,ignore_platform=true)
+        install(dl_info...; prefix=prefix, force=true, verbose=verbose)
     end
      pm_config_ninja = joinpath(libdir(prefix),"polymake","config.ninja")
      pm_bin_prefix = joinpath(@__DIR__,"usr")
