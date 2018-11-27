@@ -10,6 +10,8 @@
 
 #include "polymake_sets.h"
 
+#include "polymake_matrices.h"
+
 #include "polymake_arrays.h"
 
 #include "polymake_caller.h"
@@ -35,43 +37,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
   polymake_module_add_rational(polymake);
 
-  polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
-    .apply<
-      pm::Matrix<pm::Integer>,
-      pm::Matrix<pm::Rational>
-    >([](auto wrapped){
-        typedef typename decltype(wrapped)::type WrappedT;
-        typedef typename decltype(wrapped)::type::value_type elemType;
-        wrapped.template constructor<int32_t, int32_t>();
-        wrapped.template constructor<int64_t, int64_t>();
-
-        wrapped.method("_getindex", [](WrappedT& f, int64_t i, int64_t j){
-          return elemType(f(i-1,j-1));
-        });
-        wrapped.method("_setindex!", [](WrappedT& M, elemType r, int64_t i, int64_t j){
-            M(i-1,j-1)=r;
-        });
-        wrapped.method("rows",&WrappedT::rows);
-        wrapped.method("cols",&WrappedT::cols);
-        wrapped.method("resize",[](WrappedT& M, int64_t i, int64_t j){ M.resize(i,j); });
-
-        wrapped.method("take",[](pm::perl::Object p, const std::string& s, WrappedT& M){
-            p.take(s) << M;
-        });
-        wrapped.method("show_small_obj", [](WrappedT& M){
-          return show_small_object<WrappedT>(M);
-        });
-    });
-  polymake.method("to_matrix_Integer", [](pm::perl::PropertyValue pv){
-    return to_SmallObject<pm::Matrix<pm::Integer>>(pv);
-  });
-  polymake.method("to_matrix_Rational", [](pm::perl::PropertyValue pv){
-    return to_SmallObject<pm::Matrix<pm::Rational>>(pv);
-  });
-  polymake.method("to_string", [](pm::perl::PropertyValue pv){
-    return to_SmallObject<std::string>(pv);
-  });
-
+  polymake_module_add_matrix(polymake);
 
   polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
     .apply<
