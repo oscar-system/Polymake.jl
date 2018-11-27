@@ -4,3 +4,4 @@ JSON
 REPL
 Pkg
 BinaryProvider
+Libdl
