@@ -5,6 +5,10 @@ os:
   - linux
 julia:
   - 1.0
+  - nightly
+matrix:
+ allow_failures:
+ - julia: nightly
 notifications:
   email: false
 sudo: required
@@ -19,3 +23,8 @@ addons:
     - gcc-7
     - g++-7
 
+script:
+  - julia --code-coverage --inline=no -e 'using Pkg; Pkg.build(); Pkg.test();'
+after_success:
+  # push coverage results to Codecov
+  - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
