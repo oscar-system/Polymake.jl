@@ -24,7 +24,7 @@ addons:
     - g++-7
 
 script:
-  - julia --code-coverage --inline=no test/runtests.jl
+  - julia --code-coverage --inline=no -e 'using Pkg; Pkg.build(); Pkg.test();'
 after_success:
   # push coverage results to Codecov
   - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
