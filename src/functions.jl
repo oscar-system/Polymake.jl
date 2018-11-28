@@ -1,4 +1,4 @@
-export perlobj, call_func
+export perlobj, call_function, call_method
 
 import Base: convert, show
 
@@ -66,12 +66,53 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
 end
 
 """
-    call_func(func::Symbol, args...)
+    call_function(func::Symbol, args...; void=false, kwargs...)
 
-Call a polymake function with the given `func` name and given arguemnts `args`.
+Call a polymake function with the given `func` name and given arguments `args`.
+If `void=true` the function is called in a void context. For example this is important for visualization.
 """
-function call_func(func::Symbol, args...)
-    internal_call_function(string(func), Any[args...]) |> convert_from_property_value
+function call_function(func::Symbol, args...; void=false, kwargs...)
+    fname = string(func)
+    cargs = Any[args...]
+    if isempty(kwargs)
+        if void
+            ret = internal_call_function_void(fname, cargs)
+        else
+            ret = internal_call_function(fname, cargs)
+        end
+    else
+        if void
+            ret = internal_call_function_void(fname, cargs, OptionSet(kwargs))
+        else
+            ret = internal_call_function(fname, cargs, OptionSet(kwargs))
+        end
+    end
+    convert_from_property_value(ret)
+end
+
+"""
+    call_method(obj::pm_perl_Object, func::Symbol, args...; kwargs...)
+
+Call a polymake method on the object `obj` with the given `func` name and given arguments `args`.
+If `void=true` the function is called in a void context. For example this is important for visualization.
+"""
+function call_method(obj, func::Symbol, args...; void=false, kwargs...)
+    fname = string(func)
+    cargs = Any[args...]
+    if isempty(kwargs)
+        if void
+            ret = internal_call_method_void(fname, cargs)
+        else
+            ret = internal_call_method(fname, cargs)
+        end
+    else
+        if void
+            ret = internal_call_method_void(fname, obj, cargs, OptionSet(kwargs))
+        else
+            ret = internal_call_method(fname, obj, cargs, OptionSet(kwargs))
+        end
+    end
+    convert_from_property_value(ret)
 end
 
 function give(obj::Polymake.pm_perl_Object, prop::String)

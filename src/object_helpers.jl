@@ -1,12 +1,15 @@
-
-function complete_property(obj::pm_perl_Object,prefix::String)
-   return convert_from_property_value(internal_call_function("complete_property",Any[obj,prefix]))
+function complete_property(obj::pm_perl_Object, prefix::String)
+   call_function(:complete_property, obj, prefix)
 end
 
-function list_applications()
-   return convert_from_property_value(internal_call_function("list_applications",Any[]))
-end
+list_applications() = call_function(:list_applications)
 
-function list_big_objects(app::String)
-   return convert_from_property_value(internal_call_function("list_big_objects",Any[app]))
+list_big_objects(app::String) = call_function(:list_big_objects, app)
+
+function pm_perl_OptionSet(iter)
+    opt_set = pm_perl_OptionSet()
+    for (key, value) in iter
+        option_set_take(opt_set, string(key), value)
+    end
+    return opt_set
 end
