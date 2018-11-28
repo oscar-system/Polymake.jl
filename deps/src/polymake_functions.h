@@ -6,8 +6,8 @@ void initialize_polymake();
 
 pm::perl::Object to_perl_object(pm::perl::PropertyValue);
 
-template<typename T>
-T to_SmallObject(pm::perl::PropertyValue pv){
+template <typename T> T to_SmallObject(pm::perl::PropertyValue pv)
+{
     T obj = pv;
     return obj;
 };
@@ -15,10 +15,11 @@ T to_SmallObject(pm::perl::PropertyValue pv){
 pm::Integer new_integer_from_bigint(jl_value_t*);
 
 // We can do better templating here
-template<typename T>
-std::string show_small_object(const T& obj, bool print_typename = true){
+template <typename T>
+std::string show_small_object(const T& obj, bool print_typename = true)
+{
     std::ostringstream buffer;
-    auto wrapped_buffer = wrap(buffer);
+    auto               wrapped_buffer = wrap(buffer);
     if (print_typename) {
         wrapped_buffer << polymake::legible_typename(typeid(obj)) << pm::endl;
     }
