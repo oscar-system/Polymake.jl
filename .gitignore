@@ -7,6 +7,9 @@ deps/src/Makefile
 deps/src/cmake_install.cmake
 deps/src/libpolymake.*
 deps/build.log
+deps/build_*.jl
+deps/deps.jl
+deps/usr
 local
 Manifest.toml
 src/generated/*

@@ -14,6 +14,8 @@ import Base: ==, <, <=, *, -, +, /, div, rem,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
+using Pkg: depots1
+
 using CxxWrap
 
 struct PolymakeError <: Exception
@@ -44,11 +46,16 @@ include("repl.jl")
 
 function __init__()
     @initcxx
+
+    include(joinpath(@__DIR__,"..","deps","deps.jl"))
+
+    ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
     try
         initialize_polymake()
     catch ex # initialize_polymake throws jl_error
         throw(PolymakeError(ex.msg))
     end
+
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "..", "deps", "rules", "julia.rules"))\");")
     startup_apps = convert_from_property_value(call_function("startup_applications",Array{Any,1}([])))
