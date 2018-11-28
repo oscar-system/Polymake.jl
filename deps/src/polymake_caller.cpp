@@ -2,6 +2,8 @@
 
 #include "polymake_caller.h"
 
+#include "polymake_tools.h"
+
 static auto type_map_translator = new std::map<std::string, jl_value_t**>();
 
 void insert_type_in_map(std::string&& ptr_name, jl_value_t** var_space)
