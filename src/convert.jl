@@ -81,7 +81,8 @@ function convert(::Type{pm_Array{pm_Array{T}}}, vectors::Vector{<:Vector{<:Integ
     return pm_array
 end
 
-convert_to_pm(x::String) = x
+# By default convert_to_pm is a no op
+convert_to_pm(x) = x
 convert_to_pm(x::T) where T <:Integer = Base.convert(pm_Integer,x)
 convert_to_pm(x::Rational{T}) where T <:Integer = Base.convert(pm_Rational,x)
 convert_to_pm(x::Array{T,1}) where T <:Integer = Base.convert(pm_Vector{pm_Integer},x)
@@ -90,9 +91,6 @@ convert_to_pm(x::Array{T,2}) where T <:Integer = Base.convert(pm_Matrix{pm_Integ
 convert_to_pm(x::Array{Rational{T},2}) where T <:Integer = Base.convert(pm_Matrix{pm_Rational},x)
 convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} =  Base.convert(pm_Array{pm_Array{T}},x)
 convert_to_pm(x::Vector{<:Vector{<:Integer}}) =  Base.convert(pm_Array{pm_Array{pm_Integer}},x)
-for (_, T) in C_TYPES
-    @eval convert_to_pm(x::$T) = x
-end
 
 
 function convert_matrix_rational(pmmatrix::pm_perl_PropertyValue)

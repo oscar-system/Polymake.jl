@@ -24,9 +24,6 @@
 #include <polymake/perl/macros.h>
 #include <polymake/perl/wrappers.h>
 
-// #include
-// "/home/sebastian/Software/polymake_devel_git/apps/polytope/include/cube.h"
-
 #pragma clang diagnostic pop
 
 #endif

@@ -71,10 +71,10 @@ end
 Call a polymake function with the given `func` name and given arguemnts `args`.
 """
 function call_func(func::Symbol, args...)
-    call_function(string(func), Any[args...]) |> convert_from_property_value
+    internal_call_function(string(func), Any[args...]) |> convert_from_property_value
 end
 
-function give(obj::Polymake.pm_perl_Object,prop::String)
+function give(obj::Polymake.pm_perl_Object, prop::String)
     return_obj = try
         internal_give(obj, prop)
     catch ex
@@ -85,14 +85,10 @@ end
 
 Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
 
-function Base.show(io::IO, obj::pm_perl_Object)
-    print(io, properties(obj))
-end
-
+Base.show(io::IO, obj::pm_perl_Object) = print(io, properties(obj))
 function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, show_small_obj(obj))
 end
-
 # fallback for non-wrapped types
 function Base.show(io::IO, ::MIME"text/plain", pv::pm_perl_PropertyValue)
     print(io, to_string(pv))

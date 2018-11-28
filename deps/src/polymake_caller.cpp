@@ -2,8 +2,6 @@
 
 #include "polymake_caller.h"
 
-#include "polymake_tools.h"
-
 static auto type_map_translator = new std::map<std::string, jl_value_t**>();
 
 void insert_type_in_map(std::string&& ptr_name, jl_value_t** var_space)
@@ -23,6 +21,15 @@ void set_julia_type(std::string name, void* type_address)
     }
     memcpy(address, &type_address, sizeof(jl_value_t*));
 }
+
+void* get_ptr_from_cxxwrap_obj(jl_value_t* obj)
+{
+    return *reinterpret_cast<void**>(obj);
+}
+
+// void* get_ptr_from_cxxwrap_obj(jl_value_t* obj){
+//     return jl_unbox_voidpointer(jl_get_field(obj,"cpp_object"));
+// }
 
 #define TO_POLYMAKE_FUNCTION(juliatype, ctype)                               \
     if (jl_subtype(current_type, POLYMAKETYPE_##juliatype)) {                \
@@ -64,6 +71,20 @@ polymake_call_function(std::string                  function_name,
     return function();
 }
 
+// Visualization in polymake only works if the function is called and
+// then immediately released,i.e. not converted to a property value
+void polymake_call_function_void(std::string                  function_name,
+                                 jlcxx::ArrayRef<jl_value_t*> arguments)
+{
+    size_t argument_list = arguments.size();
+    auto   function = polymake::prepare_call_function(function_name);
+    for (size_t i = 0; i < argument_list; i++) {
+        polymake_call_function_feed_argument(function, arguments[i]);
+    }
+
+    function();
+}
+
 pm::perl::PropertyValue
 polymake_call_method(std::string                  function_name,
                      pm::perl::Object*            object,
@@ -77,6 +98,8 @@ polymake_call_method(std::string                  function_name,
     return function();
 }
 
+// Visualization in polymake only works if the method is called and
+// then immediately released,i.e. not converted to a property value
 void polymake_call_method_void(std::string                  function_name,
                                pm::perl::Object             object,
                                jlcxx::ArrayRef<jl_value_t*> arguments)
@@ -92,8 +115,9 @@ void polymake_call_method_void(std::string                  function_name,
 
 void polymake_module_add_caller(jlcxx::Module& polymake)
 {
-    polymake.method("call_function", &polymake_call_function);
-    polymake.method("call_method", &polymake_call_method);
-    polymake.method("call_method_void", &polymake_call_method_void);
+    polymake.method("internal_call_function", &polymake_call_function);
+    polymake.method("internal_call_function_void", &polymake_call_function_void);
+    polymake.method("internal_call_method", &polymake_call_method);
+    polymake.method("internal_call_method_void", &polymake_call_method_void);
     polymake.method("set_julia_type", &set_julia_type);
 }
