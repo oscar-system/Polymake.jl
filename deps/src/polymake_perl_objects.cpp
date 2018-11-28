@@ -10,12 +10,15 @@
 
 #define TO_POLYMAKE_FUNCTION(juliatype, ctype)                               \
     if (jl_subtype(current_type, POLYMAKETYPE_##juliatype)) {                \
-        optset[key] << *reinterpret_cast<ctype*>(                               \
-            get_ptr_from_cxxwrap_obj(value));                             \
+        optset[key] << *reinterpret_cast<ctype*>(                            \
+            get_ptr_from_cxxwrap_obj(value));                                \
         return;                                                              \
     }
 
-void option_set_take(pm::perl::OptionSet optset,std::string key,jl_value_t* value){
+void option_set_take(pm::perl::OptionSet optset,
+                     std::string         key,
+                     jl_value_t*         value)
+{
     jl_value_t* current_type = jl_typeof(value);
     if (jl_is_int64(value)) {
         // check size of long, to be sure
@@ -40,7 +43,7 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
     polymake.add_type<pm::perl::PropertyValue>("pm_perl_PropertyValue");
     polymake.add_type<pm::perl::OptionSet>("pm_perl_OptionSet");
 
-    polymake.method("option_set_take",option_set_take);
+    polymake.method("option_set_take", option_set_take);
 
 
     polymake.add_type<pm::perl::Object>("pm_perl_Object")

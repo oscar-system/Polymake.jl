@@ -26,16 +26,14 @@ type_translate_list = Dict(
 )
 
 ## Dummy, will soon be generated
-filenames_list = Array{String,1}(
-    [ abspath(joinpath( @__DIR__, "..", "..", "tmp", "polytope.json")) ]
-)
+filenames_list = [abspath(joinpath( @__DIR__, "..", "..", "tmp", "polytope.json"))]
 
 function julia_function_string(julia_name::String, polymake_name::String, app_name::String, julia_args::String, call_args::String, parameter_string::String )
 
     return """
 function $julia_name( $julia_args, ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
-    return_value = call_function( "$polymake_name$parameter_string", Any[ $call_args ] )
+    return_value = internal_call_function( "$polymake_name$parameter_string", Any[ $call_args ] )
     if Convert
         return convert_from_property_value(return_value)
     else
@@ -50,7 +48,7 @@ function julia_method_string(julia_name::String, polymake_name::String, app_name
     return """
 function $julia_name( $julia_args, ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
-    return_value = call_method( "$polymake_name$parameter_string", dispatch_obj, Any[ $call_args ] )
+    return_value = internal_call_method( "$polymake_name$parameter_string", dispatch_obj, Any[ $call_args ] )
     if Convert
         convert_from_property_value(return_value)
     else
@@ -182,7 +180,7 @@ module $app_name
 
 import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
        ..pm_perl_Object, ..pm_perl_OptionSet, ..pm_perl_PropertyValue,
-       ..application, ..call_function, ..call_method,
+       ..application, ..internal_call_function, ..internal_call_method,
        ..convert_from_property_value
 
 """

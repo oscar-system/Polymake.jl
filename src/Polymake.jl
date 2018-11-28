@@ -58,7 +58,7 @@ function __init__()
 
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "..", "deps", "rules", "julia.rules"))\");")
-    startup_apps = convert_from_property_value(call_function("startup_applications",Array{Any,1}([])))
+    startup_apps = convert_from_property_value(internal_call_function("startup_applications",[]))
     for app in startup_apps
         application(app)
     end
