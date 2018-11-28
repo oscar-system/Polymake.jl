@@ -168,3 +168,11 @@ end
 
 convert(::Type{Array{BigInt,1}},vector::pm_perl_PropertyValue) = convert_vector_integer(vector)
 convert(::Type{Array{BigInt,1}},vector::pm_Vector{pm_Integer}) = convert_vector_integer(vector)
+
+function convert(::Type{pm_perl_OptionSet}, dict)
+    opt_set = pm_perl_OptionSet()
+    for (key,value) in dict
+        option_set_take(opt_set,string(key),value)
+    end
+    return opt_set
+end

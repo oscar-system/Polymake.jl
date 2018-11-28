@@ -2,6 +2,8 @@
 
 #include "polymake_caller.h"
 
+#include "polymake_tools.h"
+
 static auto type_map_translator = new std::map<std::string, jl_value_t**>();
 
 void insert_type_in_map(std::string&& ptr_name, jl_value_t** var_space)
@@ -21,15 +23,6 @@ void set_julia_type(std::string name, void* type_address)
     }
     memcpy(address, &type_address, sizeof(jl_value_t*));
 }
-
-void* get_ptr_from_cxxwrap_obj(jl_value_t* obj)
-{
-    return *reinterpret_cast<void**>(obj);
-}
-
-    // void* get_ptr_from_cxxwrap_obj(jl_value_t* obj){
-    //     return jl_unbox_voidpointer(jl_get_field(obj,"cpp_object"));
-    // }
 
 #define TO_POLYMAKE_FUNCTION(juliatype, ctype)                               \
     if (jl_subtype(current_type, POLYMAKETYPE_##juliatype)) {                \
