@@ -1,5 +1,7 @@
 # Polymake.jl
 
+[![Build Status](https://travis-ci.com/oscar-system/Polymake.jl.svg?branch=master)](https://travis-ci.com/oscar-system/Polymake.jl)
+
 Julia package for using [polymake](https://polymake.org/doku.php), a software for research in polyhedral geometry.
 This package is developed as part of the [OSCAR](https://oscar.computeralgebra.de) project.
 
