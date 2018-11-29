@@ -48,6 +48,13 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
 
     polymake.add_type<pm::perl::Object>("pm_perl_Object")
         .constructor<const std::string&>()
+        .method("save_perl_object",
+                [](pm::perl::Object p, const std::string& s) {
+                    return p.save(s);
+                })
+        .method(
+            "load_perl_object",
+            [](const std::string& s) { return pm::perl::Object::load(s); })
         .method("internal_give",
                 [](pm::perl::Object p, const std::string& s) {
                     return p.give(s);

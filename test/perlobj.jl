@@ -51,4 +51,14 @@
         g = test_polytope.GRAPH
         @test Base.propertynames(g) isa Vector{Symbol}
     end
+
+    @testset "save load" begin
+        test_polytope = perlobj("Polytope", input_dict_rat )
+        mktempdir() do path
+            Polymake.save_perl_object(test_polytope,joinpath(path,"test.poly"))
+            loaded = Polymake.load_perl_object(joinpath(path,"test.poly"))
+            @test loaded isa pm_perl_Object
+            @test Base.propertynames(test_polytope) == Base.propertynames(loaded)
+        end
+    end
 end
