@@ -26,26 +26,18 @@ end
 const WrappedTypes = Dict(
     Symbol("int") => to_int,
     Symbol("double") => to_double,
-    Symbol("perl::Object") => to_perl_object,
-    Symbol("pm::Integer") => to_pm_Integer,
-    Symbol("pm::Rational") => to_pm_Rational,
-    Symbol("pm::Vector<pm::Integer>") => to_vector_Integer,
-    Symbol("pm::Vector<pm::Rational>") => to_vector_Rational,
-    Symbol("pm::Matrix<pm::Integer>") => to_matrix_Integer,
-    Symbol("pm::Matrix<pm::Rational>") => to_matrix_Rational,
-    Symbol("pm::Set<int,pm::operations::cmp>") => to_set_int32,
-    Symbol("pm::Set<long,pm::operations::cmp>") => to_set_int64,
-    Symbol("pm::Array<int>") => to_array_int32,
-    Symbol("pm::Array<long>") => to_array_int64,
-    Symbol("pm::Array<pm::Integer>") => to_array_Integer,
-    Symbol("pm::Array<pm::Array<int>") => to_array_array_int32,
-    Symbol("pm::Array<pm::Array<long>") => to_array_array_int64,
-    Symbol("pm::Array<pm::Array<pm::Integer>") => to_array_array_Integer,
-    Symbol("pm::Array<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>") => to_array_string,
-    Symbol("pm::Array<pm::Set<int,pm::operations::cmp>>") => to_array_set_int32,
-    Symbol("pm::Array<pm::Matrix<pm::Integer>>") => to_array_matrix_Integer,
     Symbol("undefined") => x -> nothing,
 )
+
+function enhance_wrapped_type_dict()
+    name_list = get_type_names()
+    i = 1
+    while i <= length(name_list)
+        println(name_list[i+1])
+        WrappedTypes[Symbol(replace(name_list[i+1]," "=>""))] = eval(Symbol(name_list[i]))
+        i += 2
+    end
+end
 
 Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
 
