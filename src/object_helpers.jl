@@ -13,3 +13,14 @@ function pm_perl_OptionSet(iter)
     end
     return opt_set
 end
+
+function _get_visual_string(x::pm_perl_Object)
+    shell_execute("""include "common::jupyter.rules";""")
+    mktempdir() do path
+        complete_path = joinpath(path,"test.poly")
+        save_perl_object(x,complete_path)
+        shell_execute("\$visual_temp = load(\"$complete_path\");")
+    end
+    string_tuple = shell_execute("\$visual_temp->VISUAL;")
+    return string_tuple[2]
+end
