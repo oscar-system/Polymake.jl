@@ -82,6 +82,12 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
     polymake.method("take",
                     [](pm::perl::Object p, const std::string& s,
                        const pm::perl::PropertyValue& v) { p.take(s) << v; });
+    polymake.method("take",
+                    [](pm::perl::Object p, const std::string& s,
+                       const pm::perl::Object& v) { p.take(s) << v; });
+    polymake.method("add",
+                    [](pm::perl::Object p, const std::string& s,
+                       const pm::perl::Object& v) { p.add(s,v); });
 
     polymake.method("typeinfo_string",
                     [](pm::perl::PropertyValue p, bool demangle) {
