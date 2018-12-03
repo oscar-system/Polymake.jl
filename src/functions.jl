@@ -27,6 +27,7 @@ const WrappedTypes = Dict(
     Symbol("int") => to_int,
     Symbol("double") => to_double,
     Symbol("undefined") => x -> nothing,
+    Symbol("perl::Object") => to_perl_object,
 )
 
 function enhance_wrapped_type_dict()
@@ -46,13 +47,13 @@ function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
 end
 
 function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
-    type_name = Polymake.typeinfo_string(obj)
+    type_name = Polymake.typeinfo_string(obj,true)
     T = Symbol(replace(type_name," "=>""))
     if haskey(WrappedTypes, T)
         f = WrappedTypes[T]
         return f(obj)
     else
-        @warn("The return value contains $(typeinfo_string(obj)) which has not been wrapped yet")
+        @warn("The return value contains $(typeinfo_string(obj,true)) which has not been wrapped yet")
         return obj
     end
 end

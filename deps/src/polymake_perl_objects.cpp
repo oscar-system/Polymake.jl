@@ -77,14 +77,14 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
     });
     polymake.method("to_perl_object", &to_perl_object);
 
-    polymake.method("typeinfo_string", [](pm::perl::PropertyValue p) {
-        PropertyValueHelper ph(p);
-        return ph.get_typename();
-    });
-
     polymake.method("take", [](pm::perl::Object p, const std::string& s,
                                const std::string& t) { p.take(s) << t; });
     polymake.method("take",
                     [](pm::perl::Object p, const std::string& s,
                        const pm::perl::PropertyValue& v) { p.take(s) << v; });
+
+    polymake.method("typeinfo_string", [](pm::perl::PropertyValue p, bool demangle) {
+        return typeinfo_helper(p, demangle);
+    });
+    polymake.method("check_defined",[]( pm::perl::PropertyValue v){ return PropertyValueHelper(v).is_defined(); });
 }
