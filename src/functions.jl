@@ -34,7 +34,6 @@ function enhance_wrapped_type_dict()
     name_list = get_type_names()
     i = 1
     while i <= length(name_list)
-        println(name_list[i+1])
         WrappedTypes[Symbol(replace(name_list[i+1]," "=>""))] = eval(Symbol(name_list[i]))
         i += 2
     end
