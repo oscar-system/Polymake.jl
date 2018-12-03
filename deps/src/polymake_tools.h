@@ -19,24 +19,24 @@ using namespace polymake;
 namespace {
 
 class PropertyValueHelper : public pm::perl::PropertyValue {
-   public:
-      PropertyValueHelper(const pm::perl::PropertyValue& pv) : pm::perl::PropertyValue(pv) {};
+  public:
+    PropertyValueHelper(const pm::perl::PropertyValue& pv)
+        : pm::perl::PropertyValue(pv){};
 
-   // in some form these will be moved to the polymake code
-   bool is_boolean() const
-   {
-      return call_function("is_boolean",*this);
-   };
+    // in some form these will be moved to the polymake code
+    bool is_boolean() const
+    {
+        return call_function("is_boolean", *this);
+    };
 
-   using Value::is_defined;
-   using Value::get_canned_typeinfo;
-   using Value::classify_number;
-   using Value::number_is_zero;
-   using Value::number_is_int;
-   using Value::number_is_float;
-   using Value::number_is_object;
-   using Value::not_a_number;
-
+    using Value::classify_number;
+    using Value::get_canned_typeinfo;
+    using Value::is_defined;
+    using Value::not_a_number;
+    using Value::number_is_float;
+    using Value::number_is_int;
+    using Value::number_is_object;
+    using Value::number_is_zero;
 };
 
 }    // namespace
@@ -64,9 +64,9 @@ static inline void* get_ptr_from_cxxwrap_obj(jl_value_t* obj)
     return *reinterpret_cast<void**>(obj);
 }
 
-// Safe way
-// void* get_ptr_from_cxxwrap_obj(jl_value_t* obj){
-//     return jl_unbox_voidpointer(jl_get_field(obj,"cpp_object"));
-// }
+    // Safe way
+    // void* get_ptr_from_cxxwrap_obj(jl_value_t* obj){
+    //     return jl_unbox_voidpointer(jl_get_field(obj,"cpp_object"));
+    // }
 
 #endif

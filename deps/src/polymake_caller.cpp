@@ -110,7 +110,8 @@ void polymake_call_method_void(std::string                  function_name,
 void polymake_module_add_caller(jlcxx::Module& polymake)
 {
     polymake.method("internal_call_function", &polymake_call_function);
-    polymake.method("internal_call_function_void", &polymake_call_function_void);
+    polymake.method("internal_call_function_void",
+                    &polymake_call_function_void);
     polymake.method("internal_call_method", &polymake_call_method);
     polymake.method("internal_call_method_void", &polymake_call_method_void);
     polymake.method("set_julia_type", &set_julia_type);
