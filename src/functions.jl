@@ -27,7 +27,6 @@ const WrappedTypes = Dict(
     Symbol("int") => to_int,
     Symbol("double") => to_double,
     Symbol("undefined") => x -> nothing,
-    Symbol("perl::Object") => to_perl_object,
 )
 
 function enhance_wrapped_type_dict()
