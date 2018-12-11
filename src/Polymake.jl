@@ -46,7 +46,7 @@ include("repl.jl")
 
 function __init__()
     @initcxx
-
+    enhance_wrapped_type_dict()
     include(joinpath(@__DIR__,"..","deps","deps.jl"))
 
     ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))

@@ -20,6 +20,8 @@
 
 #include "polymake_caller.h"
 
+#include "polymake_type_translations.h"
+
 Polymake_Data data{nullptr, nullptr};
 
 JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
@@ -69,6 +71,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 #include "generated/map_inserts.h"
 
     polymake_module_add_caller(polymake);
+
+    polymake_module_add_type_translations(polymake);
 
     //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2,
     //   pm::perl::Value a3, pm::perl::OptionSet opt){ return
