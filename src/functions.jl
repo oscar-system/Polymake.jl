@@ -125,4 +125,7 @@ end
 function Base.show(io::IO, ::MIME"text/plain", pv::pm_perl_PropertyValue)
     print(io, to_string(pv))
 end
+function Base.show(io::IO, ::MIME"text/plain", a::pm_Array{pm_perl_Object})
+    print(io, "pm_Array{pm_perl_Object} of size ",length(a))
+end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
