@@ -55,7 +55,8 @@ std::string typeinfo_helper(pm::perl::PropertyValue p, bool demangle)
             {
                 const std::type_info* ti = ph.get_canned_typeinfo();
                 if (ti == nullptr) {
-                    return "pm::perl::Object";
+                    // check some perl based types via custom perl code
+                    return call_function("classify_perl_pv",p);
                 }
                 // demangle:
                 int                                    status = -1;
