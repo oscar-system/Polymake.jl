@@ -59,8 +59,8 @@ void polymake_module_add_array(jlcxx::Module& polymake)
                               WrappedT& A) { p.take(s) << A; });
         })
         .apply<pm::Array<pm::perl::Object>>([](auto wrapped) {
-            typedef typename decltype(wrapped)::type             WrappedT;
-            typedef perl::Object elemType;
+            typedef typename decltype(wrapped)::type WrappedT;
+            typedef perl::Object                     elemType;
 
             wrapped.template constructor<int32_t>();
             wrapped.template constructor<int64_t>();
@@ -89,24 +89,29 @@ void polymake_module_add_array(jlcxx::Module& polymake)
     polymake.method("to_array_int64", [](const pm::perl::PropertyValue& pv) {
         return to_SmallObject<pm::Array<long>>(pv);
     });
-    polymake.method("to_array_Integer", [](const pm::perl::PropertyValue& pv) {
-        return to_SmallObject<pm::Array<pm::Integer>>(pv);
-    });
+    polymake.method("to_array_Integer",
+                    [](const pm::perl::PropertyValue& pv) {
+                        return to_SmallObject<pm::Array<pm::Integer>>(pv);
+                    });
     polymake.method("to_array_string", [](const pm::perl::PropertyValue& pv) {
         return to_SmallObject<pm::Array<std::string>>(pv);
     });
-    polymake.method("to_array_array_int32", [](const pm::perl::PropertyValue& pv) {
-        return to_SmallObject<pm::Array<pm::Array<int32_t>>>(pv);
-    });
-    polymake.method("to_array_array_int64", [](const pm::perl::PropertyValue& pv) {
-        return to_SmallObject<pm::Array<pm::Array<long>>>(pv);
-    });
-    polymake.method("to_array_array_Integer", [](const pm::perl::PropertyValue& pv) {
-        return to_SmallObject<pm::Array<pm::Array<pm::Integer>>>(pv);
-    });
-    polymake.method("to_array_set_int32", [](const pm::perl::PropertyValue& pv) {
-        return to_SmallObject<pm::Array<pm::Set<int32_t>>>(pv);
-    });
+    polymake.method(
+        "to_array_array_int32", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::Array<int32_t>>>(pv);
+        });
+    polymake.method("to_array_array_int64",
+                    [](const pm::perl::PropertyValue& pv) {
+                        return to_SmallObject<pm::Array<pm::Array<long>>>(pv);
+                    });
+    polymake.method(
+        "to_array_array_Integer", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::Array<pm::Integer>>>(pv);
+        });
+    polymake.method(
+        "to_array_set_int32", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::Set<int32_t>>>(pv);
+        });
     polymake.method(
         "to_array_matrix_Integer", [](const pm::perl::PropertyValue& pv) {
             return to_SmallObject<pm::Array<pm::Matrix<pm::Integer>>>(pv);

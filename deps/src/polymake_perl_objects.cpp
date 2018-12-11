@@ -65,8 +65,9 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
                 })
         .method("exists", [](pm::perl::Object   p,
                              const std::string& s) { return p.exists(s); })
-        .method("object_type", [](pm::perl::Object   p) { return p.type(); })
-        .method("type_name", [](pm::perl::Object   p) { return p.type().name(); })
+        .method("object_type", [](pm::perl::Object p) { return p.type(); })
+        .method("type_name",
+                [](pm::perl::Object p) { return p.type().name(); })
         .method("properties", [](pm::perl::Object p) {
             std::string x = p.call_method("properties");
             return x;
@@ -91,9 +92,8 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
     polymake.method("take",
                     [](pm::perl::Object p, const std::string& s,
                        const pm::perl::Object& v) { p.take(s) << v; });
-    polymake.method("add",
-                    [](pm::perl::Object p, const std::string& s,
-                       const pm::perl::Object& v) { p.add(s,v); });
+    polymake.method("add", [](pm::perl::Object p, const std::string& s,
+                              const pm::perl::Object& v) { p.add(s, v); });
 
     polymake.method("typeinfo_string",
                     [](pm::perl::PropertyValue p, bool demangle) {
