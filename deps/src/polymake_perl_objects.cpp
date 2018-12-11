@@ -47,7 +47,7 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
 
     polymake.add_type<pm::perl::ObjectType>("pm_perl_ObjectType")
         .constructor<const std::string&>()
-        .method("name", [](pm::perl::ObjectType p) { return p.name(); });
+        .method("type_name", [](pm::perl::ObjectType p) { return p.name(); });
 
     polymake.add_type<pm::perl::Object>("pm_perl_Object")
         .constructor<const std::string&>()
@@ -65,7 +65,8 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
                 })
         .method("exists", [](pm::perl::Object   p,
                              const std::string& s) { return p.exists(s); })
-        .method("type", [](pm::perl::Object   p) { return p.type(); })
+        .method("object_type", [](pm::perl::Object   p) { return p.type(); })
+        .method("type_name", [](pm::perl::Object   p) { return p.type().name(); })
         .method("properties", [](pm::perl::Object p) {
             std::string x = p.call_method("properties");
             return x;
