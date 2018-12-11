@@ -22,14 +22,14 @@ void initialize_polymake()
     }
 }
 
-pm::perl::Object to_perl_object(pm::perl::PropertyValue v)
+pm::perl::Object to_perl_object(const pm::perl::PropertyValue& v)
 {
     pm::perl::Object obj;
     v >> obj;
     return v;
 }
 
-std::string typeinfo_helper(pm::perl::PropertyValue p, bool demangle)
+std::string typeinfo_helper(const pm::perl::PropertyValue& p, bool demangle)
 {
     PropertyValueHelper ph(p);
 
