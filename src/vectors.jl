@@ -4,7 +4,7 @@ function pm_Vector(v::AbstractVector{T}) where T<:Integer
     res .= v
     return res
 end
-function pm_Vector(v::AbstractVector{T}) where T<:Rational
+function pm_Vector(v::AbstractVector{T}) where T<:Union{Rational,pm_Rational}
     res = pm_Vector{pm_Rational}(size(v)...)
     res .= v
     return res

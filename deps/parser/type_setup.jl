@@ -18,7 +18,8 @@ type_tuples = [
 ( "pm_Array_pm_Array_Int32",       "pm::Array<pm::Array<int32_t>>",      "pm_Array{pm_Array{Int32}}",       "to_array_array_int32" ),
 ( "pm_Array_pm_Array_Int64",       "pm::Array<pm::Array<long>>",         "pm_Array{pm_Array{Int64}}",       "to_array_array_int64" ),
 ( "pm_Array_pm_Array_pm_Integer",  "pm::Array<pm::Array<pm::Integer>>",  "pm_Array{pm_Array{pm_Integer}}",  "to_array_array_Integer" ),
-( "pm_Array_pm_Matrix_pm_Integer", "pm::Array<pm::Matrix<pm::Integer>>", "pm_Array{pm_Matrix{pm_Integer}}", "to_array_matrix_Integer" )
+( "pm_Array_pm_Matrix_pm_Integer", "pm::Array<pm::Matrix<pm::Integer>>", "pm_Array{pm_Matrix{pm_Integer}}", "to_array_matrix_Integer" ),
+( "pm_Array_pm_perl_Object",       "pm::Array<pm::perl::Object>",        "pm_Array{pm_perl_Object}",        "to_array_perl_object" ),
 ]
 
 type_var_file = abspath( @__DIR__, "..", "src", "generated", "type_vars.h" )

@@ -23,3 +23,19 @@ function list_big_objects($) {
    my ($app) = @_;
    return new Array<String>(uniq(map {$_->name} @{User::application($app)->object_types}));
 }
+
+# map some perl based types without typeinfo to c++ types
+function classify_perl_pv($) {
+   my ($pv) = @_;
+   return "pm::perl::Object"
+      if instanceof Polymake::Core::Object($pv);
+   return "pm::perl::ObjectType"
+      if instanceof Polymake::Core::ObjectType($pv);
+   return "pm::Array<pm::perl::Object>"
+      if instanceof Polymake::Core::BigObjectArray($pv);
+   # a plain perl string is also done here
+   return "std::string"
+      if is_string($pv);
+   # ref will return some string representation of the perl object type
+   return ref($pv);
+}

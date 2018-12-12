@@ -4,11 +4,11 @@
 
 void initialize_polymake();
 
-pm::perl::Object to_perl_object(pm::perl::PropertyValue);
+pm::perl::Object to_perl_object(const pm::perl::PropertyValue&);
 
-std::string typeinfo_helper(pm::perl::PropertyValue p, bool demangle);
+std::string typeinfo_helper(const pm::perl::PropertyValue& p, bool demangle);
 
-template <typename T> T to_SmallObject(pm::perl::PropertyValue pv)
+template <typename T> T to_SmallObject(const pm::perl::PropertyValue& pv)
 {
     T obj = pv;
     return obj;

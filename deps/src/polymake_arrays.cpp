@@ -57,34 +57,67 @@ void polymake_module_add_array(jlcxx::Module& polymake)
             wrapped.method("take",
                            [](pm::perl::Object p, const std::string& s,
                               WrappedT& A) { p.take(s) << A; });
+        })
+        .apply<pm::Array<pm::perl::Object>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            typedef perl::Object                     elemType;
+
+            wrapped.template constructor<int32_t>();
+            wrapped.template constructor<int64_t>();
+
+            wrapped.method("_getindex", [](const WrappedT& A, int64_t n) {
+                return elemType(A[static_cast<long>(n) - 1]);
+            });
+            wrapped.method("_setindex!",
+                           [](WrappedT& A, const elemType& val, int64_t n) {
+                               A[static_cast<long>(n) - 1] = val;
+                           });
+            wrapped.method("length", &WrappedT::size);
+            wrapped.method("resize!", [](WrappedT& A, int64_t newsz) {
+                A.resize(static_cast<long>(newsz));
+                return A;
+            });
+            wrapped.method("resize!", [](WrappedT& A, int32_t newsz) {
+                A.resize(static_cast<long>(newsz));
+                return A;
+            });
         });
 
-    polymake.method("to_array_int32", [](pm::perl::PropertyValue pv) {
+    polymake.method("to_array_int32", [](const pm::perl::PropertyValue& pv) {
         return to_SmallObject<pm::Array<int32_t>>(pv);
     });
-    polymake.method("to_array_int64", [](pm::perl::PropertyValue pv) {
+    polymake.method("to_array_int64", [](const pm::perl::PropertyValue& pv) {
         return to_SmallObject<pm::Array<long>>(pv);
     });
-    polymake.method("to_array_Integer", [](pm::perl::PropertyValue pv) {
-        return to_SmallObject<pm::Array<pm::Integer>>(pv);
-    });
-    polymake.method("to_array_string", [](pm::perl::PropertyValue pv) {
+    polymake.method("to_array_Integer",
+                    [](const pm::perl::PropertyValue& pv) {
+                        return to_SmallObject<pm::Array<pm::Integer>>(pv);
+                    });
+    polymake.method("to_array_string", [](const pm::perl::PropertyValue& pv) {
         return to_SmallObject<pm::Array<std::string>>(pv);
     });
-    polymake.method("to_array_array_int32", [](pm::perl::PropertyValue pv) {
-        return to_SmallObject<pm::Array<pm::Array<int32_t>>>(pv);
-    });
-    polymake.method("to_array_array_int64", [](pm::perl::PropertyValue pv) {
-        return to_SmallObject<pm::Array<pm::Array<long>>>(pv);
-    });
-    polymake.method("to_array_array_Integer", [](pm::perl::PropertyValue pv) {
-        return to_SmallObject<pm::Array<pm::Array<pm::Integer>>>(pv);
-    });
-    polymake.method("to_array_set_int32", [](pm::perl::PropertyValue pv) {
-        return to_SmallObject<pm::Array<pm::Set<int32_t>>>(pv);
-    });
     polymake.method(
-        "to_array_matrix_Integer", [](pm::perl::PropertyValue pv) {
+        "to_array_array_int32", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::Array<int32_t>>>(pv);
+        });
+    polymake.method("to_array_array_int64",
+                    [](const pm::perl::PropertyValue& pv) {
+                        return to_SmallObject<pm::Array<pm::Array<long>>>(pv);
+                    });
+    polymake.method(
+        "to_array_array_Integer", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::Array<pm::Integer>>>(pv);
+        });
+    polymake.method(
+        "to_array_set_int32", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::Set<int32_t>>>(pv);
+        });
+    polymake.method(
+        "to_array_matrix_Integer", [](const pm::perl::PropertyValue& pv) {
             return to_SmallObject<pm::Array<pm::Matrix<pm::Integer>>>(pv);
+        });
+    polymake.method(
+        "to_array_perl_object", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::perl::Object>>(pv);
         });
 }
