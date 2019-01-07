@@ -14,3 +14,4 @@ local
 Manifest.toml
 src/generated/*
 deps/src/generated/*
+deps/parser/json
