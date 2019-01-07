@@ -1,10 +1,5 @@
 using JSON
 
-struct UnknownPolymakeType <: Exception
-    msg::String
-    UnknownPolymakeType(type_string) = new("Unknown polymake type: $type_string")
-end
-
 struct UnparsablePolymakeFunction <: Exception
     msg::String
     UnparsablePolymakeFunction(function_name) = new("Cannot parse function: $function_name")
@@ -22,16 +17,23 @@ type_translate_list = Dict(
     "Integer"            => "pm_Integer",
     "Rational"           => "pm_Rational",
     "Set"                => "pm_Set",
+    "Int"                => "Int",
+    "String"             => "AbstractString",
     "Anything"           => "Any"
 )
 
-## Dummy, will soon be generated
-filenames_list = [abspath(joinpath( @__DIR__, "..", "..", "tmp", "polytope.json"))]
+jsonfolder = joinpath(@__DIR__, "json")
+filenames_list = filter(x->endswith(x,"json"), readdir(jsonfolder))
+
+outputfolder = abspath(joinpath(@__DIR__, "..", "..", "src","generated"))
+include_file = abspath(joinpath(@__DIR__, "..", "..", "src","generated","includes.jl"))
+isfile(include_file) && rm(include_file)
+
 
 function julia_function_string(julia_name::String, polymake_name::String, app_name::String, julia_args::String, call_args::String, parameter_string::String )
 
     return """
-function $julia_name( $julia_args, ::Val{Convert}=Val(true) ) where Convert
+function $julia_name( $julia_args ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
     return_value = internal_call_function( "$polymake_name$parameter_string", Any[ $call_args ] )
     if Convert
@@ -46,7 +48,7 @@ end
 
 function julia_method_string(julia_name::String, polymake_name::String, app_name::String, julia_args::String, call_args::String, parameter_string::String )
     return """
-function $julia_name( $julia_args, ::Val{Convert}=Val(true) ) where Convert
+function $julia_name( $julia_args ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
     return_value = internal_call_method( "$polymake_name$parameter_string", dispatch_obj, Any[ $call_args ] )
     if Convert
@@ -59,16 +61,24 @@ end
 """
 end
 
+function translate_type(type_string::String)
+    ## Warn for unknown types
+    if haskey(type_translate_list,type_string)
+        return type_translate_list[type_string]
+    else
+        warn("Unknown polymake type: $type_string")
+        return "Any"
+    end
+end
+
+
 function create_argument_string_from_type( type_string::String, number::Int64 )
     ## Special case for BigObject (we do not care 'bout the type here)
     if startswith(type_string,"BigObject")
-        return "arg" * string(number) * "::" * type_translate_list["BigObject"]
+        return "arg" * string(number) * "::" * translate_type("BigObject")
     end
-    ## We only translate the known cases
-    if !haskey(type_translate_list,type_string)
-        throw(UnknownPolymakeType(type_string))
-    end
-    return "arg" * string(number) * "::" * type_translate_list[type_string]
+    
+    return "arg" * string(number) * "::" * translate_type(type_string)
 end
 
 function parse_definition(method_dict::Dict, app_name::String)
@@ -102,7 +112,7 @@ function parse_definition(method_dict::Dict, app_name::String)
     min_argument_number = mandatory
 
     ## Option set parameter
-    option_set_argument = "option_set::" * type_translate_list["OptionSet"]
+    option_set_argument = "option_set::" * translate_type("OptionSet")
     option_set_parameter = "option_set"
 
     ## Real arguments
@@ -161,10 +171,16 @@ function parse_definition(method_dict::Dict, app_name::String)
         else
             call_args = join(argument_list[1:number_arguments],",")
         end
+        if length(julia_args) > 0
+            julia_args = julia_args * ","
+        end
+        if length(call_args) > 0
+            call_args = call_args * ","
+        end
         return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
         if has_option_set
-            julia_args = julia_args * "," * option_set_argument
-            call_args = call_args * "," * option_set_parameter
+            julia_args = julia_args * option_set_argument * ","
+            call_args = call_args *  option_set_parameter * ","
             return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
         end
     end
@@ -204,11 +220,7 @@ import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
     end
 end
 
-outputfolder = abspath(joinpath(@__DIR__, "..", "..", "src","generated"))
-include_file = abspath(joinpath(@__DIR__, "..", "..", "src","generated","includes.jl"))
-isfile(include_file) && rm(include_file)
-
 
 for current_file in filenames_list
-    parse_app_definitions(current_file, outputfolder, include_file)
+    parse_app_definitions(joinpath(jsonfolder,current_file), outputfolder, include_file)
 end
