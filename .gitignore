@@ -10,6 +10,7 @@ deps/build.log
 deps/build_*.jl
 deps/deps.jl
 deps/usr
+deps/parser/json
 local
 Manifest.toml
 src/generated/*
