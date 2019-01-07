@@ -35,6 +35,7 @@ catch
 end
 
 const prefix = Prefix(joinpath(dirname(pm_config),".."))
+const polymake = joinpath(prefix,"bin","polymake")
 
 products = Product[
     #LibraryProduct(prefix, "libpolymake", :libpolymake)
@@ -110,6 +111,11 @@ include("parser/type_setup.jl")
 
 run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
 run(`make -j$(div(Sys.CPU_THREADS,2))`)
+
+json_script = joinpath(@__DIR__,"rules","funtojson.pl")
+json_folder = joinpath(@__DIR__,"parser","json")
+mkpath(json_folder)
+run(`$perl $polymake --iscript $json_script $json_folder`)
 
 include("parser/parser.jl")
 
