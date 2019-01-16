@@ -8,7 +8,7 @@ This package is developed as part of the [OSCAR](https://oscar.computeralgebra.d
 ## Installation
 
 The current version relies on an unreleased version of polymake. A compatible version is available at [polymake/polymake#snapshots](https://github.com/polymake/polymake/tree/Snapshots).
-It can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folder.
+It can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folder. Please note that these need to be absolute paths.
 Also make sure to check [the necessary dependencies](https://polymake.org/doku.php/howto/install) as well as the [additional instructions for Macs](https://polymake.org/doku.php/howto/mac).
 ```sh
 export POLYMAKE_GIT=GIT_FOLDER
