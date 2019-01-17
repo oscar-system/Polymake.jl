@@ -26,6 +26,7 @@ end
 const WrappedTypes = Dict(
     Symbol("int") => to_int,
     Symbol("double") => to_double,
+    Symbol("bool") => to_bool,
     Symbol("undefined") => x -> nothing,
 )
 
