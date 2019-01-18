@@ -98,12 +98,12 @@ function convert_matrix_rational(pmmatrix::pm_perl_PropertyValue)
 end
 
 function convert_matrix_rational(matrix::pm_Matrix{pm_Rational})
-    rows = rows(matrix)
+    nr_rows = rows(matrix)
     columns = cols(matrix)
-    result = Array{Rational{BigInt},2}(rows,columns)
-    for i = 1:rows
+    result = Array{Rational{BigInt},2}(undef,nr_rows,columns)
+    for i = 1:nr_rows
         for j = 1:columns
-            current_entry = matrix(i-1,j-1)
+            current_entry = matrix[i,j]
             result[i,j] = convert(Rational{BigInt},current_entry)
         end
     end
@@ -118,12 +118,12 @@ function convert_matrix_integer(pmmatrix::pm_perl_PropertyValue)
 end
 
 function convert_matrix_integer(matrix::pm_Matrix{pm_Integer})
-    rows = rows(matrix)
+    nr_rows = rows(matrix)
     columns = cols(matrix)
-    result = Array{BigInt,2}(rows,columns)
-    for i = 1:rows
+    result = Array{BigInt,2}(undef,nr_rows,columns)
+    for i = 1:nr_rows
         for j = 1:columns
-            current_entry = matrix(i-1,j-1)
+            current_entry = matrix[i,j]
             result[i,j] = convert(BigInt,current_entry)
         end
     end
@@ -138,10 +138,10 @@ function convert_vector_rational(pmvector::pm_perl_PropertyValue)
 end
 
 function convert_vector_rational(vector::pm_Vector{pm_Rational})
-    dim = dim(vector)
-    result = Array{Rational{BigInt},1}(dim)
+    dim = length(vector)
+    result = Array{Rational{BigInt},1}(undef,dim)
     for i = 1:dim
-        current_entry = vector(i-1)
+        current_entry = vector[i]
         result[i] = convert(Rational{BigInt},current_entry)
     end
     return result
@@ -155,10 +155,10 @@ function convert_vector_integer(pmvector::pm_perl_PropertyValue)
 end
 
 function convert_vector_integer(vector::pm_Vector{pm_Integer})
-    dim = dim(vector)
-    result = Array{BigInt,1}(dim)
+    dim = length(vector)
+    result = Array{BigInt,1}(undef,dim)
     for i = 1:dim
-        current_entry = vector(i-1)
+        current_entry = vector[i]
         result[i] = convert(BigInt,current_entry)
     end
     return result

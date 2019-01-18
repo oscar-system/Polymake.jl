@@ -93,9 +93,9 @@ function call_method(obj, func::Symbol, args...; void=false, kwargs...)
     cargs = Any[args...]
     if isempty(kwargs)
         if void
-            ret = internal_call_method_void(fname, cargs)
+            ret = internal_call_method_void(fname, obj, cargs)
         else
-            ret = internal_call_method(fname, cargs)
+            ret = internal_call_method(fname, obj, cargs)
         end
     else
         if void
