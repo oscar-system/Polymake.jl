@@ -70,6 +70,12 @@
           "mandatory": 2,
           "type_params": 0,
           "include": [ "Obsolete" ]
+        },
+        { "name": "equal_polyhedra",
+          "args" : ["Anything","Anything"],
+          "mandatory": 2,
+          "type_params": 0,
+          "include": [ "Obsolete" ]
         }
 
     ],

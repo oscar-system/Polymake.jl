@@ -53,4 +53,12 @@
     @test pm_v == v
 
     @test pm_Vector(v) == pm_Vector((4*v)//4)
+
+    ### Conversion
+
+    v = pm_Vector([4,0,0])
+    @test convert(Array{BigInt,1},v) == BigInt[4,0,0]
+
+    v = pm_Vector([4,0,0//1])
+    @test convert(Array{Rational{BigInt},1},v) == Rational{BigInt}[4,0,0]
 end
