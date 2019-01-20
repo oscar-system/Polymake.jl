@@ -55,4 +55,13 @@
     @test pm_Matrix(big.(m)//big(den)) isa pm_Matrix{pm_Rational}
 
     @test pm_Matrix(m) == pm_Matrix((den*m)//den)
+
+    ### Conversion
+
+    m = pm_Matrix([4 0 0 0; 0 0 0 0; 0 0 0 0])
+    @test convert(Array{BigInt,2},m) == BigInt[4 0 0 0; 0 0 0 0; 0 0 0 0]
+
+    m = pm_Matrix([4 0 0 0; 0 0 0 0; 0 0 0 0//1])
+    @test convert(Array{Rational{BigInt},2},m) == Rational{BigInt}[4 0 0 0; 0 0 0 0; 0 0 0 0//1]
+
 end
