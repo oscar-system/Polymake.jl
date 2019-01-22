@@ -83,7 +83,7 @@ function create_argument_string_from_type( type_string::String, number::Int64 )
     return "arg" * string(number) * "::" * translate_type(type_string)
 end
 
-function parse_definition(method_dict::Dict, app_name::String)
+function parse_definition(method_dict::Dict, app_name::String,uniqueness_checker)
     name = method_dict["name"]
     arguments = method_dict["args"]
     mandatory = method_dict["mandatory"]
@@ -181,14 +181,20 @@ function parse_definition(method_dict::Dict, app_name::String)
         if length(call_args) > 0
             call_args = call_args * ","
         end
-        return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+        if ! ( (julia_name,julia_args) in uniqueness_checker )
+            return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+            push!(uniqueness_checker,(julia_name,julia_args))
+        end
         if has_option_set
             julia_args = julia_args * option_set_argument * ","
             call_args = call_args *  option_set_parameter * ","
-            return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+            if ! ( (julia_name,julia_args) in uniqueness_checker )
+                return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
+                push!(uniqueness_checker,(julia_name,julia_args))
+            end
         end
     end
-    return return_string
+    return return_string,uniqueness_checker
 end
 
 function parse_app_definitions(filename::String,outputfileposition::String,include_file::String)
@@ -204,10 +210,11 @@ import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
        ..convert_from_property_value
 
 """
+    uniqueness_checker = []
     for current_function in parsed_dict["functions"]
         return_value = ""
         try
-            return_value = parse_definition(current_function,app_name)
+            (return_value,uniqueness_checker) = parse_definition(current_function,app_name,uniqueness_checker)
         catch exception
             if exception isa UnparsablePolymakeFunction
                 @warn(exception.msg)
