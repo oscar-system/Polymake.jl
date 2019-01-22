@@ -25,8 +25,10 @@ type_translate_list = Dict(
 jsonfolder = joinpath(@__DIR__, "json")
 filenames_list = filter(x->endswith(x,"json"), readdir(jsonfolder))
 
+
 outputfolder = abspath(joinpath(@__DIR__, "..", "..", "src","generated"))
 include_file = abspath(joinpath(@__DIR__, "..", "..", "src","generated","includes.jl"))
+additional_json_files_path = abspath(joinpath(@__DIR__, "..", "..", "JSON" ) )
 isfile(include_file) && rm(include_file)
 
 
@@ -197,10 +199,20 @@ function parse_definition(method_dict::Dict, app_name::String,uniqueness_checker
     return return_string,uniqueness_checker
 end
 
-function parse_app_definitions(filename::String,outputfileposition::String,include_file::String)
+function parse_app_definitions(filename::String,outputfileposition::String,include_file::String,additional_json_files_path::String)
     println("Parsing "*filename)
     parsed_dict = JSON.Parser.parsefile(filename)
     app_name = parsed_dict["app"]
+    additional_json_file_name = abspath( joinpath( additional_json_files_path, app_name*".json" ) )
+    if isfile(additional_json_file_name)
+        additional_dict = JSON.Parser.parsefile(additional_json_file_name)
+        if additional_dict["app"] != parsed_dict["app"]
+            @warn("Parsed wrong additional dict")
+        end
+        for i in additional_dict["functions"]
+            push!(parsed_dict["functions"],i)
+        end
+    end
     return_string = """
 module $app_name
 
@@ -233,5 +245,5 @@ end
 
 
 for current_file in filenames_list
-    parse_app_definitions(joinpath(jsonfolder,current_file), outputfolder, include_file)
+    parse_app_definitions(joinpath(jsonfolder,current_file), outputfolder, include_file,additional_json_files_path)
 end
