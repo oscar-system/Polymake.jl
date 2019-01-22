@@ -35,7 +35,8 @@ function julia_function_string(julia_name::String, polymake_name::String, app_na
     return """
 function $julia_name( $julia_args ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
-    return_value = internal_call_function( "$polymake_name$parameter_string", Any[ $call_args ] )
+    # return_value = internal_call_function( "$polymake_name$parameter_string", Any[ $call_args ] )
+    return_value = internal_call_function( "$polymake_name", Any[ $call_args ] )
     if Convert
         return convert_from_property_value(return_value)
     else
@@ -50,7 +51,8 @@ function julia_method_string(julia_name::String, polymake_name::String, app_name
     return """
 function $julia_name( $julia_args ::Val{Convert}=Val(true) ) where Convert
     application( "$app_name" )
-    return_value = internal_call_method( "$polymake_name$parameter_string", dispatch_obj, Any[ $call_args ] )
+    # return_value = internal_call_method( "$polymake_name$parameter_string", dispatch_obj, Any[ $call_args ] )
+    return_value = internal_call_method( "$polymake_name", dispatch_obj, Any[ $call_args ] )
     if Convert
         convert_from_property_value(return_value)
     else
@@ -97,15 +99,16 @@ function parse_definition(method_dict::Dict, app_name::String)
     ## Make type parameters
     param_list_header = Array{String,1}()
     param_list = Array{String,1}()
-    for i in 1:type_params
-        push!(param_list_header,"param$i::String")
-        push!(param_list,"\$param$i")
-    end
-    if length(param_list) >= 1
-        parameter_string = "<" * join(param_list,",") * ">"
-    else
-        parameter_string = ""
-    end
+    # for i in 1:type_params
+    #     push!(param_list_header,"param$i::String")
+    #     push!(param_list,"\$param$i")
+    # end
+    # if length(param_list) >= 1
+    #     parameter_string = "<" * join(param_list,",") * ">"
+    # else
+    #     parameter_string = ""
+    # end
+    parameter_string = ""
 
     ## Compute the argument range
     max_argument_number = length(arguments) - (has_option_set ? 1 : 0)
@@ -165,7 +168,8 @@ function parse_definition(method_dict::Dict, app_name::String)
 
     julia_argument_list = vcat(param_list_header,argument_list_header)
     for number_arguments in min_argument_number:max_argument_number
-        julia_args = join(julia_argument_list[1:number_arguments+type_params],",")
+        # julia_args = join(julia_argument_list[1:number_arguments+type_params],",")
+        julia_args = join(julia_argument_list[1:number_arguments],",")
         if is_method
             call_args = join(argument_list[1:number_arguments - 1],",")
         else
