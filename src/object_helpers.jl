@@ -27,7 +27,10 @@ end
 
 function visual(x::pm_perl_Object)
     if isdefined(Main, :IJulia) && Main.IJulia.inited
-        return HTML(_get_visual_string(x))
+        html_string = _get_visual_string(x)
+        html_string = replace(html_string,".@@HTML@@"=>"")
+        html_string = replace(html_string,".@@ENDHTML@@"=>"")
+        return HTML(html_string)
     else
         call_method(x,:VISUAL;void=true)
     end
