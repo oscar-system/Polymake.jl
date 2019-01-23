@@ -56,12 +56,16 @@ if use_binary
     # Install unsatisfied or updated dependencies:
     unsatisfied = any(!satisfied(p; verbose=verbose) for p in products)
     dl_info = choose_download(download_info, platform_key_abi())
-    @info platform_key_abi()
+    platform = platform_key_abi()
+    @info platform
     if dl_info === nothing && unsatisfied
         # If we don't have a BinaryProvider-compatible .tar.gz to download, complain.
         # Alternatively, you could attempt to install from a separate provider,
         # build from source or something even more ambitious here.
-        error("Your platform $(triplet(platform)) is not supported by this package!")
+        error("""
+Your platform $(triplet(platform)) is not supported by this package!
+If you already have a polymake installation you need to set the environment variable `POLYMAKE_CONFIG`.
+""")
     end
     if unsatisfied || !isinstalled(dl_info...; prefix=prefix)
         # Download and install binaries
