@@ -30,6 +30,11 @@ function visual(x::pm_perl_Object)
         html_string = _get_visual_string(x)
         html_string = replace(html_string,".@@HTML@@"=>"")
         html_string = replace(html_string,".@@ENDHTML@@"=>"")
+        html_string = replace(html_string,".@@ENDHTML@@"=>"")
+        # we guess that the julia kernel is named this way...
+        kernel = "julia-$(VERSION.major).$(VERSION.minor)"
+        html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/")
+
         return HTML(html_string)
     else
         call_method(x,:VISUAL;void=true)
