@@ -68,13 +68,15 @@ function call_function(func::Symbol, args...; void=false, kwargs...)
     cargs = Any[args...]
     if isempty(kwargs)
         if void
-            ret = internal_call_function_void(fname, cargs)
+            internal_call_function_void(fname, cargs)
+            return
         else
             ret = internal_call_function(fname, cargs)
         end
     else
         if void
-            ret = internal_call_function_void(fname, cargs, OptionSet(kwargs))
+            internal_call_function_void(fname, cargs, OptionSet(kwargs))
+            return
         else
             ret = internal_call_function(fname, cargs, OptionSet(kwargs))
         end
@@ -93,13 +95,15 @@ function call_method(obj, func::Symbol, args...; void=false, kwargs...)
     cargs = Any[args...]
     if isempty(kwargs)
         if void
-            ret = internal_call_method_void(fname, obj, cargs)
+            internal_call_method_void(fname, obj, cargs)
+            return
         else
             ret = internal_call_method(fname, obj, cargs)
         end
     else
         if void
-            ret = internal_call_method_void(fname, obj, cargs, OptionSet(kwargs))
+            internal_call_method_void(fname, obj, cargs, OptionSet(kwargs))
+            return
         else
             ret = internal_call_method(fname, obj, cargs, OptionSet(kwargs))
         end

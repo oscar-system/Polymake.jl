@@ -24,3 +24,11 @@ function _get_visual_string(x::pm_perl_Object)
     string_tuple = shell_execute("\$visual_temp->VISUAL;")
     return string_tuple[2]
 end
+
+function visual(x::pm_perl_Object)
+    if isdefined(Main, :IJulia) && Main.IJulia.inited
+        return HTML(_get_visual_string(x))
+    else
+        call_method(x,:VISUAL;void=true)
+    end
+end
