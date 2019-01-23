@@ -15,27 +15,24 @@ function pm_perl_OptionSet(iter)
 end
 
 function _get_visual_string(x::pm_perl_Object)
-    shell_execute("""include "common::jupyter.rules";""")
     mktempdir() do path
         complete_path = joinpath(path,"test.poly")
         save_perl_object(x,complete_path)
         shell_execute("\$visual_temp = load(\"$complete_path\");")
     end
     string_tuple = shell_execute("\$visual_temp->VISUAL;")
-    return string_tuple[2]
+    html_string = string_tuple[2]
+    html_string = replace(html_string,".@@HTML@@"=>"")
+    html_string = replace(html_string,".@@ENDHTML@@"=>"")
+    # we guess that the julia kernel is named this way...
+    kernel = "julia-$(VERSION.major).$(VERSION.minor)"
+    html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/")
+    return html_string
 end
 
 function visual(x::pm_perl_Object)
     if isdefined(Main, :IJulia) && Main.IJulia.inited
-        html_string = _get_visual_string(x)
-        html_string = replace(html_string,".@@HTML@@"=>"")
-        html_string = replace(html_string,".@@ENDHTML@@"=>"")
-        html_string = replace(html_string,".@@ENDHTML@@"=>"")
-        # we guess that the julia kernel is named this way...
-        kernel = "julia-$(VERSION.major).$(VERSION.minor)"
-        html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/")
-
-        return HTML(html_string)
+        return HTML(_get_visual_string(x))
     else
         call_method(x,:VISUAL;void=true)
     end
