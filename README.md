@@ -7,8 +7,22 @@ This package is developed as part of the [OSCAR](https://oscar.computeralgebra.d
 
 ## Installation
 
-The current version relies on an unreleased version of polymake. A compatible version is available at [polymake/polymake#snapshots](https://github.com/polymake/polymake/tree/Snapshots).
-It can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folder. Please note that these need to be absolute paths.
+The installation can be done in the Julia REPL by first pressing `]` and then
+```julia
+pkg> add https://github.com/oscar-system/Polymake.jl
+```
+This will fetch a pre-build binary of `polymake`. You are ready to start `using Polymake`.
+
+### Your own installation of `polymake`
+
+If you already have a recent enough version of polymake on your system, you either need to make `polymake-config` available in your `PATH` or the environment variable `POLYMAKE_CONFIG` needs to point to the correct `polymake-config` file.
+
+After this just `add` the package url as above, the build script will use your `polymake` installation.
+
+### `polymake` from source
+
+The current version of `Polymake.jl` relies on an unreleased version of polymake. A compatible version is available at [polymake/polymake#snapshots](https://github.com/polymake/polymake/tree/Snapshots).
+It can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folders. Please note that these need to be absolute paths.
 Also make sure to check [the necessary dependencies](https://polymake.org/doku.php/howto/install) as well as the [additional instructions for Macs](https://polymake.org/doku.php/howto/mac).
 ```sh
 export POLYMAKE_GIT=GIT_FOLDER
@@ -23,12 +37,23 @@ export POLYMAKE_CONFIG=$POLYMAKE_INSTALL/bin/polymake-config
 ```
 Note that polymake might take some time to compile.
 
-If you already have a recent enough version of polymake on your system and skipped the above instructions you still need to either have `polymake-config` available in your PATH or the environment variable `POLYMAKE_CONFIG` needs to point to the correct `polymake-config` file.
+After this start `julia` and just `add` the `Polymake.jl` from url as above.
 
-After this the installation can be done in the Julia REPL by first pressing `]` and then
-```julia
-pkg> add https://github.com/oscar-system/Polymake.jl
+### `Polymake.jl` in a separate environment:
+First clone `Polymake.jl`:
 ```
+git clone https://github.com/oscar-system/Polymake.jl.git
+```
+In Julia REPL press `]` for `pkg` mode and 
+```julia
+(v1.0) pkg> activate Polymake.jl
+(Polymake) pkg> instantiate
+(Polymake) pkg> build Polymake # fetches the prebuild polymake binaries
+(Polymake) pkg> test Polymake # and You are good to go!
+```
+If `polymake-config` is in your `PATH`, or `POLYMAKE_CONFIG` environment variable is set the `build` phase will try to use it.
+
+Just remember that You need to `activate Polymake.jl` to use `Polymake`.
 
 ## Examples
 
