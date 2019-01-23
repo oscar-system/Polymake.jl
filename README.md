@@ -7,6 +7,21 @@ This package is developed as part of the [OSCAR](https://oscar.computeralgebra.d
 
 ## Installation
 
+### From `Manifest.toml`
+It's as simple as:
+```
+git clone https://github.com/oscar-system/Polymake.jl.git
+```
+and press `]` in Julia REPL for `pkg` mode)
+```julia
+(v1.0) pkg> activate Polymake.jl
+(Polymake) pkg> instantiate
+(Polymake) pkg> build Polymake # fetches the prebuild polymake binaries
+(Polymake) pkg> test Polymake # and You are good to go!
+```
+You just need to remember to `activate Polymake.jl` when You intend to use `Polymake` from julia.
+
+### From source
 The current version relies on an unreleased version of polymake. A compatible version is available at [polymake/polymake#snapshots](https://github.com/polymake/polymake/tree/Snapshots).
 It can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folder. Please note that these need to be absolute paths.
 Also make sure to check [the necessary dependencies](https://polymake.org/doku.php/howto/install) as well as the [additional instructions for Macs](https://polymake.org/doku.php/howto/mac).
