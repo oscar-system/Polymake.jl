@@ -6,4 +6,5 @@
     @test polytope.cube( 2 ) isa pm_perl_Object
     cc = polytope.cube( 3 )
     @test call_function(:equal_polyhedra,cc,cc)
+    @test polytope.pseudopower(2,2) == 2
 end

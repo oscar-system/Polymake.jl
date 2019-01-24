@@ -21,7 +21,7 @@ function startup_applications() {
 # list all big objects in given application
 function list_big_objects($) {
    my ($app) = @_;
-   return new Array<String>(uniq(map {$_->name} @{User::application($app)->object_types}));
+   return new Array<String>(uniq(map {$_->full_name} grep {!defined($_->generic) } @{User::application($app)->object_types}));
 }
 
 # map some perl based types without typeinfo to c++ types
