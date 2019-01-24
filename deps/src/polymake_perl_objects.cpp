@@ -82,6 +82,9 @@ void polymake_module_add_perl_object(jlcxx::Module& polymake)
     polymake.method("to_double", [](pm::perl::PropertyValue p) {
         return static_cast<double>(p);
     });
+    polymake.method("to_string", [](pm::perl::PropertyValue p) {
+        return to_SmallObject<std::string>(p);
+    });
     polymake.method("to_perl_object", &to_perl_object);
 
     polymake.method("take", [](pm::perl::Object p, const std::string& s,
