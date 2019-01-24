@@ -5,23 +5,6 @@ struct UnparsablePolymakeFunction <: Exception
     UnparsablePolymakeFunction(function_name) = new("Cannot parse function: $function_name")
 end
 
-type_translate_list = Dict(
-    "BigObject"          => "pm_perl_Object",
-    "OptionSet"          => "pm_perl_OptionSet",
-    "Matrix"             => "pm_Matrix{T} where T",
-    "Matrix<Rational>"   => "pm_Matrix{pm_Rational}",
-    "Matrix<Integer>"    => "pm_Matrix{pm_Integer}",
-    "Vector"             => "pm_Vector{T} where T",
-    "Vector<Rational>"   => "pm_Vector{pm_Rational}",
-    "Vector<Integer>"    => "pm_Vector{pm_Integer}",
-    "Integer"            => "pm_Integer",
-    "Rational"           => "pm_Rational",
-    "Set"                => "pm_Set",
-    "Int"                => "Int",
-    "String"             => "AbstractString",
-    "Anything"           => "Any"
-)
-
 jsonfolder = joinpath(@__DIR__, "json")
 filenames_list = filter(x->endswith(x,"json"), readdir(jsonfolder))
 
@@ -32,171 +15,66 @@ additional_json_files_path = abspath(joinpath(@__DIR__, "..", "..", "JSON" ) )
 isfile(include_file) && rm(include_file)
 
 
-function julia_function_string(julia_name::String, polymake_name::String, app_name::String, julia_args::String, call_args::String, parameter_string::String )
+function julia_function_string(julia_name::String, polymake_name::String, app_name::String )
 
     return """
-function $julia_name( $julia_args ::Val{Convert}=Val(true) ) where Convert
-    application( "$app_name" )
-    # return_value = internal_call_function( "$polymake_name$parameter_string", Any[ $call_args ] )
-    return_value = internal_call_function( "$polymake_name", Any[ $call_args ] )
-    if Convert
+function $julia_name(args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
+    application( \"$app_name\" )
+    if call_as_void
+        internal_call_function_void( \"$polymake_name\", c_arguments(args...;kwargs...))
+        return
+    else
+        return_value = internal_call_function( \"$polymake_name\", c_arguments(args...;kwargs...))
+    end
+    if keep_PropertyValue
+        return return_value
+    else
         return convert_from_property_value(return_value)
-    else
-        return return_value
     end
 end
 
 """
 end
 
-function julia_method_string(julia_name::String, polymake_name::String, app_name::String, julia_args::String, call_args::String, parameter_string::String )
+function julia_method_string(julia_name::String, polymake_name::String, app_name::String )
     return """
-function $julia_name( $julia_args ::Val{Convert}=Val(true) ) where Convert
-    application( "$app_name" )
-    # return_value = internal_call_method( "$polymake_name$parameter_string", dispatch_obj, Any[ $call_args ] )
-    return_value = internal_call_method( "$polymake_name", dispatch_obj, Any[ $call_args ] )
-    if Convert
-        convert_from_property_value(return_value)
+function $julia_name(dispatch_object,args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
+    application( \"$app_name\" )
+    if call_as_void
+        internal_call_method_void( \"$polymake_name\", dispatch_object, c_arguments(args...;kwargs...))
+        return
     else
+        return_value = internal_call_method( \"$polymake_name\", dispatch_object, c_arguments(args...;kwargs...))
+    end
+    if keep_PropertyValue
         return return_value
+    else
+        return convert_from_property_value(return_value)
     end
 end
 
 """
 end
 
-function translate_type(type_string::String)
-    ## Warn for unknown types
-    if haskey(type_translate_list,type_string)
-        return type_translate_list[type_string]
-    else
-        warn("Unknown polymake type: $type_string")
-        return "Any"
-    end
-end
-
-
-function create_argument_string_from_type( type_string::String, number::Int64 )
-    ## Special case for BigObject (we do not care 'bout the type here)
-    if startswith(type_string,"BigObject")
-        return "arg" * string(number) * "::" * translate_type("BigObject")
-    end
-    
-    return "arg" * string(number) * "::" * translate_type(type_string)
-end
-
-function parse_definition(method_dict::Dict, app_name::String,uniqueness_checker)
+function parse_definition(method_dict::Dict, app_name::String, uniqueness_checker)
     name = method_dict["name"]
-    arguments = method_dict["args"]
-    mandatory = method_dict["mandatory"]
-    type_params = method_dict["type_params"]
     is_method = haskey(method_dict,"method_of")
+
     ## for now, we use the same name for Julia and Polymake
     julia_name = name
     polymake_name = name
 
-    ## Check for option set
-    has_option_set = length(arguments) > 0 && last(arguments) == "OptionSet"
-
-    ## Make type parameters
-    param_list_header = Array{String,1}()
-    param_list = Array{String,1}()
-    # for i in 1:type_params
-    #     push!(param_list_header,"param$i::String")
-    #     push!(param_list,"\$param$i")
-    # end
-    # if length(param_list) >= 1
-    #     parameter_string = "<" * join(param_list,",") * ">"
-    # else
-    #     parameter_string = ""
-    # end
-    parameter_string = ""
-
-    ## Compute the argument range
-    max_argument_number = length(arguments) - (has_option_set ? 1 : 0)
-    min_argument_number = mandatory
-
-    ## Option set parameter
-    option_set_argument = "option_set::" * translate_type("OptionSet")
-    option_set_parameter = "option_set"
-
-    ## Real arguments
-    if is_method
-        if ! startswith(method_dict["method_of"],"BigObject")
-            throw(UnparsablePolymakeFunction(name))
-        end
-        argument_list_header = Array{String,1}(["dispatch_obj::pm_perl_Object"])
-        ## Fixme: good?
-    else
-        argument_list_header = Array{String,1}()
+    if julia_name in uniqueness_checker
+        return "",uniqueness_checker
     end
-    argument_list = Array{String,1}()
-
-
-    for i in 1:max_argument_number
-        try
-            push!(argument_list_header,create_argument_string_from_type(arguments[i],i))
-        catch exception
-            if exception isa UnknownPolymakeType
-                @warn(exception.msg)
-                break
-            else
-                rethrow(exception)
-            end
-        end
-        push!(argument_list,"arg$i")
-    end
-
-    if is_method
-        min_argument_number = min_argument_number + 1
-        max_argument_number = max_argument_number + 1
-    end
-
-    actual_arguments = length(argument_list_header)
-    if actual_arguments < min_argument_number
-        throw(UnparsablePolymakeFunction(name))
-    elseif actual_arguments < max_argument_number
-        @warn("Ignoring " * string(max_argument_number-actual_arguments) * " arguments of function " * name)
-        max_argument_number = actual_arguments
-    end
-
-    return_string = ""
-
+    push!(uniqueness_checker,julia_name)
     if is_method
         function_string_creator = julia_method_string
     else
         function_string_creator = julia_function_string
     end
+    return function_string_creator(julia_name,polymake_name,app_name),uniqueness_checker
 
-    julia_argument_list = vcat(param_list_header,argument_list_header)
-    for number_arguments in min_argument_number:max_argument_number
-        # julia_args = join(julia_argument_list[1:number_arguments+type_params],",")
-        julia_args = join(julia_argument_list[1:number_arguments],",")
-        if is_method
-            call_args = join(argument_list[1:number_arguments - 1],",")
-        else
-            call_args = join(argument_list[1:number_arguments],",")
-        end
-        if length(julia_args) > 0
-            julia_args = julia_args * ","
-        end
-        if length(call_args) > 0
-            call_args = call_args * ","
-        end
-        if ! ( (julia_name,julia_args) in uniqueness_checker )
-            return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
-            push!(uniqueness_checker,(julia_name,julia_args))
-        end
-        if has_option_set
-            julia_args = julia_args * option_set_argument * ","
-            call_args = call_args *  option_set_parameter * ","
-            if ! ( (julia_name,julia_args) in uniqueness_checker )
-                return_string = return_string * function_string_creator(julia_name,polymake_name,app_name,julia_args,call_args,parameter_string)
-                push!(uniqueness_checker,(julia_name,julia_args))
-            end
-        end
-    end
-    return return_string,uniqueness_checker
 end
 
 function parse_app_definitions(filename::String,outputfileposition::String,include_file::String,additional_json_files_path::String)
@@ -216,10 +94,9 @@ function parse_app_definitions(filename::String,outputfileposition::String,inclu
     return_string = """
 module $app_name
 
-import ..pm_Integer, ..pm_Rational, ..pm_Matrix, ..pm_Vector, ..pm_Set,
-       ..pm_perl_Object, ..pm_perl_OptionSet, ..pm_perl_PropertyValue,
-       ..application, ..internal_call_function, ..internal_call_method,
-       ..convert_from_property_value
+import ..internal_call_function, ..internal_call_method,
+       ..internal_call_function_void, ..internal_call_method_void,
+       ..convert_from_property_value, ..c_arguments, ..application
 
 """
     uniqueness_checker = []
