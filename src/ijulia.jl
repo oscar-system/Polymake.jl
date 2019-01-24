@@ -17,7 +17,6 @@ Jupyter is very particular from where it wants to load these.
 So we just copy into the Julia kernel directory...
 """
 function prepare_jupyter_kernel_for_visualization()
-    shell_execute("""include "common::jupyter.rules";""")
 
     json = read(`$(Main.IJulia.JUPYTER) kernelspec list --json`, String)
     kernelspecs = JSON.parse(json)["kernelspecs"]

@@ -75,7 +75,6 @@ void polymake_call_function_void(std::string                  function_name,
     for (size_t i = 0; i < argument_list; i++) {
         polymake_call_function_feed_argument(function, arguments[i]);
     }
-
     function();
 }
 
