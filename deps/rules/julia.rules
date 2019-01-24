@@ -39,3 +39,8 @@ function classify_perl_pv($) {
    # ref will return some string representation of the perl object type
    return ref($pv);
 }
+
+function is_boolean_wrapper($) {
+   my($c) = @_;
+   return is_boolean($c);
+}

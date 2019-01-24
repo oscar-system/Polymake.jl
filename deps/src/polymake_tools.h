@@ -26,7 +26,7 @@ class PropertyValueHelper : public pm::perl::PropertyValue {
     // in some form these will be moved to the polymake code
     bool is_boolean() const
     {
-        return call_function("is_boolean", *this);
+        return call_function("is_boolean_wrapper", *this);
     };
 
     using Value::classify_number;
