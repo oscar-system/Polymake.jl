@@ -13,3 +13,14 @@ function pm_perl_OptionSet(iter)
     end
     return opt_set
 end
+
+function _get_visual_string(x::Visual,function_symbol::Symbol)
+    html_string=call_function(function_symbol,x.obj)
+    # we guess that the julia kernel is named this way...
+    kernel = "julia-$(VERSION.major).$(VERSION.minor)"
+    html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/")
+    return html_string
+end
+
+_get_visual_string_threejs(x::Visual) = _get_visual_string(x,:jupyter_visual_threejs)
+_get_visual_string_svg(x::Visual) = _get_visual_string(x,:jupyter_visual_svg)

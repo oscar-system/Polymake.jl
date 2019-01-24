@@ -27,6 +27,7 @@ const WrappedTypes = Dict(
     Symbol("int") => to_int,
     Symbol("double") => to_double,
     Symbol("bool") => to_bool,
+    Symbol("std::string") => to_string,
     Symbol("undefined") => x -> nothing,
 )
 
@@ -45,14 +46,20 @@ function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
     take(obj, string(prop), convert_to_pm(val))
 end
 
+struct Visual
+    obj::Polymake.pm_perl_PropertyValue
+end
+
 function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
     type_name = Polymake.typeinfo_string(obj,true)
     T = Symbol(replace(type_name," "=>""))
     if haskey(WrappedTypes, T)
         f = WrappedTypes[T]
         return f(obj)
+    elseif startswith(type_name,"Visual::")
+        return Visual(obj)
     else
-        @warn("The return value contains $(typeinfo_string(obj,true)) which has not been wrapped yet")
+        @warn("The return value contains $type_name which has not been wrapped yet")
         return obj
     end
 end
@@ -63,23 +70,29 @@ end
 Call a polymake function with the given `func` name and given arguments `args`.
 If `void=true` the function is called in a void context. For example this is important for visualization.
 """
-function call_function(func::Symbol, args...; void=false, kwargs...)
+function call_function(func::Symbol, args...; void=false, unwrap=true, kwargs...)
     fname = string(func)
     cargs = Any[args...]
     if isempty(kwargs)
         if void
-            ret = internal_call_function_void(fname, cargs)
+            internal_call_function_void(fname, cargs)
+            return
         else
             ret = internal_call_function(fname, cargs)
         end
     else
         if void
-            ret = internal_call_function_void(fname, cargs, OptionSet(kwargs))
+            internal_call_function_void(fname, cargs, OptionSet(kwargs))
+            return
         else
             ret = internal_call_function(fname, cargs, OptionSet(kwargs))
         end
     end
-    convert_from_property_value(ret)
+    if unwrap
+        return convert_from_property_value(ret)
+    else
+        return ret
+    end
 end
 
 """
@@ -88,23 +101,29 @@ end
 Call a polymake method on the object `obj` with the given `func` name and given arguments `args`.
 If `void=true` the function is called in a void context. For example this is important for visualization.
 """
-function call_method(obj, func::Symbol, args...; void=false, kwargs...)
+function call_method(obj, func::Symbol, args...; void=false, unwrap=true, kwargs...)
     fname = string(func)
     cargs = Any[args...]
     if isempty(kwargs)
         if void
-            ret = internal_call_method_void(fname, obj, cargs)
+            internal_call_method_void(fname, obj, cargs)
+            return
         else
             ret = internal_call_method(fname, obj, cargs)
         end
     else
         if void
-            ret = internal_call_method_void(fname, obj, cargs, OptionSet(kwargs))
+            internal_call_method_void(fname, obj, cargs, OptionSet(kwargs))
+            return
         else
             ret = internal_call_method(fname, obj, cargs, OptionSet(kwargs))
         end
     end
-    convert_from_property_value(ret)
+    if unwrap
+        return convert_from_property_value(ret)
+    else
+        return ret
+    end
 end
 
 function give(obj::Polymake.pm_perl_Object, prop::String)
@@ -130,3 +149,20 @@ function Base.show(io::IO, ::MIME"text/plain", a::pm_Array{pm_perl_Object})
     print(io, "pm_Array{pm_perl_Object} of size ",length(a))
 end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
+
+function Base.show(io::IO, v::Visual)
+    # IJulia renders all possible mimes, so frontend can decide on
+    # the way to display the output.
+    # This `if` keeps the browser from opening a new tab
+    if !(isdefined(Main, :IJulia) && Main.IJulia.inited)
+        show(io,MIME("text/plain"),v.obj)
+    end
+end
+
+function Base.show(io::IO,::MIME"text/html",v::Visual)
+     print(io,_get_visual_string_threejs(v))
+end
+
+function Base.show(io::IO,::MIME"text/svg+xml",v::Visual)
+    print(io,_get_visual_string_svg(v))
+end

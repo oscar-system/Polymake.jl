@@ -43,6 +43,7 @@ end
 include("generated/type_translator.jl")
 
 include("repl.jl")
+include("ijulia.jl")
 
 function __init__()
     @initcxx
@@ -72,6 +73,10 @@ function __init__()
 
     if isdefined(Base, :active_repl)
         run_polymake_repl()
+    end
+
+    if isdefined(Main, :IJulia) && Main.IJulia.inited
+        prepare_jupyter_kernel_for_visualization()
     end
 end
 
