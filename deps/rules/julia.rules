@@ -44,3 +44,25 @@ function is_boolean_wrapper($) {
    my($c) = @_;
    return is_boolean($c);
 }
+
+function jupyter_visual_threejs(Visual::Object+) {
+   my $string = "";
+   local $ThreeJS::is_used_in_jupyter=1;
+   open my $handle, ">", \$string;
+   threejs(@_,File=>$handle);
+   close $handle;
+   state $id = 0;
+   $string =~ s/OUTPUTID/$id/gm;
+   $id++;
+   return $string;
+}
+
+function jupyter_visual_svg(Visual::Object+) {
+   die "polymake svg.rules disabled: perl module SVG probably missing"
+      unless application("common")->configured->{"svg.rules"} > 0;
+   my $string = "";
+   open my $handle, ">", \$string;
+   svg(@_,File=>$handle);
+   close $handle;
+   return $string;
+}
