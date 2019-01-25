@@ -70,22 +70,22 @@ end
 Call a polymake function with the given `func` name and given arguments `args`.
 If `void=true` the function is called in a void context. For example this is important for visualization.
 """
-function call_function(func::Symbol, args...; void=false, unwrap=true, kwargs...)
+function call_function(func::Symbol, args...; template_parameters::Array{String,1}=String[], void=false, unwrap=true, kwargs...)
     fname = string(func)
     cargs = Any[args...]
     if isempty(kwargs)
         if void
-            internal_call_function_void(fname, cargs)
+            internal_call_function_void(fname, template_parameters, cargs)
             return
         else
-            ret = internal_call_function(fname, cargs)
+            ret = internal_call_function(fname, template_parameters, cargs)
         end
     else
         if void
-            internal_call_function_void(fname, cargs, OptionSet(kwargs))
+            internal_call_function_void(fname, template_parameters, cargs, OptionSet(kwargs))
             return
         else
-            ret = internal_call_function(fname, cargs, OptionSet(kwargs))
+            ret = internal_call_function(fname, template_parameters, cargs, OptionSet(kwargs))
         end
     end
     if unwrap
