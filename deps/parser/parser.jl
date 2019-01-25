@@ -18,13 +18,13 @@ isfile(include_file) && rm(include_file)
 function julia_function_string(julia_name::String, polymake_name::String, app_name::String )
 
     return """
-function $julia_name(args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
+function $julia_name(args...; template_parameters::Array{String,1}=String[], keep_PropertyValue=false, call_as_void=false, kwargs...)
     application( \"$app_name\" )
     if call_as_void
-        internal_call_function_void( \"$polymake_name\", c_arguments(args...;kwargs...))
+        internal_call_function_void( \"$polymake_name\", template_parameters, c_arguments(args...; kwargs...))
         return
     else
-        return_value = internal_call_function( \"$polymake_name\", c_arguments(args...;kwargs...))
+        return_value = internal_call_function( \"$polymake_name\", template_parameters, c_arguments(args...;kwargs...))
     end
     if keep_PropertyValue
         return return_value

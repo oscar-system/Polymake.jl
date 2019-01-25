@@ -4,6 +4,8 @@
 
 #include "polymake_tools.h"
 
+#include <vector>
+
 static auto type_map_translator = new std::map<std::string, jl_value_t**>();
 
 void insert_type_in_map(std::string&& ptr_name, jl_value_t** var_space)
@@ -53,12 +55,26 @@ void polymake_call_function_feed_argument(T& function, jl_value_t* argument)
 #include "generated/to_polymake_function.h"
 }
 
+std::vector<std::string>
+create_template_vector(jlcxx::ArrayRef<std::string> template_parameters)
+{
+    size_t                   number_templates = template_parameters.size();
+    std::vector<std::string> return_vector(number_templates);
+    for (size_t i = 0; i < number_templates; i++) {
+        return_vector[i] = template_parameters[i];
+    }
+    return return_vector;
+}
+
 pm::perl::PropertyValue
 polymake_call_function(std::string                  function_name,
+                       jlcxx::ArrayRef<std::string> template_parameters,
                        jlcxx::ArrayRef<jl_value_t*> arguments)
 {
+    std::vector<std::string> template_vector =
+        create_template_vector(template_parameters);
     size_t argument_list = arguments.size();
-    auto   function = polymake::prepare_call_function(function_name);
+    auto   function = polymake::prepare_call_function(function_name, template_vector);
     for (size_t i = 0; i < argument_list; i++) {
         polymake_call_function_feed_argument(function, arguments[i]);
     }
@@ -67,11 +83,15 @@ polymake_call_function(std::string                  function_name,
 
 // Visualization in polymake only works if the function is called and
 // then immediately released,i.e. not converted to a property value
-void polymake_call_function_void(std::string                  function_name,
-                                 jlcxx::ArrayRef<jl_value_t*> arguments)
+void polymake_call_function_void(
+    std::string                  function_name,
+    jlcxx::ArrayRef<std::string> template_parameters,
+    jlcxx::ArrayRef<jl_value_t*> arguments)
 {
+    std::vector<std::string> template_vector =
+        create_template_vector(template_parameters);
     size_t argument_list = arguments.size();
-    auto   function = polymake::prepare_call_function(function_name);
+    auto   function = polymake::prepare_call_function(function_name, template_vector);
     for (size_t i = 0; i < argument_list; i++) {
         polymake_call_function_feed_argument(function, arguments[i]);
     }
