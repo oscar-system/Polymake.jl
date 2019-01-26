@@ -47,7 +47,6 @@ include("ijulia.jl")
 
 function __init__()
     @initcxx
-    enhance_wrapped_type_dict()
     include(joinpath(@__DIR__,"..","deps","deps.jl"))
 
     ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
@@ -98,5 +97,7 @@ if isfile(joinpath(@__DIR__, includes))
 else
     @warn("You need to run '] build Polymake' first.")
 end
+
+enhance_wrapped_type_dict()
 
 end # of module Polymake
