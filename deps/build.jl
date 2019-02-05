@@ -5,10 +5,7 @@ import Pkg
 
 
 const verbose = true
-pm_config = nothing
-use_binary = false
 depsjl = ""
-perl = "perl"
 
 # Dependencies that must be installed before this package can be built
 dependencies = [
@@ -21,16 +18,23 @@ dependencies = [
     "https://github.com/benlorenz/perlBuilder/releases/download/v5.28.0/build_perl.v5.28.0.jl",
 ]
 
-try
-    # test whether polymake config is available in path
-    global pm_config = chomp(read(`command -v polymake-config`, String))
-catch
-    if haskey(ENV, "POLYMAKE_CONFIG")
-        global pm_config = ENV["POLYMAKE_CONFIG"]
-    else
-        global pm_config = joinpath(@__DIR__,"usr","bin","polymake-config")
-        global use_binary = true
-        global perl = joinpath(@__DIR__,"usr","bin","perl")
+
+pm_config = joinpath(@__DIR__,"usr","bin","polymake-config")
+perl = joinpath(@__DIR__,"usr","bin","perl")
+use_binary = true
+
+if !( haskey(ENV, "POLYMAKE_CONFIG") && ENV["POLYMAKE_CONFIG"] == "no" )
+    try
+        # test whether polymake config is available in path
+        global pm_config = chomp(read(`command -v polymake-config`, String))
+        global perl ="perl"
+        global use_binary = false
+    catch
+        if haskey(ENV, "POLYMAKE_CONFIG")
+            global pm_config = ENV["POLYMAKE_CONFIG"]
+            global perl ="perl"
+            global use_binary = false
+        end
     end
 end
 
