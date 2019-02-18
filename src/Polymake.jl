@@ -14,8 +14,6 @@ import Base: ==, <, <=, *, -, +, /, div, rem,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
-using Pkg: depots1
-
 using CxxWrap
 
 struct PolymakeError <: Exception
@@ -49,7 +47,6 @@ function __init__()
     @initcxx
     include(joinpath(@__DIR__,"..","deps","deps.jl"))
 
-    ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
     try
         initialize_polymake()
     catch ex # initialize_polymake throws jl_error
