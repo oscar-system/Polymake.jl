@@ -7,4 +7,5 @@
     cc = polytope.cube( 3 )
     @test call_function(:equal_polyhedra,cc,cc)
     @test polytope.pseudopower(2,2) == 2
+    @test tropical.cyclic(3,5,template_parameters=["Max"]) isa pm_perl_Object
 end
