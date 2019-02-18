@@ -43,8 +43,8 @@ const polymake = joinpath(prefix,"bin","polymake")
 
 products = Product[
     LibraryProduct(prefix, "libpolymake", :libpolymake)
-    ExecutableProduct(prefix,"polymake-config", Symbol("polymake_config"))
     ExecutableProduct(prefix,"polymake", :polymake)
+    ExecutableProduct(prefix,"polymake-config", Symbol("polymake_config"))
 ]
 
 # Download binaries from hosted location
@@ -88,10 +88,16 @@ If you already have a polymake installation you need to set the environment vari
      pm_bin_prefix = joinpath(@__DIR__,"usr")
      perllib = replace(chomp(read(`$perl -e 'print join(":",@INC);'`,String)),"/workspace/destdir/"=>prefix.path)
      ENV["PERL5LIB"]="$perllib"
+     ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"))
      run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
      run(`sh -c "$perl -pi -e 's{/workspace/destdir}{$pm_bin_prefix}g' $pm_bin_prefix/lib/perl5/*/*/Config_heavy.pl"`)
+
      global depsjl = """
+
+        using Pkg: depots1
         ENV["PERL5LIB"]="$perllib"
+        ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
+
         """
 else
     if pm_config == nothing
@@ -121,10 +127,10 @@ include("parser/type_setup.jl")
 run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
 run(`make -j$(div(Sys.CPU_THREADS,2))`)
 
-ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"))
 json_script = joinpath(@__DIR__,"rules","funtojson.pl")
 json_folder = joinpath(@__DIR__,"parser","json")
 mkpath(json_folder)
+
 run(`$perl $polymake --iscript $json_script $json_folder`)
 
 include("parser/parser.jl")
