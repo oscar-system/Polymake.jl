@@ -135,12 +135,15 @@ run(`$perl $polymake --iscript $json_script $json_folder`)
 
 include("parser/parser.jl")
 
+# remove old deps.jl first to avoid problems when switching from binary installation
+rm(joinpath(@__DIR__,"deps.jl"))
+
 if use_binary
     # Write out a deps.jl file that will contain mappings for our products
     write_deps_file(joinpath(@__DIR__, "deps.jl"), products, verbose=verbose)
 end
 
 println("appending to deps.jl file")
-f = open(joinpath(dirname(@__FILE__),"deps.jl"), "a")
+f = open(joinpath(@__DIR__,"deps.jl"), "a")
 write(f, depsjl)
 close(f)
