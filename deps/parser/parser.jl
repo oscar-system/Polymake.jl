@@ -129,9 +129,42 @@ import ..internal_call_function, ..internal_call_method,
     end
 end
 
+function create_compat_module(outputfolder::String,include_file::String,appname_dict::Dict{Symbol,Symbol})
+    header ="""
+module PolymakeCompat
+
+"""
+    footer ="""
+
+end
+
+"""
+    open(abspath(joinpath(outputfolder,"PolymakeCompat.jl")),"w") do outputfile
+        print(outputfile, header)
+        for (polymake_app,julia_module) in appname_dict
+            print(outputfile,"""
+import ..$julia_module
+
+const $polymake_app = $julia_module
+
+export $polymake_app
+
+""")
+        end
+        print(outputfile,footer)
+    end
+
+    open(abspath(include_file),"a") do outputfile
+        print(outputfile,"include(\"PolymakeCompat.jl\")\n")
+    end
+
+end
+
 ## Creates appname_dict
 include( joinpath(@__DIR__,"app_setup.jl" ) )
 
 for current_file in filenames_list
     parse_app_definitions(joinpath(jsonfolder,current_file), outputfolder, include_file,additional_json_files_path,appname_dict)
 end
+
+create_compat_module(outputfolder,include_file,appname_dict)
