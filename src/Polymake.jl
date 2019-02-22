@@ -106,6 +106,6 @@ else
     @warn("You need to run '] build Polymake' first.")
 end
 
-enhance_wrapped_type_dict()
+fill_wrapped_types!(WrappedTypes, get_type_names())
 
 end # of module Polymake

@@ -31,13 +31,15 @@ const WrappedTypes = Dict(
     Symbol("undefined") => x -> nothing,
 )
 
-function enhance_wrapped_type_dict()
-    name_list = get_type_names()
-    i = 1
-    while i <= length(name_list)
-        WrappedTypes[Symbol(replace(name_list[i+1]," "=>""))] = eval(Symbol(name_list[i]))
-        i += 2
+function fill_wrapped_types!(wrapped_types_dict, function_type_list)
+    function_names = function_type_list[1:2:end]
+    type_names = function_type_list[2:2:end]
+    for (fn, tn) in zip(function_names, type_names)
+        fns = Symbol(fn)
+        tn = replace(tn," "=>"")
+        @eval $wrapped_types_dict[Symbol($tn)] = Polymake.$fns
     end
+    return wrapped_types_dict
 end
 
 Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
