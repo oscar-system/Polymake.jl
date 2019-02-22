@@ -15,4 +15,5 @@ end
     include("arrays.jl")
     include("perlobj.jl")
     include("interface_functions.jl")
+    include("compat.jl")
 end
