@@ -109,3 +109,68 @@ All three ways of calling a function in polymake can return any big or
 small object, and the generic return (`PropertyValue`) is transparently
 converted to one of the data types above. For performance reasons, this
 conversion can be deactivated
+
+## Rosetta stone
+
+The following tables explain by example how to quickly translate `Polymake` syntax to `Polymake.jl`.
+
+### Variables
+
+| Polymake                              | Julia                                                        |
+| ------------------------------------- | ------------------------------------------------------------ |
+| `$p` (reference to 'scalar' variable) | `p` (reference to any variable)                              |
+| `print $p;`                           | `print(p)` or `println(p)` or `@show p`, or just `p` in REPL |
+| `$i=5; $j=6;`                         | `i,j = 5,6` or `i=5; j=6` (`;` is needed for separation, <br />can be used to suppress return value in REPL) |
+| `$s = $i + $j; print $s;`             | `s = i + j`                                                  |
+
+### Arrays
+
+| Polymake                                                 | Julia                                                        |
+| -------------------------------------------------------- | ------------------------------------------------------------ |
+| Linear containers with random access                     | Linear containers with random access + all the algebra attached      |
+| `@A = ("a", "b", "c");`                                  | `A = ["a", "b", "c"]`                                        |
+| `$first = $A[0];`<br />(`first` is equal to `a`)         | `first = A[1]`<br />(note the `1`-based indexing!)           |
+| `@A2 = (3,1,4,2);`                                       | `A2 = [3,1,4,2]`                                             |
+| `print sort(@A2);` <br />(a copy of `A2` is sorted)      | `println(sort(A2))` <br />(to sort in place use `sort!(A2))` |
+| `$arr = new Array<Int>([3,2,5]);` <br />(a `C++` object) | `arr = Int[3,2,5]` <br />(although the type would have been inferred) |
+| `$arr->[0] = 100;`<br />(assignment)                     | `arr[1] = 100` <br />(assignment; returns `100`)             |
+
+### Dictionaries/Hash Tables
+
+| Polymake                       | Julia                                                        |
+| ------------------------------ | ------------------------------------------------------------ |
+| `%h = ();`                     | `h = Dict()`<br />it is **MUCH** better to provide types, e.g.<br />`h = Dict{String, Int}()` |
+| `$h{"zero"}=0; $h{"four"}=4;`  | `h["zero"] = 0; h["four"] = 4`<br />(call returns the value) |
+| `print keys %h;`               | `@show keys(h)` (order is not specified)                     |
+| `print join(", ",keys %hash);` | `join(keys(h), ", ")`<br />(returns `String`)                |
+| `%hash=("one",1,"two",2);`     | `Dict([("one",1), ("two",2)])`<br />(will infer types)       |
+| `%hash=("one"=>1,"two"=>2);`   | `Dict("one"=>1,"two"=>2)`<br />(will infer types)            |
+|                                |                                                              |
+
+### Sets
+
+| Polymake                      | Julia                                                        |
+| ----------------------------- | ------------------------------------------------------------ |
+| Balanced binary search trees  | Hash table with no content                                   |
+| `$set=new Set<Int>(3,2,5,3);` | `set = Set{Int}([3,2,5,3])`                                  |
+| `print $set->size;`           | `length(set)`                                                |
+| `@array_from_set=@$set`       | `collect(set)` <br />(creates a `Vector` , order is not specified) |
+|                               |                                                              |
+
+### Matrices
+
+| Polymake                                                     | Julia                                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Containers with algebraic operations                         | `Matrix{T} = Array{T, 2}` – (linear) container of elements of type `T` with available indexing by `2`-ples; all algebra attached |
+| `$mat=new Matrix<Rational>([[2,1,4,0,0],[3,1,5,2,1],[1,0,4,0,6]]);` | `mat = Rational{Int}[2 1 4 0 0; 3 1 5 2 1; 1 0 4 0 6]`       |
+| `$row1=new Vector<Rational>([2,1,4,0,0]); $row2=new Vector<Rational>([3,1,5,2,1]); $row3=new Vector<Rational>([1,0,4,0,6]);` <br />`@matrix_rows=($row1,$row2,$row3);` (`Perl` object)<br />`$matrix_from_array=new Matrix<Rational>(\@matrix_rows);`(`C++` object) | `row1 = Rational{Int}[2, 1, 4, 0, 0]; row2 = Rational{Int}[3, 1, 5, 2, 1]; row3 = Rational{Int}[1, 0, 4, 0, 6];`<br />`matrix_rows = hcat(row1', row2', row3')`<br />(Julia stores matrices in **column major** format, so `'` i.e. transposition is needed) |
+| `$mat->row(1)->[1]=7; $mat->elem(1,2)=8;`                    | `mat[2,2] = 7; mat[2,3] = 8`                                 |
+| `$unit_mat=4*unit_matrix<Rational>(3);`                      | `unit_mat = Diagonal([4//1 for i in 1:3])`<br />or `UniformScalin(4//1)`, depending on application (both require `using LinearAlgebra`) |
+| `$dense=new Matrix<Rational>($unit_mat);`                    | `Array(unit_mat)`                                            |
+| `$m_rat=new Matrix<Rational>(3/5*unit_matrix<Rational>(5));`<br />`$m2=$mat/$m_rat;` | `m_rat = Diagonal([3//5 for i in 1:5])`<br />`m2 = mat/m_rat` |
+| `$m_int=new Matrix<Int>(unit_matrix<Rational>(5));`<br />`$m3=$m_rat/$m_int;`<br />(results in an error due to incompatible types) | `m_int = Diagonal([1 for i in 1:5])`<br />`m_rat/m_int`<br />(succeeds due to `promote` happening in `/`) |
+| `convert_to<Rational>($m_int)`                               | `convert(Diagonal{Rational{Int}}, m_int)`                    |
+| `$z_vec=zero_vector<Int>($m_int->rows)`<br />`$extended_matrix=($z_vec\|$m_int);`<br />(adds `z_vec` as the first column, result is dense) | `z_vec = zeros(Int, size(m_int, 1))`<br />`extended_matrix = hcat(z_vec, m_int)`<br />(result is sparse) |
+| `$set=new Set<Int>(3,2,5);`<br />`$template_Ex=new Array<Set<Int>>((new Set<Int>(5,2,6)),$set)` | `set = Set([3,2,5]); template_Ex = [Set([5,2,6]), set]`      |
+| `$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);`<br />`$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);`<br />`$p->LP=$lp;`<br />`p->LP->MAXIMAL_VALUE;` | `p = p = perlobj("Polytope", :POINTS=>Polymake.polytope.cube(4).VERTICES)`<br />`lp = perlobj("LinearProgram", :LINEAR_OBJECTIVE=>[0,1,1,1,1])`<br />`p.LP = lp`<br />`p.LP.MAXIMAL_VALUE` |
+| `$i = ($p->N_FACETS * $p->N_FACETS) * 15;`                   | `i = (p.N_FACETS * p.N_FACETS) * 15`                         |
