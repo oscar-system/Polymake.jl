@@ -12,13 +12,13 @@ function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) wher
     return perl_obj
 end
 
-function perlobj(name::String, input_data::Pair{Symbol}...; kwargsdata...)
+function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwargsdata...)
     obj = pm_perl_Object(name)
     for (key, val) in input_data
-        setproperty!(obj, key, val)
+        setproperty!(obj, string(key), val)
     end
     for (key, val) in kwargsdata
-        setproperty!(obj, key, val)
+        setproperty!(obj, string(key), val)
     end
     return obj
 end
@@ -42,8 +42,8 @@ end
 
 Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
 
-function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
-    take(obj, string(prop), convert_to_pm(val))
+function Base.setproperty!(obj::pm_perl_Object, prop::Union{Symbol,String}, val)
+    return take(obj, string(prop), convert_to_pm(val))
 end
 
 struct Visual
