@@ -33,6 +33,8 @@ function $julia_name(args...; template_parameters::Array{String,1}=String[], kee
     end
 end
 
+export $julia_name
+
 """
 end
 
@@ -52,6 +54,8 @@ function $julia_name(dispatch_object,args...; keep_PropertyValue=false, call_as_
         return convert_from_property_value(return_value)
     end
 end
+
+export $julia_name
 
 """
 end
