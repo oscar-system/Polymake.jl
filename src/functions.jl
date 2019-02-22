@@ -1,4 +1,4 @@
-export perlobj, call_function, call_method
+export @pm, call_function, call_method
 
 import Base: convert, show
 
@@ -21,6 +21,50 @@ function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwar
         setproperty!(obj, string(key), val)
     end
     return obj
+end
+
+const module_appname_dict = Dict(
+  :Common  => :common,
+  :Fans  => :fan,
+  :Fulton  => :fulton,
+  :Graphs  => :graph,
+  :Groups  => :group,
+  :Ideals  => :ideal,
+  :Matroids  => :matroid,
+  :Polytopes  => :polytope,
+  :Topaz  => :topaz,
+  :Tropical  => :tropical
+)
+
+function qualified_func_name(app_name, func_name, template_params=:Symbol[])
+    name = "$app_name::$func_name"
+    if length(template_params) > 0
+        name *= "<$(join(template_params, ","))>"
+    end
+    return name
+end
+
+macro pm(expr)
+    @assert expr.head == :call
+    func = expr.args[1] # called function
+    args = expr.args[2:end] # its arguments
+
+    template_types = Symbol[]
+    # grab template parameters if present
+    if func.head == :curly
+        template_types = func.args[2:end]
+        func = func.args[1]
+    end
+
+    # for now we want the function name to be fully qualified:
+    @assert func.head == Symbol('.')
+    haskey(module_appname_dict, func.args[1]) || throw("Module '$(func.args[1])' not in Polymake.jl.")
+    polymake_app = module_appname_dict[func.args[1]]
+    polymake_func = func.args[2].value
+
+    polymake_func_name = qualified_func_name(polymake_app, polymake_func, template_types)
+    ex = :(Polymake.perlobj($polymake_func_name, $(esc(args...))))
+    return ex
 end
 
 const WrappedTypes = Dict(
