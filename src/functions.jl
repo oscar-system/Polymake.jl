@@ -36,7 +36,7 @@ const module_appname_dict = Dict(
   :Tropical  => :tropical
 )
 
-function qualified_func_name(app_name, func_name, template_params=:Symbol[])
+function qualified_func_name(app_name, func_name, template_params=Symbol[])
     name = "$app_name::$func_name"
     if length(template_params) > 0
         name *= "<$(join(template_params, ","))>"
