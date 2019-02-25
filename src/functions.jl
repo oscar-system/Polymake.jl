@@ -88,7 +88,11 @@ end
 
 Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
 
-function Base.setproperty!(obj::pm_perl_Object, prop::Union{Symbol,String}, val)
+function Base.setproperty!(obj::pm_perl_Object, prop::String, val)
+    return take(obj, prop, convert_to_pm(val))
+end
+
+function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
     return take(obj, string(prop), convert_to_pm(val))
 end
 
