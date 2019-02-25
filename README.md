@@ -172,7 +172,7 @@ The following tables explain by example how to quickly translate `Polymake` synt
 | `convert_to<Rational>($m_int)`                               | `convert(Diagonal{Rational{Int}}, m_int)`                    |
 | `$z_vec=zero_vector<Int>($m_int->rows)`<br />`$extended_matrix=($z_vec\|$m_int);`<br />(adds `z_vec` as the first column, result is dense) | `z_vec = zeros(Int, size(m_int, 1))`<br />`extended_matrix = hcat(z_vec, m_int)`<br />(result is sparse) |
 | `$set=new Set<Int>(3,2,5);`<br />`$template_Ex=new Array<Set<Int>>((new Set<Int>(5,2,6)),$set)` | `set = Set([3,2,5]); template_Ex = [Set([5,2,6]), set]`      |
-| `$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);`<br />`$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);`<br />`$p->LP=$lp;`<br />`$p->LP->MAXIMAL_VALUE;` | `p = @pm Polytopes.Polytope(:POINTS=>Polymake.polytope.cube(4).VERTICES)`<br />`lp = @pm Polytopes.LinearProgram(:LINEAR_OBJECTIVE=>[0,1,1,1,1])`<br />`p.LP = lp`<br />`p.LP.MAXIMAL_VALUE` |
+| `$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);`<br />`$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);`<br />`$p->LP=$lp;`<br />`$p->LP->MAXIMAL_VALUE;` | `p = @pm Polytopes.Polytope(:POINTS=>Polymake.Polytopes.cube(4).VERTICES)`<br />`lp = @pm Polytopes.LinearProgram(:LINEAR_OBJECTIVE=>[0,1,1,1,1])`<br />`p.LP = lp`<br />`p.LP.MAXIMAL_VALUE` |
 | `$i = ($p->N_FACETS * $p->N_FACETS) * 15;`                   | `i = (p.N_FACETS * p.N_FACETS) * 15`                         |
 
 ### Example script
@@ -190,18 +190,18 @@ matrix = eval(Base.Meta.parse(matrix_str))
 p = @pm Polytopes.Polytope(:POINTS=>matrix)
 
 @show p.FACETS # polymake matrix of polymake rationals
-@show Polymake.polytope.DIM(p) # julias Int64
+@show Polymake.Polytopes.DIM(p) # julias Int64
 # note that even in Polymake property DIM is "fake" -- it's actually a function
 @show p.VERTEX_SIZES # polymake array of ints
 
 for (i, vsize) in enumerate(p.VERTEX_SIZES)
-  if vsize == Polymake.polytope.DIM(p)
+  if vsize == Polymake.Polytopes.DIM(p)
     println("$i : $(p.VERTICES[i,:])")
     # $i will be shifted by one from the polymake version
   end
 end
 
-s = [i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.polytope.DIM(p)] # julias vector of Int64s
+s = [i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.Polytopes.DIM(p)] # julias vector of Int64s
 # note that sets are unordered in julia
 unique!(s)
 
@@ -227,7 +227,7 @@ p.FACETS = pm::Matrix<pm::Rational>
 3 -20 16 16
 0 -1 -1 20
 
-(Polymake.polytope).DIM(p) = 3
+(Polymake.Polytopes).DIM(p) = 3
 p.VERTEX_SIZES = pm::Array<int>
 9 3 4 4 3 4 3 4 4 4
 2 : pm_Rational[1, 1/16, 1/4, 1/16]
@@ -249,10 +249,10 @@ To suppress it just execute `include("example_script.jl);`.
 The same minor (up to permutation of rows) could be obtained by using sets, or the identical minor by using (ordered) polymake sets.
 Just remember to `collect` the set to a vector when indexing `VERTICES`.
 ```julia
-s = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.polytope.DIM(p))
+s = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.Polytopes.DIM(p))
 # s is julias set of Int64s
 
-s = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.polytope.DIM(p))
+s = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.Polytopes.DIM(p))
 # polymake set of longs
 
 special_points = p.VERTICES[collect(s), :]
