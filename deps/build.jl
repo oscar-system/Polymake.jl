@@ -2,6 +2,7 @@ using CxxWrap
 using BinaryProvider
 using Base.Filesystem
 import Pkg
+import CMake
 
 # Parse some basic command-line arguments
 const verbose = "--verbose" in ARGS
@@ -124,7 +125,7 @@ cd(joinpath(@__DIR__, "src"))
 
 include("parser/type_setup.jl")
 
-run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
+run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
 run(`make -j$(div(Sys.CPU_THREADS,2))`)
 
 json_script = joinpath(@__DIR__,"rules","funtojson.pl")
