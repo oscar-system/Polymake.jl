@@ -13,6 +13,7 @@ matrix:
 notifications:
   email: false
 sudo: required
+codecov: true
 before_install:
   - sudo ln -sf /usr/bin/gcc-7 /usr/bin/gcc
   - sudo ln -sf /usr/bin/g++-7 /usr/bin/g++
@@ -23,9 +24,7 @@ addons:
     packages:
     - gcc-7
     - g++-7
-
-script:
-  - julia --code-coverage --inline=no -e 'using Pkg; Pkg.build(); include("test/runtests.jl");'
-after_success:
-  # push coverage results to Codecov
-  - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+before_script:
+  - julia -e 'using Pkg;
+    Pkg.add(PackageSpec(name="MbedTLS", version="0.6.6"));
+    Pkg.pin(PackageSpec(name="MbedTLS", version="0.6.6"));'
