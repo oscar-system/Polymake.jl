@@ -89,6 +89,7 @@ end
 
 const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
 
+include("app_setup.jl")
 include("functions.jl")
 include("convert.jl")
 include("object_helpers.jl")

@@ -23,19 +23,6 @@ function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwar
     return obj
 end
 
-const module_appname_dict = Dict(
-  :Common  => :common,
-  :Fans  => :fan,
-  :Fulton  => :fulton,
-  :Graphs  => :graph,
-  :Groups  => :group,
-  :Ideals  => :ideal,
-  :Matroids  => :matroid,
-  :Polytopes  => :polytope,
-  :Topaz  => :topaz,
-  :Tropical  => :tropical
-)
-
 function qualified_func_name(app_name, func_name, template_params=Symbol[])
     name = "$app_name::$func_name"
     if length(template_params) > 0

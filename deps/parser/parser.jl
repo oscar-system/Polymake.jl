@@ -161,10 +161,10 @@ export $polymake_app
 end
 
 ## Creates appname_dict
-include( joinpath(@__DIR__,"app_setup.jl" ) )
+include( abspath( joinpath( @__DIR__, "..", "..", "src", "app_setup.jl" ) ) )
 
 for current_file in filenames_list
-    parse_app_definitions(joinpath(jsonfolder,current_file), outputfolder, include_file,additional_json_files_path,appname_dict)
+    parse_app_definitions(joinpath(jsonfolder,current_file), outputfolder, include_file,additional_json_files_path,appname_module_dict)
 end
 
-create_compat_module(outputfolder,include_file,appname_dict)
+create_compat_module(outputfolder,include_file,appname_module_dict)
