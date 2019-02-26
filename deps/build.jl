@@ -16,6 +16,7 @@ dependencies = [
     "https://github.com/benlorenz/GMPBuilder/releases/download/v6.1.2-2/build_GMP.v6.1.2.jl",
     "https://github.com/benlorenz/MPFRBuilder/releases/download/v4.0.1-3/build_MPFR.v4.0.1.jl",
     "https://github.com/benlorenz/perlBuilder/releases/download/v5.28.0/build_perl.v5.28.0.jl",
+    "https://github.com/benlorenz/ninjaBuilder/releases/download/v1.9.0/build_ninja.v1.9.0.jl",
 ]
 
 
@@ -46,6 +47,8 @@ products = Product[
     LibraryProduct(prefix, "libpolymake", :libpolymake)
     ExecutableProduct(prefix,"polymake", :polymake)
     ExecutableProduct(prefix,"polymake-config", Symbol("polymake_config"))
+    ExecutableProduct(prefix,"ninja", :ninja)
+    ExecutableProduct(prefix,"perl", :perl)
 ]
 
 # Download binaries from hosted location
@@ -85,21 +88,19 @@ If you already have a polymake installation you need to set the environment vari
         end
         install(dl_info...; prefix=prefix, force=true, verbose=verbose)
     end
-     pm_config_ninja = joinpath(libdir(prefix),"polymake","config.ninja")
-     pm_bin_prefix = joinpath(@__DIR__,"usr")
-     perllib = replace(chomp(read(`$perl -e 'print join(":",@INC);'`,String)),"/workspace/destdir/"=>prefix.path)
-     ENV["PERL5LIB"]="$perllib"
-     ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"))
-     run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
+    pm_config_ninja = joinpath(libdir(prefix),"polymake","config.ninja")
+    pm_bin_prefix = joinpath(@__DIR__,"usr")
+    perllib = replace(chomp(read(`$perl -e 'print join(":",@INC);'`,String)),"/workspace/destdir/"=>prefix.path)
+    global depsjl = quote
+        using Pkg: depots1
+        ENV["PERL5LIB"]=$perllib
+        ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
+        ENV["PATH"] = ENV["PATH"]*":"*$pm_bin_prefix*"/bin"
+    end
+    eval(depsjl)
+    run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
      run(`sh -c "$perl -pi -e 's{/workspace/destdir}{$pm_bin_prefix}g' $pm_bin_prefix/lib/perl5/*/*/Config_heavy.pl"`)
 
-     global depsjl = """
-
-        using Pkg: depots1
-        ENV["PERL5LIB"]="$perllib"
-        ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
-
-        """
 else
     if pm_config == nothing
         error("Set `POLYMAKE_CONFIG` ENV variable. And rebuild Polymake by calling `import Pkg; Pkg.build(\"Polymake\")`.")
@@ -145,6 +146,6 @@ if use_binary
 end
 
 println("appending to deps.jl file")
-f = open(joinpath(@__DIR__,"deps.jl"), "a")
-write(f, depsjl)
-close(f)
+open(joinpath(@__DIR__,"deps.jl"), "a") do f
+   println(f, depsjl)
+end
