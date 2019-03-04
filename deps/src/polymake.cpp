@@ -68,6 +68,15 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         return jlcxx::make_julia_array(output, props.size() + 1);
     });
 
+    polymake.method("shell_context_help", [](const std::string input, size_t pos=std::string::npos, bool full=false, bool html=false){
+        std::vector<std::string> ctx_help =
+            data.main_polymake_session->shell_context_help(input, pos, full, html);
+        jl_value_t** doc_strings = new jl_value_t*[ctx_help.size()];
+        for (int i=0; i < ctx_help.size(); ++i)
+            doc_strings[i] = jl_cstr_to_string(ctx_help[i].c_str());
+        return jlcxx::make_julia_array(doc_strings, ctx_help.size());
+    });
+
 #include "generated/map_inserts.h"
 
     polymake_module_add_caller(polymake);
