@@ -23,14 +23,6 @@ function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwar
     return obj
 end
 
-function qualified_func_name(app_name, func_name, template_params=Symbol[])
-    name = "$app_name::$func_name"
-    if length(template_params) > 0
-        name *= "<$(join(template_params, ","))>"
-    end
-    return name
-end
-
 macro pm(expr)
     @assert expr.head == :call
     func = expr.args[1] # called function
