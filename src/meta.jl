@@ -50,6 +50,12 @@ struct PolymakeMethod <: PolymakeCallable
         new(jl_name, pm_name, app_name, json_dict)
 end
 
+struct PolymakeApp
+    jl_module::Symbol
+    pm_name::String
+    callables::Vector{PolymakeCallable}
+end
+
 ########## constructors
 
 function PolymakeCallable(app_name::String, dict::Dict{String, Any},
@@ -62,16 +68,46 @@ function PolymakeCallable(app_name::String, dict::Dict{String, Any},
     end
 end
 
+function PolymakeApp(app_json::Dict{String, Any})
+    app_name = app_json["app"]
+    jl_module = appname_module_dict[Symbol(app_json["app"])]
+
+    for f in app_json["functions"]
+        if !haskey(f, "name")
+            @warn "No 'name' field in json node. Malformed json for application '$app_name'?\n node = $f"
+        end
+    end
+
+    callables = [PolymakeCallable(app_name,f) for f in app_json["functions"] if haskey(f, "name")]
+
+    callables = unique(pc -> pm_name(pc), callables)
+
+    return PolymakeApp(jl_module, app_name, callables)
+end
+
+function PolymakeApp(module_name::Symbol, json_file::String, module_file::String)
+    @assert isfile(json_file)
+    app_json = JSON.Parser.parsefile(json_file)
+    return PolymakeApp(app_json)
+end
+
 ########## utils
 
 pm_name(pc::PolymakeCallable) = pc.pm_name
 pm_name_qualified(pc::PolymakeCallable) = pm_name_qualified(pc.app_name, pc.pm_name)
+jl_module_name(pa::PolymakeApp) = pa.jl_module
+
+push!(pa::PolymakeApp, pc::PolymakeCallable) = push!(pa.callables, pc)
 
 callable(::PolymakeFunction) = :internal_call_function
 callable(::PolymakeMethod) = :internal_call_method
 callable_void(::PolymakeFunction) = :internal_call_function_void
 callable_void(::PolymakeMethod) = :internal_call_method_void
 
+function push!(pa::PolymakeApp, func_json::Dict{String, Any})
+    pc = PolymakeCallable(pm_name(pa), func_json)
+    push!(pa, pc)
+end
 
 function Base.show(io::IO, pc::PolymakeCallable)
     println(io, typeof(pc), ":")
@@ -84,6 +120,12 @@ function Base.show(io::IO, pc::PolymakeCallable)
         end
         println(io, " • ", name, " → ", content)
     end
+end
+
+function Base.show(io::IO, pa::PolymakeApp)
+    println(io, "Parsed Polymake Application $(pm_name(pa)) as Polymake.$jl_module_name")
+    println(io, "Contains $(length(pa.functions)) functions:")
+    println(io, [f.jl_function for f in pa.functions])
 end
 
 ########## code generation
@@ -129,6 +171,23 @@ function jl_code(pf::PolymakeMethod)
             end
         end;
         export $(pf.jl_function);
+    )
+end
+
+
+module_imports() = :(import Polymake:
+    internal_call_function, internal_call_method,
+    internal_call_function_void, internal_call_method_void,
+    convert_from_property_value, c_arguments, pm_perl_Object
+    )
+
+function jl_code(pa::PolymakeApp)
+    fn_code = jl_code.(pa.callables)
+    :(
+        module $(jl_module_name(pa))
+        $(module_imports())
+        $(fn_code...)
+        end
     )
 end
 
