@@ -65,7 +65,7 @@ function __init__()
     for app in startup_apps
         application(app)
     end
-    application("polytope")
+    application("common")
 
     # We need to set the Julia types as c types for polymake
     for (name, c_type) in C_TYPES

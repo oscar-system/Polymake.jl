@@ -102,13 +102,13 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
 end
 
 """
-    call_function(func::Symbol, args...; void=false, kwargs...)
+    call_function(app::Symbol, func::Symbol, args...; void=false, kwargs...)
 
-Call a polymake function with the given `func` name and given arguments `args`.
+Call a polymake function `func` from application `app` with given arguments `args`.
 If `void=true` the function is called in a void context. For example this is important for visualization.
 """
-function call_function(func::Symbol, args...; template_parameters::Array{String,1}=String[], void=false, unwrap=true, kwargs...)
-    fname = string(func)
+function call_function(app::Symbol, func::Symbol, args...; template_parameters::Array{String,1}=String[], void=false, unwrap=true, kwargs...)
+    fname = "$app::$func"
     cargs = Any[args...]
     if isempty(kwargs)
         if void
