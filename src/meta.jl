@@ -96,9 +96,8 @@ function PolymakeCallable(app_name::String, dict::Dict{String, Any},
     end
 end
 
-function PolymakeApp(app_json::Dict{String, Any})
+function PolymakeApp(jl_module::Symbol, app_json::Dict{String, Any})
     app_name = app_json["app"]
-    jl_module = appname_module_dict[Symbol(app_json["app"])]
 
     for f in app_json["functions"]
         if !haskey(f, "name")
@@ -113,10 +112,10 @@ function PolymakeApp(app_json::Dict{String, Any})
     return PolymakeApp(jl_module, app_name, callables)
 end
 
-function PolymakeApp(module_name::Symbol, json_file::String, module_file::String)
+function PolymakeApp(module_name::Symbol, json_file::String)
     @assert isfile(json_file)
     app_json = JSON.Parser.parsefile(json_file)
-    return PolymakeApp(app_json)
+    return PolymakeApp(module_name, app_json)
 end
 
 ########## utils

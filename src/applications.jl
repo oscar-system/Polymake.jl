@@ -11,7 +11,7 @@ for (app, mod) in appname_module_dict
 
     if !isfile(module_file)
         @info "Generating module $mod"
-        pa = Polymake.Meta.PolymakeApp(mod, json_file, module_file)
+        pa = Polymake.Meta.PolymakeApp(mod, json_file)
         open(module_file, "w") do file
             println(file, Polymake.Meta.jl_code(pa))
         end
