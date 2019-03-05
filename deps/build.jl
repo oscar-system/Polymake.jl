@@ -138,7 +138,7 @@ mkpath(json_folder)
 
 run(`$perl $polymake --iscript $json_script $json_folder`)
 
-include("parser/parser.jl")
+# include("parser/parser.jl")
 
 # remove old deps.jl first to avoid problems when switching from binary installation
 rm(joinpath(@__DIR__,"deps.jl"), force=true)

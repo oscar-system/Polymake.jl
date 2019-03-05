@@ -99,13 +99,9 @@ include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
 include("arrays.jl")
+include("meta.jl")
 
-includes = joinpath("generated", "includes.jl")
-if isfile(joinpath(@__DIR__, includes))
-    include(includes)
-else
-    @warn("You need to run '] build Polymake' first.")
-end
+include("applications.jl")
 
 fill_wrapped_types!(WrappedTypes, get_type_names())
 
