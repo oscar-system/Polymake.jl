@@ -25,3 +25,4 @@ end
     end
 @eval Polymake export Compat
 
+Polymake.@register Polytopes.pseudopower

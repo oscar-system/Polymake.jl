@@ -196,3 +196,19 @@ macro pm(expr)
         )
     end
 end
+
+macro register(expr)
+    if expr.head == Symbol(".")
+        module_name = expr.args[1]
+        polymake_func = expr.args[2].value
+    elseif expr.head == :call
+        module_name, polymake_func, templates, args, kwargs = Meta.parse_function_call(expr)
+    else
+        throw(ArgumentError("Provide either qualified name or a call"))
+    end
+    polymake_app = Meta.get_polymake_app_name(module_name)
+
+    pc = Meta.PolymakeFunction(polymake_func, string(polymake_func), string(polymake_app))
+
+    :(@eval $(module_name) $(Meta.jl_code(pc)); $(module_name).$(pc.jl_function))
+end
