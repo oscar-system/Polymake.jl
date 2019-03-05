@@ -89,6 +89,7 @@ end
 
 const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
 
+include("app_setup.jl")
 include("functions.jl")
 include("convert.jl")
 include("object_helpers.jl")
@@ -106,6 +107,6 @@ else
     @warn("You need to run '] build Polymake' first.")
 end
 
-enhance_wrapped_type_dict()
+fill_wrapped_types!(WrappedTypes, get_type_names())
 
 end # of module Polymake

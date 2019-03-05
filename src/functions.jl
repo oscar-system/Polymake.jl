@@ -1,4 +1,4 @@
-export perlobj, call_function, call_method
+export @pm, call_function, call_method
 
 import Base: convert, show
 
@@ -12,15 +12,46 @@ function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) wher
     return perl_obj
 end
 
-function perlobj(name::String, input_data::Pair{Symbol}...; kwargsdata...)
+function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwargsdata...)
     obj = pm_perl_Object(name)
     for (key, val) in input_data
-        setproperty!(obj, key, val)
+        setproperty!(obj, string(key), val)
     end
     for (key, val) in kwargsdata
-        setproperty!(obj, key, val)
+        setproperty!(obj, string(key), val)
     end
     return obj
+end
+
+function qualified_func_name(app_name, func_name, template_params=Symbol[])
+    name = "$app_name::$func_name"
+    if length(template_params) > 0
+        name *= "<$(join(template_params, ","))>"
+    end
+    return name
+end
+
+macro pm(expr)
+    @assert expr.head == :call
+    func = expr.args[1] # called function
+    args = expr.args[2:end] # its arguments
+
+    template_types = Symbol[]
+    # grab template parameters if present
+    if func.head == :curly
+        template_types = func.args[2:end]
+        func = func.args[1]
+    end
+
+    # for now we want the function name to be fully qualified:
+    @assert func.head == Symbol('.')
+    haskey(module_appname_dict, func.args[1]) || throw("Module '$(func.args[1])' not in Polymake.jl.")
+    polymake_app = module_appname_dict[func.args[1]]
+    polymake_func = func.args[2].value
+
+    polymake_func_name = qualified_func_name(polymake_app, polymake_func, template_types)
+    ex = :(Polymake.perlobj($polymake_func_name, $(esc(args...))))
+    return ex
 end
 
 const WrappedTypes = Dict(
@@ -31,19 +62,25 @@ const WrappedTypes = Dict(
     Symbol("undefined") => x -> nothing,
 )
 
-function enhance_wrapped_type_dict()
-    name_list = get_type_names()
-    i = 1
-    while i <= length(name_list)
-        WrappedTypes[Symbol(replace(name_list[i+1]," "=>""))] = eval(Symbol(name_list[i]))
-        i += 2
+function fill_wrapped_types!(wrapped_types_dict, function_type_list)
+    function_names = function_type_list[1:2:end]
+    type_names = function_type_list[2:2:end]
+    for (fn, tn) in zip(function_names, type_names)
+        fns = Symbol(fn)
+        tn = replace(tn," "=>"")
+        @eval $wrapped_types_dict[Symbol($tn)] = Polymake.$fns
     end
+    return wrapped_types_dict
 end
 
 Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
 
+function Base.setproperty!(obj::pm_perl_Object, prop::String, val)
+    return take(obj, prop, convert_to_pm(val))
+end
+
 function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
-    take(obj, string(prop), convert_to_pm(val))
+    return take(obj, string(prop), convert_to_pm(val))
 end
 
 struct Visual
