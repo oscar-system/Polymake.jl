@@ -176,6 +176,8 @@ function jl_code(pf::PolymakeFunction)
                 end
             end
         end;
+        $(Base.Docs).getdoc(::typeof($(pf.jl_function))) =
+            Markdown.parse(join(get_docs($func_name, full=true), "="^76));
         export $(pf.jl_function);
     )
 end
@@ -206,7 +208,8 @@ end
 module_imports() = :(import Polymake:
     internal_call_function, internal_call_method,
     internal_call_function_void, internal_call_method_void,
-    convert_from_property_value, c_arguments, pm_perl_Object
+    convert_from_property_value, c_arguments, pm_perl_Object, get_docs;
+    import Markdown;
     )
 
 function jl_code(pa::PolymakeApp)

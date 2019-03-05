@@ -32,3 +32,8 @@ function c_arguments(args...; kwargs...)
         Any[ args..., pm_perl_OptionSet(kwargs) ]
     end
 end
+
+function get_docs(input::String; full::Bool=true, html::Bool=false)
+    pos = UInt(max(length(input)-1, 0))
+    return Polymake.shell_context_help(input, pos, full, html)
+end

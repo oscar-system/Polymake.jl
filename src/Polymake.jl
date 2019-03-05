@@ -101,6 +101,8 @@ include("matrices.jl")
 include("arrays.jl")
 include("meta.jl")
 
+using Base.Docs
+using Markdown
 include("applications.jl")
 
 fill_wrapped_types!(WrappedTypes, get_type_names())
