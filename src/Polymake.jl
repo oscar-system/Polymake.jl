@@ -43,9 +43,15 @@ include("generated/type_translator.jl")
 include("repl.jl")
 include("ijulia.jl")
 
+include(joinpath(@__DIR__,"..","deps","deps.jl"))
+
 function __init__()
     @initcxx
-    include(joinpath(@__DIR__,"..","deps","deps.jl"))
+
+    if using_binary
+        check_deps()
+        prepare_env()
+    end
 
     try
         initialize_polymake()

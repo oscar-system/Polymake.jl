@@ -93,11 +93,14 @@ If you already have a polymake installation you need to set the environment vari
     perllib = replace(chomp(read(`$perl -e 'print join(":",@INC);'`,String)),"/workspace/destdir/"=>prefix.path)
     global depsjl = quote
         using Pkg: depots1
-        ENV["PERL5LIB"]=$perllib
-        ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
-        ENV["PATH"] = ENV["PATH"]*":"*$pm_bin_prefix*"/bin"
+        function prepare_env()
+            ENV["PERL5LIB"]=$perllib
+            ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
+            ENV["PATH"] = ENV["PATH"]*":"*$pm_bin_prefix*"/bin"
+        end
     end
     eval(depsjl)
+    prepare_env()
     run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
      run(`sh -c "$perl -pi -e 's{/workspace/destdir}{$pm_bin_prefix}g' $pm_bin_prefix/lib/perl5/*/*/Config_heavy.pl"`)
 
@@ -147,5 +150,6 @@ end
 
 println("appending to deps.jl file")
 open(joinpath(@__DIR__,"deps.jl"), "a") do f
+   println(f, "const using_binary = $use_binary")
    println(f, depsjl)
 end
