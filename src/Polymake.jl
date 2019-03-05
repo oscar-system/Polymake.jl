@@ -43,9 +43,15 @@ include("generated/type_translator.jl")
 include("repl.jl")
 include("ijulia.jl")
 
+include(joinpath(@__DIR__,"..","deps","deps.jl"))
+
 function __init__()
     @initcxx
-    include(joinpath(@__DIR__,"..","deps","deps.jl"))
+
+    if using_binary
+        check_deps()
+        prepare_env()
+    end
 
     try
         initialize_polymake()
@@ -73,6 +79,11 @@ function __init__()
 
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         prepare_jupyter_kernel_for_visualization()
+    end
+    
+    # make wrapper compilation verbose on travis
+    if (haskey(ENV, "TRAVIS"))
+        shell_execute(raw"$Verbose::cpp=3;")
     end
 end
 
