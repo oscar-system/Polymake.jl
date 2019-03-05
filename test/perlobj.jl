@@ -10,16 +10,17 @@
             POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]) isa pm_perl_Object
         @test Polymake.perlobj("polytope::Polytope",
             :POINTS => [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]) isa pm_perl_Object
+        # macro literals
+        @test (@pm Polytopes.Polytope(POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
+        @test (@pm Polytopes.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
+        @test (@pm Polytopes.Polytope("POINTS"=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
 
+        # make sure we're escaping where we should
         @test (@pm Polytopes.Polytope(input_dict_int)) isa pm_perl_Object
         @test (@pm Polytopes.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
         @test (@pm Polytopes.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
 
         @test (@pm Polytopes.Polytope(input_dict_rat)) isa pm_perl_Object
-
-        @test (@pm Polytopes.Polytope(POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
-        @test (@pm Polytopes.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
-        @test (@pm Polytopes.Polytope("POINTS"=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
 
         @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
 
@@ -105,14 +106,14 @@
 
         p = @pm Polytopes.Polytope(:POINTS=>matrix)
 
-        @test Polymake.Polytopes.DIM(p) == 3
+        @test Polytopes.dim(p) == 3
 
         @test p.VERTEX_SIZES == [9, 3, 4, 4, 3, 4, 3, 4, 4, 4]
 
         s = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES)
-                if vsize == Polymake.Polytopes.DIM(p))
+                if vsize == Polytopes.dim(p))
         pm_s = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES)
-                if vsize == Polymake.Polytopes.DIM(p))
+                if vsize == Polytopes.dim(p))
 
         @test Set([2,5,7]) == s == pm_s
 

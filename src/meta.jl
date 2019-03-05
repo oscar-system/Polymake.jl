@@ -121,8 +121,11 @@ end
 
 ########## utils
 
+Base.lowercase(s::Symbol) = Symbol(lowercase(string(s)))
+
 pm_name(pc::PolymakeCallable) = pc.pm_name
 pm_name_qualified(pc::PolymakeCallable) = pm_name_qualified(pc.app_name, pc.pm_name)
+jl_symbol(pc::PolymakeCallable) = lowercase(pc.jl_function)
 jl_module_name(pa::PolymakeApp) = pa.jl_module
 
 push!(pa::PolymakeApp, pc::PolymakeCallable) = push!(pa.callables, pc)
@@ -153,7 +156,7 @@ end
 function Base.show(io::IO, pa::PolymakeApp)
     println(io, "Parsed Polymake Application $(pm_name(pa)) as Polymake.$jl_module_name")
     println(io, "Contains $(length(pa.functions)) functions:")
-    println(io, [f.jl_function for f in pa.functions])
+    println(io, [jl_symbol(f) for f in pa.functions])
 end
 
 ########## code generation
@@ -161,7 +164,7 @@ end
 function jl_code(pf::PolymakeFunction)
     func_name = pm_name_qualified(pf)
     :(
-        function $(pf.jl_function)(args...; template_parameters::Array{String,1}=String[], keep_PropertyValue=false, call_as_void=false, kwargs...)
+        function $(jl_symbol(pf))(args...; template_parameters::Array{String,1}=String[], keep_PropertyValue=false, call_as_void=false, kwargs...)
             if call_as_void
                 $(callable_void(pf))($func_name, template_parameters,
                     c_arguments(args...; kwargs...))
@@ -176,9 +179,9 @@ function jl_code(pf::PolymakeFunction)
                 end
             end
         end;
-        $(Base.Docs).getdoc(::typeof($(pf.jl_function))) =
+        $(Base.Docs).getdoc(::typeof($(jl_symbol(pf)))) =
             Markdown.parse(join(get_docs($func_name, full=true), "="^76));
-        export $(pf.jl_function);
+        export $(jl_symbol(pf));
     )
 end
 
@@ -186,7 +189,7 @@ function jl_code(pf::PolymakeMethod)
     func_name = pf.pm_name
 
     :(
-        function $(pf.jl_function)(object::pm_perl_Object, args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
+        function $(jl_symbol(pf))(object::pm_perl_Object, args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
             if call_as_void
                 $(callable_void(pf))($func_name, object, c_arguments(args...; kwargs...))
                 return nothing
@@ -200,7 +203,7 @@ function jl_code(pf::PolymakeMethod)
                 end
             end
         end;
-        export $(pf.jl_function);
+        export $(jl_symbol(pf));
     )
 end
 
