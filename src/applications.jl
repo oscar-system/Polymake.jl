@@ -9,13 +9,12 @@ for (app, mod) in appname_module_dict
     @assert isfile(json_file)
     module_file = joinpath(generated_dir, "$app.jl")
 
-    if !isfile(module_file)
-        @info "Generating module $mod"
-        pa = Polymake.Meta.PolymakeApp(mod, json_file)
-        open(module_file, "w") do file
-            println(file, Polymake.Meta.jl_code(pa))
-        end
+    @info "Generating module $mod"
+    pa = Polymake.Meta.PolymakeApp(mod, json_file)
+    open(module_file, "w") do file
+        println(file, Polymake.Meta.jl_code(pa))
     end
+
     include(module_file)
     @eval Polymake export $mod
 end
