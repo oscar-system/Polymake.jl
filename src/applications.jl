@@ -20,3 +20,8 @@ for (app, mod) in appname_module_dict
     @eval Polymake export $mod
 end
 
+@eval module Compat
+    $([Polymake.Meta.compat_statement(app, mod) for (app, mod) in appname_module_dict]...)
+    end
+@eval Polymake export Compat
+
