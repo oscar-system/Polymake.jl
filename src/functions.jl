@@ -23,29 +23,6 @@ function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwar
     return obj
 end
 
-macro pm(expr)
-    @assert expr.head == :call
-    func = expr.args[1] # called function
-    args = expr.args[2:end] # its arguments
-
-    template_types = Symbol[]
-    # grab template parameters if present
-    if func.head == :curly
-        template_types = func.args[2:end]
-        func = func.args[1]
-    end
-
-    # for now we want the function name to be fully qualified:
-    @assert func.head == Symbol('.')
-    haskey(module_appname_dict, func.args[1]) || throw("Module '$(func.args[1])' not in Polymake.jl.")
-    polymake_app = module_appname_dict[func.args[1]]
-    polymake_func = func.args[2].value
-
-    polymake_func_name = qualified_func_name(polymake_app, polymake_func, template_types)
-    ex = :(Polymake.perlobj($polymake_func_name, $(esc(args...))))
-    return ex
-end
-
 const WrappedTypes = Dict(
     Symbol("int") => to_int,
     Symbol("double") => to_double,
@@ -194,4 +171,28 @@ end
 
 function Base.show(io::IO,::MIME"text/svg+xml",v::Visual)
     print(io,_get_visual_string_svg(v))
+end
+
+macro pm(expr)
+    module_name, polymake_func, templates, args, kwargs = Meta.parse_function_call(expr)
+    polymake_app = Meta.get_polymake_app_name(module_name)
+
+    # poor-mans Big Object constructor detection
+    if isuppercase(string(polymake_func)[1])
+        polymake_func_name =
+            Meta.pm_name_qualified(polymake_app, polymake_func, templates)
+        return :(
+            perlobj($polymake_func_name, $(esc.(args)...), $(esc.(kwargs)...))
+            )
+    else # we presume it's a function
+        polymake_func_name =
+            Meta.pm_name_qualified(polymake_app, polymake_func)
+
+        return :(
+            val = internal_call_function($polymake_func_name,
+                $(string.(templates)),
+                c_arguments($(esc.(args)...), $(esc.(args)...)));
+            return convert_from_property_value(val)
+        )
+    end
 end

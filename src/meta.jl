@@ -16,6 +16,34 @@ function get_polymake_app_name(mod::Symbol)
     return polymake_app
 end
 
+############### macro helpers
+
+function parse_function_call(expr)
+    @assert expr.head == :call
+    func = expr.args[1] # called function
+    args = expr.args[2:end] # its arguments
+
+    templates = Symbol[]
+    # grab template parameters if present
+    if func.head == :curly
+        templates = func.args[2:end]
+        func = func.args[1]
+    end
+
+    @assert func.head == Symbol('.')
+    module_name = func.args[1]
+    func_name = func.args[2].value
+
+    kwargs = Expr[]
+    kwar_idx = findfirst(a -> a isa Expr && a.head == :kw, args)
+    if kwar_idx != nothing
+        kwargs = args[kwar_idx:end]
+        args = args[1:kwar_idx-1]
+    end
+
+    return module_name, func_name, templates, args, kwargs
+end
+
 ############### json parsing
 
 ########## structs
