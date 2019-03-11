@@ -2,6 +2,11 @@ module Meta
 import JSON
 import Polymake: appname_module_dict, module_appname_dict
 
+struct UnparsablePolymakeFunction <: Exception
+    msg::String
+    UnparsablePolymakeFunction(function_name) = new("Cannot parse function: $function_name")
+end
+
 pm_name_qualified(app_name, func_name) = "$app_name::$func_name"
 
 function pm_name_qualified(app_name, func_name, templates)
@@ -101,7 +106,7 @@ function PolymakeApp(jl_module::Symbol, app_json::Dict{String, Any})
 
     for f in app_json["functions"]
         if !haskey(f, "name")
-            @warn "No 'name' field in json node. Malformed json for application '$app_name'?\n node = $f"
+            @warn UnparsablePolymakeFunction("$app_name::$f")
         end
     end
 
