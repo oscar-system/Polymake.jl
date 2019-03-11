@@ -210,5 +210,8 @@ macro register(expr)
 
     pc = Meta.PolymakeFunction(polymake_func, string(polymake_func), string(polymake_app))
 
-    :(@eval $(module_name) $(Meta.jl_code(pc)); $(module_name).$(pc.jl_function))
+    :(
+        @eval $(module_name) $(Meta.jl_code(pc)); 
+        $(module_name).$(pc.jl_function)
+    )
 end
