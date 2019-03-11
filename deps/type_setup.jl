@@ -22,11 +22,11 @@ type_tuples = [
 ( "pm_Array_pm_perl_Object",       "pm::Array<pm::perl::Object>",        "pm_Array{pm_perl_Object}",        "to_array_perl_object" ),
 ]
 
-type_var_file = abspath( @__DIR__, "..", "src", "generated", "type_vars.h" )
-map_insert = abspath( @__DIR__, "..", "src", "generated", "map_inserts.h" )
-to_polymake_function = abspath( @__DIR__, "..", "src", "generated", "to_polymake_function.h" )
-polymake_type_names = abspath( @__DIR__, "..", "src", "generated", "real_type_names.h" )
-to_julia_types = abspath( @__DIR__, "..", "..", "src", "generated", "type_translator.jl" )
+type_var_file = abspath( @__DIR__, "src", "generated", "type_vars.h" )
+map_insert = abspath( @__DIR__, "src", "generated", "map_inserts.h" )
+to_polymake_function = abspath( @__DIR__, "src", "generated", "to_polymake_function.h" )
+polymake_type_names = abspath( @__DIR__, "src", "generated", "real_type_names.h" )
+to_julia_types = abspath( @__DIR__, "..", "src", "generated", "type_translator.jl" )
 
 open(type_var_file,"w") do outputfile
     for (type_string,_,_,_) in type_tuples
