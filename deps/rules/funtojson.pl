@@ -37,7 +37,7 @@ sub type_for_julia($$;$) {
 sub help_to_hash($$$) {
    my ($appname,$help,$ov) = @_;
    my %fun;
-   return \%fun if $ov->text eq "UNDOCUMENTED\n";
+   # return \%fun if $ov->text eq "UNDOCUMENTED\n";
    my $ann = $ov->annex;
    $fun{name} = $help->name;
    my $numparam = $ann->{param} ? scalar(@{$ann->{param}}) : 0;

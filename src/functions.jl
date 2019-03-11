@@ -23,37 +23,6 @@ function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwar
     return obj
 end
 
-function qualified_func_name(app_name, func_name, template_params=Symbol[])
-    name = "$app_name::$func_name"
-    if length(template_params) > 0
-        name *= "<$(join(template_params, ","))>"
-    end
-    return name
-end
-
-macro pm(expr)
-    @assert expr.head == :call
-    func = expr.args[1] # called function
-    args = expr.args[2:end] # its arguments
-
-    template_types = Symbol[]
-    # grab template parameters if present
-    if func.head == :curly
-        template_types = func.args[2:end]
-        func = func.args[1]
-    end
-
-    # for now we want the function name to be fully qualified:
-    @assert func.head == Symbol('.')
-    haskey(module_appname_dict, func.args[1]) || throw("Module '$(func.args[1])' not in Polymake.jl.")
-    polymake_app = module_appname_dict[func.args[1]]
-    polymake_func = func.args[2].value
-
-    polymake_func_name = qualified_func_name(polymake_app, polymake_func, template_types)
-    ex = :(Polymake.perlobj($polymake_func_name, $(esc(args...))))
-    return ex
-end
-
 const WrappedTypes = Dict(
     Symbol("int") => to_int,
     Symbol("double") => to_double,
@@ -102,13 +71,13 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
 end
 
 """
-    call_function(func::Symbol, args...; void=false, kwargs...)
+    call_function(app::Symbol, func::Symbol, args...; void=false, kwargs...)
 
-Call a polymake function with the given `func` name and given arguments `args`.
+Call a polymake function `func` from application `app` with given arguments `args`.
 If `void=true` the function is called in a void context. For example this is important for visualization.
 """
-function call_function(func::Symbol, args...; template_parameters::Array{String,1}=String[], void=false, unwrap=true, kwargs...)
-    fname = string(func)
+function call_function(app::Symbol, func::Symbol, args...; template_parameters::Array{String,1}=String[], void=false, unwrap=true, kwargs...)
+    fname = "$app::$func"
     cargs = Any[args...]
     if isempty(kwargs)
         if void
@@ -202,4 +171,47 @@ end
 
 function Base.show(io::IO,::MIME"text/svg+xml",v::Visual)
     print(io,_get_visual_string_svg(v))
+end
+
+macro pm(expr)
+    module_name, polymake_func, templates, args, kwargs = Meta.parse_function_call(expr)
+    polymake_app = Meta.get_polymake_app_name(module_name)
+
+    # poor-mans Big Object constructor detection
+    if isuppercase(string(polymake_func)[1])
+        polymake_func_name =
+            Meta.pm_name_qualified(polymake_app, polymake_func, templates)
+        return :(
+            perlobj($polymake_func_name, $(esc.(args)...), $(esc.(kwargs)...))
+            )
+    else # we presume it's a function
+        polymake_func_name =
+            Meta.pm_name_qualified(polymake_app, polymake_func)
+
+        return :(
+            val = internal_call_function($polymake_func_name,
+                $(string.(templates)),
+                c_arguments($(esc.(args)...), $(esc.(args)...)));
+            return convert_from_property_value(val)
+        )
+    end
+end
+
+macro register(expr)
+    if expr.head == Symbol(".")
+        module_name = expr.args[1]
+        polymake_func = expr.args[2].value
+    elseif expr.head == :call
+        module_name, polymake_func, templates, args, kwargs = Meta.parse_function_call(expr)
+    else
+        throw(ArgumentError("Provide either qualified name or a call"))
+    end
+    polymake_app = Meta.get_polymake_app_name(module_name)
+
+    pc = Meta.PolymakeFunction(polymake_func, string(polymake_func), string(polymake_app))
+
+    :(
+        @eval $(module_name) $(Meta.jl_code(pc)); 
+        $(module_name).$(pc.jl_function)
+    )
 end

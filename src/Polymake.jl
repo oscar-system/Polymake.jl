@@ -65,7 +65,7 @@ function __init__()
     for app in startup_apps
         application(app)
     end
-    application("polytope")
+    application("common")
 
     # We need to set the Julia types as c types for polymake
     for (name, c_type) in C_TYPES
@@ -99,13 +99,11 @@ include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
 include("arrays.jl")
+include("meta.jl")
 
-includes = joinpath("generated", "includes.jl")
-if isfile(joinpath(@__DIR__, includes))
-    include(includes)
-else
-    @warn("You need to run '] build Polymake' first.")
-end
+using Base.Docs
+using Markdown
+include("applications.jl")
 
 fill_wrapped_types!(WrappedTypes, get_type_names())
 

@@ -6,13 +6,12 @@ deps/src/CMakeFiles/*
 deps/src/Makefile
 deps/src/cmake_install.cmake
 deps/src/libpolymake.*
+deps/src/generated/*
 deps/build.log
 deps/build_*.jl
 deps/deps.jl
 deps/usr
-deps/parser/json
+deps/json
 local
 Manifest.toml
-src/generated/*
-deps/src/generated/*
-deps/parser/json
+src/generated/*.jl

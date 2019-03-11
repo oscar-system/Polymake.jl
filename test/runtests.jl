@@ -7,6 +7,9 @@ end
 
 # write your own tests here
 @testset "Polymake" begin
+    
+    Polymake.@register Polytopes.pseudopower
+    
     include("integers.jl")
     include("rationals.jl")
     include("vectors.jl")

@@ -1,10 +1,10 @@
 function complete_property(obj::pm_perl_Object, prefix::String)
-   call_function(:complete_property, obj, prefix)
+   call_function(:common, :complete_property, obj, prefix)
 end
 
-list_applications() = call_function(:list_applications)
+list_applications() = call_function(:common, :list_applications)
 
-list_big_objects(app::String) = call_function(:list_big_objects, app)
+list_big_objects(app::Symbol) = call_function(:common, :list_big_objects, string(app))
 
 function pm_perl_OptionSet(iter)
     opt_set = pm_perl_OptionSet()
@@ -15,7 +15,7 @@ function pm_perl_OptionSet(iter)
 end
 
 function _get_visual_string(x::Visual,function_symbol::Symbol)
-    html_string=call_function(function_symbol,x.obj)
+    html_string=call_function(:common, function_symbol, x.obj)
     # we guess that the julia kernel is named this way...
     kernel = "julia-$(VERSION.major).$(VERSION.minor)"
     html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/")
@@ -31,4 +31,9 @@ function c_arguments(args...; kwargs...)
     else
         Any[ args..., pm_perl_OptionSet(kwargs) ]
     end
+end
+
+function get_docs(input::String; full::Bool=true, html::Bool=false)
+    pos = UInt(max(length(input)-1, 0))
+    return Polymake.shell_context_help(input, pos, full, html)
 end
