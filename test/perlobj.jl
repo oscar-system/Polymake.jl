@@ -27,6 +27,11 @@
         @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
         @test (@pm Tropical.Polytope{Max, Rational}(input_dict_int)) isa pm_perl_Object
         @test (@pm Tropical.Polytope{Max, QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+        
+        @test (@pm Tropical.Hypersurface{Min}(
+            MONOMIALS=[1 0 0; 0 1 0; 0 0 1],
+            COEFFICIENTS=[0, 0, 0])) isa pm_perl_Object
+        # note: You need to input COEFFICIENTS as Vector, otherwise it will be converted to pm_Matrix which polymake doesn't like.
     end
 
     @testset "PolymakeException" begin
