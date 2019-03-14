@@ -85,6 +85,11 @@ end
 convert_to_pm(x) = x
 convert_to_pm(x::T) where T <:Integer = Base.convert(pm_Integer,x)
 convert_to_pm(x::Rational{T}) where T <:Integer = Base.convert(pm_Rational,x)
+# We realize AbstractVectors/Matrices if they are not already Vector/Matrix or pm_*
+convert_to_pm(x::AbstractVector) = convert_to_pm(Vector(x))
+convert_to_pm(x::AbstractMatrix) = convert_to_pm(Matrix(x))
+convert_to_pm(x::pm_Vector) = x
+convert_to_pm(x::pm_Matrix) = x
 convert_to_pm(x::Array{T,1}) where T <:Integer = Base.convert(pm_Vector{pm_Integer},x)
 convert_to_pm(x::Array{Rational{T},1}) where T <:Integer = Base.convert(pm_Vector{pm_Rational},x)
 convert_to_pm(x::Array{T,2}) where T <:Integer = Base.convert(pm_Matrix{pm_Integer},x)
