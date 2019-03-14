@@ -5,6 +5,12 @@
 Julia package for using [polymake](https://polymake.org/doku.php), a software for research in polyhedral geometry.
 This package is developed as part of the [OSCAR](https://oscar.computeralgebra.de) project.
 
+**Index:**
+* [Installation](#installation)
+* [Examples](#examples)
+* [Polymake syntax translation](#polymake-syntax-translation)
+* [Current state](#current-state)
+
 ## Installation
 
 The installation can be done in the Julia REPL by first pressing `]` and then
@@ -79,38 +85,7 @@ pm::Matrix<pm::Integer>
 1 0 0
 ```
 
-## Current state
-
-### Data structures
-
-* Several small data types from polymake are available in Julia:
-    * Integers
-    * Rationals
-    * Vectors
-    * Matrices
-    * Arrays
-    * Sets
-    * Combinations thereof, e.g., Sets of Arrays of Integers
-
-The polymake data types can be converted to appropriate Julia types,
-but are also subtypes of the corresponding Julia abstract types, e.g., a
-polymake array is an `AbstractArray`, and one can call methods that
-apply to `AbstractArray`s on polymake arrays.
-* Big objects, e.g., Polytopes, can be handled in Julia
-
-### Functions
-
-* Properties of big objects are accessible by `object.property` syntax
-(and also via the `give` function).
-* Methods can be called via `call_method`
-* Functions can be called via `call_function`
-
-All three ways of calling a function in polymake can return any big or
-small object, and the generic return (`PropertyValue`) is transparently
-converted to one of the data types above. For performance reasons, this
-conversion can be deactivated
-
-## Rosetta stone
+## Polymake syntax translation
 
 The following tables explain by example how to quickly translate `Polymake` syntax to `Polymake.jl`.
 
@@ -257,3 +232,35 @@ s = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.Po
 
 special_points = p.VERTICES[collect(s), :]
 ```
+
+
+## Current state
+
+### Data structures
+
+* Several small data types from polymake are available in Julia:
+    * Integers
+    * Rationals
+    * Vectors
+    * Matrices
+    * Arrays
+    * Sets
+    * Combinations thereof, e.g., Sets of Arrays of Integers
+
+The polymake data types can be converted to appropriate Julia types,
+but are also subtypes of the corresponding Julia abstract types, e.g., a
+polymake array is an `AbstractArray`, and one can call methods that
+apply to `AbstractArray`s on polymake arrays.
+* Big objects, e.g., Polytopes, can be handled in Julia
+
+### Functions
+
+* Properties of big objects are accessible by `object.property` syntax
+(and also via the `give` function).
+* Methods can be called via `call_method`
+* Functions can be called via `call_function`
+
+All three ways of calling a function in polymake can return any big or
+small object, and the generic return (`PropertyValue`) is transparently
+converted to one of the data types above. For performance reasons, this
+conversion can be deactivated
