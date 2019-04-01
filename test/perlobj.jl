@@ -11,23 +11,23 @@
         @test Polymake.perlobj("polytope::Polytope",
             :POINTS => [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]) isa pm_perl_Object
         # macro literals
-        @test (@pm Polytopes.Polytope(POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
-        @test (@pm Polytopes.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
-        @test (@pm Polytopes.Polytope("POINTS"=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
+        @test (@pm Polytope.Polytope(POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
+        @test (@pm Polytope.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
+        @test (@pm Polytope.Polytope("POINTS"=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
 
         # make sure we're escaping where we should
-        @test (@pm Polytopes.Polytope(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytopes.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytopes.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
 
-        @test (@pm Polytopes.Polytope(input_dict_rat)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope(input_dict_rat)) isa pm_perl_Object
 
         @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
 
         @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
         @test (@pm Tropical.Polytope{Max, Rational}(input_dict_int)) isa pm_perl_Object
         @test (@pm Tropical.Polytope{Max, QuadraticExtension}(input_dict_int)) isa pm_perl_Object
-        
+
         @test (@pm Tropical.Hypersurface{Min}(
             MONOMIALS=[1 0 0; 0 1 0; 0 0 1],
             COEFFICIENTS=[0, 0, 0])) isa pm_perl_Object
@@ -35,13 +35,13 @@
     end
 
     @testset "PolymakeException" begin
-        test_polytope = @pm Polytopes.Polytope(input_dict_int)
+        test_polytope = @pm Polytope.Polytope(input_dict_int)
         @test !(:STH in Base.propertynames(test_polytope))
         @test_throws PolymakeError test_polytope.STH
     end
 
     @testset "properties" begin
-        test_polytope = @pm Polytopes.Polytope(input_dict_int)
+        test_polytope = @pm Polytope.Polytope(input_dict_int)
         @test test_polytope.F_VECTOR == [ 4, 4 ]
         @test test_polytope.INTERIOR_LATTICE_POINTS ==
             [ 1 1 1 ; 1 1 2 ; 1 2 1 ; 1 2 2 ]
@@ -53,12 +53,12 @@
 
         @test test_polytope.LATTICE_POINTS_GENERATORS isa pm_Array
 
-        test_polytope = @pm Polytopes.Polytope(input_dict_unbounded)
+        test_polytope = @pm Polytope.Polytope(input_dict_unbounded)
         @test test_polytope.FAR_FACE == Set([1])
     end
 
     @testset "tab-completion" begin
-        test_polytope = @pm Polytopes.Polytope(input_dict_int)
+        test_polytope = @pm Polytope.Polytope(input_dict_int)
 
         @test Base.propertynames(test_polytope) isa Vector{Symbol}
         names = Base.propertynames(test_polytope)
@@ -73,7 +73,7 @@
     end
 
     @testset "save load" begin
-        test_polytope = @pm Polytopes.Polytope(input_dict_int)
+        test_polytope = @pm Polytope.Polytope(input_dict_int)
         mktempdir() do path
             Polymake.save_perl_object(test_polytope,joinpath(path,"test.poly"))
             loaded = Polymake.load_perl_object(joinpath(path,"test.poly"))
@@ -83,10 +83,10 @@
     end
 
     @testset "polymake tutorials" begin
-        p = @pm Polytopes.Polytope(:POINTS=>Polymake.Polytopes.cube(4).VERTICES)
+        p = @pm Polytope.Polytope(:POINTS=>Polymake.Polytope.cube(4).VERTICES)
         @test p isa pm_perl_Object
 
-        lp = @pm Polytopes.LinearProgram(:LINEAR_OBJECTIVE=>[0,1,1,1,1])
+        lp = @pm Polytope.LinearProgram(:LINEAR_OBJECTIVE=>[0,1,1,1,1])
         @test lp isa pm_perl_Object
 
         @test (p.LP = lp) isa pm_perl_Object
@@ -109,16 +109,16 @@
             1 1//16 1//16 1//4;
             1 1//4 1//16 1//16]
 
-        p = @pm Polytopes.Polytope(:POINTS=>matrix)
+        p = @pm Polytope.Polytope(:POINTS=>matrix)
 
-        @test Polytopes.dim(p) == 3
+        @test Polytope.dim(p) == 3
 
         @test p.VERTEX_SIZES == [9, 3, 4, 4, 3, 4, 3, 4, 4, 4]
 
         s = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES)
-                if vsize == Polytopes.dim(p))
+                if vsize == Polytope.dim(p))
         pm_s = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES)
-                if vsize == Polytopes.dim(p))
+                if vsize == Polytope.dim(p))
 
         @test Set([2,5,7]) == s == pm_s
 
