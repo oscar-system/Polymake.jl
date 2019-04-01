@@ -5,6 +5,12 @@
 Julia package for using [`polymake`](https://polymake.org/doku.php), a software for research in polyhedral geometry.
 This package is developed as part of the [OSCAR](https://oscar.computeralgebra.de) project.
 
+**Index:**
+* [Installation](#installation)
+* [Examples](#examples)
+* [Polymake syntax translation](#polymake-syntax-translation)
+* [Current state](#current-state)
+
 ## Installation
 
 The installation can be done in the Julia REPL by first pressing `]` and then
@@ -81,40 +87,7 @@ pm::Matrix<pm::Integer>
 1 0 0
 ```
 
-## Current state
-
-### Data structures
-
-* Several small data types from `polymake` are available in `julia`:
-    * Integers
-    * Rationals
-    * Vectors
-    * Matrices
-    * Arrays
-    * Sets
-    * some combinations thereof, e.g., Sets of Arrays of Integers
-
-`polymake` data types can be converted to appropriate `julia` types,
-but are also subtypes of the corresponding `julia` abstract types, e.g., a
-`polymake` array is an `AbstractArray`, and one can call methods that
-apply to `AbstractArray`s on `polymake` arrays.
-
-* Big objects, e.g., Polytopes, can be handled in `julia`.
-
-### Functions
-
-* All user functions from `perl/polymake` are available in the appropriate modules, e.g. `homology` function from `topaz` can be called as `Topaz.homology(...)` in `julia`. We pull the documentation from `perl/polymake` as well, so `?Topaz.homology` (in `julia`s REPL) returns a `perl/polymake` docstring. Note: the syntax presented in the docstring is a `perl/polymake` syntax, not `julia/Polymake` one.
-* Most of the user functions from `perl/polymake` are available as `Appname.funcname(...)` in `julia/Polymake`.  However, any function from `polymake` `C++` library can be called via `@pm Appname.funcname(...)` macro . If you happen to use a non-user `perl/polymake` function in REPL quite often you might `Polymake.@register Appname.funcname` so that it becomes available for completion. This is a purely convenience macro, as the effects of `@register` will be lost when `julia` kernel restarts.
-* All big objects of `perl/polymake` can be constructed via `@pm` macro. For example `$obj = new BigObject<Template,Parameters>(args)` becomes
-```julia
-obj = @pm Appname.BigObject{Templete,Parameters}(args)
-```
-See Section Rosetta stone below for concrete examples.
-* Properties of big objects are accessible by `bigobject.property` syntax (as opposed to `$bigobject->property` in `perl/polymake`). If there is a missing property (e.g. `Polytope.Polytope` does not have `DIM` property in `julia/Polymake`), please check if it can be accessed by `appname.property(object)`. For example property `DIM` is exposed as `Polytope.dim(...)` function.
-* Methods are available as functions in the appropriate modules, with the first argument as the object, i.e. `$bigobj->methodname(...)` can be called via `Appname.methodname(bigobj, ...)`
-* A function in `julia/Polymake` calling `per/polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=false` keyword argument to function/method call.
-
-## Rosetta stone
+## Polymake syntax translation
 
 The following tables explain by example how to quickly translate `Polymake` syntax to `Polymake.jl`.
 
@@ -264,3 +237,37 @@ s = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polymake.Po
 
 special_points = p.VERTICES[collect(s), :]
 ```
+
+
+## Current state
+
+### Data structures
+
+* Several small data types from `polymake` are available in `julia`:
+    * Integers
+    * Rationals
+    * Vectors
+    * Matrices
+    * Arrays
+    * Sets
+    * some combinations thereof, e.g., Sets of Arrays of Integers
+
+`polymake` data types can be converted to appropriate `julia` types,
+but are also subtypes of the corresponding `julia` abstract types, e.g., a
+`polymake` array is an `AbstractArray`, and one can call methods that
+apply to `AbstractArray`s on `polymake` arrays.
+
+* Big objects, e.g., Polytopes, can be handled in `julia`.
+
+### Functions
+
+* All user functions from `perl/polymake` are available in the appropriate modules, e.g. `homology` function from `topaz` can be called as `Topaz.homology(...)` in `julia`. We pull the documentation from `perl/polymake` as well, so `?Topaz.homology` (in `julia`s REPL) returns a `perl/polymake` docstring. Note: the syntax presented in the docstring is a `perl/polymake` syntax, not `julia/Polymake` one.
+* Most of the user functions from `perl/polymake` are available as `Appname.funcname(...)` in `julia/Polymake`.  However, any function from `polymake` `C++` library can be called via `@pm Appname.funcname(...)` macro . If you happen to use a non-user `perl/polymake` function in REPL quite often you might `Polymake.@register Appname.funcname` so that it becomes available for completion. This is a purely convenience macro, as the effects of `@register` will be lost when `julia` kernel restarts.
+* All big objects of `perl/polymake` can be constructed via `@pm` macro. For example `$obj = new BigObject<Template,Parameters>(args)` becomes
+```julia
+obj = @pm Appname.BigObject{Templete,Parameters}(args)
+```
+See Section Rosetta stone below for concrete examples.
+* Properties of big objects are accessible by `bigobject.property` syntax (as opposed to `$bigobject->property` in `perl/polymake`). If there is a missing property (e.g. `Polytope.Polytope` does not have `DIM` property in `julia/Polymake`), please check if it can be accessed by `appname.property(object)`. For example property `DIM` is exposed as `Polytope.dim(...)` function.
+* Methods are available as functions in the appropriate modules, with the first argument as the object, i.e. `$bigobj->methodname(...)` can be called via `Appname.methodname(bigobj, ...)`
+* A function in `julia/Polymake` calling `per/polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=false` keyword argument to function/method call.

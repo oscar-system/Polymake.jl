@@ -6,10 +6,9 @@
     @testset "constructors" begin
         @test Polymake.perlobj("polytope::Polytope", input_dict_int ) isa pm_perl_Object
         @test Polymake.perlobj("polytope::Polytope", input_dict_rat ) isa pm_perl_Object
-        @test Polymake.perlobj("polytope::Polytope",
-            POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]) isa pm_perl_Object
-        @test Polymake.perlobj("polytope::Polytope",
-            :POINTS => [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]) isa pm_perl_Object
+        A = [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]
+        @test Polymake.perlobj("polytope::Polytope", POINTS=A) isa pm_perl_Object
+        @test Polymake.perlobj("polytope::Polytope", :POINTS => A) isa pm_perl_Object
         # macro literals
         @test (@pm Polytope.Polytope(POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
         @test (@pm Polytope.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
@@ -32,6 +31,9 @@
             MONOMIALS=[1 0 0; 0 1 0; 0 0 1],
             COEFFICIENTS=[0, 0, 0])) isa pm_perl_Object
         # note: You need to input COEFFICIENTS as Vector, otherwise it will be converted to pm_Matrix which polymake doesn't like.
+
+        # Make sure that we can also handle different matrix types, e.g. adjoint
+        @test (@pm Polytope.Polytope(POINTS=A')) isa pm_perl_Object
     end
 
     @testset "PolymakeException" begin
