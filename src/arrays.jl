@@ -12,6 +12,8 @@ function pm_Array(v::AbstractVector{T}) where T
     return arr
 end
 
+pm_ArrayAllocated{T}(v) where T = pm_Array{T}(v)
+
 Base.size(a::pm_Array) = (length(a),)
 
 Base.@propagate_inbounds function getindex(A::pm_Array, n::Integer)
