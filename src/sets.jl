@@ -19,6 +19,8 @@ function pm_Set(itr)
     return union!(pm_Set{T}(), itr)
 end
 
+pm_SetAllocated{T}(v::Vector{T}) where T<:Integer = pm_Set{T}(v)
+
 ### convert FROM polymake object
 
 function Vector{I}(s::pm_Set{J}) where {I,J<:Integer}

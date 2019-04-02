@@ -215,3 +215,13 @@ macro register(expr)
         $(module_name).$(pc.jl_function)
     )
 end
+
+to_one_based_indexing(n::Number) = n + one(n)
+to_zero_based_indexing(n::Number) = (n > zero(n) ? n - one(n) : throw(ArgumentError("Can't use negative index")))
+
+for f in [:to_one_based_indexing, :to_zero_based_indexing]
+    @eval begin
+        $f(itr) = $f.(itr)
+        $f(s::S) where S<:AbstractSet = S($f.(s))
+    end
+end
