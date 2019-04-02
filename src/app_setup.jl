@@ -1,12 +1,12 @@
 const appname_module_dict = Dict(
   :common  => :Common,
-  :fan  => :Fans,
+  :fan  => :Fan,
   :fulton  => :Fulton,
-  :graph  => :Graphs,
-  :group  => :Groups,
-  :ideal  => :Ideals,
-  :matroid  => :Matroids,
-  :polytope  => :Polytopes,
+  :graph  => :Graph,
+  :group  => :Group,
+  :ideal  => :Ideal,
+  :matroid  => :Matroid,
+  :polytope  => :Polytope,
   :topaz  => :Topaz,
   :tropical  => :Tropical
 )
