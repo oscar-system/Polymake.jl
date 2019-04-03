@@ -257,17 +257,23 @@ but are also subtypes of the corresponding `julia` abstract types, e.g., a
 `polymake` array is an `AbstractArray`, and one can call methods that
 apply to `AbstractArray`s on `polymake` arrays.
 
+NOTE: if the returned type is a small data type which has not been wrapped in julia yet, you will not be able to access its content or in general use it in any meaningful way, except for passing to `polymake` as an argument of a function.
+
 * Big objects, e.g., Polytopes, can be handled in `julia`.
 
 ### Functions
 
 * All user functions from `perl/polymake` are available in the appropriate modules, e.g. `homology` function from `topaz` can be called as `Topaz.homology(...)` in `julia`. We pull the documentation from `perl/polymake` as well, so `?Topaz.homology` (in `julia`s REPL) returns a `perl/polymake` docstring. Note: the syntax presented in the docstring is a `perl/polymake` syntax, not `julia/Polymake` one.
 * Most of the user functions from `perl/polymake` are available as `Appname.funcname(...)` in `julia/Polymake`.  However, any function from `polymake` `C++` library can be called via `@pm Appname.funcname(...)` macro . If you happen to use a non-user `perl/polymake` function in REPL quite often you might `Polymake.@register Appname.funcname` so that it becomes available for completion. This is a purely convenience macro, as the effects of `@register` will be lost when `julia` kernel restarts.
-* All big objects of `perl/polymake` can be constructed via `@pm` macro. For example `$obj = new BigObject<Template,Parameters>(args)` becomes
+* All big objects of `perl/polymake` can be constructed via `@pm` macro. For example
+```perl
+$obj = new BigObject<Template,Parameters>(args)
+```
+becomes
 ```julia
 obj = @pm Appname.BigObject{Templete,Parameters}(args)
 ```
-See Section Rosetta stone below for concrete examples.
+See Section Polymake syntax translation for concrete examples.
 * Properties of big objects are accessible by `bigobject.property` syntax (as opposed to `$bigobject->property` in `perl/polymake`). If there is a missing property (e.g. `Polytope.Polytope` does not have `DIM` property in `julia/Polymake`), please check if it can be accessed by `appname.property(object)`. For example property `DIM` is exposed as `Polytope.dim(...)` function.
 * Methods are available as functions in the appropriate modules, with the first argument as the object, i.e. `$bigobj->methodname(...)` can be called via `Appname.methodname(bigobj, ...)`
-* A function in `julia/Polymake` calling `per/polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=false` keyword argument to function/method call.
+* A function in `julia/Polymake` calling `perl/polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=false` keyword argument to function/method call.
