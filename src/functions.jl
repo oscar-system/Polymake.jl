@@ -143,7 +143,27 @@ end
 
 Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
 
-Base.show(io::IO, obj::pm_perl_Object) = print(io, properties(obj))
+Base.show(io::IO,::MIME"text/plain", obj::pm_perl_Object) = print(io, properties(obj))
+
+function Base.show(io::IO,::MIME"text/html",obj::pm_perl_Object)
+    return_string = properties(obj)
+    summary, description = split(return_string,"\n";limit=2)
+    if startswith(summary, "type: ")
+        summary = summary[7:end]
+    end
+    if startswith(description, "description: ")
+        description = description[14:end]
+    end
+    print(io,"""
+<details>
+<summary>$summary</summary>
+    <pre>
+$description
+    </pre>
+</details>
+""")
+end
+
 function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, show_small_obj(obj))
 end
@@ -211,7 +231,7 @@ macro register(expr)
     pc = Meta.PolymakeFunction(polymake_func, string(polymake_func), string(polymake_app))
 
     :(
-        @eval $(module_name) $(Meta.jl_code(pc)); 
+        @eval $(module_name) $(Meta.jl_code(pc));
         $(module_name).$(pc.jl_function)
     )
 end
