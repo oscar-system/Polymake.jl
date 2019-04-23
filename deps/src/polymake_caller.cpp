@@ -8,6 +8,17 @@
 
 static auto type_map_translator = new std::map<std::string, jl_value_t**>();
 
+static jl_value_t* bigint_type;
+static jl_value_t* rational_bigint_type;
+static jl_value_t* rational_int64_type;
+
+void initialize_standard_types()
+{
+    bigint_type = jl_eval_string("BigInt");
+    rational_bigint_type = jl_eval_string("Rational{BigInt}");
+    rational_int64_type = jl_eval_string("Rational{Int64}");
+}
+
 void insert_type_in_map(std::string&& ptr_name, jl_value_t** var_space)
 {
     type_map_translator->emplace(std::make_pair(ptr_name, var_space));
@@ -50,6 +61,23 @@ void polymake_call_function_feed_argument(T& function, jl_value_t* argument)
     }
     if (jl_is_string(argument)) {
         function << std::string(jl_string_data(argument));
+        return;
+    }
+    if (jl_subtype(current_type, bigint_type)) {
+        function << reinterpret_cast<pm::Integer*>(argument);
+        return;
+    }
+    if (jl_subtype(current_type, rational_bigint_type)) {
+        function << pm::Rational(pm::Integer(*reinterpret_cast<pm::Integer*>(
+                                     jl_get_field(argument, "num"))),
+                                 pm::Integer(*reinterpret_cast<pm::Integer*>(
+                                     jl_get_field(argument, "den"))));
+        return;
+    }
+    if (jl_subtype(current_type, rational_int64_type)) {
+        function << pm::Rational(
+            jl_unbox_int64(jl_get_field(argument, "num")),
+            jl_unbox_int64(jl_get_field(argument, "den")));
         return;
     }
 #include "generated/to_polymake_function.h"

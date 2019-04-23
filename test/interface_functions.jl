@@ -18,6 +18,11 @@
 
     @test (@pm Tropical.cyclic{Max}(3,5)) isa pm_perl_Object
 
+    c = Polymake.pm_Matrix([1 -1//2; 1 1//2])
+    @test Polytope.cube(1,1//2).VERTICES == c
+    @test Polytope.cube(1,BigInt(1)//2).VERTICES == c
+    c = Polymake.pm_Matrix([1 2; 1 2])
+    @test Polytope.cube(1,BigInt(2)).VERTICES == c
 end
 
 @testset "Indexing helpers" begin

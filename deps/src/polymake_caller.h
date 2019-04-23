@@ -23,4 +23,6 @@ void set_julia_type(std::string, void*);
 
 void polymake_module_add_caller(jlcxx::Module&);
 
+void initialize_standard_types();
+
 #endif

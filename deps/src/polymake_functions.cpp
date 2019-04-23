@@ -20,6 +20,7 @@ void initialize_polymake()
     catch (const std::exception& e) {
         jl_error(e.what());
     }
+    initialize_standard_types();
 }
 
 pm::perl::Object to_perl_object(const pm::perl::PropertyValue& v)
