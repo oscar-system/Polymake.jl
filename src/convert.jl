@@ -1,7 +1,4 @@
-## BigInt
 
-function convert(::Type{BigInt},int::pm_Integer)
-    return deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
 end
 
 function convert(::Type{BigInt},int::pm_perl_PropertyValue)
