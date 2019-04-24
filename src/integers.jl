@@ -1,7 +1,7 @@
-# Int32, Int64 constructors handled by Cxx side
-pm_Integer(int::Int128) = pm_Integer(big(int))
+# One arguments constructors used by convert:
+# specialized Int32, Int64 constructors handled by Cxx side
 pm_Integer(int::BigInt) = new_pm_Integer_from_bigint(int)
-pm_Integer(int::Integer) = pm_Integer(BigInt(int))
+pm_Integer(int::Integer) = pm_Integer(big(int))
 
 Base.one(i::Type{<:pm_Integer}) = pm_Integer(1)
 Base.one(i::pm_Integer) = pm_Integer(1)
@@ -18,28 +18,27 @@ for op in (:(==), :(<), :(<=))
     end
 end
 
-function Base.promote_rule(::Type{pm_Integer}, ::Type{<:Union{Int128, Int64, Int32}})
-    pm_Integer
+function Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Union{Signed, Unsigned}})
+    return pm_Integer
 end
-
-Base.promote_rule(::Type{<:pm_Integer}, ::Type{BigInt}) = pm_Integer
+# symmetric promote_rule is needed since BigInts define those for Integer:
 Base.promote_rule(::Type{BigInt}, ::Type{<:pm_Integer}) = pm_Integer
 
-# Convert from Julia to PM
-function Base.convert(::Type{<:pm_Integer}, int::Integer)
-    return pm_Integer(int)
+# BigInt constructor from pm_Integer
+@inline function Base.BigInt(int::pmI) where pmI<:pm_Integer
+    return deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
 end
-Base.convert(::Type{<:pm_Integer}, int::T) where T <: pm_Integer = int
-# Convert from PM to Julia
-function Base.convert(::Type{T}, int::pm_Integer) where {T<:Number}
-    convert(T, BigInt(int))
-end
-function Base.BigInt(int::pm_IntegerAllocated)
-    deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
+# all convert(T, x) fallbacks to T(x)
+# big(::Integer) goes through convert(BigInt, x)
+for T in [:Int8,  :Int16,  :Int32,  :Int64,  :Int128,
+          :UInt8, :UInt16, :UInt32, :UInt64, :UInt128]
+    @eval Base.$T(int::pm_Integer) = $T(BigInt(int))
 end
 
-for T in [:Int8, :Int16, :Int32, :Int64, :UInt8, :UInt16, :UInt32, :UInt64]
-    @eval Base.$T(x::pm_Integer) = $T(BigInt(x))
-end
+convert(::Type{T}, int::pm_Integer) where {T<:Number} = convert(T, BigInt(int))
 
-Base.convert(::Type{Integer}, int::pm_Integer) = int
+Base.float(int::pm_Integer) = float(BigInt(int))
+
+# no-copy converts
+convert(::Type{<:pm_Integer}, int::T) where T <: pm_Integer = int
+convert(::Type{Integer}, int::pm_Integer) = int

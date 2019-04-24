@@ -1,38 +1,49 @@
 @testset "pm_Integer" begin
-    @testset "Constructors" begin
-        @test pm_Integer(Int32(2)) isa pm_Integer
-        @test pm_Integer(Int64(2)) isa pm_Integer
-        @test pm_Integer(2) isa pm_Integer
-        @test pm_Integer(big(2)) isa pm_Integer
+    IntTypes = [Int8, UInt8, Int32, UInt32, Int64, UInt64, BigInt]
 
+    @testset "Constructors/Conversions" begin
         @test pm_Integer <: Integer
-    end
 
-    @testset "Equality" begin
-        a = pm_Integer(2)
-        for b in [Int32(2), Int64(2), big(2), pm_Integer(2)]
-            @test a == b
-            @test b == a
+        # constructors
+        for T in IntTypes
+            @test pm_Integer(T(2)) isa pm_Integer
         end
-    end
 
-    @testset "zero / one" begin
-        a = pm_Integer(0)
-        b = pm_Integer(1)
+        a = pm_Integer(5)
 
-        @test one(a) isa pm_Integer
-        @test zero(a) isa pm_Integer
-        @test one(pm_Integer) isa pm_Integer
-        @test zero(pm_Integer) isa pm_Integer
+        # no copy conversions
+        @test convert(Integer,a) === a
+        @test convert(pm_Integer, a) === a
 
-        @test one(pm_Integer) == one(a) == 1
-        @test zero(pm_Integer) == zero(a) == 0
+        # conversions to Integer types
+        for T in IntTypes
+            @test T(a) isa T
+            @test convert(T, a) isa T
+            @test convert(pm_Integer, T(a)) isa pm_Integer
+            @test convert(pm_Integer, T(a)) isa Polymake.pm_IntegerAllocated
+        end
+        @test big(a) isa BigInt
+
+        # conversion to other Number types
+        @test convert(Float64, a) isa Float64
+        @test float(a) == convert(BigFloat, a)
+
+        # julia arrays
+        @test Array{Any,1}([a,1])[1] isa Polymake.pm_IntegerAllocated
+        @test [a,1] isa Vector{pm_Integer}
+        @test [a,a] isa Vector{Polymake.pm_IntegerAllocated}
     end
 
     @testset "Arithmetic" begin
         a = pm_Integer(2)
         @test -a == -2
-        for b in [Int32(5), Int64(5), big(5), pm_Integer(5)]
+        # for T in [IntTypes; pm_Integer]
+        for T in IntTypes
+            b = T(5)
+            # Equality
+            @test a == T(2)
+            @test T(2) == a
+
             # check promotion
             @test a + b isa pm_Integer
             @test b + a isa pm_Integer
@@ -54,11 +65,16 @@
         end
     end
 
-    @testset "Promotions/Conversions" begin
-        a = pm_Integer(1)
-        @test convert(Integer,a) === a
-        @test typeof(Array{Any,1}([a,1])[1]) <: pm_Integer
+    @testset "zero / one" begin
+        ZERO = pm_Integer(0)
+        ONE = pm_Integer(1)
+
+        @test one(ZERO) isa pm_Integer
+        @test zero(ZERO) isa pm_Integer
+        @test one(pm_Integer) isa pm_Integer
+        @test zero(pm_Integer) isa pm_Integer
+
+        @test zero(pm_Integer) == zero(ONE) == ZERO
+        @test one(pm_Integer) == one(ZERO) == ONE
     end
-
-
 end
