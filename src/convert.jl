@@ -16,48 +16,26 @@ convert(::Type{Vector{Rational{BigInt}}}, pv::pm_perl_PropertyValue) =
 convert(::Type{Vector{BigInt}}, pv::pm_perl_PropertyValue) =
     convert(Matrix{BigInt}, to_vector_int(pv))
 
-function convert(::Type{pm_Matrix{pm_Integer}}, matrix::Array{S,2}) where S <:Integer
-    rows,cols = size(matrix)
-    pm_matrix = pm_Matrix{pm_Integer}(rows,cols)
-    for i in 1:rows
-        for j in 1:cols
-            pm_matrix[i,j] = matrix[i,j]
-        end
-    end
-    return pm_matrix
-end
+#################### Converting to polymake types  ####################
 
+convert(::Type{pm_Vector}, vec::AbstractVector) = pm_Vector(vec)
+convert(::Type{pm_Vector{T}}, vec::AbstractVector) where T = pm_Vector{T}(vec)
 
-function convert(::Type{pm_Vector{pm_Integer}}, matrix::Array{S,1}) where S <:Integer
-    (dim,) = size(matrix)
-    pm_matrix = pm_Vector{pm_Integer}(dim)
-    for i in 1:dim
-        pm_matrix[i] = matrix[i]
-    end
-    return pm_matrix
-end
+convert(::Type{pm_Matrix}, mat::AbstractMatrix) = pm_Matrix(mat)
+convert(::Type{pm_Matrix{T}}, mat::AbstractMatrix) where T = pm_Matrix{T}(mat)
 
-function convert(::Type{pm_Vector{pm_Rational}}, matrix::Array{Rational{S},1}) where S <:Integer
-    (dim,) = size(matrix)
-    pm_matrix = pm_Vector{pm_Rational}(dim)
-    for i in 1:dim
-        pm_matrix[i] = matrix[i]
-    end
-    return pm_matrix
-end
+convert(::Type{pm_Array}, vec::AbstractVector) = pm_Array(vec)
+convert(::Type{pm_Array{T}}, vec::AbstractVector) where T = pm_Array{T}(vec)
 
-function convert(::Type{pm_Array{pm_Array{T}}}, vectors::Vector{<:Vector{<:Integer}}) where T
-    n = length(vectors)
-    pm_array = pm_Array{pm_Array{T}}(n)
-    for (i, v_i) in enumerate(vectors)
-        pm_array_i = pm_Array{T}(length(v_i))
-        for j=1:length(v_i)
-            pm_array_i[j] = T(v_i[j])
-        end
-        pm_array[i] = pm_array_i
-    end
-    return pm_array
-end
+#################### Guessing the polymake type  ####################
+
+convert_to_pm_type(::Type{<:Union{Integer, pm_Integer}}) = pm_Integer
+convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational
+convert_to_pm_type(::Type{Vector{T}}) where T<:Union{Int32, Int64} = pm_Array{T}
+convert_to_pm_type(::Type{<:Union{Set, pm_Set}}) = pm_Set
+convert_to_pm_type(::Type{<:Union{Vector, pm_Vector}}) = pm_Matrix
+convert_to_pm_type(::Type{<:Union{Matrix, pm_Matrix}}) = pm_Matrix
+convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
 
 # By default convert_to_pm is a no op
 convert_to_pm(x) = x
@@ -69,63 +47,6 @@ convert_to_pm(x::AbstractMatrix) = convert_to_pm(Matrix(x))
 convert_to_pm(x::pm_Vector) = x
 convert_to_pm(x::pm_Matrix) = x
 
-convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} =  Base.convert(pm_Array{pm_Array{T}},x)
-convert_to_pm(x::Vector{<:Vector{<:Integer}}) =  Base.convert(pm_Array{pm_Array{pm_Integer}},x)
-
-
-function convert_matrix_rational(matrix::pm_Matrix{pm_Rational})
-    nr_rows = rows(matrix)
-    columns = cols(matrix)
-    result = Array{Rational{BigInt},2}(undef,nr_rows,columns)
-    for i = 1:nr_rows
-        for j = 1:columns
-            current_entry = matrix[i,j]
-            result[i,j] = convert(Rational{BigInt},current_entry)
-        end
-    end
-    return result
-end
-
-convert(::Type{Array{Rational{BigInt},2}},matrix::pm_Matrix{pm_Rational}) = convert_matrix_rational(matrix)
-
-function convert_matrix_integer(matrix::pm_Matrix{pm_Integer})
-    nr_rows = rows(matrix)
-    columns = cols(matrix)
-    result = Array{BigInt,2}(undef,nr_rows,columns)
-    for i = 1:nr_rows
-        for j = 1:columns
-            current_entry = matrix[i,j]
-            result[i,j] = convert(BigInt,current_entry)
-        end
-    end
-    return result
-end
-
-convert(::Type{Array{BigInt,2}},matrix::pm_Matrix{pm_Rational}) = convert_matrix_integer(matrix)
-
-function convert_vector_rational(vector::pm_Vector{pm_Rational})
-    dim = length(vector)
-    result = Array{Rational{BigInt},1}(undef,dim)
-    for i = 1:dim
-        current_entry = vector[i]
-        result[i] = convert(Rational{BigInt},current_entry)
-    end
-    return result
-end
-
-convert(::Type{Array{Rational{BigInt},1}},vector::pm_Vector{pm_Rational}) = convert_vector_rational(vector)
-
-function convert_vector_integer(vector::pm_Vector{pm_Integer})
-    dim = length(vector)
-    result = Array{BigInt,1}(undef,dim)
-    for i = 1:dim
-        current_entry = vector[i]
-        result[i] = convert(BigInt,current_entry)
-    end
-    return result
-end
-
-convert(::Type{Array{BigInt,1}},vector::pm_Vector{pm_Integer}) = convert_vector_integer(vector)
 convert_to_pm(x::Vector{<:Integer}) = convert(pm_Vector{pm_Integer},x)
 convert_to_pm(x::Vector{<:Rational}) = convert(pm_Vector{pm_Rational},x)
 convert_to_pm(x::Matrix{<:Integer}) = convert(pm_Matrix{pm_Integer},x)
