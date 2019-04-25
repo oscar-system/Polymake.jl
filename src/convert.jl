@@ -1,13 +1,20 @@
+#################### Unwrapping PropertyValues  ####################
 
-end
+convert(::Type{BigInt}, pv::pm_perl_PropertyValue) = convert(BigInt, to_pm_Integer(pv))
 
-function convert(::Type{BigInt},int::pm_perl_PropertyValue)
-    return to_pm_Integer(int)
-end
+convert(::Type{<:Rational}, pv::pm_perl_PropertyValue) = convert(Rational{BigInt}, to_pm_Rational(pv))
 
-end
+convert(::Type{Matrix{Rational{BigInt}}}, pv::pm_perl_PropertyValue) =
+    convert(Matrix{Rational{BigInt}}, to_matrix_rational(pv))
 
+convert(::Type{Matrix{BigInt}}, matrix::pm_perl_PropertyValue) =
+    convert(Matrix{BigInt}, to_matrix_int(pv))
 
+convert(::Type{Vector{Rational{BigInt}}}, pv::pm_perl_PropertyValue) =
+    convert(Matrix{Rational{BigInt}}, to_vector_rational(pv))
+
+convert(::Type{Vector{BigInt}}, pv::pm_perl_PropertyValue) =
+    convert(Matrix{BigInt}, to_vector_int(pv))
 
 function convert(::Type{pm_Matrix{pm_Integer}}, matrix::Array{S,2}) where S <:Integer
     rows,cols = size(matrix)
@@ -54,27 +61,17 @@ end
 
 # By default convert_to_pm is a no op
 convert_to_pm(x) = x
-convert_to_pm(x::T) where T <:Integer = Base.convert(pm_Integer,x)
-convert_to_pm(x::Rational{T}) where T <:Integer = Base.convert(pm_Rational,x)
+convert_to_pm(x::T) where T <:Integer = convert(pm_Integer, x)
+convert_to_pm(x::Rational{T}) where T <:Integer = convert(pm_Rational, x)
 # We realize AbstractVectors/Matrices if they are not already Vector/Matrix or pm_*
 convert_to_pm(x::AbstractVector) = convert_to_pm(Vector(x))
 convert_to_pm(x::AbstractMatrix) = convert_to_pm(Matrix(x))
 convert_to_pm(x::pm_Vector) = x
 convert_to_pm(x::pm_Matrix) = x
-convert_to_pm(x::Array{T,1}) where T <:Integer = Base.convert(pm_Vector{pm_Integer},x)
-convert_to_pm(x::Array{Rational{T},1}) where T <:Integer = Base.convert(pm_Vector{pm_Rational},x)
-convert_to_pm(x::Array{T,2}) where T <:Integer = Base.convert(pm_Matrix{pm_Integer},x)
-convert_to_pm(x::Array{Rational{T},2}) where T <:Integer = Base.convert(pm_Matrix{pm_Rational},x)
-convert_to_pm(x::Matrix{<:Rational}) = Base.convert(pm_Matrix{pm_Rational},x)
-convert_to_pm(x::Matrix{Float64}) = Base.convert(pm_Matrix{Float64},x)
 
 convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} =  Base.convert(pm_Array{pm_Array{T}},x)
 convert_to_pm(x::Vector{<:Vector{<:Integer}}) =  Base.convert(pm_Array{pm_Array{pm_Integer}},x)
 
-
-function convert_matrix_rational(pmmatrix::pm_perl_PropertyValue)
-    return convert_matrix_rational(to_matrix_rational(pmmatrix))
-end
 
 function convert_matrix_rational(matrix::pm_Matrix{pm_Rational})
     nr_rows = rows(matrix)
@@ -89,12 +86,7 @@ function convert_matrix_rational(matrix::pm_Matrix{pm_Rational})
     return result
 end
 
-convert(::Type{Array{Rational{BigInt},2}},matrix::pm_perl_PropertyValue) = convert_matrix_rational(matrix)
 convert(::Type{Array{Rational{BigInt},2}},matrix::pm_Matrix{pm_Rational}) = convert_matrix_rational(matrix)
-
-function convert_matrix_integer(pmmatrix::pm_perl_PropertyValue)
-    return convert_matrix_integer(to_matrix_int(pmmatrix))
-end
 
 function convert_matrix_integer(matrix::pm_Matrix{pm_Integer})
     nr_rows = rows(matrix)
@@ -109,12 +101,7 @@ function convert_matrix_integer(matrix::pm_Matrix{pm_Integer})
     return result
 end
 
-convert(::Type{Array{BigInt,2}},matrix::pm_perl_PropertyValue) = convert_matrix_integer(matrix)
 convert(::Type{Array{BigInt,2}},matrix::pm_Matrix{pm_Rational}) = convert_matrix_integer(matrix)
-
-function convert_vector_rational(pmvector::pm_perl_PropertyValue)
-    return convert_vector_rational(to_vector_rational(pmvector))
-end
 
 function convert_vector_rational(vector::pm_Vector{pm_Rational})
     dim = length(vector)
@@ -126,12 +113,7 @@ function convert_vector_rational(vector::pm_Vector{pm_Rational})
     return result
 end
 
-convert(::Type{Array{Rational{BigInt},1}},vector::pm_perl_PropertyValue) = convert_vector_rational(vector)
 convert(::Type{Array{Rational{BigInt},1}},vector::pm_Vector{pm_Rational}) = convert_vector_rational(vector)
-
-function convert_vector_integer(pmvector::pm_perl_PropertyValue)
-    return convert_vector_integer(to_vector_int(pmvector))
-end
 
 function convert_vector_integer(vector::pm_Vector{pm_Integer})
     dim = length(vector)
@@ -143,7 +125,18 @@ function convert_vector_integer(vector::pm_Vector{pm_Integer})
     return result
 end
 
-convert(::Type{Array{BigInt,1}},vector::pm_perl_PropertyValue) = convert_vector_integer(vector)
 convert(::Type{Array{BigInt,1}},vector::pm_Vector{pm_Integer}) = convert_vector_integer(vector)
+convert_to_pm(x::Vector{<:Integer}) = convert(pm_Vector{pm_Integer},x)
+convert_to_pm(x::Vector{<:Rational}) = convert(pm_Vector{pm_Rational},x)
+convert_to_pm(x::Matrix{<:Integer}) = convert(pm_Matrix{pm_Integer},x)
+convert_to_pm(x::Matrix{<:Rational}) = convert(pm_Matrix{pm_Rational},x)
+convert_to_pm(x::Matrix{Float64}) = convert(pm_Matrix{Float64},x)
+
+convert_to_pm(x::Vector{<:pm_Rational}) = convert(pm_Vector{pm_Rational}, x)
+convert_to_pm(x::Matrix{<:pm_Rational}) = convert(pm_Matrix{pm_Rational}, x)
+
+convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} = convert(pm_Array{pm_Array{T}},x)
+convert_to_pm(x::Vector{<:Vector{<:Integer}}) = convert(pm_Array{pm_Array{pm_Integer}},x)
+
 
 convert(::Type{pm_perl_OptionSet}, dict) = pm_perl_OptionSet(dict)
