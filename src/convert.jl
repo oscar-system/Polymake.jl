@@ -39,6 +39,9 @@ convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
 
 # By default convert_to_pm is a no op
 convert_to_pm(x) = x
+# no convert for Cxx compatible types
+convert_to_pm(x::T) where T <:Union{Int32, Int64, Float64} = x
+
 convert_to_pm(x::T) where T <:Integer = convert(pm_Integer, x)
 convert_to_pm(x::Rational{T}) where T <:Integer = convert(pm_Rational, x)
 # We realize AbstractVectors/Matrices if they are not already Vector/Matrix or pm_*
@@ -59,5 +62,6 @@ convert_to_pm(x::Matrix{<:pm_Rational}) = convert(pm_Matrix{pm_Rational}, x)
 convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} = convert(pm_Array{pm_Array{T}},x)
 convert_to_pm(x::Vector{<:Vector{<:Integer}}) = convert(pm_Array{pm_Array{pm_Integer}},x)
 
+convert_to_pm(v::Visual) = v.obj
 
 convert(::Type{pm_perl_OptionSet}, dict) = pm_perl_OptionSet(dict)

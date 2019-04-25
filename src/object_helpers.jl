@@ -25,11 +25,11 @@ end
 _get_visual_string_threejs(x::Visual) = _get_visual_string(x,:jupyter_visual_threejs)
 _get_visual_string_svg(x::Visual) = _get_visual_string(x,:jupyter_visual_svg)
 
-function c_arguments(args...; kwargs...)
+function polymake_arguments(args...; kwargs...)
     if isempty(kwargs)
-        return Any[ args... ]
+        return Any[ convert_to_pm.(args)... ]
     else
-        Any[ args..., pm_perl_OptionSet(kwargs) ]
+        Any[ convert_to_pm.(args)..., pm_perl_OptionSet(kwargs) ]
     end
 end
 

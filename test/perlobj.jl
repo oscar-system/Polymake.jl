@@ -34,6 +34,14 @@
 
         # Make sure that we can also handle different matrix types, e.g. adjoint
         @test (@pm Polytope.Polytope(POINTS=A')) isa pm_perl_Object
+
+        pm1 = pm_Integer(1)
+        pm2 = pm_Integer(2)
+        @test (@pm Polytope.Polytope(POINTS=[pm1 pm2])) isa pm_perl_Object
+        @test (@pm Polytope.Polytope(POINTS=[pm1//pm2 pm2//pm2])) isa pm_perl_Object
+        @test (@pm Polytope.Polytope(POINTS=[1//2 1//2])) isa pm_perl_Object
+
+        @test Polytope.cube(3, 1//4, -1//4) isa pm_perl_Object
     end
 
     @testset "PolymakeException" begin
@@ -57,6 +65,9 @@
 
         test_polytope = @pm Polytope.Polytope(input_dict_unbounded)
         @test test_polytope.FAR_FACE == Set([1])
+
+        c = Polytope.cube(3, 1//4, -1//4)
+        @test c.VERTICES[1,2] == -1//4
     end
 
     @testset "tab-completion" begin
