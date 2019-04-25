@@ -171,11 +171,11 @@ function jl_code(pf::PolymakeFunction)
         function $(jl_symbol(pf))(args...; template_parameters::Array{String,1}=String[], keep_PropertyValue=false, call_as_void=false, kwargs...)
             if call_as_void
                 $(callable_void(pf))($func_name, template_parameters,
-                    c_arguments(args...; kwargs...))
+                    polymake_arguments(args...; kwargs...))
                 return nothing
             else
                 return_value = $(callable(pf))($func_name, template_parameters,
-                    c_arguments(args...; kwargs...))
+                    polymake_arguments(args...; kwargs...))
                 if keep_PropertyValue
                     return return_value
                 else
@@ -199,11 +199,11 @@ function jl_code(pf::PolymakeMethod)
     :(
         function $(jl_symbol(pf))(object::pm_perl_Object, args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
             if call_as_void
-                $(callable_void(pf))($func_name, object, c_arguments(args...; kwargs...))
+                $(callable_void(pf))($func_name, object, polymake_arguments(args...; kwargs...))
                 return nothing
             else
                 return_value =
-                $(callable(pf))($func_name, object, c_arguments(args...; kwargs...))
+                $(callable(pf))($func_name, object, polymake_arguments(args...; kwargs...))
                 if keep_PropertyValue
                     return return_value
                 else
@@ -219,7 +219,7 @@ end
 module_imports() = :(import Polymake:
     internal_call_function, internal_call_method,
     internal_call_function_void, internal_call_method_void,
-    convert_from_property_value, c_arguments, pm_perl_Object, get_docs;
+    convert_from_property_value, polymake_arguments, pm_perl_Object, get_docs;
     import Markdown;
     )
 
