@@ -7,7 +7,7 @@ export pm_Integer, pm_Rational,
 
 
 # We need to import all functions which will be extended on the Cxx side
-import Base: ==, <, <=, *, -, +, /, div, rem,
+import Base: ==, <, <=, *, -, +, //, div, rem,
     append!, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty,
     length, numerator, push!, resize!,

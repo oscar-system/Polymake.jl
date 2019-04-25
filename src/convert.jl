@@ -5,25 +5,9 @@ function convert(::Type{BigInt},int::pm_perl_PropertyValue)
     return to_pm_Integer(int)
 end
 
-function convert(::Type{Rational{BigInt}},rat::pm_Rational)
-    num = numerator(rat)
-    denom = denominator(rat)
-    num = convert(BigInt,num)
-    denom = convert(BigInt,denom)
-    return Rational{BigInt}(num,denom)
 end
 
-function convert(::Type{pm_Rational},rat::Rational{BigInt})
-    num = convert(pm_Integer,numerator(rat))
-    denom = convert(pm_Integer,denominator(rat))
-    return pm_Rational(num,denom)
-end
 
-function convert(::Type{pm_Rational},rat::Rational{T}) where T <: Union{Int128,Int64,Int32}
-    num = convert(pm_Integer,numerator(rat))
-    denom = convert(pm_Integer,denominator(rat))
-    return pm_Rational(num,denom)
-end
 
 function convert(::Type{pm_Matrix{pm_Integer}}, matrix::Array{S,2}) where S <:Integer
     rows,cols = size(matrix)
@@ -36,16 +20,6 @@ function convert(::Type{pm_Matrix{pm_Integer}}, matrix::Array{S,2}) where S <:In
     return pm_matrix
 end
 
-function convert(::Type{pm_Matrix{pm_Rational}}, matrix::Array{Rational{S},2}) where S <:Integer
-    rows,cols = size(matrix)
-    pm_matrix = pm_Matrix{pm_Rational}(rows,cols)
-    for i in 1:rows
-        for j in 1:cols
-            pm_matrix[i,j] = matrix[i,j]
-        end
-    end
-    return pm_matrix
-end
 
 function convert(::Type{pm_Vector{pm_Integer}}, matrix::Array{S,1}) where S <:Integer
     (dim,) = size(matrix)
