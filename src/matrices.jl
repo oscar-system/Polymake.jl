@@ -1,14 +1,10 @@
-pm_Matrix{T}(v::AbstractMatrix) where T = pm_Matrix(convert(AbstractMatrix{T}, v))
-function pm_Matrix(v::AbstractMatrix{T}) where T<:Integer
-    res = pm_Matrix{pm_Integer}(size(v)...)
-    res .= v
+@inline function pm_Matrix{T}(mat::AbstractMatrix) where T
+    res = pm_Matrix{T}(size(mat)...)
+    @inbounds res .= mat
     return res
 end
-function pm_Matrix(v::AbstractMatrix{T}) where T<:Rational
-    res = pm_Matrix{pm_Rational}(size(v)...)
-    res .= v
-    return res
-end
+
+pm_Matrix(mat::AbstractMatrix) = pm_Matrix{convert_to_pm_type(eltype(mat))}(mat)
 
 Base.size(m::pm_Matrix) = (rows(m), cols(m))
 

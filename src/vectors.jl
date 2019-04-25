@@ -1,16 +1,13 @@
-pm_Vector{T}(v::AbstractVector) where T = pm_Vector(convert(AbstractVector{T}, v))
-function pm_Vector(v::AbstractVector{T}) where T<:Integer
-    res = pm_Vector{pm_Integer}(size(v)...)
-    res .= v
-    return res
-end
-function pm_Vector(v::AbstractVector{T}) where T<:Union{Rational,pm_Rational}
-    res = pm_Vector{pm_Rational}(size(v)...)
-    res .= v
+@inline function pm_Vector{T}(vec::AbstractVector) where T
+    res = pm_Vector{T}(size(vec)...)
+    @inbounds res .= vec
     return res
 end
 
+pm_Vector(vec::AbstractVector) = pm_Vector{convert_to_pm_type(eltype(vec))}(vec)
+
 Base.size(v::pm_Vector) = (length(v),)
+
 Base.@propagate_inbounds function Base.getindex(V::pm_Vector, n::Integer)
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
     return _getindex(V, Int(n))
