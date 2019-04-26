@@ -65,6 +65,8 @@ void polymake_module_add_rational(jlcxx::Module& polymake)
                 [](const pm::Rational& r) {
                     return show_small_object<pm::Rational>(r, false);
                 })
+        .method("Float64", [](pm::Rational& a) { return double(a); })
+
         // the symmetric definitions are on the julia side
         .method("+", [](pm::Rational& a, pm::Rational& b) { return a + b; })
         .method("+", [](pm::Rational& a, pm::Integer& b) { return a + b; })
