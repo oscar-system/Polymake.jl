@@ -6,6 +6,7 @@ type_tuples = [
 ( "pm_Rational",                   "pm::Rational",                       "pm_Rational",                     "to_pm_Rational" ),
 ( "pm_Matrix_pm_Integer",          "pm::Matrix<pm::Integer>",            "pm_Matrix{pm_Integer}",           "to_matrix_Integer" ),
 ( "pm_Matrix_pm_Rational",         "pm::Matrix<pm::Rational>",           "pm_Matrix{pm_Rational}",          "to_matrix_Rational" ),
+( "pm_Matrix_double",              "pm::Matrix<double>",                 "pm_Matrix{Float64}",              "to_matrix_double" ),
 ( "pm_Vector_pm_Integer",          "pm::Vector<pm::Integer>",            "pm_Vector{pm_Integer}",           "to_vector_Integer" ),
 ( "pm_Vector_pm_Rational",         "pm::Vector<pm::Rational>",           "pm_Vector{pm_Rational}",          "to_vector_Rational" ),
 ( "pm_Set_Int32",                  "pm::Set<int32_t>",                   "pm_Set{Int32}",                   "to_set_int32" ),

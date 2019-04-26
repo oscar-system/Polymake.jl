@@ -1,9 +1,13 @@
 @testset "pm_Matrix" begin
-    for T in [pm_Integer, pm_Rational]
+    for T in [pm_Integer, pm_Rational, Float64]
         @test pm_Matrix{T} <: AbstractMatrix
         @test pm_Matrix{T}(3,4) isa AbstractMatrix
         @test pm_Matrix{T}(3,4) isa pm_Matrix
         @test pm_Matrix{T}(3,4) isa pm_Matrix{T}
+        M = pm_Matrix{T}(3,4)
+        M[1,1] = 10
+        @test M[1,1] isa T
+        @test M[1,1] == 10
     end
 
     x = pm_Matrix{pm_Integer}(3,4)

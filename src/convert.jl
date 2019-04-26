@@ -94,6 +94,9 @@ convert_to_pm(x::Array{T,1}) where T <:Integer = Base.convert(pm_Vector{pm_Integ
 convert_to_pm(x::Array{Rational{T},1}) where T <:Integer = Base.convert(pm_Vector{pm_Rational},x)
 convert_to_pm(x::Array{T,2}) where T <:Integer = Base.convert(pm_Matrix{pm_Integer},x)
 convert_to_pm(x::Array{Rational{T},2}) where T <:Integer = Base.convert(pm_Matrix{pm_Rational},x)
+convert_to_pm(x::Matrix{<:Rational}) = Base.convert(pm_Matrix{pm_Rational},x)
+convert_to_pm(x::Matrix{Float64}) = Base.convert(pm_Matrix{Float64},x)
+
 convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} =  Base.convert(pm_Array{pm_Array{T}},x)
 convert_to_pm(x::Vector{<:Vector{<:Integer}}) =  Base.convert(pm_Array{pm_Array{pm_Integer}},x)
 
