@@ -31,13 +31,19 @@ convert(::Type{pm_Set}, itr) = pm_Set(itr)
 convert(::Type{pm_Set{T}}, itr) where T = pm_Set{T}(itr)
 convert(::Type{pm_Set{T}}, as::AbstractSet) where T = pm_Set{T}(as)
 
+################  Guessing the wrapped polymake type  ##################
+
+convert_to_pm_type(T::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:Union{Integer, pm_Integer}}) = pm_Integer
 convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational
-convert_to_pm_type(::Type{Vector{T}}) where T<:Union{Int32, Int64} = pm_Array{T}
-convert_to_pm_type(::Type{<:Union{Set, pm_Set}}) = pm_Set
-convert_to_pm_type(::Type{<:Union{Vector, pm_Vector}}) = pm_Matrix
-convert_to_pm_type(::Type{<:Union{Matrix, pm_Matrix}}) = pm_Matrix
+convert_to_pm_type(::Type{<:Union{AbstractVector, pm_Vector}}) = pm_Vector
+convert_to_pm_type(::Type{<:Union{AbstractMatrix, pm_Matrix}}) = pm_Matrix
 convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
+convert_to_pm_type(::Type{<:Union{AbstractSet, pm_Set}}) = pm_Set
+
+convert_to_pm_type(::Type{AbstractVector{T}}) where T<:Union{Int32, Int64, String, AbstractSet{Int32}} = pm_Array{T}
+# this catches all pm_Arrays of pm_Arrays we have right now:
+convert_to_pm_type(::Type{AbstractVector{<:AbstractArray{T}}}) where T<:Union{Int32, Int64, pm_Integer} = pm_Array{pm_Array{T}}
 
 # By default convert_to_pm is a no op
 convert_to_pm(x) = x
