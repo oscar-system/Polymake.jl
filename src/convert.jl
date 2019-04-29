@@ -16,7 +16,7 @@ convert(::Type{Vector{Rational{BigInt}}}, pv::pm_perl_PropertyValue) =
 convert(::Type{Vector{BigInt}}, pv::pm_perl_PropertyValue) =
     convert(Matrix{BigInt}, to_vector_int(pv))
 
-#################### Converting to polymake types  ####################
+####################  Converting to polymake types  ####################
 
 convert(::Type{pm_Vector}, vec::AbstractVector) = pm_Vector(vec)
 convert(::Type{pm_Vector{T}}, vec::AbstractVector) where T = pm_Vector{T}(vec)
@@ -27,7 +27,9 @@ convert(::Type{pm_Matrix{T}}, mat::AbstractMatrix) where T = pm_Matrix{T}(mat)
 convert(::Type{pm_Array}, vec::AbstractVector) = pm_Array(vec)
 convert(::Type{pm_Array{T}}, vec::AbstractVector) where T = pm_Array{T}(vec)
 
-#################### Guessing the polymake type  ####################
+convert(::Type{pm_Set}, itr) = pm_Set(itr)
+convert(::Type{pm_Set{T}}, itr) where T = pm_Set{T}(itr)
+convert(::Type{pm_Set{T}}, as::AbstractSet) where T = pm_Set{T}(as)
 
 convert_to_pm_type(::Type{<:Union{Integer, pm_Integer}}) = pm_Integer
 convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational

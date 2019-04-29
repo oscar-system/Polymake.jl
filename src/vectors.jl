@@ -10,11 +10,11 @@ Base.size(v::pm_Vector) = (length(v),)
 
 Base.@propagate_inbounds function Base.getindex(V::pm_Vector, n::Integer)
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
-    return _getindex(V, Int(n))
+    return _getindex(V, convert(Int64, n))
 end
 
 Base.@propagate_inbounds function Base.setindex!(V::pm_Vector{T}, val, n::Integer) where T
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
-    _setindex!(V, T(val), Int(n))
+    _setindex!(V, convert(T, val), convert(Int64, n))
     return V
 end
