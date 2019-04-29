@@ -15,12 +15,12 @@ Base.size(a::pm_Array) = (length(a),)
 
 Base.@propagate_inbounds function getindex(A::pm_Array, n::Integer)
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
-    return _getindex(A, Int(n))
+    return _getindex(A, convert(Int64, n))
 end
 
 Base.@propagate_inbounds function Base.setindex!(A::pm_Array{T}, val, n::Integer) where T
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
-    _setindex!(A, T(val), Int(n))
+    _setindex!(A, convert(T, val), convert(Int64, n))
     return A
 end
 
@@ -35,12 +35,12 @@ function Base.append!(A::pm_Array{T}, itr) where T
 end
 
 # workarounds for pm_Array{String}
-pm_Array{T}(n::Integer) where T<:AbstractString = pm_Array{AbstractString}(Int64(n))
+pm_Array{T}(n::Integer) where T<:AbstractString = pm_Array{AbstractString}(convert(Int64, n))
 pm_Array{T}(n::Integer, elt::T) where T<:AbstractString =
-pm_Array{AbstractString}(Int64(n), elt)
+pm_Array{AbstractString}(convert(Int64, n), elt)
 
 Base.@propagate_inbounds function Base.setindex!(A::pm_Array{S}, val, n::Integer) where {S<:AbstractString}
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
-    _setindex!(A, string(val), Int64(n))
+    _setindex!(A, string(val), convert(Int64, n))
     return A
 end
