@@ -1,7 +1,10 @@
 # One arguments constructors used by convert:
 # specialized Int32, Int64 constructors handled by Cxx side
 pm_Integer(int::BigInt) = new_pm_Integer_from_bigint(int)
-pm_Integer(int::Integer) = pm_Integer(big(int))
+pm_Integer(int::Number) = pm_Integer(BigInt(int))
+# to avoid ambiguities:
+pm_Integer(rat::Rational) = pm_Integer(BigInt(rat))
+pm_Integer(flt::BigFloat) = pm_Integer(BigInt(flt))
 
 Base.one(i::Type{<:pm_Integer}) = pm_Integer(1)
 Base.one(i::pm_Integer) = pm_Integer(1)
@@ -23,6 +26,9 @@ function Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Union{Signed, Unsigned
 end
 # symmetric promote_rule is needed since BigInts define those for Integer:
 Base.promote_rule(::Type{BigInt}, ::Type{<:pm_Integer}) = pm_Integer
+Base.promote_rule(::Type{BigFloat}, ::Type{<:pm_Integer}) = BigFloat
+
+Base.promote_rule(::Type{T}, ::Type{<:pm_Integer}) where T<:AbstractFloat = promote_type(T, BigFloat)
 
 # BigInt constructor from pm_Integer
 @inline function Base.BigInt(int::pmI) where pmI<:pm_Integer

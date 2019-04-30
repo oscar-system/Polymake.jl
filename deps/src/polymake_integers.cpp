@@ -52,6 +52,8 @@ void polymake_module_add_integer(jlcxx::Module& polymake)
                 [](pm::Integer& i) {
                     return show_small_object<pm::Integer>(i, false);
                 })
+        .method("Float64", [](pm::Integer& a) { return double(a); })
+
         // the symmetric definitions are on the julia side
         .method("+", [](pm::Integer& a, pm::Integer& b) { return a + b; })
         .method("+", [](pm::Integer& a,
