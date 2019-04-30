@@ -1,5 +1,5 @@
 @testset "pm_Rational" begin
-    IntTypes = [Int8, UInt8, Int32, UInt32, Int64, UInt64, BigInt]
+    IntTypes = [Int32, Int64, UInt64, BigInt]
 
     @testset "Constructors/Conversions" begin
         @test pm_Rational <: Real
@@ -12,6 +12,10 @@
 
         for T in IntTypes
             @test pm_Rational(T(2)//T(3)) isa pm_Rational
+        end
+
+        for T in [Float64, BigFloat]
+            @test pm_Rational(T(2)) isa pm_Rational
         end
 
         a = pm_Rational(4,3)
@@ -31,6 +35,7 @@
 
         # conversion to other Number types
         @test convert(Float64, a) isa Float64
+        @test Float64(a) isa Float64
         @test float(a) == convert(BigFloat, a)
 
         # julia arrays
@@ -70,6 +75,7 @@
                 @test T(2)//a isa pm_Rational
                 @test T(2)//a == 5//2
             end
+            @test a//a == pm_Rational(1)
         end
 
         a = pm_Rational(2, 1)
