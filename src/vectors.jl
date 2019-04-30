@@ -18,3 +18,14 @@ Base.@propagate_inbounds function Base.setindex!(V::pm_Vector{T}, val, n::Intege
     _setindex!(V, convert(T, val), convert(Int64, n))
     return V
 end
+
+function Base.similar(V::pm_Vector, ::Type{S}, dims::Dims) where S
+    return pm_Vector{convert_to_pm_type(S)}(dims...)
+end
+
+Base.BroadcastStyle(::Type{<:pm_Vector}) = Broadcast.ArrayStyle{pm_Vector}()
+
+function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{pm_Vector}},
+    ::Type{ElType}) where ElType
+    return pm_Vector{convert_to_pm_type(ElType)}(axes(bc)...)
+end
