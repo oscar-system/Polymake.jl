@@ -96,14 +96,20 @@ If you already have a polymake installation you need to set the environment vari
         using Pkg: depots1
         function prepare_env()
             ENV["PERL5LIB"]=$perllib
-            ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
+            user_dir = ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
+            if Base.Filesystem.isdir(user_dir)
+                del = filter(i -> Base.Filesystem.isdir(i) && startswith(i, "wrappers."), readdir(user_dir))
+                for i in del
+                    Base.Filesystem.rm(user_dir * "/" * i, recursive = true)
+                end
+            end
             ENV["PATH"] = ENV["PATH"]*":"*$pm_bin_prefix*"/bin"
         end
     end
     eval(depsjl)
     prepare_env()
     run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
-     run(`sh -c "$perl -pi -e 's{/workspace/destdir}{$pm_bin_prefix}g' $pm_bin_prefix/lib/perl5/*/*/Config_heavy.pl"`)
+    run(`sh -c "$perl -pi -e 's{/workspace/destdir}{$pm_bin_prefix}g' $pm_bin_prefix/lib/perl5/*/*/Config_heavy.pl"`)
 
 else
     if pm_config == nothing
