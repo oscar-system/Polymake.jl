@@ -21,9 +21,12 @@ for op in (:(==), :(<), :(<=))
     end
 end
 
-function Base.promote_rule(::Type{<:pm_Rational}, ::Type{<:Union{Integer, Rational{<:Integer}}})
+function Base.promote_rule(::Type{<:pm_Rational},
+    ::Type{<:Union{Integer, Rational{<:Integer}}})
     return pm_Rational
 end
+
+Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Rational}) = pm_Rational
 
 # Rational{<:Integer} constructors from pm_Rational (provides converts as well)
 @inline function Base.Rational{T}(rat::pm_Rational) where T<:Integer
@@ -42,11 +45,16 @@ Base.float(rat::pm_Rational) = float(big(rat))
 # no-copy convert
 convert(::Type{<:pm_Rational}, rat::T) where T <: pm_Rational = rat
 
+
 # Rational division:
+
 Base.://(x::pm_Integer, y::pm_Integer) = pm_Rational(x, y)
-# # ala promotion rules
+# ala promotion rules
 Base.://(x::pm_Integer, y::Integer) = pm_Rational(x, pm_Integer(y))
 Base.://(x::Integer, y::pm_Integer) = pm_Rational(pm_Integer(x), y)
+
+Base.://(x::Rational, y::pm_Integer) = pm_Rational(numerator(x), denominator(x)*y)
+Base.://(x::pm_Integer, y::Rational) = pm_Rational(x*numerator(y), denominator(y))
 
 # division by Int32, Int64, pm_Integer defined on the Cxx side
 Base.://(x::pm_Rational, y::Union{Int8, Int16, BigInt, Unsigned}) = x//pm_Integer(y)
