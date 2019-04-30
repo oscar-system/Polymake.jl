@@ -26,9 +26,7 @@ function Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Union{Signed, Unsigned
 end
 # symmetric promote_rule is needed since BigInts define those for Integer:
 Base.promote_rule(::Type{BigInt}, ::Type{<:pm_Integer}) = pm_Integer
-Base.promote_rule(::Type{BigFloat}, ::Type{<:pm_Integer}) = BigFloat
-
-Base.promote_rule(::Type{T}, ::Type{<:pm_Integer}) where T<:AbstractFloat = promote_type(T, BigFloat)
+Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:AbstractFloat}) = Float64
 
 # BigInt constructor from pm_Integer
 @inline function Base.BigInt(int::pmI) where pmI<:pm_Integer
@@ -42,8 +40,8 @@ for T in [:Int8,  :Int16,  :Int32,  :Int64,  :Int128,
 end
 
 convert(::Type{T}, int::pm_Integer) where {T<:Number} = convert(T, BigInt(int))
-
-Base.float(int::pm_Integer) = float(BigInt(int))
+convert(::Type{T}, int::pm_Integer) where {T<:AbstractFloat} = convert(T, Float64(int))
+Base.float(int::pm_Integer) = Float64(int)
 
 # no-copy converts
 convert(::Type{<:pm_Integer}, int::T) where T <: pm_Integer = int
