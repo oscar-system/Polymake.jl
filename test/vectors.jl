@@ -1,4 +1,5 @@
 @testset "pm_Vector" begin
+    IntTypes = [Int32, Int64, UInt64, BigInt]
     for T in [pm_Integer, pm_Rational]
         @test pm_Vector{T} <: AbstractVector
         @test pm_Vector{T}(3) isa AbstractVector
@@ -6,59 +7,170 @@
         @test pm_Vector{T}(3) isa pm_Vector{T}
     end
 
-    v = [1,2,3]
-    @test pm_Vector(Int32.(v)) isa pm_Vector{pm_Integer}
-    @test pm_Vector(v) isa pm_Vector{pm_Integer}
-    @test pm_Vector(big.(v)) isa pm_Vector{pm_Integer}
-    den = 4
-    @test pm_Vector(Int32.(v)//Int32(den)) isa pm_Vector{pm_Rational}
-    @test pm_Vector(v//den) isa pm_Vector{pm_Rational}
-    @test pm_Vector(big.(v)//big(den)) isa pm_Vector{pm_Rational}
+    jl_v = [1,2,3]
+    @testset "Constructors/Converts" begin
+        for T in [IntTypes; pm_Integer]
+            @test pm_Vector(T.(jl_v)) isa pm_Vector{pm_Integer}
+            @test pm_Vector(T.(jl_v)) isa pm_Vector{pm_Integer}
+            @test pm_Vector{pm_Integer}(jl_v//T(1)) isa pm_Vector{pm_Integer}
 
-    x = pm_Vector{pm_Integer}([0,0,0])
+            @test convert(Vector{T}, pm_Vector(T.(jl_v))) isa Vector{T}
 
-    @test x[1] isa pm_Integer
-    @test setindex!(x, pm_Integer(4), 1) == pm_Vector([4,0,0])
-    @test setindex!(x, 4, 1) == pm_Vector([4,0,0])
-    @test x[1] == 4
-    x[3] = 2
-    @test x[3] == 2
-    @test x == pm_Vector([4,0,2])
+            @test pm_Vector(jl_v//T(1)) isa pm_Vector{pm_Rational}
+            @test pm_Vector{pm_Rational}(T.(jl_v)) isa pm_Vector{pm_Rational}
 
-    @test_throws BoundsError x[0]
-    @test_throws BoundsError x[5]
+            @test Polymake.convert_to_pm(T.(jl_v)) isa pm_Vector{pm_Integer}
 
-    @test length(x) == 3
-    @test size(x) == (3,)
+            @test Polymake.convert_to_pm(T.(jl_v)//1) isa pm_Vector{pm_Rational}
+        end
+    end
 
-    x = pm_Vector{pm_Rational}(4)
-    @test x[1] isa pm_Rational
-    @test setindex!(x, pm_Rational(4,1), 1) == pm_Vector([4//1, 0//1, 0//1, 0//1])
-    @test setindex!(x, 4, 1) == pm_Vector([4//1, 0//1, 0//1, 0//1])
-    @test x[1] == pm_Rational(4//1)
-    x[3] = 2//4
-    @test x[3] == pm_Rational(1//2)
-    @test x == pm_Vector([4//1, 0//1, 1//2, 0//1])
+    @testset "Low-level operations" begin
+        @testset "pm_Vector{pm_Integer}" begin
+            V = pm_Vector{pm_Integer}(jl_v)
 
-    @test_throws BoundsError x[0]
-    @test_throws BoundsError x[6]
+            @test eltype(V) == pm_Integer
 
-    @test length(x) == 4
-    @test size(x) == (4,)
+            @test_throws BoundsError V[0]
+            @test_throws BoundsError V[5]
 
-    @test sprint(show, x) == "pm::Vector<pm::Rational>\n4 0 1/2 0"
-    v = [1,2,3]
-    pm_v = pm_Vector{pm_Integer}(3)
-    pm_v .= v
-    @test pm_v == v
+            @test length(V) == 3
+            @test size(V) == (3,)
 
-    @test pm_Vector(v) == pm_Vector((4*v)//4)
+            for T in [IntTypes; pm_Integer]
+                V = pm_Vector{pm_Integer}(jl_v) # local copy
+                @test setindex!(V, T(5), 1) isa pm_Vector{pm_Integer}
+                @test V[T(1)] isa Polymake.pm_IntegerAllocated
+                @test V[T(1)] == 5
+                # testing the return value of brackets operator
+                @test V[2] = T(10) isa T
+                V[2] = T(10)
+                @test V[2] == 10
+                @test string(V) == "pm::Vector<pm::Integer>\n5 10 3"
+            end
+        end
 
-    ### Conversion
+        @testset "pm_Vector{pm_Rational}" begin
+            V = pm_Vector{pm_Rational}(jl_v)
 
-    v = pm_Vector([4,0,0])
-    @test convert(Array{BigInt,1},v) == BigInt[4,0,0]
+            @test eltype(V) == pm_Rational
 
-    v = pm_Vector([4,0,0//1])
-    @test convert(Array{Rational{BigInt},1},v) == Rational{BigInt}[4,0,0]
+            @test_throws BoundsError V[0]
+            @test_throws BoundsError V[5]
+
+            @test length(V) == 3
+            @test size(V) == (3,)
+
+            for T in [IntTypes; pm_Integer]
+                @test setindex!(V, T(5)//T(3), 1) isa pm_Vector{pm_Rational}
+                @test V[T(1)] isa Polymake.pm_RationalAllocated
+                @test V[T(1)] == 5//3
+                # testing the return value of brackets operator
+                if T != pm_Integer
+                    @test V[2] = T(10)//T(3) isa Rational{T}
+                else
+                    @test V[2] = T(10)//T(3) isa pm_Rational
+                end
+                V[2] = T(10)//T(3)
+                @test V[2] == 10//3
+                @test string(V) == "pm::Vector<pm::Rational>\n5/3 10/3 3"
+            end
+        end
+
+        @testset "Equality" begin
+            V = pm_Vector{pm_Integer}(3)
+            W = pm_Vector{pm_Rational}(3)
+
+            for T in [IntTypes; pm_Integer]
+                @test (V .= T.(jl_v)) isa pm_Vector{pm_Integer}
+                @test (V .= T.(jl_v).//1) isa pm_Vector{pm_Integer}
+
+                @test (W .= T.(jl_v)) isa pm_Vector{pm_Rational}
+                @test (W .= T.(jl_v).//1) isa pm_Vector{pm_Rational}
+
+                @test V == W
+
+                # TODO:
+                # @test (V .== jl_v) isa BitArray
+                # @test all(V .== jl_v)
+            end
+        end
+    end
+
+    @testset "Arithmetic" begin
+        V = pm_Vector{pm_Integer}(jl_v)
+        jl_w = jl_v//4
+        W = pm_Vector{pm_Rational}(jl_w)
+
+
+        @test -V isa Polymake.pm_VectorAllocated{pm_Integer}
+        @test -V == -jl_v
+
+        @test -W isa Polymake.pm_VectorAllocated{pm_Rational}
+        @test -W == -(jl_w)
+
+        int_scalar_types = [IntTypes; pm_Integer]
+        rational_scalar_types = [[Rational{T} for T in IntTypes]; pm_Rational]
+
+        for T in int_scalar_types
+            for (vec, ElType) in [(V, pm_Integer), (W, pm_Rational)]
+                op = *
+                @test op(T(2), vec) isa pm_Vector{ElType}
+                @test op(vec, T(2)) isa pm_Vector{ElType}
+                @test broadcast(op, T(2), vec) isa pm_Vector{ElType}
+                @test broadcast(op, vec, T(2)) isa pm_Vector{ElType}
+
+                op = //
+                # @test op(T(2), vec) isa pm_Vector{pm_Rational}
+                @test op(vec, T(2)) isa pm_Vector{pm_Rational}
+                @test broadcast(op, T(2), vec) isa pm_Vector{pm_Rational}
+                @test broadcast(op, vec, T(2)) isa pm_Vector{pm_Rational}
+
+                op = +
+                @test op(vec, T.(jl_v)) isa pm_Vector{ElType}
+                @test op(T.(jl_v), vec) isa pm_Vector{ElType}
+                @test broadcast(op, vec, T.(jl_v)) isa pm_Vector{ElType}
+                @test broadcast(op, T.(jl_v), vec) isa pm_Vector{ElType}
+
+                @test broadcast(op, vec, T(2)) isa pm_Vector{ElType}
+                @test broadcast(op, T(2), vec) isa pm_Vector{ElType}
+            end
+        end
+
+        for T in rational_scalar_types
+            for vec in [V, W]
+                op = *
+                @test op(T(2), vec) isa pm_Vector{pm_Rational}
+                @test op(vec, T(2)) isa pm_Vector{pm_Rational}
+                @test broadcast(op, T(2), vec) isa pm_Vector{pm_Rational}
+                @test broadcast(op, vec, T(2)) isa pm_Vector{pm_Rational}
+
+                op = //
+                # @test op(T(2), vec) isa pm_Vector{pm_Rational}
+                @test op(vec, T(2)) isa pm_Vector{pm_Rational}
+                @test broadcast(op, T(2), vec) isa pm_Vector{pm_Rational}
+                @test broadcast(op, vec, T(2)) isa pm_Vector{pm_Rational}
+
+                op = +
+                @test op(vec, T.(jl_v)) isa pm_Vector{pm_Rational}
+                @test op(T.(jl_v), vec) isa pm_Vector{pm_Rational}
+
+                @test broadcast(op, vec, T.(jl_v)) isa pm_Vector{pm_Rational}
+                @test broadcast(op, T.(jl_v), vec) isa pm_Vector{pm_Rational}
+
+                @test broadcast(op, T(2), vec) isa pm_Vector{pm_Rational}
+                @test broadcast(op, vec, T(2)) isa pm_Vector{pm_Rational}
+            end
+        end
+
+        for T in [int_scalar_types; rational_scalar_types]
+            @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_v
+            @test T(2)*W == W*T(2) == T(2) .* W == W .* T(2) == 2jl_w
+
+            @test V + T.(jl_v) == T.(jl_v) + V == V .+ T.(jl_v) == T.(jl_v) .+ V == 2jl_v
+
+            @test W + T.(4jl_w) == T.(4jl_w) + W == W .+ T.(4jl_w) == T.(4jl_w) .+ W == 5jl_w
+        end
+    end
+
 end
