@@ -45,30 +45,30 @@ convert_to_pm_type(::Type{AbstractVector{T}}) where T<:Union{Int32, Int64, Strin
 # this catches all pm_Arrays of pm_Arrays we have right now:
 convert_to_pm_type(::Type{AbstractVector{<:AbstractArray{T}}}) where T<:Union{Int32, Int64, pm_Integer} = pm_Array{pm_Array{T}}
 
-# By default convert_to_pm is a no op
-convert_to_pm(x) = x
-# no convert for Cxx compatible types
-convert_to_pm(x::T) where T <:Union{Int32, Int64, Float64} = x
+###########  Converting to objects polymake understands  ##############
+
+# By default we throw an error:
+convert_to_pm(x) = throw(ArgumentError("Unrecognized argument type $(typeof(x)).\nYou need to convert to polymake compatible type first."))
+
+# no convert for C++ compatible or wrapped polymake types:
+convert_to_pm(x::Union{Int32, Int64, Float64}) = x
+convert_to_pm(x::Union{pm_Vector, pm_Matrix, pm_Array}) = x
+convert_to_pm(x::Union{pm_perl_Object, pm_perl_PropertyValue}) = x
 
 convert_to_pm(x::T) where T <:Integer = convert(pm_Integer, x)
-convert_to_pm(x::Rational{T}) where T <:Integer = convert(pm_Rational, x)
-# We realize AbstractVectors/Matrices if they are not already Vector/Matrix or pm_*
-convert_to_pm(x::AbstractVector) = convert_to_pm(Vector(x))
-convert_to_pm(x::AbstractMatrix) = convert_to_pm(Matrix(x))
-convert_to_pm(x::pm_Vector) = x
-convert_to_pm(x::pm_Matrix) = x
+convert_to_pm(x::Rational{T}) where T <: Integer = convert(pm_Rational, x)
 
-convert_to_pm(x::Vector{<:Integer}) = convert(pm_Vector{pm_Integer},x)
-convert_to_pm(x::Vector{<:Rational}) = convert(pm_Vector{pm_Rational},x)
-convert_to_pm(x::Matrix{<:Integer}) = convert(pm_Matrix{pm_Integer},x)
-convert_to_pm(x::Matrix{<:Rational}) = convert(pm_Matrix{pm_Rational},x)
-convert_to_pm(x::Matrix{Float64}) = convert(pm_Matrix{Float64},x)
+convert_to_pm(x::AbstractVector{<:Integer}) = convert(pm_Vector{pm_Integer},x)
+convert_to_pm(x::AbstractVector{<:Rational}) = convert(pm_Vector{pm_Rational},x)
+convert_to_pm(x::AbstractVector{<:pm_Rational}) = convert(pm_Vector{pm_Rational},x)
 
-convert_to_pm(x::Vector{<:pm_Rational}) = convert(pm_Vector{pm_Rational}, x)
-convert_to_pm(x::Matrix{<:pm_Rational}) = convert(pm_Matrix{pm_Rational}, x)
+convert_to_pm(x::AbstractMatrix{<:AbstractFloat}) = convert(pm_Matrix{Float64},x)
+convert_to_pm(x::AbstractMatrix{<:Integer}) = convert(pm_Matrix{pm_Integer},x)
+convert_to_pm(x::AbstractMatrix{<:Rational}) = convert(pm_Matrix{pm_Rational},x)
+convert_to_pm(x::AbstractMatrix{<:pm_Rational}) = convert(pm_Matrix{pm_Rational},x)
 
-convert_to_pm(x::Vector{<:Vector{T}}) where T<:Union{Int32, Int64} = convert(pm_Array{pm_Array{T}},x)
-convert_to_pm(x::Vector{<:Vector{<:Integer}}) = convert(pm_Array{pm_Array{pm_Integer}},x)
+convert_to_pm(x::AbstractVector{<:AbstractVector{T}}) where T<:Union{Int32, Int64} = convert(pm_Array{pm_Array{T}},x)
+convert_to_pm(x::AbstractVector{<:AbstractVector{<:Integer}}) = convert(pm_Array{pm_Array{pm_Integer}},x)
 
 convert_to_pm(v::Visual) = v.obj
 
