@@ -135,7 +135,7 @@
 
         @test Set([2,5,7]) == s == pm_s
 
-        @test p.VERTICES[collect(pm_s), :] isa Matrix{pm_Rational}
+        @test p.VERTICES[collect(pm_s), :] isa pm_Matrix{pm_Rational}
         @test p.VERTICES[collect(pm_s), :] == special_points
     end
 end
