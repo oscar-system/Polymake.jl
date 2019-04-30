@@ -27,11 +27,7 @@ function Base.promote_rule(::Type{<:pm_Rational},
     return pm_Rational
 end
 
-function Base.promote_rule(::Type{<:pm_Rational},
-    ::Type{T}) where T<:AbstractFloat
-    return promote_type(T, BigFloat)
-end
-
+Base.promote_rule(::Type{<:pm_Rational}, ::Type{<:AbstractFloat}) = Float64
 Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Rational}) = pm_Rational
 
 # Rational{<:Integer} constructors from pm_Rational (provides converts as well)
@@ -42,15 +38,12 @@ end
 Base.Rational(rat::pm_Rational) = Rational{BigInt}(rat)
 Base.big(rat::pm_Rational) = Rational{BigInt}(rat)
 
-function convert(::Type{T}, rat::pm_Rational) where T<:Number
-    return convert(T, big(rat))
-end
-
-Base.float(rat::pm_Rational) = float(big(rat))
+convert(::Type{T}, rat::pm_Rational) where T<:Number = convert(T, big(rat))
+convert(::Type{T}, rat::pm_Rational) where T<:AbstractFloat = convert(T, Float64(rat))
+Base.float(rat::pm_Rational) = Float64(rat)
 
 # no-copy convert
 convert(::Type{<:pm_Rational}, rat::T) where T <: pm_Rational = rat
-
 
 # Rational division:
 
