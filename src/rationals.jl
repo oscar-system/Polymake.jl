@@ -5,6 +5,7 @@ pm_Rational(a::BigInt, b::BigInt) = pm_Rational(pm_Integer(a), pm_Integer(b))
 pm_Rational(x::Rational{<:Integer}) = pm_Rational(numerator(x), denominator(x))
 
 pm_Rational(int::Integer) = pm_Rational(int, one(int))
+pm_Rational(x::Number) = pm_Rational(Rational(x))
 
 Base.one(i::Type{<:pm_Rational}) = pm_Rational(1)
 Base.one(i::pm_Rational) = pm_Rational(1)
@@ -24,6 +25,11 @@ end
 function Base.promote_rule(::Type{<:pm_Rational},
     ::Type{<:Union{Integer, Rational{<:Integer}}})
     return pm_Rational
+end
+
+function Base.promote_rule(::Type{<:pm_Rational},
+    ::Type{T}) where T<:AbstractFloat
+    return promote_type(T, BigFloat)
 end
 
 Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Rational}) = pm_Rational
