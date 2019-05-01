@@ -15,7 +15,7 @@ This package is developed as part of the [OSCAR](https://oscar.computeralgebra.d
 
 The installation can be done in the Julia REPL by first pressing `]` and then
 ```julia
-pkg> add https://github.com/oscar-system/Polymake.jl
+pkg> add Polymake
 ```
 This will fetch a pre-build binary of `polymake`. You are ready to start `using Polymake`.
 
