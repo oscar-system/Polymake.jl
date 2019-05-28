@@ -3,9 +3,6 @@ using Test
 
 # write your own tests here
 @testset "Polymake" begin
-
-    Polymake.@register Polytope.pseudopower
-
     include("integers.jl")
     include("rationals.jl")
     include("vectors.jl")
