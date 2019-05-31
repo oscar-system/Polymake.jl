@@ -149,10 +149,9 @@
         @test (@pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)) isa Polymake.pm_perl_Object
 
         p.MILP = @pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)
-        if Threads.nthreads() == 1
-            # segfaults when called from different thread, see
-            # https://github.com/oscar-system/Polymake.jl/issues/144
-            @test p.MILP.MINIMAL_VALUE == -7
-        end
+
+        # segfaults when called from different thread, see
+        # https://github.com/oscar-system/Polymake.jl/issues/144
+        @test p.MILP.MINIMAL_VALUE == -7
     end
 end
