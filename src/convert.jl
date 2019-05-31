@@ -28,9 +28,12 @@ convert(::Type{pm_Array}, vec::AbstractVector) = pm_Array(vec)
 convert(::Type{pm_Array{T}}, vec::AbstractVector) where T = pm_Array{T}(vec)
 
 convert(::Type{pm_Set}, itr) = pm_Set(itr)
-convert(::Type{pm_Set}, as::AbstractSet) = pm_Set(as) # disambiguation
 convert(::Type{pm_Set{T}}, itr) where T = pm_Set{T}(itr)
 convert(::Type{pm_Set{T}}, as::AbstractSet) where T = pm_Set{T}(as)
+
+# disambiguations:
+convert(::Type{pm_Set}, as::AbstractSet) = pm_Set(as)
+convert(::Type{pm_Set{T}}, s::pm_Set{T}) where T = s
 
 ################  Guessing the wrapped polymake type  ##################
 
