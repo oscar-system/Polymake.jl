@@ -81,10 +81,6 @@ function __init__()
         prepare_jupyter_kernel_for_visualization()
     end
 
-    # make wrapper compilation verbose on travis
-    if (haskey(ENV, "TRAVIS"))
-        shell_execute(raw"$Verbose::cpp=3;")
-    end
 end
 
 const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
