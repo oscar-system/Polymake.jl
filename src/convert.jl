@@ -43,7 +43,7 @@ convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational
 convert_to_pm_type(::Type{<:Union{AbstractVector, pm_Vector}}) = pm_Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, pm_Matrix}}) = pm_Matrix
 convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
-convert_to_pm_type(::Type{<:AbstractSet}) = pm_Set
+convert_to_pm_type(::Type{<:Union{AbstractSet, pm_Set}}) = pm_Set
 
 convert_to_pm_type(::Type{AbstractVector{T}}) where T<:Union{Int32, Int64, String, AbstractSet{Int32}} = pm_Array{T}
 # this catches all pm_Arrays of pm_Arrays we have right now:
@@ -57,7 +57,7 @@ convert_to_pm(x) = throw(ArgumentError("Unrecognized argument type $(typeof(x)).
 # no convert for C++ compatible or wrapped polymake types:
 convert_to_pm(x::Union{Int32, Int64, Float64}) = x
 convert_to_pm(x::Union{pm_Vector, pm_Matrix, pm_Array, pm_Set}) = x
-convert_to_pm(x::Union{pm_perl_Object, pm_perl_PropertyValue}) = x
+convert_to_pm(x::Union{pm_perl_Object, pm_perl_PropertyValue, pm_perl_OptionSet}) = x
 
 convert_to_pm(x::T) where T <:Integer = convert(pm_Integer, x)
 convert_to_pm(x::Rational{T}) where T <: Integer = convert(pm_Rational, x)
