@@ -148,6 +148,10 @@
 
         @test (@pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)) isa Polymake.pm_perl_Object
 
+        pmintvar = pm_Set(intvar)
+
+        @test (@pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = pmintvar)) isa Polymake.pm_perl_Object
+
         p.MILP = @pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)
 
         omp_nthreads = parse(Int, get(ENV, "OMP_NUM_THREADS", "1"))
