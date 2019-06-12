@@ -9,9 +9,11 @@ pm_Set(v::Vector{T}) where T<:Integer = _new_set(v)
 pm_Set{T}(v::AbstractVector) where T = pm_Set(Vector{T}(v))
 pm_Set{T}(s::AbstractSet) where T = pm_Set{T}(collect(s))
 
-pm_Set{S}(n::T) where {S,T <: Integer} = scalar2set(S(n))
+pm_Set{S}(n::T) where {S, T <: Integer} = scalar2set(S(n))
 
 pm_Set{T}(itr) where T = union!(pm_Set{T}(), itr)
+
+pm_Set{T}(s::pm_Set{T}) where T = s
 
 function pm_Set(itr)
     T = Base.@default_eltype(itr)
@@ -35,7 +37,6 @@ Vector(s::pm_Set) = collect(s)
 
 Set(s::pm_Set{T}) where T = Set{T}(Vector(s))
 
-pm_Set{T}(s::pm_Set{T}) where T = s
 function Set{T}(s::pm_Set{S}) where {T, S}
     jls = Set{T}()
     sizehint!(jls, length(s))
