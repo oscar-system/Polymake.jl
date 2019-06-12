@@ -23,18 +23,27 @@ pm_SetAllocated{T}(v::Vector{T}) where T<:Integer = pm_Set{T}(v)
 
 ### convert FROM polymake object
 
-function Vector{I}(s::pm_Set{J}) where {I,J<:Integer}
-    return convert(Vector{I}, collect(s))
+function Vector{I}(s::pm_Set{J}) where {I, J}
+    jlv = Vector{I}(undef, length(s))
+    for (i,x) in enumerate(s)
+        jlv[i] = x
+    end
+    return jlv
 end
 
 Vector(s::pm_Set) = collect(s)
 
 Set(s::pm_Set{T}) where T = Set{T}(Vector(s))
-Set{T}(s::pm_Set{S}) where {T, S} = Set{T}(Vector{S}(s))
-
-Set{T}(s::pm_Set{S}) where {T, S<:Integer} = Set{T}(collect(s))
 
 pm_Set{T}(s::pm_Set{T}) where T = s
+function Set{T}(s::pm_Set{S}) where {T, S}
+    jls = Set{T}()
+    sizehint!(jls, length(s))
+    for x in s
+        push!(jls, x)
+    end
+    return jls
+end
 
 ### Promotion rules
 
