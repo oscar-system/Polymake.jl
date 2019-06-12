@@ -6,8 +6,8 @@ import Base: Set
 
 pm_Set(v::Vector{T}) where T<:Integer = _new_set(v)
 
-pm_Set{T}(v::Vector) where T = pm_Set(Vector{T}(v))
-pm_Set{T}(s::Set) where T = pm_Set{T}(collect(s))
+pm_Set{T}(v::AbstractVector) where T = pm_Set(Vector{T}(v))
+pm_Set{T}(s::AbstractSet) where T = pm_Set{T}(collect(s))
 
 pm_Set{S}(n::T) where {S,T <: Integer} = scalar2set(S(n))
 
@@ -19,7 +19,7 @@ function pm_Set(itr)
     return union!(pm_Set{T}(), itr)
 end
 
-pm_SetAllocated{T}(v::Vector{T}) where T<:Integer = pm_Set{T}(v)
+pm_SetAllocated{T}(v::Vector{T}) where T = pm_Set{T}(v)
 
 ### convert FROM polymake object
 
@@ -54,7 +54,7 @@ Base.promote_rule(::Type{Set{S}}, ::Type{pm_Set{T}}) where {S,T} = Set{promote_t
 # comparison between not-equally typed sets is not defined in Polymake
 ==(S::pm_Set, T::pm_Set) = incl(S,T) == 0
 
-function ==(S::pm_Set, jlS::Set)
+function ==(S::pm_Set, jlS::AbstractSet)
     length(S) == length(jlS) || return false
     for s in jlS
         s in S || return false
@@ -84,7 +84,7 @@ function Base.filter!(pred, s::pm_Set{T}) where T
 end
 
 # in      : Defined on the C++ side
-function Base.in(x::Integer, s::pm_Set{T}) where T<:Integer
+function Base.in(x::Integer, s::pm_Set{T}) where T
     in(T(x), s)
 end
 #
@@ -134,7 +134,7 @@ function Base.pop!(s::pm_Set{T}) where T
 end
 
 # push! : Defined on the C++ side
-Base.push!(s::pm_Set{T}, x::Integer) where T<:Integer = push!(s, T(x))
+Base.push!(s::pm_Set{T}, x::Integer) where T = push!(s, T(x))
 # show! : Defined on the C++ side
 
 Base.sizehint!(s::pm_Set, newsz) = s
