@@ -22,14 +22,13 @@ convert(::Type{pm_perl_OptionSet}, dict) = pm_perl_OptionSet(dict)
 
 ###########  Converting to objects polymake understands  ###############
 
-convert_to_pm(x::T) where T = convert(convert_to_pm_type(T), x)
-convert_to_pm(v::Visual) = v.obj
+struct PolymakeType end
 
-# disambiguations:
-convert(::Type{pm_Set}, as::AbstractSet) = pm_Set(as)
-convert(::Type{pm_Set{T}}, s::pm_Set{T}) where T = s
+convert(::Type{PolymakeType}, x::T) where T = convert(convert_to_pm_type(T), x)
+convert(::Type{PolymakeType}, v::Visual) = v.obj
+convert(::Type{pm_perl_OptionSet}, dict) = pm_perl_OptionSet(dict)
 
-################  Guessing the wrapped polymake type  ##################
+####################  Guessing the polymake type  ######################
 
 # By default we throw an error:
 convert_to_pm_type(T::Type) = throw(ArgumentError("Unrecognized argument type: $T.\nYou need to convert to polymake compatible type first."))

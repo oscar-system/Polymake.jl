@@ -33,7 +33,7 @@
 
             for m in [jl_m, jl_m//T(1), jl_m/T(1)]
                 M = pm_Matrix(m)
-                @test Polymake.convert_to_pm(M) === M
+                @test Polymake.convert(Polymake.PolymakeType, M) === M
                 @test float.(M) isa pm_Matrix{Float64}
                 @test Float64.(M) isa pm_Matrix{Float64}
                 @test Matrix{Float64}(M) isa Matrix{Float64}

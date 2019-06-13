@@ -142,7 +142,7 @@
     @testset "polymake MILP" begin
         p = @pm Polytope.Polytope( :INEQUALITIES => [1 1 -1; -1 0 1; 7 -1 -1] )
         intvar = Set([0,1,2])
-        @test Polymake.convert_to_pm(intvar) isa pm_Set{Int64}
+        @test Polymake.convert(Polymake.PolymakeType, intvar) isa pm_Set{Int64}
 
         obj = [0,-1,-1]
 
