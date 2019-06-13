@@ -1,10 +1,12 @@
-function pm_Array{T}(vec::AbstractVector) where T
+const pm_Array_suppT = Union{Int32, Int64, String, pm_Set{Int32}, pm_Matrix{pm_Integer}, AbstractString}
+
+function pm_Array{T}(vec::AbstractVector) where T <: pm_Array_suppT
     arr = pm_Array{T}(length(vec))
     @inbounds arr .= vec
     return arr
 end
 
-pm_Array{T}(n::Integer, elt) where T = pm_Array{T}(Int64(n), T(elt))
+pm_Array{T}(n::Integer, elt) where T<:pm_Array_suppT = pm_Array{T}(Int64(n), T(elt))
 pm_Array(n::Integer, elt::T) where T = pm_Array{T}(Int64(n), elt)
 
 pm_Array(vec::AbstractVector) = pm_Array{convert_to_pm_type(eltype(vec))}(vec)

@@ -1,15 +1,12 @@
 export incl, swap
 
-import Base: Set
+const pm_Set_suppT = Union{Int32, Int64}
 
 ### convert TO polymake object
 
-pm_Set(v::Vector{T}) where T<:Integer = _new_set(v)
-
-pm_Set{T}(v::AbstractVector) where T = pm_Set(Vector{T}(v))
-pm_Set{T}(s::AbstractSet) where T = pm_Set{T}(collect(s))
-
-pm_Set{S}(n::T) where {S, T <: Integer} = scalar2set(S(n))
+pm_Set(v::Vector{T}) where T<:pm_Set_suppT = _new_set(v)
+pm_Set{T}(s::pm_Set{T}) where T<:pm_Set_suppT = s
+pm_Set{S}(n::Integer) where S<:pm_Set_suppT = scalar2set(S(n))
 
 pm_Set{T}(itr) where T = union!(pm_Set{T}(), itr)
 
