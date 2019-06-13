@@ -83,6 +83,9 @@ void polymake_module_add_set(jlcxx::Module& polymake)
             wrapped.method("show_small_obj", [](pm_Set& S) {
                 return show_small_object<pm_Set>(S);
             });
+            wrapped.method("take",
+                [](pm::perl::Object p, const std::string& s,
+                    pm_Set& S){ p.take(s) << S; });
         });
 
     polymake.method("to_set_int32", [](pm::perl::PropertyValue v) {

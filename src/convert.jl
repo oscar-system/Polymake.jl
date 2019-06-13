@@ -25,6 +25,10 @@ convert(::Type{pm_perl_OptionSet}, dict) = pm_perl_OptionSet(dict)
 convert_to_pm(x::T) where T = convert(convert_to_pm_type(T), x)
 convert_to_pm(v::Visual) = v.obj
 
+# disambiguations:
+convert(::Type{pm_Set}, as::AbstractSet) = pm_Set(as)
+convert(::Type{pm_Set{T}}, s::pm_Set{T}) where T = s
+
 ################  Guessing the wrapped polymake type  ##################
 
 # By default we throw an error:

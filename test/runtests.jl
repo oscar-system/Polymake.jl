@@ -1,11 +1,13 @@
 using Polymake
 using Test
 
+# make wrapper compilation verbose on travis
+if (haskey(ENV, "TRAVIS"))
+    Polymake.shell_execute(raw"$Verbose::cpp=3;")
+end
+
 # write your own tests here
 @testset "Polymake" begin
-
-    Polymake.@register Polytope.pseudopower
-
     include("integers.jl")
     include("rationals.jl")
     include("vectors.jl")

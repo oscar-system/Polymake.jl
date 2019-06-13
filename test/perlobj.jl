@@ -138,4 +138,28 @@
         @test p.VERTICES[collect(pm_s), :] isa pm_Matrix{pm_Rational}
         @test p.VERTICES[collect(pm_s), :] == special_points
     end
+
+    @testset "polymake MILP" begin
+        p = @pm Polytope.Polytope( :INEQUALITIES => [1 1 -1; -1 0 1; 7 -1 -1] )
+        intvar = Set([0,1,2])
+        @test Polymake.convert_to_pm(intvar) isa pm_Set{Int64}
+
+        obj = [0,-1,-1]
+
+        @test (@pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)) isa Polymake.pm_perl_Object
+
+        pmintvar = pm_Set(intvar)
+
+        @test (@pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = pmintvar)) isa Polymake.pm_perl_Object
+
+        p.MILP = @pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)
+
+        omp_nthreads = parse(Int, get(ENV, "OMP_NUM_THREADS", "1"))
+
+        if max(omp_nthreads, Threads.nthreads()) == 1
+            # segfaults when called from different thread, see
+            # https://github.com/oscar-system/Polymake.jl/issues/144
+            @test p.MILP.MINIMAL_VALUE == -7
+        end
+    end
 end

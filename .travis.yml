@@ -14,6 +14,9 @@ notifications:
   email: false
 sudo: required
 codecov: true
+env:
+  global:
+    - OMP_NUM_THREADS=1
 before_install:
   - sudo ln -sf /usr/bin/gcc-7 /usr/bin/gcc
   - sudo ln -sf /usr/bin/g++-7 /usr/bin/g++
