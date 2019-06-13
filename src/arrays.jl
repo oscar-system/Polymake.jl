@@ -37,9 +37,9 @@ function Base.append!(A::pm_Array{T}, itr) where T
 end
 
 # workarounds for pm_Array{String}
-pm_Array{T}(n::Integer) where T<:AbstractString = pm_Array{AbstractString}(convert(Int64, n))
+pm_Array{T}(n::Integer) where T<:AbstractString = pm_Array{AbstractString}(Int64(n))
 pm_Array{T}(n::Integer, elt::T) where T<:AbstractString =
-pm_Array{AbstractString}(convert(Int64, n), elt)
+pm_Array{AbstractString}(Int64(n), elt)
 
 Base.@propagate_inbounds function Base.setindex!(A::pm_Array{S}, val, n::Integer) where {S<:AbstractString}
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
