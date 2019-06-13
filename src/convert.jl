@@ -1,24 +1,20 @@
 ####################  Converting to polymake types  ####################
 
-convert(::Type{pm_Vector}, vec::AbstractVector) = pm_Vector(vec)
-convert(::Type{pm_Vector{T}}, vec::AbstractVector) where T = pm_Vector{T}(vec)
-convert(::Type{pm_Vector{T}}, vec::pm_Vector) where T = vec
+for (pm_T, jl_T) in [
+        (pm_Vector, AbstractVector),
+        (pm_Matrix, AbstractMatrix),
+        (pm_Array, AbstractVector),
+        (pm_Set, AbstractSet)
+        ]
+    @eval begin
+        convert(::Type{$pm_T}, itr::$jl_T) = $pm_T(itr)
+        convert(::Type{$pm_T{T}}, itr::$jl_T) where T = $pm_T{T}(itr)
+        convert(::Type{$pm_T}, itr::$pm_T) where T = itr
+        convert(::Type{$pm_T{T}}, itr::$pm_T) where T = itr
+    end
+end
 
-convert(::Type{pm_Matrix}, mat::AbstractMatrix) = pm_Matrix(mat)
-convert(::Type{pm_Matrix{T}}, mat::AbstractMatrix) where T = pm_Matrix{T}(mat)
-convert(::Type{pm_Matrix{T}}, mat::pm_Matrix) where T = mat
-
-convert(::Type{pm_Array}, vec::AbstractVector) = pm_Array(vec)
-convert(::Type{pm_Array{T}}, vec::AbstractVector) where T = pm_Array{T}(vec)
-
-convert(::Type{pm_Set}, as::AbstractSet) = pm_Set(as)
-convert(::Type{pm_Set{T}}, as::AbstractSet) where T = pm_Set{T}(as)
-
-# disambiguations:
-convert(::Type{pm_Set}, itr) = pm_Set(itr)
-convert(::Type{pm_Set{T}}, itr) where T = pm_Set{T}(itr)
-
-convert(::Type{pm_perl_OptionSet}, dict) = pm_perl_OptionSet(dict)
+convert(::Type{pm_Set{T}}, itr::AbstractArray) where T = pm_Set{T}(itr)
 
 ###########  Converting to objects polymake understands  ###############
 
