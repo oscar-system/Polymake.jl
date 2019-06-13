@@ -23,6 +23,9 @@
 
             @test Polymake.convert(Polymake.PolymakeType, T.(jl_v)//1) isa pm_Vector{pm_Rational}
         end
+
+        pmV = convert(Polymake.PolymakeType, jl_v)
+        @test convert(Polymake.PolymakeType, pmV) === pmV
     end
 
     @testset "Low-level operations" begin

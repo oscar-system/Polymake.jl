@@ -27,9 +27,9 @@ _get_visual_string_svg(x::Visual) = _get_visual_string(x,:jupyter_visual_svg)
 
 function polymake_arguments(args...; kwargs...)
     if isempty(kwargs)
-        return Any[ convert_to_pm.(args)... ]
+        return Any[ convert.(PolymakeType, args)... ]
     else
-        Any[ convert_to_pm.(args)..., pm_perl_OptionSet(kwargs) ]
+        Any[ convert.(PolymakeType, args)..., pm_perl_OptionSet(kwargs) ]
     end
 end
 
