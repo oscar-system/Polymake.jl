@@ -158,7 +158,7 @@ macro pm(expr)
             val = internal_call_function($polymake_func_name,
                 $(string.(templates)),
                 polymake_arguments($(esc.(args)...), $(esc.(kwargs)...)));
-            return convert_from_property_value(val)
+            convert_from_property_value(val)
         )
     end
 end
