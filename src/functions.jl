@@ -183,7 +183,7 @@ POINTS
 
 
 ```
-Note: the expression in `@pm` macro is parsed syntactically, so it has to be a valid `julia` expression. However template parameters NEED NOT to be defined in `julia`, but must be valid names of `polymake` property types.
+Note: the expression in `@pm` macro is parsed syntactically, so it has to be a valid `julia` expression. However template parameters NEED NOT to be defined in `julia`, but must be valid names of `polymake` property types. Nested types (such as `{QuadraticExtension{Rational}}`) are allowed.
 """
 macro pm(expr)
     module_name, polymake_func, templates, args, kwargs = Meta.parse_function_call(expr)

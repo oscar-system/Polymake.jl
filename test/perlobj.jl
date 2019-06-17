@@ -18,6 +18,7 @@
         @test (@pm Polytope.Polytope(input_dict_int)) isa pm_perl_Object
         @test (@pm Polytope.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
         @test (@pm Polytope.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{QuadraticExtension{Rational}}(input_dict_int)) isa pm_perl_Object
 
         @test (@pm Polytope.Polytope(input_dict_rat)) isa pm_perl_Object
 

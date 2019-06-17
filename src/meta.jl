@@ -23,6 +23,14 @@ end
 
 ############### macro helpers
 
+function recursive_replace(s::Symbol, pairs::Dict)
+    str = string(s)
+    for (p,r) in pairs
+        str = replace(str, p=>r)
+    end
+    return Symbol(str)
+end
+
 function parse_function_call(expr)
     @assert expr.head == :call
     func = expr.args[1] # called function
@@ -31,8 +39,10 @@ function parse_function_call(expr)
     templates = Symbol[]
     # grab template parameters if present
     if func.head == :curly
-        templates = func.args[2:end]
+        templates = Symbol.(func.args[2:end])
         func = func.args[1]
+
+        templates = recursive_replace.(templates, Ref(Dict("{"=>"<", "}"=>">")))
     end
 
     @assert func.head == Symbol('.')
