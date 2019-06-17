@@ -54,7 +54,7 @@ function __init__()
     end
 
     try
-        initialize_polymake()
+        initialize_polymake(isinteractive())
     catch ex # initialize_polymake throws jl_error
         throw(PolymakeError(ex.msg))
     end

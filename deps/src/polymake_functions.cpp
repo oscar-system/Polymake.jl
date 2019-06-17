@@ -6,7 +6,7 @@
 #include <typeinfo>
 #include <cxxabi.h>
 
-void initialize_polymake()
+void initialize_polymake(bool interactive = true)
 {
     try {
         if (data.main_polymake_session == nullptr) {
@@ -14,7 +14,9 @@ void initialize_polymake()
             data.main_polymake_session->shell_enable();
             data.main_polymake_scope = new polymake::perl::Scope(
                 data.main_polymake_session->newScope());
-            std::cout << data.main_polymake_session->greeting() << std::endl;
+            if (interactive){
+                std::cout << data.main_polymake_session->greeting() << std::endl;
+            };
         };
     }
     catch (const std::exception& e) {

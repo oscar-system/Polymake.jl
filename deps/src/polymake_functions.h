@@ -2,7 +2,7 @@
 #define POLYMAKE_WRAP_FUNCTIONS
 
 
-void initialize_polymake();
+void initialize_polymake(bool interactive);
 
 pm::perl::Object to_perl_object(const pm::perl::PropertyValue&);
 
