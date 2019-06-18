@@ -15,6 +15,7 @@ import Base: ==, <, <=, *, -, +, //, div, rem,
     union, union!
 
 using CxxWrap
+import Libdl.dlext
 
 struct PolymakeError <: Exception
     msg
@@ -28,22 +29,18 @@ end
 # Load Cxx stuff and init
 ##########################
 
-@static if Sys.isapple()
-    @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.dylib"),
-        :define_module_polymake)
-elseif Sys.islinux()
-    @wrapmodule(joinpath(@__DIR__, "..", "deps", "src", "libpolymake.so"),
-        :define_module_polymake)
-else
-    error("System is not supported!")
-end
+Sys.isapple() || Sys.islinux() || error("System is not supported!")
+
+deps_dir = joinpath(@__DIR__, "..", "deps")
+
+@wrapmodule(joinpath(deps_dir, "src", "libpolymake.$dlext"), :define_module_polymake)
 
 include("generated/type_translator.jl")
 
 include("repl.jl")
 include("ijulia.jl")
 
-include(joinpath(@__DIR__,"..","deps","deps.jl"))
+include(joinpath(deps_dir,"deps.jl"))
 
 function __init__()
     @initcxx
@@ -54,15 +51,18 @@ function __init__()
     end
 
     try
-        initialize_polymake()
+        initialize_polymake(isinteractive())
+        if !isinteractive()
+            shell_execute(raw"$Verbose::credits=\"0\";")
+        end
     catch ex # initialize_polymake throws jl_error
         throw(PolymakeError(ex.msg))
     end
 
     application("common")
-    shell_execute("include(\"$(joinpath(@__DIR__, "..", "deps", "rules", "julia.rules"))\");")
-    startup_apps = convert_from_property_value(internal_call_function("startup_applications",String[],[]))
-    for app in startup_apps
+    shell_execute("include(\"$(joinpath(deps_dir, "rules", "julia.rules"))\");")
+
+    for app in call_function(:common, :startup_applications)
         application(app)
     end
     application("common")
