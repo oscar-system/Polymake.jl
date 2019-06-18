@@ -147,7 +147,7 @@ This macro can be used to
  * create `polymake` Big Objects (such as polytopes)
  * call `polymake` functions with specific template parameters.
 
-The expression passed to the macro has to be fully qualified name (starting with the uppercase name of polymake application) of a `polymake` object or function, with template parameters enclosed in `{ ... }`.
+The expression passed to the macro has to be the fully qualified name (starting with the uppercase name of polymake application) of a `polymake` object or function, with template parameters enclosed in `{ ... }`.
 
 # Examples
 ```jldoctest
