@@ -18,6 +18,7 @@
         @test (@pm Polytope.Polytope(input_dict_int)) isa pm_perl_Object
         @test (@pm Polytope.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
         @test (@pm Polytope.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{QuadraticExtension{Rational}}(input_dict_int)) isa pm_perl_Object
 
         @test (@pm Polytope.Polytope(input_dict_rat)) isa pm_perl_Object
 
@@ -42,6 +43,15 @@
         @test (@pm Polytope.Polytope(POINTS=[1//2 1//2])) isa pm_perl_Object
 
         @test Polytope.cube(3, 1//4, -1//4) isa pm_perl_Object
+
+        function test_pm_macro()
+            P = @pm Polytope.cube(3)
+            Pfl = @pm Common.convert_to{Float}(P)
+            d = Polytope.dim(Pfl)
+            return d+1
+        end
+
+        @test test_pm_macro() == 4
     end
 
     @testset "PolymakeException" begin

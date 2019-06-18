@@ -139,6 +139,52 @@ end
 
 Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
 
+
+"""
+    @pm PolymakeModule.function_name{Template, parameters}(args)
+
+This macro can be used to
+ * create `polymake` Big Objects (such as polytopes)
+ * call `polymake` functions with specific template parameters.
+
+The expression passed to the macro has to be the fully qualified name (starting with the uppercase name of polymake application) of a `polymake` object or function, with template parameters enclosed in `{ ... }`.
+
+# Examples
+```jldoctest
+julia> P = @pm Polytope.Polytope{QuadraticExtension}(POINTS=[1 0 0; 0 1 0])
+type: Polytope<QuadraticExtension<Rational>>
+
+POINTS
+1 0 0
+0 1 0
+
+
+
+julia> @pm Common.convert_to{Float}(P)
+type: Polytope<Float>
+
+POINTS
+1 0 0
+0 1 0
+
+
+CONE_AMBIENT_DIM
+3
+
+
+
+julia> @pm Tropical.Polytope{Max}(POINTS=[1 0 0; 0 1 0])
+type: Polytope<Max, Rational>
+
+POINTS
+0 -1 -1
+0 1 0
+
+
+
+```
+Note: the expression in `@pm` macro is parsed syntactically, so it has to be a valid `julia` expression. However template parameters **need not** to be defined in `julia`, but must be valid names of `polymake` property types. Nested types (such as `{QuadraticExtension{Rational}}`) are allowed.
+"""
 macro pm(expr)
     module_name, polymake_func, templates, args, kwargs = Meta.parse_function_call(expr)
     polymake_app = Meta.get_polymake_app_name(module_name)
@@ -158,7 +204,7 @@ macro pm(expr)
             val = internal_call_function($polymake_func_name,
                 $(string.(templates)),
                 polymake_arguments($(esc.(args)...), $(esc.(kwargs)...)));
-            return convert_from_property_value(val)
+            convert_from_property_value(val)
         )
     end
 end
