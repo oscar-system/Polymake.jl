@@ -55,6 +55,9 @@ function __init__()
 
     try
         initialize_polymake(isinteractive())
+        if !isinteractive()
+            shell_execute(raw"$Verbose::credits=\"0\";")
+        end
     catch ex # initialize_polymake throws jl_error
         throw(PolymakeError(ex.msg))
     end
