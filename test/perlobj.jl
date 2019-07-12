@@ -14,25 +14,6 @@
         @test (@pm Polytope.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
         @test (@pm Polytope.Polytope("POINTS"=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
 
-        # make sure we're escaping where we should
-        @test (@pm Polytope.Polytope(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytope.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytope.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytope.Polytope{QuadraticExtension{Rational}}(input_dict_int)) isa pm_perl_Object
-
-        @test (@pm Polytope.Polytope(input_dict_rat)) isa pm_perl_Object
-
-        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
-
-        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Tropical.Polytope{Max, Rational}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Tropical.Polytope{Max, QuadraticExtension}(input_dict_int)) isa pm_perl_Object
-
-        @test (@pm Tropical.Hypersurface{Min}(
-            MONOMIALS=[1 0 0; 0 1 0; 0 0 1],
-            COEFFICIENTS=[0, 0, 0])) isa pm_perl_Object
-        # note: You need to input COEFFICIENTS as Vector, otherwise it will be converted to pm_Matrix which polymake doesn't like.
-
         # Make sure that we can also handle different matrix types, e.g. adjoint
         @test (@pm Polytope.Polytope(POINTS=A')) isa pm_perl_Object
 
@@ -52,6 +33,35 @@
         end
 
         @test test_pm_macro() == 4
+    end
+
+    @testset "template parameters" begin
+        @test (@pm Polytope.Polytope(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{QuadraticExtension{Rational}}(input_dict_int)) isa pm_perl_Object
+
+        @test (@pm Polytope.Polytope(input_dict_rat)) isa pm_perl_Object
+
+        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
+
+        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Tropical.Polytope{Max, Rational}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Tropical.Polytope{Max, QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+
+        @test (@pm Tropical.Hypersurface{Min}(
+            MONOMIALS=[1 0 0; 0 1 0; 0 0 1],
+            COEFFICIENTS=[0, 0, 0])) isa pm_perl_Object
+        # note: You need to input COEFFICIENTS as Vector, otherwise it will be converted to pm_Matrix which polymake doesn't like.
+
+        P = @pm Polytope.Polytope{Float}(POINTS=[1 1//2 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{Float64}
+        P = @pm Polytope.Polytope{Float}(POINTS=[1 0.5 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{Float64}
+        P = @pm Polytope.Polytope(POINTS=[1 0.5 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{pm_Rational}
+        P = @pm Polytope.Polytope{Rational}(POINTS=[1 0.5 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{pm_Rational}
     end
 
     @testset "PolymakeException" begin
