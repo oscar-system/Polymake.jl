@@ -174,12 +174,6 @@
 
         p.MILP = @pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)
 
-        omp_nthreads = parse(Int, get(ENV, "OMP_NUM_THREADS", "1"))
-
-        if max(omp_nthreads, Threads.nthreads()) == 1
-            # segfaults when called from different thread, see
-            # https://github.com/oscar-system/Polymake.jl/issues/144
-            @test p.MILP.MINIMAL_VALUE == -7
-        end
+        @test p.MILP.MINIMAL_VALUE == -7
     end
 end

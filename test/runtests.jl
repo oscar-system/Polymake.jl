@@ -1,3 +1,7 @@
+# tosimplex segfaults when called from different thread, see
+# https://github.com/oscar-system/Polymake.jl/issues/144
+ENV["OMP_NUM_THREADS"] = 1
+
 using Polymake
 using Test
 
