@@ -61,7 +61,9 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
     elseif startswith(type_name,"Visual::")
         return Visual(obj)
     else
-        @warn("The return value contains $type_name which has not been wrapped yet")
+        lines = ["The return value contains $type_name which has not been wrapped yet;",
+        "use `@pm Common.convert_to{wrapped_type}(...)` to convert to julia-understandable type."]
+        @warn(join(lines, "\n"))
         return obj
     end
 end
