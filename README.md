@@ -243,7 +243,7 @@ special_points = p.VERTICES[collect(s), :]
 
 ### Data structures
 
-* Several small data types from `polymake` are available in `julia`:
+* Several small objects (data types) from `polymake` are available in `julia`:
     * Integers
     * Rationals
     * Vectors
@@ -257,7 +257,39 @@ but are also subtypes of the corresponding `julia` abstract types, e.g., a
 `polymake` array is an `AbstractArray`, and one can call methods that
 apply to `AbstractArray`s on `polymake` arrays.
 
-NOTE: if the returned type is a small data type which has not been wrapped in julia yet, you will not be able to access its content or in general use it in any meaningful way, except for passing to `polymake` as an argument of a function.
+**Note**: If the returned small object has not been wrapped in `Polymake.jl` yet,
+you will not be able to access its content or in general use it **from julia**,
+however you can always pass it back as an argument to `polymake` function.
+Moreover you may try to convert to julia understandable type via
+`@pm convert_to{wrapped{templated, type}}(obj)`.
+For example:
+
+```julia
+julia> c = Polytope.cube(3);
+
+julia> f = c.FACETS;
+┌ Warning: The return value contains pm::SparseMatrix<pm::Rational, pm::NonSymmetric> which has not been wrapped yet;
+│ use `@pm Common.convert_to{wrapped_type}(...)` to convert to julia-understandable type.
+└ @ Polymake ~/.julia/dev/Polymake/src/functions.jl:66
+
+julia> f[1,1] # f is an opaque pm::perl::PropertyValue to julia
+ERROR: MethodError: no method matching getindex(::Polymake.pm_perl_PropertyValueAllocated, ::Int64, ::Int64)
+Stacktrace:
+ [1] top-level scope at none:0
+
+julia> m = @pm Common.convert_to{Matrix{Integer}}(f)
+pm::Matrix<pm::Integer>
+1 1 0 0
+1 -1 0 0
+1 0 1 0
+1 0 -1 0
+1 0 0 1
+1 0 0 -1
+
+julia> m[1,1]
+1
+
+```
 
 * Big objects, e.g., Polytopes, can be handled in `julia`.
 
@@ -276,4 +308,4 @@ obj = @pm Appname.BigObject{Templete,Parameters}(args)
 See Section Polymake syntax translation for concrete examples.
 * Properties of big objects are accessible by `bigobject.property` syntax (as opposed to `$bigobject->property` in `perl/polymake`). If there is a missing property (e.g. `Polytope.Polytope` does not have `DIM` property in `julia/Polymake`), please check if it can be accessed by `appname.property(object)`. For example property `DIM` is exposed as `Polytope.dim(...)` function.
 * Methods are available as functions in the appropriate modules, with the first argument as the object, i.e. `$bigobj->methodname(...)` can be called via `Appname.methodname(bigobj, ...)`
-* A function in `julia/Polymake` calling `perl/polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=false` keyword argument to function/method call.
+* A function in `julia/Polymake` calling `perl/polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=true` keyword argument to function/method call.

@@ -14,25 +14,6 @@
         @test (@pm Polytope.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
         @test (@pm Polytope.Polytope("POINTS"=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa pm_perl_Object
 
-        # make sure we're escaping where we should
-        @test (@pm Polytope.Polytope(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytope.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytope.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Polytope.Polytope{QuadraticExtension{Rational}}(input_dict_int)) isa pm_perl_Object
-
-        @test (@pm Polytope.Polytope(input_dict_rat)) isa pm_perl_Object
-
-        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
-
-        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Tropical.Polytope{Max, Rational}(input_dict_int)) isa pm_perl_Object
-        @test (@pm Tropical.Polytope{Max, QuadraticExtension}(input_dict_int)) isa pm_perl_Object
-
-        @test (@pm Tropical.Hypersurface{Min}(
-            MONOMIALS=[1 0 0; 0 1 0; 0 0 1],
-            COEFFICIENTS=[0, 0, 0])) isa pm_perl_Object
-        # note: You need to input COEFFICIENTS as Vector, otherwise it will be converted to pm_Matrix which polymake doesn't like.
-
         # Make sure that we can also handle different matrix types, e.g. adjoint
         @test (@pm Polytope.Polytope(POINTS=A')) isa pm_perl_Object
 
@@ -54,6 +35,35 @@
         @test test_pm_macro() == 4
     end
 
+    @testset "template parameters" begin
+        @test (@pm Polytope.Polytope(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{Rational}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Polytope.Polytope{QuadraticExtension{Rational}}(input_dict_int)) isa pm_perl_Object
+
+        @test (@pm Polytope.Polytope(input_dict_rat)) isa pm_perl_Object
+
+        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
+
+        @test (@pm Tropical.Polytope{Max}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Tropical.Polytope{Max, Rational}(input_dict_int)) isa pm_perl_Object
+        @test (@pm Tropical.Polytope{Max, QuadraticExtension}(input_dict_int)) isa pm_perl_Object
+
+        @test (@pm Tropical.Hypersurface{Min}(
+            MONOMIALS=[1 0 0; 0 1 0; 0 0 1],
+            COEFFICIENTS=[0, 0, 0])) isa pm_perl_Object
+        # note: You need to input COEFFICIENTS as Vector, otherwise it will be converted to pm_Matrix which polymake doesn't like.
+
+        P = @pm Polytope.Polytope{Float}(POINTS=[1 1//2 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{Float64}
+        P = @pm Polytope.Polytope{Float}(POINTS=[1 0.5 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{Float64}
+        P = @pm Polytope.Polytope(POINTS=[1 0.5 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{pm_Rational}
+        P = @pm Polytope.Polytope{Rational}(POINTS=[1 0.5 0; 1 0 1])
+        @test P.VERTICES isa pm_Matrix{pm_Rational}
+    end
+
     @testset "PolymakeException" begin
         test_polytope = @pm Polytope.Polytope(input_dict_int)
         @test !(:STH in Base.propertynames(test_polytope))
@@ -69,7 +79,8 @@
         @test test_polytope.GRAPH isa pm_perl_Object
         test_graph = test_polytope.GRAPH
         @test :ADJACENCY in Base.propertynames(test_graph)
-        @test_logs (:warn, "The return value contains pm::graph::Graph<pm::graph::Undirected> which has not been wrapped yet") test_graph.ADJACENCY isa Polymake.pm_perl_PropertyValue
+        @test_logs (:warn, "The return value contains pm::graph::Graph<pm::graph::Undirected> which has not been wrapped yet;
+use `@pm Common.convert_to{wrapped_type}(...)` to convert to julia-understandable type.") test_graph.ADJACENCY isa Polymake.pm_perl_PropertyValue
 
         @test test_polytope.LATTICE_POINTS_GENERATORS isa pm_Array
 
@@ -164,12 +175,6 @@
 
         p.MILP = @pm Polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)
 
-        omp_nthreads = parse(Int, get(ENV, "OMP_NUM_THREADS", "1"))
-
-        if max(omp_nthreads, Threads.nthreads()) == 1
-            # segfaults when called from different thread, see
-            # https://github.com/oscar-system/Polymake.jl/issues/144
-            @test p.MILP.MINIMAL_VALUE == -7
-        end
+        @test p.MILP.MINIMAL_VALUE == -7
     end
 end

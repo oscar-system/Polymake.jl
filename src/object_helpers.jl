@@ -37,3 +37,12 @@ function get_docs(input::String; full::Bool=true, html::Bool=false)
     pos = UInt(max(length(input)-1, 0))
     return Polymake.shell_context_help(input, pos, full, html)
 end
+
+function cite(;format=:bibtex)
+    cite_str = split(shell_execute("""help "core/citation";""")[2], "\n\n")[2]
+    if format == :bibtex
+        return cite_str
+    else
+        throw("The only supported citation format is :bibtex")
+    end
+end
