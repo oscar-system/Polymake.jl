@@ -6,7 +6,7 @@ function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) wher
     perl_obj = pm_perl_Object(name)
     for value in input_data
         key = string(value[1])
-        val = convert_to_pm(value[2])
+        val = convert(PolymakeType, value[2])
         take(perl_obj,key,val)
     end
     return perl_obj
@@ -45,11 +45,11 @@ end
 Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
 
 function Base.setproperty!(obj::pm_perl_Object, prop::String, val)
-    return take(obj, prop, convert_to_pm(val))
+    return take(obj, prop, convert(PolymakeType, val))
 end
 
 function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
-    return take(obj, string(prop), convert_to_pm(val))
+    return take(obj, string(prop), convert(PolymakeType, val))
 end
 
 function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)

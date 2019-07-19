@@ -19,10 +19,13 @@
             @test pm_Vector(jl_v//T(1)) isa pm_Vector{pm_Rational}
             @test pm_Vector{pm_Rational}(T.(jl_v)) isa pm_Vector{pm_Rational}
 
-            @test Polymake.convert_to_pm(T.(jl_v)) isa pm_Vector{pm_Integer}
+            @test Polymake.convert(Polymake.PolymakeType, T.(jl_v)) isa pm_Vector{pm_Integer}
 
-            @test Polymake.convert_to_pm(T.(jl_v)//1) isa pm_Vector{pm_Rational}
+            @test Polymake.convert(Polymake.PolymakeType, T.(jl_v)//1) isa pm_Vector{pm_Rational}
         end
+
+        pmV = convert(Polymake.PolymakeType, jl_v)
+        @test convert(Polymake.PolymakeType, pmV) === pmV
     end
 
     @testset "Low-level operations" begin

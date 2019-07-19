@@ -1,10 +1,15 @@
-@inline function pm_Vector{T}(vec::AbstractVector) where T
+const pm_Vector_suppT = Union{pm_Integer, pm_Rational}
+
+@inline function pm_Vector{T}(vec::AbstractVector) where T <: pm_Vector_suppT
     res = pm_Vector{T}(size(vec)...)
     @inbounds res .= vec
     return res
 end
 
-pm_Vector(vec::AbstractVector) = pm_Vector{convert_to_pm_type(eltype(vec))}(vec)
+# we can't use convert_to_pm_type(T) below:
+# only types in pm_Vector_suppT are available
+pm_Vector(vec::AbstractVector{T}) where T <: Integer = pm_Vector{pm_Integer}(vec)
+pm_Vector(vec::AbstractVector{T}) where T <: Union{Rational, pm_Rational} = pm_Vector{pm_Rational}(vec)
 
 Base.size(v::pm_Vector) = (length(v),)
 

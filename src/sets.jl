@@ -1,16 +1,14 @@
 export incl, swap
 
-import Base: Set
+const pm_Set_suppT = Union{Int32, Int64}
 
 ### convert TO polymake object
 
-pm_Set(v::Vector{T}) where T<:Integer = _new_set(v)
+pm_Set(v::Vector{T}) where T<:pm_Set_suppT = _new_set(v)
+pm_Set{T}(s::pm_Set{T}) where T<:pm_Set_suppT = s
+pm_Set{S}(n::Integer) where S<:pm_Set_suppT = scalar2set(S(n))
 
-pm_Set{T}(v::Vector) where T = pm_Set(Vector{T}(v))
-pm_Set{T}(s::Set) where T = pm_Set{T}(collect(s))
-
-pm_Set{S}(n::T) where {S,T <: Integer} = scalar2set(S(n))
-
+pm_Set{T}(v::S) where {T, S <: Union{AbstractVector, AbstractSet}} = pm_Set(collect(T, v))
 pm_Set{T}(itr) where T = union!(pm_Set{T}(), itr)
 
 function pm_Set(itr)
@@ -19,22 +17,30 @@ function pm_Set(itr)
     return union!(pm_Set{T}(), itr)
 end
 
-pm_SetAllocated{T}(v::Vector{T}) where T<:Integer = pm_Set{T}(v)
+pm_SetAllocated{T}(v::Vector{T}) where T = pm_Set{T}(v)
 
 ### convert FROM polymake object
 
-function Vector{I}(s::pm_Set{J}) where {I,J<:Integer}
-    return convert(Vector{I}, collect(s))
+function Vector{I}(s::pm_Set{J}) where {I, J}
+    jlv = Vector{I}(undef, length(s))
+    for (i,x) in enumerate(s)
+        jlv[i] = x
+    end
+    return jlv
 end
 
 Vector(s::pm_Set) = collect(s)
 
-Set(s::pm_Set{T}) where T = Set{T}(Vector(s))
-Set{T}(s::pm_Set{S}) where {T, S} = Set{T}(Vector{S}(s))
+Base.Set(s::pm_Set{T}) where T = Set{T}(Vector(s))
 
-Set{T}(s::pm_Set{S}) where {T, S<:Integer} = Set{T}(collect(s))
-
-pm_Set{T}(s::pm_Set{T}) where T = s
+function Base.Set{T}(s::pm_Set{S}) where {T, S}
+    jls = Set{T}()
+    sizehint!(jls, length(s))
+    for x in s
+        push!(jls, x)
+    end
+    return jls
+end
 
 ### Promotion rules
 
@@ -45,7 +51,7 @@ Base.promote_rule(::Type{Set{S}}, ::Type{pm_Set{T}}) where {S,T} = Set{promote_t
 # comparison between not-equally typed sets is not defined in Polymake
 ==(S::pm_Set, T::pm_Set) = incl(S,T) == 0
 
-function ==(S::pm_Set, jlS::Set)
+function ==(S::pm_Set, jlS::AbstractSet)
     length(S) == length(jlS) || return false
     for s in jlS
         s in S || return false
@@ -75,7 +81,7 @@ function Base.filter!(pred, s::pm_Set{T}) where T
 end
 
 # in      : Defined on the C++ side
-function Base.in(x::Integer, s::pm_Set{T}) where T<:Integer
+function Base.in(x::Integer, s::pm_Set{T}) where T
     in(T(x), s)
 end
 #
@@ -125,7 +131,7 @@ function Base.pop!(s::pm_Set{T}) where T
 end
 
 # push! : Defined on the C++ side
-Base.push!(s::pm_Set{T}, x::Integer) where T<:Integer = push!(s, T(x))
+Base.push!(s::pm_Set{T}, x::Integer) where T = push!(s, T(x))
 # show! : Defined on the C++ side
 
 Base.sizehint!(s::pm_Set, newsz) = s
