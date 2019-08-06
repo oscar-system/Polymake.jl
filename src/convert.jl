@@ -39,10 +39,11 @@ convert_to_pm_type(::Type{<:Union{AbstractVector, pm_Vector}}) = pm_Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, pm_Matrix}}) = pm_Matrix
 convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
 convert_to_pm_type(::Type{<:Union{AbstractSet, pm_Set}}) = pm_Set
+convert_to_pm_type(::Type{<:Union{AbstractSet{<:Integer}, pm_Set{<:Integer}}}) = pm_Set{Int32} # pm_Set{Int32} is the natural type for polymake
 
-convert_to_pm_type(::Type{AbstractVector{T}}) where T<:Union{Int32, Int64, String, AbstractSet{Int32}} = pm_Array{T}
-convert_to_pm_type(::Type{AbstractVector{T}}) where T = pm_Vector{convert_to_pm_type(T)}
-convert_to_pm_type(::Type{AbstractMatrix{T}}) where T = pm_Matrix{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractSet} = pm_Array{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Integer = pm_Vector{pm_Integer}
+convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:Union{Rational, pm_Rational} = pm_Matrix{pm_Rational}
 
 # this catches all pm_Arrays of pm_Arrays we have right now:
-convert_to_pm_type(::Type{AbstractVector{<:AbstractArray{T}}}) where T<:Union{Int32, Int64, pm_Integer} = pm_Array{pm_Array{T}}
+convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T<:Union{Int32, Int64, pm_Integer} = pm_Array{pm_Array{T}}

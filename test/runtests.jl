@@ -18,6 +18,7 @@ end
     include("matrices.jl")
     include("sets.jl")
     include("arrays.jl")
+    include("convert.jl")
     include("perlobj.jl")
     include("interface_functions.jl")
     include("compat.jl")
