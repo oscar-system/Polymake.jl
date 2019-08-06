@@ -163,7 +163,7 @@ use `@pm Common.convert_to{wrapped_type}(...)` to convert to julia-understandabl
     @testset "polymake MILP" begin
         p = @pm Polytope.Polytope( :INEQUALITIES => [1 1 -1; -1 0 1; 7 -1 -1] )
         intvar = Set([0,1,2])
-        @test Polymake.convert(Polymake.PolymakeType, intvar) isa pm_Set{Int64}
+        @test Polymake.convert(Polymake.PolymakeType, intvar) isa pm_Set{Int32}
 
         obj = [0,-1,-1]
 

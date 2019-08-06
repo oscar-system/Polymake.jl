@@ -33,6 +33,7 @@ convert_to_pm_type(::Type{T}) where T <: Union{Int32, Int64, Float64} = T
 convert_to_pm_type(::Type{T}) where T <: Union{pm_perl_Object, pm_perl_PropertyValue, pm_perl_OptionSet} = T
 
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
+convert_to_pm_type(::Type{<:AbstractString}) = String
 convert_to_pm_type(::Type{<:Union{Integer, pm_Integer}}) = pm_Integer
 convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational
 convert_to_pm_type(::Type{<:Union{AbstractVector, pm_Vector}}) = pm_Vector
@@ -40,9 +41,22 @@ convert_to_pm_type(::Type{<:Union{AbstractMatrix, pm_Matrix}}) = pm_Matrix
 convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
 convert_to_pm_type(::Type{<:Union{AbstractSet, pm_Set}}) = pm_Set
 
-convert_to_pm_type(::Type{AbstractVector{T}}) where T<:Union{Int32, Int64, String, AbstractSet{Int32}} = pm_Array{T}
-convert_to_pm_type(::Type{AbstractVector{T}}) where T = pm_Vector{convert_to_pm_type(T)}
-convert_to_pm_type(::Type{AbstractMatrix{T}}) where T = pm_Matrix{convert_to_pm_type(T)}
+# specific converts for container types we wrap:
+# pm_Set{Int32} is the natural type for polymake
+convert_to_pm_type(::Type{<:Union{AbstractSet{T}, pm_Set{T}}}) where T<:Integer = pm_Set{Int32}
+# convert_to_pm_type(::Type{<:Union{AbstractSet{Int64}, pm_Set{Int64}}}) = pm_Set{Int64}
+
+for (pmT, jlT) in [(pm_Integer, Integer),
+                   (pm_Rational, Union{Rational, pm_Rational})]
+    @eval begin
+        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = pm_Matrix{$pmT}
+        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = pm_Vector{$pmT}
+    end
+end
+
+convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:AbstractFloat = pm_Matrix{convert_to_pm_type(T)}
+
+convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractSet} = pm_Array{convert_to_pm_type(T)}
 
 # this catches all pm_Arrays of pm_Arrays we have right now:
-convert_to_pm_type(::Type{AbstractVector{<:AbstractArray{T}}}) where T<:Union{Int32, Int64, pm_Integer} = pm_Array{pm_Array{T}}
+convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = pm_Array{pm_Array{convert_to_pm_type(T)}}
