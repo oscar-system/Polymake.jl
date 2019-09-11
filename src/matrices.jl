@@ -39,8 +39,16 @@ function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{2}) where S<:Union{p
     return pm_Matrix{convert_to_pm_type(S)}(dims...)
 end
 
-function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{1}) where S<:Union{pm_Integer, pm_Rational, Float64}
+function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{2}) where S
+    return Matrix{S}(undef, dims...)
+end
+
+function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{1}) where S<:Union{pm_Integer, pm_Rational}
     return pm_Vector{convert_to_pm_type(S)}(dims...)
+end
+
+function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{1}) where S
+    return Vector{S}(undef, dims...)
 end
 
 Base.BroadcastStyle(::Type{<:pm_Matrix}) = Broadcast.ArrayStyle{pm_Matrix}()
