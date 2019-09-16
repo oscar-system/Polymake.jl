@@ -110,6 +110,7 @@ The following script is modelled on the one from the [Using Perl within polymake
 using Polymake
 
 str = read("points.demo", String)
+# eval/parse is a hack for Rational input, don't do this at home!
 matrix_str = "["*replace(str, "/"=>"//")*"]"
 matrix = eval(Meta.parse(matrix_str))
 @show matrix
