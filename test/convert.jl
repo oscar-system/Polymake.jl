@@ -18,4 +18,11 @@
     @test convert(Polymake.PolymakeType, y) isa pm_Array{pm_Set{Int32}}
     y = Vector{Set{Int64}}([Set([3,3]), Set([3]), Set([1,2])])
     @test convert(Polymake.PolymakeType, y) isa pm_Array{pm_Set{Int32}}
+
+
+    @testset "convert to PolymakeType" begin
+        Base.convert(::Type{Polymake.PolymakeType}, n::MyInt) = n.x
+
+        @test Polymake.Polytope.cube(MyInt(3)) isa Polymake.pm_perl_Object
+    end
 end

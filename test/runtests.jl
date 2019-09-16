@@ -10,6 +10,8 @@ if (haskey(ENV, "TRAVIS"))
     Polymake.shell_execute(raw"$Verbose::cpp=3;")
 end
 
+struct MyInt x::Int end # needed in test/convert.jl
+
 # write your own tests here
 @testset "Polymake" begin
     include("integers.jl")

@@ -180,6 +180,15 @@
 
     @testset "Arithmetic" begin
         V = pm_Matrix{pm_Integer}(jl_m)
+        @test float.(V) isa Polymake.pm_MatrixAllocated{Float64}
+        @test V[1, :] isa Polymake.pm_VectorAllocated{pm_Integer}
+        @test float.(V)[1, :] isa Vector{Float64}
+
+        @test similar(V, Float64) isa Polymake.pm_MatrixAllocated{Float64}
+        @test similar(V, Float64, 10) isa Vector{Float64}
+        @test similar(V, Float64, 10, 10) isa Polymake.pm_MatrixAllocated{Float64}
+
+        V = pm_Matrix{pm_Integer}(jl_m)
         jl_w = jl_m//4
         W = pm_Matrix{pm_Rational}(jl_w)
         jl_u = jl_m/4
