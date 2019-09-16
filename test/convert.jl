@@ -21,8 +21,6 @@
 
 
     @testset "convert to PolymakeType" begin
-        struct MyInt x::Int end
-
         Base.convert(::Type{Polymake.PolymakeType}, n::MyInt) = n.x
 
         @test Polymake.Polytope.cube(MyInt(3)) isa Polymake.pm_perl_Object
