@@ -15,3 +15,4 @@ deps/json
 local
 Manifest.toml
 src/generated/*.jl
+.vscode
