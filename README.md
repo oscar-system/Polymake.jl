@@ -309,3 +309,58 @@ See Section Polymake syntax translation for concrete examples.
 * Properties of big objects are accessible by `bigobject.property` syntax (as opposed to `$bigobject->property` in `perl/polymake`). If there is a missing property (e.g. `Polytope.Polytope` does not have `DIM` property in `julia/Polymake`), please check if it can be accessed by `appname.property(object)`. For example property `DIM` is exposed as `Polytope.dim(...)` function.
 * Methods are available as functions in the appropriate modules, with the first argument as the object, i.e. `$bigobj->methodname(...)` can be called via `Appname.methodname(bigobj, ...)`
 * A function in `julia/Polymake` calling `perl/polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=true` keyword argument to function/method call.
+
+### Function Arguments
+
+Functions in `julia/polymake` accept the following types for their arguments:
+* simple data types (bools, machine integers, floats)
+* wrapped native types (`pm_Integer`, `pm_Rational`, `pm_Vector`, `pm_Matrix`, `pm_Set` etc.)
+* other objects returned by polymake:
+  *  `pm_perl_Object` (essentially Big Objects),
+  *  `pm_perl_PropertyValue` (containers opaque to `julia`)
+<!-- *  `pm_perl_OptionSet` -->
+
+If an object passed to `julia/polymake` function is of a different type the software will try its best to convert it to such. However, if the conversion doesn't work the `ArgumentError` will be thrown:
+```julia
+ERROR: ArgumentError: Unrecognized argument type: SomeType.
+```
+
+You can tell `julia/polymake` how to convert it by definig
+```julia
+Base.convert(::Type{Polymake.PolymakeType}, ma::SomeType)
+```
+The returned value must be of one of the types as above. For example to use `AbstractAlgebra` matrices as input to `julia/polymake` one may define
+```julia
+Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = pm_Matrix(M.entries)
+```
+and the following should run smoothly.
+```julia
+julia> using AbstractAlgebra, Polymake
+polymake version 3.4
+Copyright (c) 1997-2019
+Ewgenij Gawrilow, Michael Joswig (TU Berlin)
+https://polymake.org
+
+This is free software licensed under GPL; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+julia> mm = AbstractAlgebra.matrix(ZZ, [1 2 3; 4 5 6])
+[1 2 3]
+[4 5 6]
+
+julia> @pm Polytope.Polytope(POINTS=mm)
+ERROR: ArgumentError: Unrecognized argument type: AbstractAlgebra.Generic.MatSpaceElem{Int64}.
+You need to convert to polymake compatible type first.
+[...]
+
+julia> Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = pm_Matrix(M.entries)
+
+julia> @pm Polytope.Polytope(POINTS=mm)
+type: Polytope<Rational>
+
+POINTS
+1 2 3
+1 5/4 3/2
+
+```
