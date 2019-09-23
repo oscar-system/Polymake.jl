@@ -13,7 +13,7 @@ void polymake_module_add_set(jlcxx::Module& polymake)
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
             "pm_Set", jlcxx::julia_type("AbstractSet", "Base"))
-        .apply<pm::Set<int32_t>, pm::Set<int64_t>>([](auto wrapped) {
+        .apply<pm::Set<int32_t>, pm::Set<long>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type             pm_Set;
             typedef typename decltype(wrapped)::type::value_type elemType;
 
@@ -92,11 +92,11 @@ void polymake_module_add_set(jlcxx::Module& polymake)
         return to_SmallObject<pm::Set<int32_t>>(v);
     });
     polymake.method("to_set_int64", [](pm::perl::PropertyValue v) {
-        return to_SmallObject<pm::Set<int64_t>>(v);
+        return to_SmallObject<pm::Set<long>>(v);
     });
 
     polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("SetIterator")
-        .apply<WrappedSetIterator<int32_t>, WrappedSetIterator<int64_t>>(
+        .apply<WrappedSetIterator<int32_t>, WrappedSetIterator<long>>(
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type WrappedSetIter;
                 typedef typename decltype(wrapped)::type::value_type elemType;
@@ -121,13 +121,13 @@ void polymake_module_add_set(jlcxx::Module& polymake)
     polymake.method("incl", [](pm::Set<int32_t> s1, pm::Set<int32_t> s2) {
         return pm::incl(s1, s2);
     });
-    polymake.method("incl", [](pm::Set<int32_t> s1, pm::Set<int64_t> s2) {
+    polymake.method("incl", [](pm::Set<int32_t> s1, pm::Set<long> s2) {
         return pm::incl(s1, s2);
     });
-    polymake.method("incl", [](pm::Set<int64_t> s1, pm::Set<int32_t> s2) {
+    polymake.method("incl", [](pm::Set<long> s1, pm::Set<int32_t> s2) {
         return pm::incl(s1, s2);
     });
-    polymake.method("incl", [](pm::Set<int64_t> s1, pm::Set<int64_t> s2) {
+    polymake.method("incl", [](pm::Set<long> s1, pm::Set<long> s2) {
         return pm::incl(s1, s2);
     });
 }
