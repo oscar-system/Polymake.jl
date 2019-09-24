@@ -19,9 +19,11 @@ The installation can be done in the Julia's REPL by executing
 ```julia
 julia> using Pkg; Pkg.add("Polymake")
 ```
-This will fetch a pre-build binary of `polymake`. You are ready to start `using Polymake`.
+This will fetch a pre-built binary of `polymake`. You are ready to start `using Polymake`.
 
-Note: Pre-build binaries are available only for the `Linux` platform. macOS users need to follow the "Your own installation of `polymake`" below. Windows users are encouraged to try running Julia inside Window Subsystem for Linux and reporting back ;)
+Note: Pre-built binaries are available for the `Linux` and `macOS` platform, but the `macOS` binaries are considered experimental. Windows users are encouraged to try running Julia inside Window Subsystem for Linux and reporting back ;)
+
+To skip the test for `polymake-config` in the `PATH` and directly use the pre-built binaries you need to set `POLYMAKE_CONFIG=no` in your environment.
 
 ### Your own installation of `polymake`
 
@@ -34,7 +36,7 @@ After this just `add` the package as above (or `build` if the package has been a
 
 ### `polymake` from source
 
-A compatible version is available at [polymake/polymake#snapshots](https://github.com/polymake/polymake/tree/Snapshots).
+A compatible version is available at [polymake/polymake](https://github.com/polymake/polymake).
 It can be compiled as follows where `GIT_FOLDER` and `INSTALL_FOLDER` have to be substituted with your favorite folders. Please note that these need to be absolute paths.
 Also make sure to check [the necessary dependencies](https://polymake.org/doku.php/howto/install) as well as the [additional instructions for Macs](https://polymake.org/doku.php/howto/mac).
 
@@ -43,7 +45,6 @@ export POLYMAKE_GIT=GIT_FOLDER
 export POLYMAKE_INSTALL=INSTALL_FOLDER
 git clone git@github.com:polymake/polymake $POLYMAKE_GIT
 cd $POLYMAKE_GIT
-git checkout Snapshots
 ./configure --prefix=$POLYMAKE_INSTALL
 ninja -C build/Opt
 ninja -C build/Opt install
