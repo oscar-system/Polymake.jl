@@ -2,7 +2,7 @@
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
-    for T in [pm_Integer, pm_Rational, Float64]
+    for T in [Int32, pm_Integer, pm_Rational, Float64]
         @test pm_Matrix{T} <: AbstractMatrix
         @test pm_Matrix{T}(3,4) isa AbstractMatrix
         @test pm_Matrix{T}(3,4) isa pm_Matrix
@@ -16,7 +16,7 @@
     jl_m = [1 2 3; 4 5 6]
     @testset "Constructors/Converts" begin
         for T in [IntTypes; pm_Integer]
-            @test pm_Matrix(T.(jl_m)) isa pm_Matrix{pm_Integer}
+            @test pm_Matrix(T.(jl_m)) isa pm_Matrix{T == Int32 ? Int32 : pm_Integer}
             @test pm_Matrix(jl_m//1) isa pm_Matrix{pm_Rational}
             @test pm_Matrix(jl_m/1) isa pm_Matrix{Float64}
 
@@ -57,6 +57,35 @@
     end
 
     @testset "Low-level operations" begin
+        @testset "pm_Matrix{Int32}" begin
+            jl_m_32 = Int32.(jl_m)
+            V = pm_Matrix{Int32}(jl_m_32)
+            # linear indexing:
+            @test V[1] == 1
+            @test V[2] == 4
+
+            @test eltype(V) == Int32
+
+            @test_throws BoundsError V[0, 1]
+            @test_throws BoundsError V[2, 5]
+            @test_throws BoundsError V[3, 1]
+
+            @test length(V) == 6
+            @test size(V) == (2,3)
+
+            for T in [IntTypes; pm_Integer]
+                V = pm_Matrix{Int32}(jl_m_32) # local copy
+                @test setindex!(V, T(5), 1, 1) isa pm_Matrix{Int32}
+                @test V[T(1), 1] isa Int32
+                @test V[1, T(1)] == 5
+                # testing the return value of brackets operator
+                @test V[2, 1] = T(10) isa T
+                V[2, 1] = T(10)
+                @test V[2, 1] == 10
+                @test string(V) == "pm::Matrix<int>\n5 2 3\n10 5 6\n"
+            end
+        end
+
         @testset "pm_Matrix{pm_Integer}" begin
             V = pm_Matrix{pm_Integer}(jl_m)
             # linear indexing:

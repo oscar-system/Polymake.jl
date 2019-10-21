@@ -4,6 +4,7 @@ type_tuples = [
 ( "pm_perl_Object",                "pm::perl::Object",                   "pm_perl_Object",                  "to_perl_object" ),
 ( "pm_Integer",                    "pm::Integer",                        "pm_Integer",                      "to_pm_Integer" ),
 ( "pm_Rational",                   "pm::Rational",                       "pm_Rational",                     "to_pm_Rational" ),
+( "pm_Matrix_int",                 "pm::Matrix<int>",                    "pm_Matrix{Int32}",                "to_matrix_int" ),
 ( "pm_Matrix_pm_Integer",          "pm::Matrix<pm::Integer>",            "pm_Matrix{pm_Integer}",           "to_matrix_Integer" ),
 ( "pm_Matrix_pm_Rational",         "pm::Matrix<pm::Rational>",           "pm_Matrix{pm_Rational}",          "to_matrix_Rational" ),
 ( "pm_Matrix_double",              "pm::Matrix<double>",                 "pm_Matrix{Float64}",              "to_matrix_double" ),
