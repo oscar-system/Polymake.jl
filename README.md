@@ -294,9 +294,6 @@ For example:
 julia> c = Polytope.cube(3);
 
 julia> f = c.FACETS;
-┌ Warning: The return value contains pm::SparseMatrix<pm::Rational, pm::NonSymmetric> which has not been wrapped yet;
-│ use `@pm Common.convert_to{wrapped_type}(...)` to convert to julia-understandable type.
-└ @ Polymake ~/.julia/dev/Polymake/src/functions.jl:66
 
 julia> f[1,1] # f is an opaque pm::perl::PropertyValue to julia
 ERROR: MethodError: no method matching getindex(::Polymake.pm_perl_PropertyValueAllocated, ::Int64, ::Int64)

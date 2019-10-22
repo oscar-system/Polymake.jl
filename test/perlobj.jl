@@ -79,8 +79,6 @@
         @test test_polytope.GRAPH isa pm_perl_Object
         test_graph = test_polytope.GRAPH
         @test :ADJACENCY in Base.propertynames(test_graph)
-        @test_logs (:warn, "The return value contains pm::graph::Graph<pm::graph::Undirected> which has not been wrapped yet;
-use `@pm Common.convert_to{wrapped_type}(...)` to convert to julia-understandable type.") test_graph.ADJACENCY isa Polymake.pm_perl_PropertyValue
 
         @test test_polytope.LATTICE_POINTS_GENERATORS isa pm_Array
 

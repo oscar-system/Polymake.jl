@@ -194,10 +194,8 @@ function jl_code(pf::PolymakeFunction)
             end
         end;
         function $(Base.Docs).getdoc(::typeof($(jl_symbol(pf))))
-            @warn "Below is the Polymake syntax.\nPlease refer to the Polymake.jl Readme for a translation guide"
             docstrs = get_docs($func_name, full=true)
-            sep = "---"
-            return Markdown.parse(join(docstrs, "\n\n$sep\n\n"))
+            return Markdown.parse(join(docstrs, "\n\n---\n\n"))
         end;
         export $(jl_symbol(pf));
     )
