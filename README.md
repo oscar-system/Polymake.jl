@@ -25,6 +25,8 @@ Note: Pre-built binaries are available for the `Linux` and `macOS` platform, but
 
 To skip the test for `polymake-config` in the `PATH` and directly use the pre-built binaries you need to set `POLYMAKE_CONFIG=no` in your environment.
 
+Note: Pre-built polymake will use a separate `.polymake` config directory (usually `joinpath(homedir(), ".julia", "polymake_user")`).
+
 ### Your own installation of `polymake`
 
 If you already have a recent enough version of `polymake` (i.e. `>=3.3`) on your system,
@@ -53,6 +55,8 @@ export POLYMAKE_CONFIG=$POLYMAKE_INSTALL/bin/polymake-config
 Note that `polymake` might take some time to compile.
 
 After this start Julia and follow the instructions above.
+
+Note: Self-built polymake will use the standard `.polymake` config directory (usually `$HOME/.polymake`).
 
 ### `Polymake.jl` in a separate environment:
 First clone `Polymake.jl`:
