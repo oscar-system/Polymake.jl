@@ -12,6 +12,7 @@ void initialize_polymake(bool interactive = true)
         if (data.main_polymake_session == nullptr) {
             data.main_polymake_session = new polymake::Main;
             data.main_polymake_session->shell_enable();
+            data.main_polymake_session->set_interrupt_signal(SIGINT);
             data.main_polymake_scope = new polymake::perl::Scope(
                 data.main_polymake_session->newScope());
             if (interactive){
