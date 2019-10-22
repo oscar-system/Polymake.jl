@@ -1,4 +1,4 @@
-const pm_Matrix_suppT = Union{pm_Integer, pm_Rational, Float64}
+const pm_Matrix_suppT = Union{Int32, pm_Integer, pm_Rational, Float64}
 
 @inline function pm_Matrix{T}(mat::AbstractMatrix) where T <: pm_Matrix_suppT
     res = pm_Matrix{T}(size(mat)...)
@@ -13,6 +13,7 @@ end
 
 # we can't use convert_to_pm_type(T) below:
 # only types in pm_Matrix_suppT are available
+pm_Matrix(mat::AbstractMatrix{Int32}) = pm_Matrix{Int32}(mat)
 pm_Matrix(mat::AbstractMatrix{T}) where T <: Integer = pm_Matrix{pm_Integer}(mat)
 pm_Matrix(mat::AbstractMatrix{T}) where T <: Union{Rational, pm_Rational} = pm_Matrix{pm_Rational}(mat)
 pm_Matrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = pm_Matrix{Float64}(mat)
