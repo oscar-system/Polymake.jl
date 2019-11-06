@@ -1,70 +1,5 @@
 export @pm, call_function, call_method
 
-import Base: convert, show
-
-function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
-    perl_obj = pm_perl_Object(name)
-    for value in input_data
-        key = string(value[1])
-        val = convert(PolymakeType, value[2])
-        take(perl_obj,key,val)
-    end
-    return perl_obj
-end
-
-function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwargsdata...)
-    obj = pm_perl_Object(name)
-    for (key, val) in input_data
-        setproperty!(obj, string(key), val)
-    end
-    for (key, val) in kwargsdata
-        setproperty!(obj, string(key), val)
-    end
-    return obj
-end
-
-const WrappedTypes = Dict(
-    Symbol("int") => to_int,
-    Symbol("double") => to_double,
-    Symbol("bool") => to_bool,
-    Symbol("std::string") => to_string,
-    Symbol("undefined") => x -> nothing,
-)
-
-function fill_wrapped_types!(wrapped_types_dict, function_type_list)
-    function_names = function_type_list[1:2:end]
-    type_names = function_type_list[2:2:end]
-    for (fn, tn) in zip(function_names, type_names)
-        fns = Symbol(fn)
-        tn = replace(tn," "=>"")
-        @eval $wrapped_types_dict[Symbol($tn)] = Polymake.$fns
-    end
-    return wrapped_types_dict
-end
-
-Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
-
-function Base.setproperty!(obj::pm_perl_Object, prop::String, val)
-    return take(obj, prop, convert(PolymakeType, val))
-end
-
-function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
-    return take(obj, string(prop), convert(PolymakeType, val))
-end
-
-function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
-    type_name = Polymake.typeinfo_string(obj,true)
-    T = Symbol(replace(type_name," "=>""))
-    if haskey(WrappedTypes, T)
-        f = WrappedTypes[T]
-        return f(obj)
-    elseif startswith(type_name,"Visual::")
-        return Visual(obj)
-    else
-        return obj
-    end
-end
-
 """
     call_function(app::Symbol, func::Symbol, args...; void=false, kwargs...)
 
@@ -208,6 +143,14 @@ macro pm(expr)
     end
 end
 
+function polymake_arguments(args...; kwargs...)
+    if isempty(kwargs)
+        return Any[ convert.(PolymakeType, args)... ]
+    else
+        Any[ convert.(PolymakeType, args)..., pm_perl_OptionSet(kwargs) ]
+    end
+end
+
 macro register(expr)
     if expr.head == Symbol(".")
         module_name = expr.args[1]
@@ -225,14 +168,4 @@ macro register(expr)
         @eval $(module_name) $(Meta.jl_code(pc));
         $(module_name).$(pc.jl_function)
     )
-end
-
-to_one_based_indexing(n::Number) = n + one(n)
-to_zero_based_indexing(n::Number) = (n > zero(n) ? n - one(n) : throw(ArgumentError("Can't use negative index")))
-
-for f in [:to_one_based_indexing, :to_zero_based_indexing]
-    @eval begin
-        $f(itr) = $f.(itr)
-        $f(s::S) where S<:AbstractSet = S($f.(s))
-    end
 end
