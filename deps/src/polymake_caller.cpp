@@ -26,34 +26,7 @@ void set_julia_type(std::string name, void* type_address)
     memcpy(address, &type_address, sizeof(jl_value_t*));
 }
 
-
-#define TO_POLYMAKE_FUNCTION(juliatype, ctype)                               \
-    if (jl_subtype(current_type, POLYMAKETYPE_##juliatype)) {                \
-        function << *reinterpret_cast<ctype*>(                               \
-            get_ptr_from_cxxwrap_obj(argument));                             \
-        return;                                                              \
-    }
-
-template <typename T>
-void polymake_call_function_feed_argument(T& function, jl_value_t* argument)
-{
-    jl_value_t* current_type = jl_typeof(argument);
-    if (jl_is_int64(argument)) {
-        // check size of long, to be sure
-        static_assert(sizeof(long) == 8, "long must be 64 bit");
-        function << static_cast<long>(jl_unbox_int64(argument));
-        return;
-    }
-    if (jl_is_bool(argument)) {
-        function << jl_unbox_bool(argument);
-        return;
-    }
-    if (jl_is_string(argument)) {
-        function << std::string(jl_string_data(argument));
-        return;
-    }
-#include "generated/to_polymake_function.h"
-}
+#include "generated/polymake_call_function_feed_argument.h"
 
 std::vector<std::string>
 create_template_vector(jlcxx::ArrayRef<std::string> template_parameters)
