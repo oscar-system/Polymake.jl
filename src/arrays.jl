@@ -1,4 +1,4 @@
-const pm_Array_suppT = Union{Int32, Int64, pm_Integer,
+const pm_Array_suppT = Union{Int32, Int64, pm_Integer, pm_Rational,
                       String, AbstractString, pm_Set{Int32},
                       pm_Array{Int32}, pm_Array{Int64}, pm_Array{pm_Integer},
                       pm_Matrix{pm_Integer}}
