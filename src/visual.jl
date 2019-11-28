@@ -24,12 +24,13 @@ function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
 end
 # fallback for non-wrapped types
 function Base.show(io::IO, ::MIME"text/plain", pv::pm_perl_PropertyValue)
-    if typeinfo_string(pv, true) == "undefined"
-        print(io, "undefined")
-    else
+    type_info = typeinfo_string(pv, true)
+    println(io, "pm::perl::PropertyValue wrapping $type_info")
+    if  type_info != "undefined"
         print(io, to_string(pv))
     end
 end
+
 function Base.show(io::IO, ::MIME"text/plain", a::pm_Array{pm_perl_Object})
     print(io, "pm_Array{pm_perl_Object} of size ",length(a))
 end
