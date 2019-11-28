@@ -22,6 +22,8 @@
 
 #include "polymake_type_translations.h"
 
+#include "generated/type_declarations.h"
+
 Polymake_Data data{nullptr, nullptr};
 
 JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
@@ -68,7 +70,9 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         return jlcxx::make_julia_array(output, props.size() + 1);
     });
 
-    polymake.method("shell_context_help", [](const std::string input, size_t pos=std::string::npos, bool full=false, bool html=false){
+    polymake.method("shell_context_help", [](
+        const std::string input, size_t pos=std::string::npos,
+        bool full=false, bool html=false){
         std::vector<std::string> ctx_help =
             data.main_polymake_session->shell_context_help(input, pos, full, html);
         jl_value_t** doc_strings = new jl_value_t*[ctx_help.size()];
