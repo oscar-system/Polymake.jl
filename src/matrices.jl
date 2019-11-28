@@ -36,7 +36,7 @@ Base.@propagate_inbounds function Base.setindex!(M::pm_Matrix{T}, val, i::Intege
     return M
 end
 
-function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{2}) where S<:Union{pm_Integer, pm_Rational, Float64}
+function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{2}) where S<: pm_Matrix_suppT
     return pm_Matrix{convert_to_pm_type(S)}(dims...)
 end
 
@@ -44,7 +44,7 @@ function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{2}) where S
     return Matrix{S}(undef, dims...)
 end
 
-function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{1}) where S<:Union{pm_Integer, pm_Rational}
+function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{1}) where S<: pm_Vector_suppT
     return pm_Vector{convert_to_pm_type(S)}(dims...)
 end
 

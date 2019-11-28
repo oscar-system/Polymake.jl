@@ -15,10 +15,11 @@
 
     jl_m = [1 2 3; 4 5 6]
     @testset "Constructors/Converts" begin
+        @test pm_Matrix(jl_m//1) isa pm_Matrix{pm_Rational}
+        @test pm_Matrix(jl_m/1) isa pm_Matrix{Float64}
+
         for T in [IntTypes; pm_Integer]
             @test pm_Matrix(T.(jl_m)) isa pm_Matrix{T == Int32 ? Int32 : pm_Integer}
-            @test pm_Matrix(jl_m//1) isa pm_Matrix{pm_Rational}
-            @test pm_Matrix(jl_m/1) isa pm_Matrix{Float64}
 
             for ElType in [pm_Integer, pm_Rational, Float64]
                 for m in [jl_m, jl_m//T(1), jl_m/T(1)]
@@ -135,11 +136,7 @@
                 @test V[T(1), 1] isa Polymake.pm_RationalAllocated
                 @test V[1, T(1)] == 5//3
                 # testing the return value of brackets operator
-                if T != pm_Integer
-                    @test V[2] = T(10)//T(3) isa Rational{T}
-                else
-                    @test V[2] = T(10)//T(3) isa pm_Rational
-                end
+                @test V[2] = T(10)//T(3) isa typeof(T(10)//T(3))
                 V[2] = T(10)//T(3)
                 @test V[2] == 10//3
                 @test string(V) == "pm::Matrix<pm::Rational>\n5/3 2 3\n10/3 5 6\n"
@@ -211,10 +208,10 @@
         V = pm_Matrix{pm_Integer}(jl_m)
         @test float.(V) isa Polymake.pm_MatrixAllocated{Float64}
         @test V[1, :] isa Polymake.pm_VectorAllocated{pm_Integer}
-        @test float.(V)[1, :] isa Vector{Float64}
+        @test float.(V)[1, :] isa pm_Vector{Float64}
 
         @test similar(V, Float64) isa Polymake.pm_MatrixAllocated{Float64}
-        @test similar(V, Float64, 10) isa Vector{Float64}
+        @test similar(V, Float64, 10) isa pm_Vector{Float64}
         @test similar(V, Float64, 10, 10) isa Polymake.pm_MatrixAllocated{Float64}
 
         V = pm_Matrix{pm_Integer}(jl_m)
@@ -300,8 +297,7 @@
             end
         end
         for T in FloatTypes
-            let mat = U
-                ElType = Float64
+            let mat = U, ElType = Float64
                 op = *
                 @test op(T(2), mat) isa pm_Matrix{ElType}
                 @test op(mat, T(2)) isa pm_Matrix{ElType}
@@ -335,7 +331,7 @@
 
             @test W + T.(4jl_w) == T.(4jl_w) + W == W .+ T.(4jl_w) == T.(4jl_w) .+ W == 5jl_w
 
-            @test W + T.(4jl_u) == T.(4jl_u) + W == W .+ T.(4jl_u) == T.(4jl_u) .+ W == 5jl_u
+            @test U + T.(4jl_u) == T.(4jl_u) + U == U .+ T.(4jl_u) == T.(4jl_u) .+ U == 5jl_u
         end
     end
 end

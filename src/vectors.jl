@@ -1,4 +1,4 @@
-const pm_Vector_suppT = Union{pm_Integer, pm_Rational}
+const pm_Vector_suppT = Union{pm_Integer, pm_Rational, Float64}
 
 @inline function pm_Vector{T}(vec::AbstractVector) where T <: pm_Vector_suppT
     res = pm_Vector{T}(size(vec)...)
@@ -10,6 +10,7 @@ end
 # only types in pm_Vector_suppT are available
 pm_Vector(vec::AbstractVector{T}) where T <: Integer = pm_Vector{pm_Integer}(vec)
 pm_Vector(vec::AbstractVector{T}) where T <: Union{Rational, pm_Rational} = pm_Vector{pm_Rational}(vec)
+pm_Vector(vec::AbstractVector{T}) where T <: AbstractFloat = pm_Vector{Float64}(vec)
 
 Base.size(v::pm_Vector) = (length(v),)
 
