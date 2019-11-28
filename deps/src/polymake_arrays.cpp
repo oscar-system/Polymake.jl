@@ -14,8 +14,10 @@ void polymake_module_add_array(jlcxx::Module& polymake)
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
             "pm_Array", jlcxx::julia_type("AbstractVector", "Base"))
         .apply<pm::Array<int32_t>, pm::Array<long>, pm::Array<pm::Integer>,
+               pm::Array<pm::Rational>,
                pm::Array<std::string>, pm::Array<pm::Set<int32_t>>,
-               pm::Array<pm::Array<int32_t>>, pm::Array<pm::Array<long>>,
+               pm::Array<pm::Array<int32_t>>,
+               pm::Array<pm::Array<long>>,
                pm::Array<pm::Array<pm::Integer>>,
                pm::Array<pm::Matrix<pm::Integer>>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type             WrappedT;

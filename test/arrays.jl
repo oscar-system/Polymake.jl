@@ -1,10 +1,15 @@
 @testset "pm_Array" begin
     @testset "pm_Array generics: $T " for (T, elt) in [
-        (Int32, 2), 
+        (Int32, 2),
         (Int64, 2),
+        (pm_Integer, pm_Integer(2)),
+        (pm_Rational, pm_Rational(2 //3)),
         (AbstractString, "a"),
-        (pm_Set{Int32}, pm_Set{Int32}([1,2,1])), 
+        (pm_Set{Int32}, pm_Set{Int32}([1,2,1])),
         (pm_Matrix{pm_Integer}, pm_Matrix{pm_Integer}([1 0; 2 1])),
+        (pm_Array{Int32}, pm_Array{Int32}(Int32[1, 2, 3])),
+        (pm_Array{Int64}, pm_Array{Int64}(Int64[1, 2, 3])),
+        (pm_Array{pm_Integer}, pm_Array{pm_Integer}(pm_Integer[1, 2, 3])),
         ]
         @test pm_Array{T} <: AbstractVector
         @test pm_Array{T}(3) isa AbstractVector
