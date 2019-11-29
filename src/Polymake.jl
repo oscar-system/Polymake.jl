@@ -3,11 +3,13 @@ module Polymake
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
     pm_Set, pm_Vector, pm_Array, pm_Matrix,
-    PolymakeError, application
+    pm_TropicalNumber, pm_Min, pm_Max,
+    pm_SparseMatrix, pm_SparseVector,
+    PolymakeError, application, dual_zero
 
 
 # We need to import all functions which will be extended on the Cxx side
-import Base: ==, <, <=, *, -, +, //, div, rem,
+import Base: ==, <, <=, *, -, +, //, /, div, rem, one, zero,
     append!, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty,
     length, numerator, push!, resize!,
@@ -83,7 +85,8 @@ function __init__()
 
 end
 
-const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
+const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set,
+        pm_Array, pm_TropicalNumber, pm_SparseMatrix, pm_SparseVector}
 
 include("app_setup.jl")
 include("visual.jl")
@@ -97,6 +100,9 @@ include("vectors.jl")
 include("matrices.jl")
 include("arrays.jl")
 include("meta.jl")
+include("tropicalnumber.jl")
+include("sparsematrix.jl")
+include("sparsevector.jl")
 
 using Base.Docs
 using Markdown

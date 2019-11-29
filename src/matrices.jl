@@ -11,6 +11,9 @@ end
     return pm_Matrix{T}(length(rows), length(cols))
 end
 
+#default parameter type set to Rational
+pm_Matrix(input::T) where T = pm_Matrix{pm_Rational}(input)
+
 # we can't use convert_to_pm_type(T) below:
 # only types in pm_Matrix_suppT are available
 pm_Matrix(mat::AbstractMatrix{Int32}) = pm_Matrix{Int32}(mat)

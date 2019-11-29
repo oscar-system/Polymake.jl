@@ -18,6 +18,7 @@ void polymake_module_add_vector(jlcxx::Module& polymake)
                 typedef typename decltype(wrapped)::type::value_type elemType;
                 wrapped.template constructor<int32_t>();
                 wrapped.template constructor<int64_t>();
+                wrapped.template constructor<pm::SparseVector<elemType>>();
                 wrapped.method("_getindex", [](WrappedT& V, int64_t n) {
                     return elemType(V[n - 1]);
                 });
