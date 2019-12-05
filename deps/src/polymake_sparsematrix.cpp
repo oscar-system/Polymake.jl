@@ -10,7 +10,7 @@ void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
 {
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
-            "pm_SparseMatrix", jlcxx::julia_type("AbstractMatrix", "Base"))
+            "pm_SparseMatrix", jlcxx::julia_type("AbstractSparseMatrix", "Base"))
             .apply<pm::SparseMatrix<int>, pm::SparseMatrix<pm::Integer>,
                 pm::SparseMatrix<pm::Rational>, pm::SparseMatrix<double>>(
                 [](auto wrapped) {
@@ -31,7 +31,7 @@ void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
                     });
                     wrapped.method("rows", &matType::rows);
                     wrapped.method("cols", &matType::cols);
-                    wrapped.method("resize", [](matType& M, int64_t i,
+                    wrapped.method("resize!", [](matType& M, int64_t i,
                                                 int64_t j) { M.resize(i, j); });
                     wrapped.method("take",
                                    [](pm::perl::Object p, const std::string& s,
