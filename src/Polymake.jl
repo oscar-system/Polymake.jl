@@ -15,6 +15,9 @@ import Base: ==, <, <=, *, -, +, //, div, rem,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
+using SparseArrays
+import SparseArrays: findnz
+
 using CxxWrap
 import Libdl.dlext
 

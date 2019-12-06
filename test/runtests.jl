@@ -28,4 +28,5 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("perlobj.jl")
     include("interface_functions.jl")
     include("compat.jl")
+    include("sparsematrix.jl")
 end
