@@ -18,6 +18,8 @@
 
 #include "polymake_arrays.h"
 
+#include "polymake_sparsematrix.h"
+
 #include "polymake_caller.h"
 
 #include "polymake_type_translations.h"
@@ -41,6 +43,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     polymake_module_add_set(polymake);
 
     polymake_module_add_array(polymake);
+
+    polymake_module_add_sparsematrix(polymake);
 
     polymake.method("initialize_polymake", &initialize_polymake);
     polymake.method("application", [](const std::string x) {

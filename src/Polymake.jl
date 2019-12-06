@@ -3,6 +3,7 @@ module Polymake
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
     pm_Set, pm_Vector, pm_Array, pm_Matrix,
+    pm_SparseMatrix,
     PolymakeError, application
 
 
@@ -83,7 +84,8 @@ function __init__()
 
 end
 
-const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
+const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set,
+        pm_Array, pm_SparseMatrix}
 
 include("app_setup.jl")
 include("visual.jl")
@@ -95,6 +97,7 @@ include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("sparsematrix.jl")
 include("arrays.jl")
 include("meta.jl")
 
