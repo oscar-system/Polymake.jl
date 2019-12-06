@@ -1,6 +1,7 @@
 module Meta
 import JSON
 import Polymake: appname_module_dict, module_appname_dict
+import Polymake: pm_Rational
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
@@ -24,6 +25,17 @@ function pm_name_qualified(app_name, func_name, templates=String[])
     return "$app_name::$func_name<$(join(templates, ","))>"
 end
 
+translate_type_to_pm_string(::Type{Bool}) = "bool"
+translate_type_to_pm_string(::Type{Int32}) = "int"
+translate_type_to_pm_string(::Type{<:AbstractFloat}) = "Float"
+translate_type_to_pm_string(::Type{<:Rational}) = "Rational"
+translate_type_to_pm_string(::Type{<:pm_Rational}) = "Rational"
+translate_type_to_pm_string(::Type{<:Integer}) = "Integer"
+translate_type_to_pm_string(::typeof(min)) = "Min"
+translate_type_to_pm_string(::typeof(max)) = "Max"
+
+translate_type_to_pm_string(T) = throw(DomainError(T, "$T has been passed as a type parameter but no translation to a C++ template was defined. You may define such translation by appropriately extending
+    `Polymake.Meta.translate_type_to_pm_string`."))
 
 function get_polymake_app_name(mod::Symbol)
     haskey(module_appname_dict, mod) || throw("Module '$mod' not registered in Polymake.jl. If polmake application is present add the name to Polymake.module_appname_dict.")
@@ -106,10 +118,27 @@ struct PolymakeMethod <: PolymakeCallable
         new(jl_name, pm_name, app_name, json_dict)
 end
 
+struct PolymakeObject <: PolymakeCallable
+    jl_function::Symbol
+    pm_name::String
+    app_name::String
+    json::Dict{String, Any}
+
+    PolymakeObject(pm_name::String, app_name::String) =
+        PolymakeObject(Symbol(pm_name), pm_name, app_name)
+
+    PolymakeObject(jl_name::Symbol, pm_name::String, app_name::String) =
+        new(jl_name, pm_name, app_name)
+
+    PolymakeObject(jl_name::Symbol, pm_name::String, app_name::String, json_dict) =
+        new(jl_name, pm_name, app_name, json_dict)
+end
+
 struct PolymakeApp
     jl_module::Symbol
     pm_name::String
     callables::Vector{PolymakeCallable}
+    objects::Vector{PolymakeObject}
 end
 
 ########## constructors
@@ -124,20 +153,38 @@ function PolymakeCallable(app_name::String, dict::Dict{String, Any},
     end
 end
 
+function PolymakeObject(app_name::String, dict::Dict{String, Any},
+    polymake_name=dict["name"], julia_name=Symbol(polymake_name))
+
+    return PolymakeObject(julia_name, polymake_name, app_name, dict)
+end
+
 function PolymakeApp(jl_module::Symbol, app_json::Dict{String, Any})
     app_name = app_json["app"]
 
-    for f in app_json["functions"]
-        if !haskey(f, "name")
-            @warn UnparsablePolymakeFunction("$app_name::$f")
+    if haskey(app_json, "functions")
+        for f in app_json["functions"]
+            if !haskey(f, "name")
+                @warn UnparsablePolymakeFunction("$app_name::$f", f)
+            end
         end
+
+        callables = [PolymakeCallable(app_name,f) for f in app_json["functions"] if haskey(f, "name")]
+
+        callables = unique(pc -> pm_name(pc), callables)
+    else
+        callables = PolymakeCallable[]
     end
 
-    callables = [PolymakeCallable(app_name,f) for f in app_json["functions"] if haskey(f, "name")]
+    if haskey(app_json, "objects")
+        objects = [PolymakeObject(app_name, obj) for obj in app_json["objects"] if haskey(obj, "name")]
 
-    callables = unique(pc -> pm_name(pc), callables)
+        objects = unique(pc -> pm_name(pc), objects)
+    else
+        objects = PolymakeObject[]
+    end
 
-    return PolymakeApp(jl_module, app_name, callables)
+    return PolymakeApp(jl_module, app_name, callables, objects)
 end
 
 function PolymakeApp(module_name::Symbol, json_file::String)
@@ -157,6 +204,7 @@ pm_name(app::PolymakeApp) = app.pm_name
 pm_name_qualified(pc::PolymakeCallable) = pm_name_qualified(pm_app(pc), pm_name(pc))
 
 jl_symbol(pc::PolymakeCallable) = lowercase(pc.jl_function)
+jl_symbol(pc::PolymakeObject) = pc.jl_function
 jl_module_name(pa::PolymakeApp) = pa.jl_module
 
 callable(::PolymakeFunction) = :internal_call_function
@@ -164,6 +212,9 @@ callable(::PolymakeMethod) = :internal_call_method
 callable_void(::PolymakeFunction) = :internal_call_function_void
 callable_void(::PolymakeMethod) = :internal_call_method_void
 
+docstring(obj::PolymakeObject) = get(obj.json, "help", "")
+istemplated(obj::PolymakeObject) = haskey(obj.json, "params")
+templates(obj::PolymakeObject) = Symbol.(get(obj.json, "params", String[]))
 
 function Base.show(io::IO, pc::PolymakeCallable)
     println(io, typeof(pc), ":")
@@ -182,6 +233,8 @@ function Base.show(io::IO, app::PolymakeApp)
     println(io, "Parsed polymake application $(pm_name(app)) as Polymake.$(jl_module_name(app)) containing:")
     println(io, "  $(length(app.callables)) functions:")
     println(io, join((jl_symbol(f) for f in app.callables), ", ", " and "))
+    println(io, "  $(length(app.objects)) Big Objects:")
+    println(io, join((jl_symbol(obj) for obj in app.objects), ", ", " and "))
 end
 
 ########## code generation
@@ -235,6 +288,65 @@ function jl_code(pf::PolymakeMethod)
     end
 end
 
+function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String)
+    return quote
+        function $(jl_name)(args...; kwargs...)
+            # name created at compile-time
+            return perlobj($(pm_name_qualified(app_name, pm_name)),
+                args..., kwargs...)
+        end
+    end
+end
+
+function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String, templates)
+    return quote
+        function $(jl_name){$(templates...)}(args...; kwargs...) where {$(templates...)}
+            Ts = translate_type_to_pm_string.([$(templates...)])
+            # name created at run-time
+            pm_full_name = pm_name_qualified($(app_name), $(pm_name), Ts)
+            return perlobj(pm_full_name, args..., kwargs...)
+        end
+    end
+end
+
+jl_constructor(obj::PolymakeObject, templates) =
+    jl_constructor(jl_symbol(obj), pm_name(obj), pm_app(obj), templates)
+
+jl_constructor(obj::PolymakeObject) =
+    jl_constructor(jl_symbol(obj), pm_name(obj), pm_app(obj))
+
+function jl_code(obj::PolymakeObject)
+    jl_object_name = jl_symbol(obj)
+    pm_object_name = pm_name_qualified(obj.app_name, pm_name(obj))
+
+    if istemplated(obj)
+        Ts = templates(obj)
+        templated_constructors = [
+            jl_constructor(obj, Ts[1:i]) for i in 1:length(Ts)
+        ]
+
+        struct_def = quote
+            struct $(jl_object_name){$(Ts...)}
+                # inner templated constructors:
+                $(templated_constructors...)
+                # inner template-less constructor
+                $(jl_constructor(obj))
+            end;
+        end # of quote
+    else
+        struct_def = quote
+            struct $(jl_symbol(obj))
+                # inner template-less constructor
+                $(jl_constructor(obj))
+            end;
+        end # of quote
+    end
+
+    return quote
+        $struct_def;
+        Base.Docs.getdoc(::Type{$(jl_symbol(obj))}) = Markdown.parse($(docstring(obj)))
+    end
+end
 
 module_imports() = quote
     import Polymake: convert_from_property_value,
@@ -247,10 +359,12 @@ end
 
 function jl_code(pa::PolymakeApp)
     fn_code = jl_code.(pa.callables)
-    :(
+    obj_code = jl_code.(pa.objects)
+    return :(
         module $(jl_module_name(pa))
         $(module_imports())
         $(fn_code...)
+        $(obj_code...)
         end
     )
 end
