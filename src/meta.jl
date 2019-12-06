@@ -33,8 +33,7 @@ end
 
 ############### macro helpers
 
-function recursive_replace(s::Symbol, pairs::Dict)
-    str = string(s)
+function recursive_replace(str::AbstractString, pairs::Dict)
     for (p,r) in pairs
         str = replace(str, p=>r)
     end
@@ -49,7 +48,7 @@ function parse_function_call(expr)
     templates = Symbol[]
     # grab template parameters if present
     if func.head == :curly
-        templates = Symbol.(func.args[2:end])
+        templates = func.args[2:end]
         func = func.args[1]
 
         templates = recursive_replace.(templates, Ref(Dict("{"=>"<", "}"=>">")))
@@ -82,9 +81,11 @@ struct PolymakeFunction <: PolymakeCallable
     json::Dict{String, Any}
 
     PolymakeFunction(pm_name::String, app_name::String) =
-        new(Symbol(pm_name), pm_name, app_name)
+        PolymakeFunction(Symbol(lowercase(pm_name)), pm_name, app_name)
+
     PolymakeFunction(jl_name::Symbol, pm_name::String, app_name::String) =
         new(jl_name, pm_name, app_name)
+
     PolymakeFunction(jl_name::Symbol, pm_name::String, app_name::String, json_dict) =
         new(jl_name, pm_name, app_name, json_dict)
 end
@@ -95,10 +96,12 @@ struct PolymakeMethod <: PolymakeCallable
     app_name::String
     json::Dict{String, Any}
 
-    PolymakeMethod(pm_name::String) =
-        new(Symbol(pm_name), pm_name)
-    PolymakeMethod(jl_name::Symbol, pm_name::String) =
-        new(jl_name, pm_name)
+    PolymakeMethod(pm_name::String, app_name::String) =
+        PolymakeMethod(Symbol(lowercase(pm_name)), pm_name, app_name)
+
+    PolymakeMethod(jl_name::Symbol, pm_name::String, app_name::String) =
+        new(jl_name, pm_name, app_name)
+
     PolymakeMethod(jl_name::Symbol, pm_name::String, app_name, json_dict) =
         new(jl_name, pm_name, app_name, json_dict)
 end
@@ -147,22 +150,20 @@ end
 
 Base.lowercase(s::Symbol) = Symbol(lowercase(string(s)))
 
+pm_app(pc::PolymakeCallable) = pc.app_name
+
 pm_name(pc::PolymakeCallable) = pc.pm_name
-pm_name_qualified(pc::PolymakeCallable) = pm_name_qualified(pc.app_name, pc.pm_name)
+pm_name(app::PolymakeApp) = app.pm_name
+pm_name_qualified(pc::PolymakeCallable) = pm_name_qualified(pm_app(pc), pm_name(pc))
+
 jl_symbol(pc::PolymakeCallable) = lowercase(pc.jl_function)
 jl_module_name(pa::PolymakeApp) = pa.jl_module
-
-push!(pa::PolymakeApp, pc::PolymakeCallable) = push!(pa.callables, pc)
 
 callable(::PolymakeFunction) = :internal_call_function
 callable(::PolymakeMethod) = :internal_call_method
 callable_void(::PolymakeFunction) = :internal_call_function_void
 callable_void(::PolymakeMethod) = :internal_call_method_void
 
-function push!(pa::PolymakeApp, func_json::Dict{String, Any})
-    pc = PolymakeCallable(pm_name(pa), func_json)
-    push!(pa, pc)
-end
 
 function Base.show(io::IO, pc::PolymakeCallable)
     println(io, typeof(pc), ":")
@@ -177,17 +178,18 @@ function Base.show(io::IO, pc::PolymakeCallable)
     end
 end
 
-function Base.show(io::IO, pa::PolymakeApp)
-    println(io, "Parsed Polymake Application $(pm_name(pa)) as Polymake.$jl_module_name")
-    println(io, "Contains $(length(pa.functions)) functions:")
-    println(io, [jl_symbol(f) for f in pa.functions])
+function Base.show(io::IO, app::PolymakeApp)
+    println(io, "Parsed polymake application $(pm_name(app)) as Polymake.$(jl_module_name(app)) containing:")
+    println(io, "  $(length(app.callables)) functions:")
+    println(io, join((jl_symbol(f) for f in app.callables), ", ", " and "))
 end
 
 ########## code generation
 
 function jl_code(pf::PolymakeFunction)
     func_name = pm_name_qualified(pf)
-    :(
+
+    return quote
         function $(jl_symbol(pf))(args...; template_parameters::Array{String,1}=String[], keep_PropertyValue=false, call_as_void=false, kwargs...)
             if call_as_void
                 $(callable_void(pf))($func_name, template_parameters,
@@ -208,13 +210,13 @@ function jl_code(pf::PolymakeFunction)
             return Markdown.parse(join(docstrs, "\n\n---\n\n"))
         end;
         export $(jl_symbol(pf));
-    )
+    end
 end
 
 function jl_code(pf::PolymakeMethod)
-    func_name = pf.pm_name
+    func_name = pm_name(pf)
 
-    :(
+    return quote
         function $(jl_symbol(pf))(object::pm_perl_Object, args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
             if call_as_void
                 $(callable_void(pf))($func_name, object, polymake_arguments(args...; kwargs...))
@@ -230,7 +232,7 @@ function jl_code(pf::PolymakeMethod)
             end
         end;
         export $(jl_symbol(pf));
-    )
+    end
 end
 
 
