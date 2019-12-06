@@ -25,19 +25,6 @@ end
 _get_visual_string_threejs(x::Visual) = _get_visual_string(x,:jupyter_visual_threejs)
 _get_visual_string_svg(x::Visual) = _get_visual_string(x,:jupyter_visual_svg)
 
-function polymake_arguments(args...; kwargs...)
-    if isempty(kwargs)
-        return Any[ convert.(PolymakeType, args)... ]
-    else
-        Any[ convert.(PolymakeType, args)..., pm_perl_OptionSet(kwargs) ]
-    end
-end
-
-function get_docs(input::String; full::Bool=true, html::Bool=false)
-    pos = UInt(max(length(input)-1, 0))
-    return Polymake.shell_context_help(input, pos, full, html)
-end
-
 function cite(;format=:bibtex)
     cite_str = split(shell_execute("""help "core/citation";""")[2], "\n\n")[2]
     if format == :bibtex

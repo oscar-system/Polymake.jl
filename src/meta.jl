@@ -4,19 +4,29 @@ import Polymake: appname_module_dict, module_appname_dict
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
-    UnparsablePolymakeFunction(function_name) = new("Cannot parse function: $function_name")
+    UnparsablePolymakeFunction(function_name, json) = new("Cannot parse function: $function_name\n$json")
 end
 
-pm_name_qualified(app_name, func_name) = "$app_name::$func_name"
+############### fuctions used at runtime (imported to App modules)
 
-function pm_name_qualified(app_name, func_name, templates)
-    qname = pm_name_qualified(app_name, func_name)
-    templs = length(templates) > 0 ? "<$(join(templates, ","))>" : ""
-    return qname*templs
+function polymake_arguments(args...; kwargs...)
+    isempty(kwargs) && return Any[ convert.(PolymakeType, args)... ]
+    return Any[ convert.(PolymakeType, args); pm_perl_OptionSet(kwargs) ]
 end
+
+function get_docs(input::String; full::Bool=true, html::Bool=false)
+    pos = UInt(max(length(input)-1, 0))
+    return Polymake.shell_context_help(input, pos, full, html)
+end
+
+function pm_name_qualified(app_name, func_name, templates=String[])
+    isempty(templates) && return
+    return "$app_name::$func_name<$(join(templates, ","))>"
+end
+
 
 function get_polymake_app_name(mod::Symbol)
-    haskey(module_appname_dict, mod) || throw("Module '$mod' not registered in Polymake.jl.")
+    haskey(module_appname_dict, mod) || throw("Module '$mod' not registered in Polymake.jl. If polmake application is present add the name to Polymake.module_appname_dict.")
     polymake_app = module_appname_dict[mod]
     return polymake_app
 end
@@ -224,12 +234,14 @@ function jl_code(pf::PolymakeMethod)
 end
 
 
-module_imports() = :(import Polymake:
+module_imports() = quote
+    import Polymake: convert_from_property_value,
     internal_call_function, internal_call_method,
     internal_call_function_void, internal_call_method_void,
-    convert_from_property_value, polymake_arguments, pm_perl_Object, get_docs;
+    perlobj, pm_perl_Object;
+    import Polymake.Meta: pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
     import Markdown;
-    )
+end
 
 function jl_code(pa::PolymakeApp)
     fn_code = jl_code.(pa.callables)
