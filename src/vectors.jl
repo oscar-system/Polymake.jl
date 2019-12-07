@@ -44,5 +44,5 @@ Base.BroadcastStyle(::Type{<:pm_Vector}) = Broadcast.ArrayStyle{pm_Vector}()
 
 function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{pm_Vector}},
     ::Type{ElType}) where ElType
-    return pm_Vector{convert_to_pm_type(ElType)}(axes(bc)...)
+    return pm_Vector{promote_to_pm_type(pm_Vector, ElType)}(axes(bc)...)
 end
