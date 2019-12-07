@@ -12,7 +12,11 @@ void polymake_module_add_matrix(jlcxx::Module& polymake)
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
             "pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
-        .apply<pm::Matrix<int>, pm::Matrix<pm::Integer>, pm::Matrix<pm::Rational>, pm::Matrix<double>>(
+        .apply<pm::Matrix<int>,
+	       pm::Matrix<pm::Integer>,
+	       pm::Matrix<pm::Rational>,
+	       pm::Matrix<double>
+	      >(
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type             WrappedT;
                 typedef typename decltype(wrapped)::type::value_type elemType;

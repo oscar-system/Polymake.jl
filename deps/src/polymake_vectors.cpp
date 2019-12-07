@@ -12,7 +12,11 @@ void polymake_module_add_vector(jlcxx::Module& polymake)
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
             "pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
-        .apply<pm::Vector<pm::Integer>, pm::Vector<pm::Rational>, pm::Vector<double>>(
+        .apply<pm::Vector<int>,
+	       pm::Vector<pm::Integer>,
+	       pm::Vector<pm::Rational>, 
+	       pm::Vector<double>
+	      >(
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type             WrappedT;
                 typedef typename decltype(wrapped)::type::value_type elemType;
@@ -36,6 +40,10 @@ void polymake_module_add_vector(jlcxx::Module& polymake)
                     return show_small_object<WrappedT>(V);
                 });
             });
+
+    polymake.method("to_vector_int", [](pm::perl::PropertyValue pv) {
+        return to_SmallObject<pm::Vector<int>>(pv);
+    });
     polymake.method("to_vector_Integer", [](pm::perl::PropertyValue pv) {
         return to_SmallObject<pm::Vector<pm::Integer>>(pv);
     });
