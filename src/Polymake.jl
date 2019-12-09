@@ -96,6 +96,7 @@ include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("broadcast.jl")
 include("arrays.jl")
 include("meta.jl")
 

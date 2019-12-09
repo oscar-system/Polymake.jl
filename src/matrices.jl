@@ -4,11 +4,6 @@
     return res
 end
 
-# needed for broadcast
-@inline function pm_Matrix{T}(rows::UR, cols::UR) where {T <: pm_VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
-    return pm_Matrix{T}(length(rows), length(cols))
-end
-
 # we can't use convert_to_pm_type(T) below:
 # only types in pm_VecOrMat_eltypes are available
 pm_Matrix(mat::AbstractMatrix{Int32}) = pm_Matrix{Int32}(mat)
@@ -32,29 +27,4 @@ Base.@propagate_inbounds function Base.setindex!(M::pm_Matrix{T}, val, i::Intege
     @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
     _setindex!(M, convert(T, val), convert(Int64, i), convert(Int64, j))
     return M
-end
-
-function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{2}) where
-        S <: pm_VecOrMat_eltypes
-    return pm_Matrix{convert_to_pm_type(S)}(dims...)
-end
-
-function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{2}) where S
-    return Matrix{S}(undef, dims...)
-end
-
-function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{1}) where
-        S<: pm_VecOrMat_eltypes
-    return pm_Vector{convert_to_pm_type(S)}(dims...)
-end
-
-function Base.similar(mat::pm_Matrix, ::Type{S}, dims::Dims{1}) where S
-    return Vector{S}(undef, dims...)
-end
-
-Base.BroadcastStyle(::Type{<:pm_Matrix}) = Broadcast.ArrayStyle{pm_Matrix}()
-
-function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{pm_Matrix}},
-    ::Type{ElType}) where ElType
-    return pm_Matrix{promote_to_pm_type(pm_Matrix, ElType)}(axes(bc)...)
 end
