@@ -18,6 +18,7 @@
 #include <polymake/IncidenceMatrix.h>
 #include <polymake/Rational.h>
 #include <polymake/QuadraticExtension.h>
+#include <polymake/SparseVector.h>
 
 #include <polymake/perl/calls.h>
 
