@@ -12,11 +12,7 @@ void polymake_module_add_vector(jlcxx::Module& polymake)
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
             "pm_Vector", jlcxx::julia_type("AbstractVector", "Base"))
-        .apply<pm::Vector<int>,
-	       pm::Vector<pm::Integer>,
-	       pm::Vector<pm::Rational>, 
-	       pm::Vector<double>
-	      >(
+        .apply_combination<pm::Vector, pm_VecOrMat_supported::value_type>(
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type             WrappedT;
                 typedef typename decltype(wrapped)::type::value_type elemType;
