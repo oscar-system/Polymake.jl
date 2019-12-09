@@ -84,6 +84,7 @@ function __init__()
 end
 
 const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
+const pm_VecOrMat_eltypes = Union{Int32, pm_Integer, pm_Rational, Float64}
 
 include("app_setup.jl")
 include("visual.jl")
@@ -95,6 +96,7 @@ include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("broadcast.jl")
 include("arrays.jl")
 include("meta.jl")
 
