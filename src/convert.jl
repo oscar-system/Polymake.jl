@@ -1,3 +1,4 @@
+import Base: convert
 ####################  Converting to polymake types  ####################
 
 for (pm_T, jl_T) in [

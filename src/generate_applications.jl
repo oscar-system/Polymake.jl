@@ -1,3 +1,7 @@
+using Base.Docs
+using Markdown
+include("meta.jl")
+
 using Polymake.Meta
 
 json_dir = joinpath(@__DIR__, "..", "deps", "json")
