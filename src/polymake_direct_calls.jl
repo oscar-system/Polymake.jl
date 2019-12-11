@@ -1,31 +1,24 @@
 const AbstractRational = Union{Rational, pm_Rational}
 
-for (m, flag) in [(:min, false), (:max, true)]
-    @eval begin
-        function solve_LP(
-            inequalities::AbstractMatrix{<:AbstractRational},
-            equalities::AbstractMatrix{<:AbstractRational},
-            objective::AbstractVector{<:AbstractRational}, ::typeof($m))
+for (pm_solve_LP, scalarT, concreteT) in [
+    (:direct_call_solve_LP, AbstractRational, pm_Rational),
+    (:direct_call_solve_LP_float, AbstractFloat, Float64),
+    ]
+    for (m, flag) in [(:min, false), (:max, true)]
+        @eval begin
+            function solve_LP(
+                inequalities::AbstractMatrix{<:$scalarT},
+                equalities::AbstractMatrix{<:$scalarT},
+                objective::AbstractVector{<:$scalarT},
+                sense::typeof($m))
 
-            return direct_call_solve_LP(
-                convert(pm_Matrix{pm_Rational}, inequalities),
-                convert(pm_Matrix{pm_Rational}, equalities),
-                convert(pm_Vector{pm_Rational}, objective),
-                $flag
-            )
-        end
-
-        function solve_LP(
-            inequalities::AbstractMatrix{<:AbstractFloat},
-            equalities::AbstractMatrix{<:AbstractFloat},
-            objective::AbstractVector{<:AbstractFloat}, ::typeof($m))
-
-            return direct_call_solve_LP_float(
-                convert(pm_Matrix{Float64}, inequalities),
-                convert(pm_Matrix{Float64}, equalities),
-                convert(pm_Vector{Float64}, objective),
-                $flag
-            )
+                return $pm_solve_LP(
+                    convert(pm_Matrix{$concreteT}, inequalities),
+                    convert(pm_Matrix{$concreteT}, equalities),
+                    convert(pm_Vector{$concreteT}, objective),
+                    $flag
+                )
+            end
         end
     end
 end
