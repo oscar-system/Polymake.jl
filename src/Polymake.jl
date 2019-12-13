@@ -16,7 +16,7 @@ import Base: ==, <, <=, *, -, +, //, div, rem,
     union, union!
 
 using SparseArrays
-import SparseArrays: findnz
+import SparseArrays: AbstractSparseMatrix, findnz
 
 using CxxWrap
 import Libdl.dlext
