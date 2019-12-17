@@ -21,7 +21,7 @@ function get_docs(input::AbstractString; full::Bool=true, html::Bool=false)
 end
 
 function pm_name_qualified(app_name, func_name, templates=String[])
-    isempty(templates) && return
+    isempty(templates) && return "$app_name::$func_name"
     return "$app_name::$func_name<$(join(templates, ","))>"
 end
 
