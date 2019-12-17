@@ -121,12 +121,12 @@ macro pm(expr)
     else # we presume it's a function
         polymake_func_name =
             Meta.pm_name_qualified(polymake_app, polymake_func)
-
         return :(
-            val = internal_call_function($polymake_func_name,
+            let val = internal_call_function($polymake_func_name,
                 $(string.(templates)),
-                polymake_arguments($(esc.(args)...), $(esc.(kwargs)...)));
-            convert_from_property_value(val)
+                Meta.polymake_arguments($(esc.(args)...), $(esc.(kwargs)...)));
+                convert_from_property_value(val)
+            end
         )
     end
 end
