@@ -1,3 +1,4 @@
+import Base: convert
 ####################  Converting to polymake types  ####################
 
 for (pm_T, jl_T) in [
@@ -60,3 +61,10 @@ convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractS
 
 # this catches all pm_Arrays of pm_Arrays we have right now:
 convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = pm_Array{pm_Array{convert_to_pm_type(T)}}
+
+# 2-argument version: the first is the container type
+promote_to_pm_type(::Type, S::Type) = convert_to_pm_type(S) #catch all
+function promote_to_pm_type(::Type{<:Union{pm_Vector, pm_Matrix}}, S::Type{<:Integer})
+    promote_type(S, Int32) == Int32 && return Int32
+    return pm_Integer
+end

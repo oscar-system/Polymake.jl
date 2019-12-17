@@ -29,4 +29,9 @@ std::string show_small_object(const T& obj, bool print_typename = true)
     return buffer.str();
 }
 
+struct pm_VecOrMat_supported
+{
+    typedef jlcxx::ParameterList<int, pm::Integer, pm::Rational, double> value_type;
+};
+
 #endif

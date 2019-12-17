@@ -83,25 +83,23 @@ function __init__()
 
 end
 
-const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array}
+include("setup_apps.jl")
+include("setup_types.jl")
+include("util.jl")
+include("call_function.jl")
 
-include("app_setup.jl")
+include("perlobj.jl")
 include("visual.jl")
-include("functions.jl")
 include("convert.jl")
-include("object_helpers.jl")
+
+include("generate_applications.jl")
+
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("broadcast.jl")
 include("arrays.jl")
-include("meta.jl")
-
-using Base.Docs
-using Markdown
-include("applications.jl")
-
-fill_wrapped_types!(WrappedTypes, get_type_names())
 
 end # of module Polymake
