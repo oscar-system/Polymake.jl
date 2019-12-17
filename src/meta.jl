@@ -1,7 +1,7 @@
 module Meta
 import JSON
-import Polymake: appname_module_dict, module_appname_dict
-import Polymake: pm_Rational
+import Polymake: appname_module_dict, module_appname_dict, shell_context_help
+import Polymake: pm_Rational, PolymakeType
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
@@ -15,9 +15,9 @@ function polymake_arguments(args...; kwargs...)
     return Any[ convert.(PolymakeType, args); pm_perl_OptionSet(kwargs) ]
 end
 
-function get_docs(input::String; full::Bool=true, html::Bool=false)
+function get_docs(input::AbstractString; full::Bool=true, html::Bool=false)
     pos = UInt(max(length(input)-1, 0))
-    return Polymake.shell_context_help(input, pos, full, html)
+    return shell_context_help(input, pos, full, html)
 end
 
 function pm_name_qualified(app_name, func_name, templates=String[])
