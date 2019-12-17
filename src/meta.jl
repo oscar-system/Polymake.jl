@@ -45,39 +45,55 @@ end
 
 ############### macro helpers
 
-function recursive_replace(str::AbstractString, pairs::Dict)
-    for (p,r) in pairs
+function recursive_replace(str::AbstractString, replacement_pairs)
+    for (p,r) in replacement_pairs
         str = replace(str, p=>r)
     end
-    return Symbol(str)
+    return str
+end
+
+replace_braces(str) = recursive_replace(str, ["{"=>"<", "}"=>">"])
+
+function extract_args_kwargs(expr::Expr)
+    kwarg_idx = findfirst(a -> a isa Expr && a.head == :kw, expr.args)
+    kwarg_idx === nothing && return expr.args[2:end], Any[]
+    return expr.args[2:kwarg_idx-1], expr.args[kwarg_idx:end]
+end
+
+function extract_module_function(expr::Expr)
+    @assert expr.head == Symbol('.')
+    return expr.args[1], expr.args[2].value
+end
+
+function deconstruct_head(expr::Expr)
+    @assert expr.head == :call
+    func = expr.args[1] # called function
+
+    # func its either
+    # `call(:curly, call(:., app, func_name), templates)`
+    # or
+    # `call(:., app, func_name)`
+
+    if func.head == :curly
+        module_name, func_name = extract_module_function(func.args[1])
+        templates = replace_braces.(string.(func.args[2:end]))
+    elseif func.head == Symbol('.')
+        module_name, func_name = extract_module_function(func)
+        templates = String[]
+    else
+        throw(ArgumentError("Cannot deconstruct the expression: $expr"))
+    end
+    return module_name, func_name, templates
 end
 
 function parse_function_call(expr)
     @assert expr.head == :call
-    func = expr.args[1] # called function
-    args = expr.args[2:end] # its arguments
 
-    templates = Symbol[]
-    # grab template parameters if present
-    if func.head == :curly
-        templates = func.args[2:end]
-        func = func.args[1]
+    module_name, func_name, templates = deconstruct_head(expr)
+        args, kwargs = extract_args_kwargs(expr)
 
-        templates = recursive_replace.(templates, Ref(Dict("{"=>"<", "}"=>">")))
-    end
-
-    @assert func.head == Symbol('.')
-    module_name = func.args[1]
-    func_name = func.args[2].value
-
-    kwargs = Expr[]
-    kwar_idx = findfirst(a -> a isa Expr && a.head == :kw, args)
-    if kwar_idx != nothing
-        kwargs = args[kwar_idx:end]
-        args = args[1:kwar_idx-1]
-    end
-
-    return module_name, func_name, templates, args, kwargs
+    #      Symbol     , Symbol   , String   , Any[], Any[]
+    return module_name, func_name, templates, args , kwargs
 end
 
 ############### json parsing

@@ -108,7 +108,12 @@ POINTS
 Note: the expression in `@pm` macro is parsed syntactically, so it has to be a valid `julia` expression. However template parameters **need not** to be defined in `julia`, but must be valid names of `polymake` property types. Nested types (such as `{QuadraticExtension{Rational}}`) are allowed.
 """
 macro pm(expr)
-    module_name, polymake_func, templates, args, kwargs = Meta.parse_function_call(expr)
+    module_name, polymake_func, templates, args, kwargs = try
+        Meta.parse_function_call(expr)
+    catch ex
+        throw(ArgumentError("Can not parse the expression passed to @pm macro:\n$expr\n Only `@pm app.func{template, parameters}(KEY=val)` syntax is recognized"))
+        rethrow(ex)
+    end
     polymake_app = Meta.get_polymake_app_name(module_name)
 
     # poor-mans Big Object constructor detection
@@ -123,7 +128,7 @@ macro pm(expr)
             Meta.pm_name_qualified(polymake_app, polymake_func)
         return :(
             let val = internal_call_function($polymake_func_name,
-                $(string.(templates)),
+                $templates,
                 Meta.polymake_arguments($(esc.(args)...), $(esc.(kwargs)...)));
                 convert_from_property_value(val)
             end
