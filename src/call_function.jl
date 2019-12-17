@@ -62,18 +62,6 @@ function call_method(obj, func::Symbol, args...; void=false, unwrap=true, kwargs
     end
 end
 
-function give(obj::Polymake.pm_perl_Object, prop::String)
-    return_obj = try
-        internal_give(obj, prop)
-    catch ex
-        throw(PolymakeError(ex.msg))
-    end
-    return convert_from_property_value(return_obj)
-end
-
-Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
-
-
 """
     @pm PolymakeModule.function_name{Template, parameters}(args)
 
