@@ -1,14 +1,14 @@
 const appname_module_dict = Dict(
-  :common     => :Common,
-  :fan        => :Fans,
-  :fulton     => :Fulton,
-  :graph      => :Graphs,
-  :group      => :Groups,
-  :ideal      => :Ideals,
-  :matroid    => :Matroids,
-  :polytope   => :Polytopes,
-  :topaz      => :Topaz,
-  :tropical   => :Tropical
+  :common     => :common,
+  :fan        => :fan,
+  :fulton     => :fulton,
+  :graph      => :graph,
+  :group      => :group,
+  :ideal      => :ideal,
+  :matroid    => :matroid,
+  :polytope   => :polytope,
+  :topaz      => :topaz,
+  :tropical   => :tropical
 )
 
 const module_appname_dict = Dict( (j,i) for (i,j) in appname_module_dict )

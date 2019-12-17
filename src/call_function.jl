@@ -63,7 +63,7 @@ function call_method(obj, func::Symbol, args...; void=false, unwrap=true, kwargs
 end
 
 """
-    @pm PolymakeModule.function_name{Template, parameters}(args)
+    @pm polymakemodule.function_name{Template, parameters}(args)
 
 This macro can be used to
  * create `polymake` Big Objects (such as polytopes)
@@ -73,7 +73,7 @@ The expression passed to the macro has to be the fully qualified name (starting 
 
 # Examples
 ```jldoctest
-julia> P = @pm Polytope.Polytope{QuadraticExtension}(POINTS=[1 0 0; 0 1 0])
+julia> P = @pm polytope.Polytope{QuadraticExtension}(POINTS=[1 0 0; 0 1 0])
 type: Polytope<QuadraticExtension<Rational>>
 
 POINTS
@@ -82,7 +82,7 @@ POINTS
 
 
 
-julia> @pm Common.convert_to{Float}(P)
+julia> @pm common.convert_to{Float}(P)
 type: Polytope<Float>
 
 POINTS
@@ -95,7 +95,7 @@ CONE_AMBIENT_DIM
 
 
 
-julia> @pm Tropical.Polytope{Max}(POINTS=[1 0 0; 0 1 0])
+julia> @pm tropical.Polytope{Max}(POINTS=[1 0 0; 0 1 0])
 type: Polytope<Max, Rational>
 
 POINTS

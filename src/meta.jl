@@ -369,14 +369,4 @@ function jl_code(pa::PolymakeApp)
     )
 end
 
-########## Compat
-
-function compat_statement(app, mod)
-    quote
-        import ..($mod)
-        const $app = $mod
-        export $app
-    end
-end
-
 end # of module Meta
