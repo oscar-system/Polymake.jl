@@ -146,7 +146,7 @@ run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir 
 cpus = max(div(Sys.CPU_THREADS,2), 1)
 run(`make -j$cpus`)
 
-json_script = joinpath(@__DIR__,"rules","funtojson.pl")
+json_script = joinpath(@__DIR__,"rules","apptojson.pl")
 json_folder = joinpath(@__DIR__,"json")
 mkpath(json_folder)
 
