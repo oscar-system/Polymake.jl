@@ -57,7 +57,7 @@ sub methods_to_hash($$) {
    my @methods;
    return [] if !defined($type->help_topic);
 	foreach my $m ($type->help_topic->find("!rel","methods", ".*")) {
-      foreach my $ov ((values %{$m->topics}) || ($m)) {
+      foreach my $ov (%{$m->topics} ? (values %{$m->topics}) : ($m)) {
          my $fun = help_to_hash($appname, $m, $ov);
          $fun->{method_of} = type_for_julia($appname,$type->name);
          push @methods, $fun;
