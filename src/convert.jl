@@ -6,6 +6,7 @@ for (pm_T, jl_T) in [
         (pm_Matrix, AbstractMatrix),
         (pm_Array, AbstractVector),
         (pm_Set, AbstractSet),
+        (pm_SparseMatrix, AbstractSparseMatrix),
         (pm_SparseMatrix, AbstractMatrix)
         ]
     @eval begin
@@ -40,7 +41,7 @@ convert_to_pm_type(::Type{<:Union{Integer, pm_Integer}}) = pm_Integer
 convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational
 convert_to_pm_type(::Type{<:Union{AbstractVector, pm_Vector}}) = pm_Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, pm_Matrix}}) = pm_Matrix
-convert_to_pm_type(::Type{<:AbstractSparseMatrix}) = pm_SparseMatrix
+convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, pm_SparseMatrix}}) = pm_SparseMatrix
 convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
 convert_to_pm_type(::Type{<:Union{AbstractSet, pm_Set}}) = pm_Set
 
