@@ -29,6 +29,17 @@ function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
     return take(obj, string(prop), convert(PolymakeType, val))
 end
 
+function give(obj::Polymake.pm_perl_Object, prop::String)
+    return_obj = try
+        internal_give(obj, prop)
+    catch ex
+        throw(PolymakeError(ex.msg))
+    end
+    return convert_from_property_value(return_obj)
+end
+
+Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
+
 function complete_property(obj::pm_perl_Object, prefix::String)
    call_function(:common, :complete_property, obj, prefix)
 end

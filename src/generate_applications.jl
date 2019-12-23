@@ -15,8 +15,3 @@ for (app, mod) in appname_module_dict
     @eval $(Polymake.Meta.jl_code(Polymake.Meta.PolymakeApp(mod, json_file)))
     @eval export $mod
 end
-
-@eval module Compat
-    $([Polymake.Meta.compat_statement(app, mod) for (app, mod) in appname_module_dict]...)
-    end
-export Compat
