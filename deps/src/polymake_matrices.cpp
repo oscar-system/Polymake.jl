@@ -18,7 +18,6 @@ void polymake_module_add_matrix(jlcxx::Module& polymake)
                 typedef typename decltype(wrapped)::type::value_type elemType;
                 wrapped.template constructor<int32_t, int32_t>();
                 wrapped.template constructor<int64_t, int64_t>();
-                wrapped.template constructor<pm::SparseMatrix<elemType>>();
 
                 wrapped.method("_getindex",
                                [](WrappedT& f, int64_t i, int64_t j) {

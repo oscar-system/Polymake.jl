@@ -103,7 +103,8 @@ using SparseArrays
 
             for T in [IntTypes; pm_Integer]
                 V = pm_SparseMatrix{Int32}(jl_m_32) # local copy
-                @test setindex!(V, T(5), 1, 1) isa pm_SparseMatrix{Int32}
+                setindex!(V, T(5), 1, 1)
+                @test V isa pm_SparseMatrix{Int32}
                 @test V[T(1), 1] isa Int32
                 @test V[1, T(1)] == 5
                 # testing the return value of brackets operator
@@ -133,7 +134,8 @@ using SparseArrays
 
             for T in [IntTypes; pm_Integer]
                 V = pm_SparseMatrix{pm_Integer}(jl_m) # local copy
-                @test setindex!(V, T(5), 1, 1) isa pm_SparseMatrix{pm_Integer}
+                setindex!(V, T(5), 1, 1)
+                @test V isa pm_SparseMatrix{pm_Integer}
                 @test V[T(1), 1] isa Polymake.pm_IntegerAllocated
                 @test V[1, T(1)] == 5
                 # testing the return value of brackets operator
@@ -163,7 +165,8 @@ using SparseArrays
 
             for T in [IntTypes; pm_Integer]
                 V = pm_SparseMatrix{pm_Rational}(jl_m) # local copy
-                @test setindex!(V, T(5)//T(3), 1, 1) isa pm_SparseMatrix{pm_Rational}
+                setindex!(V, T(5)//T(3), 1, 1)
+                @test V isa pm_SparseMatrix{pm_Rational}
                 @test V[T(1), 1] isa Polymake.pm_RationalAllocated
                 @test V[1, T(1)] == 5//3
                 # testing the return value of brackets operator
@@ -198,7 +201,8 @@ using SparseArrays
             for T in [IntTypes; pm_Integer]
                 V = pm_SparseMatrix{Float64}(jl_m) # local copy
                 for S in FloatTypes
-                    @test setindex!(V, S(5)/T(3), 1, 1) isa pm_SparseMatrix{Float64}
+                    setindex!(V, S(5)/T(3), 1, 1)
+                    @test V isa pm_SparseMatrix{Float64}
                     @test V[T(1), 1] isa Float64
                     @test V[1, T(1)] ≈ S(5)/T(3)
                     # testing the return value of brackets operator

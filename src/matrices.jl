@@ -28,3 +28,13 @@ Base.@propagate_inbounds function Base.setindex!(M::pm_Matrix{T}, val, i::Intege
     _setindex!(M, convert(T, val), convert(Int64, i), convert(Int64, j))
     return M
 end
+
+#create pm_Matrix from a sparse matrix
+function pm_Matrix{T}(mat::AbstractSparseMatrix) where T <: pm_VecOrMat_eltypes
+    r,c,v = SparseArrays.findnz(mat)
+    res = pm_Matrix{T}(size(mat))
+    for i = 1:length(r)
+        res[r[i],c[i]] = v[i]
+    end
+    return res
+end

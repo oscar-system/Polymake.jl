@@ -11,13 +11,10 @@ void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>, jlcxx::ParameterList<jlcxx::TypeVar<1>,int>>(
             "pm_SparseMatrix", jlcxx::julia_type("AbstractSparseMatrix", "SparseArrays"))
-            .apply<pm::SparseMatrix<int>, pm::SparseMatrix<pm::Integer>,
-                pm::SparseMatrix<pm::Rational>, pm::SparseMatrix<double>>(
+            .apply_combination<pm::SparseMatrix, pm_VecOrMat_supported::value_type>(
                 [](auto wrapped) {
                     typedef typename decltype(wrapped)::type matType;
                     typedef typename decltype(wrapped)::type::value_type elemType;
-                    wrapped.template constructor<matType>();
-                    wrapped.template constructor<pm::Matrix<elemType>>();
                     wrapped.template constructor<int32_t, int32_t>();
                     wrapped.template constructor<int64_t, int64_t>();
                     wrapped.method("_getindex",
@@ -31,6 +28,20 @@ void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
                     });
                     wrapped.method("rows", &matType::rows);
                     wrapped.method("cols", &matType::cols);
+                    wrapped.method("nzindices", [](matType& S) {
+                        // pm::IndexMatrix<const pm::SparseMatrix<elemType, pm::NonSymmetric>> im = pm::index_matrix(S);
+                        // pm::Matrix<int32_t> a(im.rows(),im.cols());
+                        // for (int i = 0; i < im.rows(); i++) {
+                        //     for (int j = 0; i < im.cols(); j++) {
+                        //         a(i,j) = im(i,j);
+                        //     }
+                        // }
+                        // return a;
+
+                        return Array<Set<int32_t>>(pm::rows(pm::index_matrix(S)));
+
+                        //return pm::Matrix<int32_t>(pm::index_matrix(S));
+                    });
                     wrapped.method("resize!", [](matType& M, int64_t i,
                                                 int64_t j) { M.resize(i, j); });
                     wrapped.method("take",

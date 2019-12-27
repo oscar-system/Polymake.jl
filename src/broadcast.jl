@@ -2,8 +2,8 @@
     return pm_Matrix{T}(length(rows), length(cols))
 end
 
-@inline function pm_Matrix{T}(rows::UR, cols::UR) where {T <: pm_VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
-    return pm_Matrix{T}(length(rows), length(cols))
+@inline function pm_Vector{T}(len::UR) where {T <: pm_VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
+    return pm_Vector{T}(length(len))
 end
 
 @inline function pm_SparseMatrix{T}(rows::UR, cols::UR) where {T <: pm_VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
@@ -61,8 +61,6 @@ end
 function Base.Broadcast.combine_eltypes(f::Tf,
 args::Tuple{SparseVecOrMat{ElType}}) where {Tf, ElType<:Union{pm_Integer,
 pm_Rational}}
-    @info "Our version with Tuple"
-
     any(isempty, args) && return Any
     x = first.(args)
     return typeof(f(x...))
@@ -71,7 +69,6 @@ end
 function Base.Broadcast.combine_eltypes(f::Tf,
 args::Tuple{SparseVecOrMat{ElType}}) where {Tf<:Union{Type{<:pm_Integer},
 Type{<:pm_Rational}}, ElType}
-    @info "Overloading constructor call"
     any(isempty, args) && return Any
     x = first.(args)
     return typeof(f(x...))
