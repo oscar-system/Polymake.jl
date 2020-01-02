@@ -35,8 +35,9 @@ pm_SparseMatrix(mat::AbstractMatrix{T}) where T <: Integer = pm_SparseMatrix{pm_
 pm_SparseMatrix(mat::AbstractMatrix{T}) where T <: Union{Rational, pm_Rational} = pm_SparseMatrix{pm_Rational}(mat)
 pm_SparseMatrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = pm_SparseMatrix{Float64}(mat)
 
-# pm_SparseMatrix{T}(mat::AbstractMatrix{T}) where T = pm_SparseMatrix(mat)
-# pm_SparseMatrix{T}(mat::AbstractMatrix) where T = pm_SparseMatrix{convert_to_pm_type(T)}(mat)
+pm_SparseMatrix{T}(x...) where T <: Integer = pm_SparseMatrix{pm_Integer}(x...)
+pm_SparseMatrix{T}(x...) where T <: Rational = pm_SparseMatrix{pm_Rational}(x...)
+pm_SparseMatrix{T}(x...) where T <: AbstractFloat = pm_SparseMatrix{Float64}(x...)
 
 pm_SparseMatrix(mat::M) where M <: pm_SparseMatrix{Float64} = mat
 
