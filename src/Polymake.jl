@@ -96,8 +96,6 @@ include("perlobj.jl")
 include("visual.jl")
 include("convert.jl")
 
-include("generate_applications.jl")
-
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")
@@ -107,4 +105,7 @@ include("sparsematrix.jl")
 include("broadcast.jl")
 include("arrays.jl")
 
+include("polymake_direct_calls.jl")
+
+include("generate_applications.jl")
 end # of module Polymake

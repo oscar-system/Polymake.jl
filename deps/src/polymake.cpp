@@ -22,6 +22,8 @@
 
 #include "polymake_caller.h"
 
+#include "polymake_direct_calls.h"
+
 #include "polymake_type_translations.h"
 
 #include "generated/type_declarations.h"
@@ -38,13 +40,15 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_matrix(polymake);
 
+    polymake_module_add_sparsematrix(polymake);
+
     polymake_module_add_vector(polymake);
 
     polymake_module_add_set(polymake);
 
     polymake_module_add_array(polymake);
 
-    polymake_module_add_sparsematrix(polymake);
+    polymake_module_add_direct_calls(polymake);
 
     polymake.method("initialize_polymake", &initialize_polymake);
     polymake.method("application", [](const std::string x) {
@@ -52,16 +56,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     });
 
     polymake.method("shell_execute", [](const std::string x) {
-        // FIXME: tuples with strings are broken in cxxwrap
-        // return res;
-        // instead we return an array of a bool and three strings now
-        auto         res = data.main_polymake_session->shell_execute(x);
-        jl_value_t** output = new jl_value_t*[4];
-        output[0] = jl_box_bool(std::get<0>(res));
-        output[1] = jl_cstr_to_string(std::get<1>(res).c_str());
-        output[2] = jl_cstr_to_string(std::get<2>(res).c_str());
-        output[3] = jl_cstr_to_string(std::get<3>(res).c_str());
-        return jlcxx::make_julia_array(output, 4);
+        return data.main_polymake_session->shell_execute(x);
     });
 
     polymake.method("shell_complete", [](const std::string x) {
@@ -79,10 +74,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         bool full=false, bool html=false){
         std::vector<std::string> ctx_help =
             data.main_polymake_session->shell_context_help(input, pos, full, html);
-        jl_value_t** doc_strings = new jl_value_t*[ctx_help.size()];
-        for (int i=0; i < ctx_help.size(); ++i)
-            doc_strings[i] = jl_cstr_to_string(ctx_help[i].c_str());
-        return jlcxx::make_julia_array(doc_strings, ctx_help.size());
+        return jlcxx::make_julia_array(&ctx_help[0], ctx_help.size());
     });
 
 #include "generated/map_inserts.h"

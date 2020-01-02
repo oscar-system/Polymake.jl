@@ -23,6 +23,6 @@
     @testset "convert to PolymakeType" begin
         Base.convert(::Type{Polymake.PolymakeType}, n::MyInt) = n.x
 
-        @test Polymake.Polytope.cube(MyInt(3)) isa Polymake.pm_perl_Object
+        @test polytope.cube(MyInt(3)) isa Polymake.pm_perl_Object
     end
 end
