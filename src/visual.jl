@@ -24,12 +24,13 @@ function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
 end
 # fallback for non-wrapped types
 function Base.show(io::IO, ::MIME"text/plain", pv::pm_perl_PropertyValue)
-    if typeinfo_string(pv, true) == "undefined"
-        print(io, "undefined")
-    else
+    type_info = typeinfo_string(pv, true)
+    println(io, "pm::perl::PropertyValue wrapping $type_info")
+    if  type_info != "undefined"
         print(io, to_string(pv))
     end
 end
+
 function Base.show(io::IO, ::MIME"text/plain", a::pm_Array{pm_perl_Object})
     print(io, "pm_Array{pm_perl_Object} of size ",length(a))
 end
@@ -48,8 +49,19 @@ function Base.show(io::IO, v::Visual)
     end
 end
 
+function _get_visual_string(x::Visual,function_symbol::Symbol)
+    html_string=call_function(:common, function_symbol, x.obj)
+    # we guess that the julia kernel is named this way...
+    kernel = "julia-$(VERSION.major).$(VERSION.minor)"
+    html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/")
+    return html_string
+end
+
+_get_visual_string_threejs(x::Visual) = _get_visual_string(x,:jupyter_visual_threejs)
+_get_visual_string_svg(x::Visual) = _get_visual_string(x,:jupyter_visual_svg)
+
 function Base.show(io::IO,::MIME"text/html",v::Visual)
-     print(io,_get_visual_string_threejs(v))
+    print(io,_get_visual_string_threejs(v))
 end
 
 function Base.show(io::IO,::MIME"text/svg+xml",v::Visual)
