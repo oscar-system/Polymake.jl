@@ -19,6 +19,7 @@
 #include <polymake/IncidenceMatrix.h>
 #include <polymake/Rational.h>
 #include <polymake/QuadraticExtension.h>
+#include <polymake/SparseMatrix.h>
 #include <polymake/polytope/solve_LP.h>
 
 #include <polymake/perl/calls.h>
