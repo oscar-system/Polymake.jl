@@ -2,7 +2,7 @@ module Polymake
 
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
-    pm_Set, pm_Vector, pm_Array, pm_Matrix,
+    pm_Set, pm_Vector, pm_Array, pm_Matrix, pm_IncidenceMatrix,
     PolymakeError, application
 
 
@@ -99,6 +99,7 @@ include("vectors.jl")
 include("matrices.jl")
 include("broadcast.jl")
 include("arrays.jl")
+include("incidencematrix.jl")
 
 include("polymake_direct_calls.jl")
 

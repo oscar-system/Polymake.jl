@@ -25,6 +25,8 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "pm_Array_pm_Array_pm_Integer",  "pm::Array<pm::Array<pm::Integer>>",  "pm_Array{pm_Array{pm_Integer}}",  "to_array_array_Integer" ),
 ( "pm_Array_pm_Matrix_pm_Integer", "pm::Array<pm::Matrix<pm::Integer>>", "pm_Array{pm_Matrix{pm_Integer}}", "to_array_matrix_Integer" ),
 ( "pm_Array_pm_perl_Object",       "pm::Array<pm::perl::Object>",        "pm_Array{pm_perl_Object}",        "to_array_perl_object" ),
+( "pm_IncidenceMatrix_pm_NonSymmetric", "pm::IncidenceMatrix<pm::NonSymmetric>", "pm_IncidenceMatrix{pm_NonSymmetric}", "to_incidencematrix_NonSymmetric"),
+( "pm_IncidenceMatrix_pm_Symmetric",    "pm::IncidenceMatrix<pm::Symmetric>",    "pm_IncidenceMatrix{pm_Symmetric}",    "to_incidencematrix_Symmetric"),
 ]
     NT.(type_tuples)
 end
