@@ -26,7 +26,7 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "pm_Array_pm_Matrix_pm_Integer", "pm::Array<pm::Matrix<pm::Integer>>", "pm_Array{pm_Matrix{pm_Integer}}", "to_array_matrix_Integer" ),
 ( "pm_Array_pm_perl_Object",       "pm::Array<pm::perl::Object>",        "pm_Array{pm_perl_Object}",        "to_array_perl_object" ),
 ( "pm_SparseVector_pm_Integer",    "pm::SparseVector<pm::Integer>",      "pm_SparseVector{pm_Integer}",     "to_pm_sparsevector_Integer"),
-( "pm_SparseVector_pm_Rational",    "pm::SparseVector<pm::Rational>",      "pm_SparseVector{pm_Rational}",     "to_pm_sparsevector_Rational"),
+( "pm_SparseVector_pm_Rational",   "pm::SparseVector<pm::Rational>",     "pm_SparseVector{pm_Rational}",    "to_pm_sparsevector_Rational"),
 ]
     NT.(type_tuples)
 end

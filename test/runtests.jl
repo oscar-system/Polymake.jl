@@ -16,7 +16,6 @@ end
 
 struct MyInt x::Int end # needed in test/convert.jl
 
-# write your own tests here
 @testset "Polymake" begin
     include("integers.jl")
     include("rationals.jl")
@@ -27,5 +26,4 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("convert.jl")
     include("perlobj.jl")
     include("interface_functions.jl")
-    include("compat.jl")
 end

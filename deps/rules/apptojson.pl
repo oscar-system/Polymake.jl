@@ -1,4 +1,4 @@
-# polymake helper script for json representation of functions and methods
+# polymake helper script for json representation of objects, functions, and methods
 
 require JSON;
 
@@ -57,7 +57,7 @@ sub methods_to_hash($$) {
    my @methods;
    return [] if !defined($type->help_topic);
 	foreach my $m ($type->help_topic->find("!rel","methods", ".*")) {
-      foreach my $ov ((values %{$m->topics}) || ($m)) {
+      foreach my $ov (%{$m->topics} ? (values %{$m->topics}) : ($m)) {
          my $fun = help_to_hash($appname, $m, $ov);
          $fun->{method_of} = type_for_julia($appname,$type->name);
          push @methods, $fun;
@@ -84,6 +84,7 @@ sub app_to_json($$) {
    my %data;
    $data{version} = "dev";
    $data{app} = $appname;
+
    # call funcs and meths
    push @{$data{functions}}, @{functions_to_hash($appname)};
    my @gen_types = grep {!defined($_->generic) } @{User::application($appname)->object_types};
@@ -94,6 +95,16 @@ sub app_to_json($$) {
             push @{$data{functions}}, @{methods_to_hash($appname,$spez)};
          }
       }
+   }
+
+   my @types = grep {!defined($_->generic) } @{User::application($appname)->object_types};
+   foreach my $type (@types) {
+      my $objhash = {
+                       name => $type->full_name,
+                       help => $type->help->display_text
+                    };
+      $objhash->{params} = [ map { $_->name } @{$type->params} ] if defined $type->params;
+      push @{$data{objects}}, $objhash;
    }
 
    my $generator = JSON->new->canonical->pretty;
