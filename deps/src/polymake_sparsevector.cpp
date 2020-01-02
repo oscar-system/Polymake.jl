@@ -9,11 +9,10 @@
 void polymake_module_add_sparsevector(jlcxx::Module& polymake)
 {
     polymake
-        .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
-            "pm_SparseVector", jlcxx::julia_type("AbstractVector", "Base"))
-            .apply<pm::SparseVector<pm::Integer>,
-                pm::SparseVector<pm::Rational>>(
-                [](auto wrapped) {
+    .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>, jlcxx::ParameterList<jlcxx::TypeVar<1>,int>>(
+        "pm_SparseVector", jlcxx::julia_type("AbstractSparseVector", "SparseArrays"))
+        .apply_combination<pm::SparseVector, pm_VecOrMat_supported::value_type>(
+            [](auto wrapped) {
                     typedef typename decltype(wrapped)::type vecType;
                     typedef typename decltype(wrapped)::type::value_type elemType;
                     wrapped.template constructor<vecType>();
