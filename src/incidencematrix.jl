@@ -8,18 +8,13 @@ end
 
 @inline function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractMatrix)
     m,n = size(mat)
+    m == n || throw(ArgumentError("a symmetric matrix needs to be quadratic"))
     res = pm_IncidenceMatrix{pm_Symmetric}(m,n)
-    if (m <= n)
-        for j = 1:n
-            for i = 1:min(j,m)
-                res[i,j] = mat[i,j]
-            end
-        end
-    else
-        for i = 1:m
-            for j = 1:min(i,n)
-                res[i,j] = mat[i,j]
-            end
+    for i = 1:m
+        for j = 1:i
+            temp = mat[i,j]
+            ((temp == mat[j,i] == 0) | ((temp != 0) & (mat[j,i] != 0))) || throw(ArgumentError("input matrix is not symmetric"))
+            res[i,j] = res[j,i] = temp
         end
     end
     return res
@@ -36,7 +31,7 @@ end
 
 @inline function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractSparseMatrix)
     m,n = size(mat)
-    res = pm_IncidenceMatrix{pm_NonSymmetric}(
+    res = pm_IncidenceMatrix{pm_NonSymmetric}(m,n)
     r,c,v = findnz(mat)
     if (m <= n)
         for i = 1:length(r)
@@ -53,6 +48,11 @@ end
     end
     return res
 end
+
+# set default parameter to pm_NonSymmetric
+pm_IncidenceMatrix(x...) = pm_IncidenceMatrix{pm_NonSymmetric}(x...)
+
+Base.size(m::pm_IncidenceMatrix) = (rows(m), cols(m))
 
 Base.@propagate_inbounds function Base.getindex(M::pm_IncidenceMatrix , i::Integer, j::Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
