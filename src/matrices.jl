@@ -14,7 +14,7 @@ pm_Matrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = pm_Matrix{Float64}(
 # no-copy constructor for pm_Matrix{Float64} (it's stored as a continuous block)
 pm_Matrix(mat::M) where M <: pm_Matrix{Float64} = mat
 
-Base.size(m::pm_Matrix) = (rows(m), cols(m))
+Base.size(m::pm_Matrix) = (Int(rows(m)), Int(cols(m)))
 
 Base.@propagate_inbounds function Base.getindex(M::pm_Matrix , i::Integer, j::Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
