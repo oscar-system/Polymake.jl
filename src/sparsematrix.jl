@@ -67,16 +67,5 @@ function SparseArrays.findnz(mat::pm_SparseMatrix{T}) where T <: pm_VecOrMat_elt
             k += 1
         end
     end
-
-    # ri = zeros(Int64,0)
-    # ci = zeros(Int64,0)
-    # v = zeros(T,0)
-    # for r=1:length(nzi)
-    #     for c in nzi[r]
-    #         append!(ri,r)
-    #         append!(ci,c+1)
-    #         append!(v,mat[r,c+1])
-    #     end
-    # end
     return (ri,ci,v)
 end
