@@ -29,11 +29,13 @@ void polymake_module_add_incidencematrix(jlcxx::Module& polymake)
         });
         wrapped.method("rows", &WrappedT::rows);
         wrapped.method("cols", &WrappedT::cols);
+        // wrapped.method("col", [](WrappedT& M, int64_t i) { return pm::SparseVector<int>(M.col(i)); });
         wrapped.method("resize!", [](WrappedT& M, int64_t i,
                                     int64_t j) { M.resize(i, j); });
         wrapped.method("take",
                        [](pm::perl::Object p, const std::string& s,
                           WrappedT& M) { p.take(s) << M; });
+
         wrapped.method("show_small_obj", [](WrappedT& S) {
             return show_small_object<WrappedT>(S);
         });
