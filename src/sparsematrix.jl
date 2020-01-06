@@ -35,10 +35,6 @@ pm_SparseMatrix(mat::AbstractMatrix{T}) where T <: Integer = pm_SparseMatrix{pm_
 pm_SparseMatrix(mat::AbstractMatrix{T}) where T <: Union{Rational, pm_Rational} = pm_SparseMatrix{pm_Rational}(mat)
 pm_SparseMatrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = pm_SparseMatrix{Float64}(mat)
 
-pm_SparseMatrix{T}(x...) where T <: Integer = pm_SparseMatrix{pm_Integer}(x...)
-pm_SparseMatrix{T}(x...) where T <: Rational = pm_SparseMatrix{pm_Rational}(x...)
-pm_SparseMatrix{T}(x...) where T <: AbstractFloat = pm_SparseMatrix{Float64}(x...)
-
 pm_SparseMatrix(mat::M) where M <: pm_SparseMatrix{Float64} = mat
 
 Base.size(m::pm_SparseMatrix) = (Int(rows(m)), Int(cols(m)))
@@ -58,15 +54,29 @@ end
 
 function SparseArrays.findnz(mat::pm_SparseMatrix{T}) where T <: pm_VecOrMat_eltypes
     nzi = nzindices(mat)
-    ri = zeros(Int64,0)
-    ci = zeros(Int64,0)
-    v = zeros(T,0)
-    for r=1:length(nzi)
+    len = sum(length, nzi)
+    ri = Vector{Int64}(undef, len)
+    ci = Vector{Int64}(undef, len)
+    v = Vector{T}(undef, len)
+    k = 1
+    for r = 1:length(nzi)
         for c in nzi[r]
-            append!(ri,r)
-            append!(ci,c+1)
-            append!(v,mat[r,c+1])
+            ri[k] = r
+            ci[k] = c + 1
+            v[k] = mat[r, c + 1]
+            k += 1
         end
     end
+
+    # ri = zeros(Int64,0)
+    # ci = zeros(Int64,0)
+    # v = zeros(T,0)
+    # for r=1:length(nzi)
+    #     for c in nzi[r]
+    #         append!(ri,r)
+    #         append!(ci,c+1)
+    #         append!(v,mat[r,c+1])
+    #     end
+    # end
     return (ri,ci,v)
 end

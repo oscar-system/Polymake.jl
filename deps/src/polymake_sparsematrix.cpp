@@ -29,18 +29,7 @@ void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
                     wrapped.method("rows", &matType::rows);
                     wrapped.method("cols", &matType::cols);
                     wrapped.method("nzindices", [](matType& S) {
-                        // pm::IndexMatrix<const pm::SparseMatrix<elemType, pm::NonSymmetric>> im = pm::index_matrix(S);
-                        // pm::Matrix<int32_t> a(im.rows(),im.cols());
-                        // for (int i = 0; i < im.rows(); i++) {
-                        //     for (int j = 0; i < im.cols(); j++) {
-                        //         a(i,j) = im(i,j);
-                        //     }
-                        // }
-                        // return a;
-
                         return Array<Set<int32_t>>(pm::rows(pm::index_matrix(S)));
-
-                        //return pm::Matrix<int32_t>(pm::index_matrix(S));
                     });
                     wrapped.method("resize!", [](matType& M, int64_t i,
                                                 int64_t j) { M.resize(i, j); });

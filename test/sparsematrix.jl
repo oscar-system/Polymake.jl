@@ -389,4 +389,14 @@ using SparseArrays
         end
     end
 
+    @testset "findnz" begin
+        jsm = sprand(1015,1841,.14)
+        psm = pm_SparseMatrix(jsm)
+        jr, jc, jv = findnz(jsm)
+        pr, pc, pv = findnz(psm)
+        p = sortperm(pc)
+        @test jr == pr[p]
+        @test jc == pc[p]
+        @test jv == pv[p]
+    end
 end
