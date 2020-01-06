@@ -16,22 +16,15 @@
 
             # no copy conversion:
             @test convert(pm_TropicalNumber{A}, a) === a
-            #
-            # # conversions to Rational types
-            # for T in IntTypes
-            #     RT = Rational{T}
-            #     @test RT(a) isa RT
-            #     @test convert(pm_Rational, RT(a)) isa pm_Rational
-            #     @test convert(pm_Rational, RT(a)) isa Polymake.pm_RationalAllocated
-            # end
-            # @test Rational(a) isa Rational{BigInt}
-            # @test big(a) isa Rational{BigInt}
-            #
-            # # conversion to other Number types
-            # @test convert(Float64, a) isa Float64
-            # @test Float64(a) isa Float64
-            # @test float(a) == convert(BigFloat, a)
-            #
+
+            for R in [Rational{Int}, pm_Rational]
+              r = R(1//3)
+              @test convert(pm_TropicalNumber{pm_Max}, r) isa pm_TropicalNumber
+              tr = convert(pm_TropicalNumber{pm_Max}, r)
+              @test convert(R, tr) isa R
+              @test convert(R, tr) == r
+            end
+
             # julia arrays
             @test Array{Any,1}([a,1])[1] isa Polymake.pm_TropicalNumberAllocated
             # @test [a,1] isa Vector{pm_TropicalNumber{A,pm_Rational}}
@@ -75,8 +68,13 @@
                 @test a // b isa pm_TropicalNumber{A}
                 @test a // b == pm_TropicalNumber{A}(-12)
                 @test b // a == pm_TropicalNumber{A}(12)
+                @test a / b isa pm_TropicalNumber{A}
+                @test a / b == pm_TropicalNumber{A}(-12)
+                @test b / a == pm_TropicalNumber{A}(12)
                 a //= b
                 @test a == pm_TropicalNumber{A}(-12)
+                a /= b
+                @test a == pm_TropicalNumber{A}(-29)
             end
         end
 
@@ -108,6 +106,8 @@
             @test_throws ArgumentError b * a
             @test_throws ArgumentError a // b
             @test_throws ArgumentError b // a
+            @test_throws ArgumentError a / b
+            @test_throws ArgumentError b / a
             @test_throws ArgumentError a < b
             @test_throws ArgumentError b < a
             @test_throws ArgumentError a > b

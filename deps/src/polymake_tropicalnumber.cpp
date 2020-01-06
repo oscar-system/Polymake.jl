@@ -19,13 +19,14 @@ void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
                 [](auto wrapped) {
                     typedef typename decltype(wrapped)::type tropType;
                     wrapped.template constructor<pm::Rational>();
-                    wrapped.method("_add", [](tropType& a, tropType& b) { return a + b; });
-                    wrapped.method("_mult", [](tropType& a, tropType& b) { return a * b; });
-                    wrapped.method("_div", [](tropType& a, tropType& b) { return a / b; });
+                    wrapped.method("+", [](tropType& a, tropType& b) { return a + b; });
+                    wrapped.method("*", [](tropType& a, tropType& b) { return a * b; });
+                    wrapped.method("//", [](tropType& a, tropType& b) { return a / b; });
                     wrapped.method("==", [](tropType& a,
                             tropType& b) { return a == b; });
-                    wrapped.method("_lt", [](tropType& a,
+                    wrapped.method("<", [](tropType& a,
                             tropType& b) { return a < b; });
+                    wrapped.method("scalar", [](tropType&a) { return a.scalar; });
                     wrapped.method("show_small_obj", [](tropType& S) {
                         return show_small_object<tropType>(S);
                     });
