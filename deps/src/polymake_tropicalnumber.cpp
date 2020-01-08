@@ -19,6 +19,9 @@ void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
                 [](auto wrapped) {
                     typedef typename decltype(wrapped)::type tropType;
                     wrapped.template constructor<pm::Rational>();
+                    wrapped.method("zero", [](tropType& a) { return a.zero(); });
+                    wrapped.method("dual_zero", [](tropType& a) { return a.dual_zero(); });
+                    wrapped.method("one", [](tropType& a) { return a.one(); });
                     wrapped.method("+", [](tropType& a, tropType& b) { return a + b; });
                     wrapped.method("*", [](tropType& a, tropType& b) { return a * b; });
                     wrapped.method("//", [](tropType& a, tropType& b) { return a / b; });
@@ -26,7 +29,7 @@ void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
                             tropType& b) { return a == b; });
                     wrapped.method("<", [](tropType& a,
                             tropType& b) { return a < b; });
-                    wrapped.method("scalar", [](tropType&a) { return a.scalar; });
+                    wrapped.method("scalar", [](tropType& a) { return pm::Rational(a); });
                     wrapped.method("show_small_obj", [](tropType& S) {
                         return show_small_object<tropType>(S);
                     });

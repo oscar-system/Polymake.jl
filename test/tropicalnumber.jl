@@ -27,7 +27,6 @@
 
             # julia arrays
             @test Array{Any,1}([a,1])[1] isa Polymake.pm_TropicalNumberAllocated
-            # @test [a,1] isa Vector{pm_TropicalNumber{A,pm_Rational}}
             @test [a,a] isa Vector{Polymake.pm_TropicalNumberAllocated{A,pm_Rational}}
         end
     end
@@ -118,29 +117,41 @@
     @testset "zero / one" begin
         ZEROmin = pm_TropicalNumber{pm_Min}()
         ONEmin = pm_TropicalNumber{pm_Min}(0)
-        DZEROmin = pm_TropicalNumber{pm_Max}()
+        DZEROmin = pm_TropicalNumber{pm_Min}(-Inf)
         ZEROmax = pm_TropicalNumber{pm_Max}()
         ONEmax = pm_TropicalNumber{pm_Max}(0)
-        DZEROmax = pm_TropicalNumber{pm_Min}()
+        DZEROmax = pm_TropicalNumber{pm_Max}(Inf)
 
         @test one(ZEROmin) isa pm_TropicalNumber{pm_Min}
         @test zero(ZEROmin) isa pm_TropicalNumber{pm_Min}
-        @test dual_zero(ZEROmin) isa pm_TropicalNumber{pm_Max}
+        @test dual_zero(ZEROmin) isa pm_TropicalNumber{pm_Min}
         @test one(pm_TropicalNumber{pm_Min}) isa pm_TropicalNumber{pm_Min}
         @test zero(pm_TropicalNumber{pm_Min}) isa pm_TropicalNumber{pm_Min}
-        @test dual_zero(pm_TropicalNumber{pm_Min}) isa pm_TropicalNumber{pm_Max}
+        @test dual_zero(pm_TropicalNumber{pm_Min}) isa pm_TropicalNumber{pm_Min}
         @test one(ZEROmax) isa pm_TropicalNumber{pm_Max}
         @test zero(ZEROmax) isa pm_TropicalNumber{pm_Max}
-        @test dual_zero(ZEROmax) isa pm_TropicalNumber{pm_Min}
+        @test dual_zero(ZEROmax) isa pm_TropicalNumber{pm_Max}
         @test one(pm_TropicalNumber{pm_Max}) isa pm_TropicalNumber{pm_Max}
         @test zero(pm_TropicalNumber{pm_Max}) isa pm_TropicalNumber{pm_Max}
-        @test dual_zero(pm_TropicalNumber{pm_Max}) isa pm_TropicalNumber{pm_Min}
+        @test dual_zero(pm_TropicalNumber{pm_Max}) isa pm_TropicalNumber{pm_Max}
 
-        @test zero(pm_TropicalNumber{pm_Min}) == zero(ONEmin) == ZEROmin == dual_zero(pm_TropicalNumber{pm_Max})
+        @test zero(pm_TropicalNumber{pm_Min}) == zero(ONEmin) == ZEROmin
+        @test dual_zero(pm_TropicalNumber{pm_Min}) == dual_zero(ONEmin) == pm_TropicalNumber{pm_Min}(-Inf)
         @test one(pm_TropicalNumber{pm_Min}) == one(ZEROmin) == ONEmin
-        @test zero(pm_TropicalNumber{pm_Max}) == zero(ONEmax) == ZEROmax == dual_zero(pm_TropicalNumber{pm_Min})
+        @test zero(pm_TropicalNumber{pm_Max}) == zero(ONEmax) == ZEROmax
+        @test dual_zero(pm_TropicalNumber{pm_Max}) == dual_zero(ONEmax) == pm_TropicalNumber{pm_Max}(Inf)
         @test one(pm_TropicalNumber{pm_Max}) == one(ZEROmax) == ONEmax
 
         @test orientation(pm_TropicalNumber{pm_Min}) == orientation(ZEROmin) == -orientation(pm_TropicalNumber{pm_Max}) == - orientation(ZEROmax) == 1
+    end
+
+    @testset "Promotion (equality)" begin
+        for A in AdditionTypes
+            for T in NumberTypes
+                a = pm_TropicalNumber{A}(5)
+                @test a == T(5)
+                @test T(5) == a
+            end
+        end
     end
 end
