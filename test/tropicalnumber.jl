@@ -99,18 +99,18 @@
         @testset "Catching mismatching parameters" begin
             a = pm_TropicalNumber{pm_Min}(5)
             b = pm_TropicalNumber{pm_Max}(17)
-            @test_throws ArgumentError a + b
-            @test_throws ArgumentError b + a
-            @test_throws ArgumentError a * b
-            @test_throws ArgumentError b * a
-            @test_throws ArgumentError a // b
-            @test_throws ArgumentError b // a
-            @test_throws ArgumentError a / b
-            @test_throws ArgumentError b / a
-            @test_throws ArgumentError a < b
-            @test_throws ArgumentError b < a
-            @test_throws ArgumentError a > b
-            @test_throws ArgumentError b > a
+            @test_throws DomainError a + b
+            @test_throws DomainError b + a
+            @test_throws DomainError a * b
+            @test_throws DomainError b * a
+            @test_throws DomainError a // b
+            @test_throws DomainError b // a
+            @test_throws DomainError a / b
+            @test_throws DomainError b / a
+            @test_throws DomainError a < b
+            @test_throws DomainError b < a
+            @test_throws DomainError a > b
+            @test_throws DomainError b > a
         end
     end
 
