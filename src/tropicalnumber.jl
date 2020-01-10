@@ -17,30 +17,16 @@ Base.:(==)(x::Real,y::pm_TropicalNumber{A,S}) where {A, S} = (y == x)
 #catch wrong typings for basic operations
 Base.promote_rule(::Type{<:pm_TropicalNumber{A, S1}}, ::Type{<:pm_TropicalNumber{A, S2}}) where {A, S1, S2} = pm_TropicalNumber{A, promote_type(S1,S2)}
 
-for op in (:(+), :(*), :(//), :(/), :(<))
+for op in (:+, :*, ://, :<)
     @eval begin
-        $op(x::pm_TropicalNumber{A, S1}, y::pm_TropicalNumber{A, S2}) where {A,S1,S2} = $(op)(promote(x,y)...)
-        $op(x::pm_TropicalNumber{A1}, y::pm_TropicalNumber{A2}) where {A1,A2} =
-            throw(DomainError((x,y), "The operation of $(esc(op)) for tropical numbers with $(esc(A)) and $(esc(B)) is not defined"))
+        Base.$(op)(x::pm_TropicalNumber{A, S}, y::pm_TropicalNumber{A, T}) where {A,S,T} = $(op)(promote(x,y)...)
+        Base.$(op)(x::pm_TropicalNumber{A}, y::pm_TropicalNumber{B}) where {A,B} =
+            throw(DomainError((x,y), "The operation $(string($op)) for tropical numbers with $A and $B is not defined"))
     end
 end
-# function Base.:+(x::pm_TropicalNumber{A1,S1},y::pm_TropicalNumber{A2,S2}) where {A1,A2 <: pm_TropicalNumber_suppAddition, S1,S2 <: pm_TropicalNumber_suppScalar}
-#     throw(ArgumentError("addition of two instances of pm_TropicalNumber only allowed when both parameter types match"))
-# end
-#
-# function Base.:*(x::pm_TropicalNumber{A1,S1},y::pm_TropicalNumber{A2,S2}) where {A1,A2 <: pm_TropicalNumber_suppAddition, S1,S2 <: pm_TropicalNumber_suppScalar}
-#     throw(ArgumentError("multiplication of two instances of pm_TropicalNumber only allowed when both parameter types match"))
-# end
-#
-# function Base.://(x::pm_TropicalNumber{A1,S1},y::pm_TropicalNumber{A2,S2}) where {A1,A2 <: pm_TropicalNumber_suppAddition, S1,S2 <: pm_TropicalNumber_suppScalar}
-#     throw(ArgumentError("division of two instances of pm_TropicalNumber only allowed when both parameter types match"))
-# end
-#
-Base.:/(x::pm_TropicalNumber{A1,S}, y::pm_TropicalNumber{A2, S}) where{A1, A2, S <: Union{pm_Integer, pm_Rational}} = x//y
-#
-# function Base.:<(x::pm_TropicalNumber{A1,S1},y::pm_TropicalNumber{A2,S2}) where {A1,A2 <: pm_TropicalNumber_suppAddition, S1,S2 <: pm_TropicalNumber_suppScalar}
-#     throw(ArgumentError("comparison of two instances of pm_TropicalNumber only allowed when both parameter types match"))
-# end
+
+#at the moment we do not distinct between // and /, so / just refers to //
+Base.:/(x::pm_TropicalNumber{A1,S}, y::pm_TropicalNumber{A2, S}) where{A1, A2, S} = x//y
 
 #zero/one
 
