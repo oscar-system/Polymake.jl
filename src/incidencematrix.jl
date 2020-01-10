@@ -29,22 +29,14 @@ end
     return res
 end
 
-@inline function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractSparseMatrix)
+@inline function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractSparseMatrix)
     m,n = size(mat)
-    res = pm_IncidenceMatrix{pm_NonSymmetric}(m,n)
+    m == n || throw(ArgumentError("a symmetric matrix needs to be quadratic"))
+    res = pm_IncidenceMatrix{pm_Symmetric}(m,n)
     r,c,v = findnz(mat)
-    if (m <= n)
-        for i = 1:length(r)
-            if (r[i] <= c[i])
-                res[r[i],c[i]] = v[i]
-            end
-        end
-    else
-        for i = 1:length(r)
-            if (r[i] >= c[i])
-                res[r[i],c[i]] = v[i]
-            end
-        end
+    for i = 1:length(r)
+        ((v[i] == mat[c[i],r[i]] == 0) | ((v[i] != 0) & (mat[c[i],r[i]] != 0))) || throw(ArgumentError("input matrix is not symmetric"))
+        res[r[i],c[i]] = v[i]
     end
     return res
 end
@@ -63,6 +55,27 @@ end
 Base.@propagate_inbounds function Base.setindex!(M::pm_IncidenceMatrix, val, i::Integer, j::Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
     @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
-    _setindex!(M, convert(Int64, val), convert(Int64, i), convert(Int64, j))
+    _setindex!(M, !iszero(val), convert(Int64, i), convert(Int64, j))
     return val
+end
+
+Base.@propagate_inbounds function row(M::pm_IncidenceMatrix, i::Integer)
+    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,1]))
+    return _row(M, convert(Int64, i))
+end
+
+Base.@propagate_inbounds function col(M::pm_IncidenceMatrix, j::Integer)
+    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [1,j]))
+    return _col(M, convert(Int64, j))
+end
+
+function Base.resize!(M::pm_IncidenceMatrix{pm_NonSymmetric}, m::Integer, n::Integer)
+    m >= 0 || throw(DomainError(m, "can not resize to a negative length"))
+    n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
+    _resize!(M,Int64(m),Int64(n))
+end
+
+function Base.resize!(M::pm_IncidenceMatrix{pm_Symmetric}, n::Integer)
+    n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
+    _resize!(M,Int64(n),Int64(n))
 end
