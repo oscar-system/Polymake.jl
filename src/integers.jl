@@ -5,11 +5,13 @@ pm_Integer(int::Number) = pm_Integer(BigInt(int))
 # to avoid ambiguities:
 pm_Integer(rat::Rational) = pm_Integer(BigInt(rat))
 pm_Integer(flt::BigFloat) = pm_Integer(BigInt(flt))
+# to allow conversion from bool
+pm_Integer(b::Bool) = pm_Integer(BigInt(b))
 
-Base.one(i::Type{<:pm_Integer}) = pm_Integer(1)
-Base.one(i::pm_Integer) = pm_Integer(1)
-Base.zero(i::pm_Integer) = pm_Integer(0)
-Base.zero(i::Type{<:pm_Integer}) = pm_Integer(0)
+Base.one(::Type{<:pm_Integer}) = pm_Integer(1)
+Base.one(::pm_Integer) = pm_Integer(1)
+Base.zero(::pm_Integer) = pm_Integer(0)
+Base.zero(::Type{<:pm_Integer}) = pm_Integer(0)
 
 import Base: ==, <, <=
 # These are operations we delegate to gmp
@@ -21,7 +23,7 @@ for op in (:(==), :(<), :(<=))
     end
 end
 
-function Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Union{Signed, Unsigned}})
+function Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Union{Bool, Signed, Unsigned}})
     return pm_Integer
 end
 # symmetric promote_rule is needed since BigInts define those for Integer:

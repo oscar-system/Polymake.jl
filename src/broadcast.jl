@@ -2,25 +2,27 @@
     return pm_Matrix{T}(length(rows), length(cols))
 end
 
-@inline function pm_IncidenceMatrix{S}(rows::UR, cols::UR) where {S <: Union{pm_NonSymmetric, pm_Symmetric}, UR<:Base.AbstractUnitRange}
-    return pm_IncidenceMatrix{S}(length(rows), length(cols))
+@inline function pm_IncidenceMatrix{pm_NonSymmetric}(rows::UR, cols::UR) where {UR<:Base.AbstractUnitRange}
+    return pm_IncidenceMatrix{pm_NonSymmetric}(length(rows), length(cols))
 end
 
-Base.similar(X::Union{pm_Vector, pm_Matrix}, ::Type{S}, dims::Dims{1}) where
+Base.similar(X::Union{pm_Vector, pm_Matrix, pm_IncidenceMatrix}, ::Type{S}, dims::Dims{1}) where
     {S <: pm_VecOrMat_eltypes} = pm_Vector{convert_to_pm_type(S)}(dims...)
 
-Base.similar(X::Union{pm_Vector, pm_Matrix}, ::Type{S}, dims::Dims{1}) where {S} = Vector{S}(dims...)
+Base.similar(X::Union{pm_Vector, pm_Matrix, pm_IncidenceMatrix}, ::Type{S}, dims::Dims{1}) where {S} = Vector{S}(dims...)
 
-Base.similar(X::Union{pm_Vector, pm_Matrix}, ::Type{S}, dims::Dims{2}) where
+Base.similar(X::Union{pm_Vector, pm_Matrix, pm_IncidenceMatrix}, ::Type{S}, dims::Dims{2}) where
     {S <: pm_VecOrMat_eltypes} = pm_Matrix{convert_to_pm_type(S)}(dims...)
 
-Base.similar(X::Union{pm_Vector, pm_Matrix}, ::Type{S}, dims::Dims{2}) where {S} = Matrix{S}(dims...)
+Base.similar(X::Union{pm_Vector, pm_Matrix, pm_IncidenceMatrix}, ::Type{S}, dims::Dims{2}) where {S} = Matrix{S}(dims...)
 
-Base.similar(X::pm_IncidenceMatrix{S}, ::Type{T}, dims::Dims{2}) where {S, T <: Bool} = pm_IncidenceMatrix{S}(dims...)
+Base.similar(X::pm_IncidenceMatrix, ::Type{S}, dims::Dims{1}) where {S <: Bool} = BitArray{1}(undef, dims...)
+
+Base.similar(X::pm_IncidenceMatrix, ::Type{S}, dims::Dims{2}) where {S <: Bool} = pm_IncidenceMatrix{pm_NonSymmetric}(dims...)
 
 Base.BroadcastStyle(::Type{<:pm_Vector}) = Broadcast.ArrayStyle{pm_Vector}()
 Base.BroadcastStyle(::Type{<:pm_Matrix}) = Broadcast.ArrayStyle{pm_Matrix}()
-Base.BroadcastStyle(::Type{<:pm_IncidenceMatrix{S}}) where {S} = Broadcast.ArrayStyle{pm_IncidenceMatrix{S}}()
+Base.BroadcastStyle(::Type{<:pm_IncidenceMatrix}) = Broadcast.ArrayStyle{pm_IncidenceMatrix{pm_NonSymmetric}}()
 
 function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{pm_Vector}},
     ::Type{ElType}) where ElType
@@ -32,11 +34,12 @@ function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{pm_Matrix}}
     return pm_Matrix{promote_to_pm_type(pm_Vector, ElType)}(axes(bc)...)
 end
 
-function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{pm_IncidenceMatrix{S}}},
-    ::Type{ElType}) where {S, ElType}
-    if ElType <: Bool
-        return pm_IncidenceMatrix{S}(axes(bc)...)
-    else
-        return pm_Matrix{promote_to_pm_type(pm_Vector, ElType)}(axes(bc)...)
-    end
+function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{T}},
+    ::Type{ElType}) where {T<:pm_IncidenceMatrix, ElType <: Bool}
+    return pm_IncidenceMatrix{pm_NonSymmetric}(axes(bc)...)
+end
+
+function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{T}},
+    ::Type{ElType}) where {T<:pm_IncidenceMatrix, ElType}
+    return pm_Matrix{promote_to_pm_type(pm_Matrix, ElType)}(axes(bc)...)
 end

@@ -61,12 +61,12 @@ end
 
 Base.@propagate_inbounds function row(M::pm_IncidenceMatrix, i::Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,1]))
-    return _row(M, convert(Int64, i))
+    return to_one_based_indexing(_row(M, convert(Int64, i)))
 end
 
 Base.@propagate_inbounds function col(M::pm_IncidenceMatrix, j::Integer)
     @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [1,j]))
-    return _col(M, convert(Int64, j))
+    return to_one_based_indexing(_col(M, convert(Int64, j)))
 end
 
 function Base.resize!(M::pm_IncidenceMatrix{pm_NonSymmetric}, m::Integer, n::Integer)
