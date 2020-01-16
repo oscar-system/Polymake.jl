@@ -3,11 +3,12 @@ module Polymake
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
     pm_Set, pm_Vector, pm_Array, pm_Matrix,
-    PolymakeError, application
+    pm_TropicalNumber, pm_Min, pm_Max,
+    PolymakeError, application, dual_zero, orientation
 
 
 # We need to import all functions which will be extended on the Cxx side
-import Base: ==, <, <=, *, -, +, //, div, rem,
+import Base: ==, <, <=, *, -, +, //, div, rem, one, zero,
     append!, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty,
     length, numerator, push!, resize!,
@@ -99,6 +100,7 @@ include("vectors.jl")
 include("matrices.jl")
 include("broadcast.jl")
 include("arrays.jl")
+include("tropicalnumber.jl")
 
 include("polymake_direct_calls.jl")
 

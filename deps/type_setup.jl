@@ -25,6 +25,10 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "pm_Array_pm_Array_pm_Integer",  "pm::Array<pm::Array<pm::Integer>>",  "pm_Array{pm_Array{pm_Integer}}",  "to_array_array_Integer" ),
 ( "pm_Array_pm_Matrix_pm_Integer", "pm::Array<pm::Matrix<pm::Integer>>", "pm_Array{pm_Matrix{pm_Integer}}", "to_array_matrix_Integer" ),
 ( "pm_Array_pm_perl_Object",       "pm::Array<pm::perl::Object>",        "pm_Array{pm_perl_Object}",        "to_array_perl_object" ),
+( "pm_TropicalNumber_pm_Max_pm_Rational",   "pm::TropicalNumber<pm::Max,pm::Rational>",  "pm_TropicalNumber{pm_Max,pm_Rational}", "to_pm_tropicalnumber_max_Rational"),
+( "pm_TropicalNumber_pm_Min_pm_Rational",   "pm::TropicalNumber<pm::Min,pm::Rational>",  "pm_TropicalNumber{pm_Min,pm_Rational}", "to_pm_tropicalnumber_min_Rational"),
+# ( "pm_TropicalNumber_pm_Max_pm_Integer",    "pm::TropicalNumber<pm::Max,pm::Integer>",   "pm_TropicalNumber{pm_Max,pm_Integer}",  "to_pm_tropicalnumber_max_Integer"),
+# ( "pm_TropicalNumber_pm_Min_pm_Integer",    "pm::TropicalNumber<pm::Min,pm::Integer>",   "pm_TropicalNumber{pm_Min,pm_Integer}",  "to_pm_tropicalnumber_min_Integer"),
 ]
     NT.(type_tuples)
 end
