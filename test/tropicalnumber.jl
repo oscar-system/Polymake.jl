@@ -3,11 +3,13 @@
     AdditionTypes = [pm_Min, pm_Max]
 
     @testset "Constructors/Conversions" begin
-        @test pm_Rational <: Number
+        for T in [NumberTypes; pm_TropicalNumber{pm_Min}; pm_TropicalNumber{pm_Max}]
+            @test_throws ArgumentError pm_TropicalNumber(T(2))
+        end
 
         for A in AdditionTypes
             # constructors
-            for T in NumberTypes
+            for T in [NumberTypes; pm_TropicalNumber{pm_Min}; pm_TropicalNumber{pm_Max}]
                 @test pm_TropicalNumber{A}(T(1)) isa pm_TropicalNumber
                 @test pm_TropicalNumber{A}(T(1)) isa pm_TropicalNumber{A}
             end
@@ -36,7 +38,7 @@
         for A in AdditionTypes
             @testset "(In-)Equality $A" begin
                 a = pm_TropicalNumber{A}(pm_Rational(5))
-                for T in NumberTypes
+                for T in [NumberTypes; pm_TropicalNumber{pm_Min}; pm_TropicalNumber{pm_Max}]
                     b = pm_TropicalNumber{A}(T(5))
                     @test a == b
                     @test b == a

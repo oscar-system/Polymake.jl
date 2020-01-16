@@ -2,11 +2,15 @@ const pm_TropicalNumber_suppAddition = Union{pm_Min, pm_Max}
 const pm_TropicalNumber_suppScalar = Union{pm_Rational}
 
 #convert input to supported Scalar type
-pm_TropicalNumber{A,S}(scalar::Real) where {A <: pm_TropicalNumber_suppAddition, S <: pm_TropicalNumber_suppScalar} = pm_TropicalNumber{A,S}(convert(S,scalar))
+pm_TropicalNumber{A,S}(scalar::Union{Real, pm_TropicalNumber}) where {A <: pm_TropicalNumber_suppAddition, S <: pm_TropicalNumber_suppScalar} = pm_TropicalNumber{A,S}(convert(S,scalar))
 
 #pm_Rational es default Scalar
-pm_TropicalNumber{A}(scalar::Real) where A = pm_TropicalNumber{A,pm_Rational}(scalar)
-pm_TropicalNumber{A}() where A = pm_TropicalNumber{A,pm_Rational}()
+pm_TropicalNumber{A}(scalar::Union{Real, pm_TropicalNumber}) where A = pm_TropicalNumber{A,pm_Rational}(scalar)
+pm_TropicalNumber{A}() where A = pm_TropicalNumber{A, pm_Rational}()
+
+#polymake requires an explicit statement what kind of tropical number (i.e. min or max) we want to construct
+pm_TropicalNumber(x...) = throw(ArgumentError("pm_TropicalNumber needs to be called with type parameter 'pm_Max' or 'pm_Min'."))
+pm_TropicalNumber(::pm_TropicalNumber) = pm_TropicalNumber()
 
 function Base.:(==)(x::pm_TropicalNumber{A,S},y::Real) where {A, S}
     return x == pm_TropicalNumber{A,S}(y)
@@ -26,39 +30,27 @@ for op in (:+, :*, ://, :<)
 end
 
 #at the moment we do not distinct between // and /, so / just refers to //
-Base.:/(x::pm_TropicalNumber{A1,S}, y::pm_TropicalNumber{A2, S}) where{A1, A2, S} = x//y
+Base.:/(x::pm_TropicalNumber, y::pm_TropicalNumber) = x//y
 
 #zero/one
 
 Base.zero(::Type{<:pm_TropicalNumber{A}}) where A = zero(pm_TropicalNumber{A}())
 Base.one(::Type{<:pm_TropicalNumber{A}}) where A = one(pm_TropicalNumber{A}())
 dual_zero(::Type{<:pm_TropicalNumber{A}}) where A = dual_zero(pm_TropicalNumber{A}())
-orientation(::pm_TropicalNumber{pm_Min}) = pm_Integer(1)
-orientation(::Type{<:pm_TropicalNumber{pm_Min}}) = pm_Integer(1)
-orientation(::pm_TropicalNumber{pm_Max}) = pm_Integer(-1)
-orientation(::Type{<:pm_TropicalNumber{pm_Max}}) = pm_Integer(-1)
+orientation(::pm_TropicalNumber{pm_Min}) = 1
+orientation(::Type{<:pm_TropicalNumber{pm_Min}}) = 1
+orientation(::pm_TropicalNumber{pm_Max}) = -1
+orientation(::Type{<:pm_TropicalNumber{pm_Max}}) = -1
 
-function pm_TropicalNumber{pm_Min, pm_Rational}(x::Float64)
+function pm_TropicalNumber{A, S}(x::Float64) where {A <: pm_TropicalNumber_suppAddition, S <: pm_TropicalNumber_suppScalar}
     if isinf(x)
-        if x > 0
-            return zero(pm_TropicalNumber{pm_Min}())
+        if x * orientation(pm_TropicalNumber{A}) > 0
+            return zero(pm_TropicalNumber{A, S})
         else
-            return dual_zero(pm_TropicalNumber{pm_Min})
+            return dual_zero(pm_TropicalNumber{A, S})
         end
     else
-        return pm_TropicalNumber{pm_Min}(pm_Rational(x))
-    end
-end
-
-function pm_TropicalNumber{pm_Max, pm_Rational}(x::Float64)
-    if isinf(x)
-        if x < 0
-            return zero(pm_TropicalNumber{pm_Max}())
-        else
-            return dual_zero(pm_TropicalNumber{pm_Max})
-        end
-    else
-        return pm_TropicalNumber{pm_Max}(pm_Rational(x))
+        return pm_TropicalNumber{A, S}(pm_Rational(x))
     end
 end
 
