@@ -12,6 +12,7 @@
 
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
+#include <polymake/SparseMatrix.h>
 #include <polymake/Vector.h>
 #include <polymake/Set.h>
 #include <polymake/Array.h>
