@@ -27,4 +27,5 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("perlobj.jl")
     include("interface_functions.jl")
     include("sparsematrix.jl")
+    include("tropicalnumber.jl")
 end

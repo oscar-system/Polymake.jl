@@ -1,4 +1,4 @@
-const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array, pm_SparseMatrix}
+const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array, pm_SparseMatrix, pm_TropicalNumber}
 const pm_VecOrMat_eltypes = Union{Int32, pm_Integer, pm_Rational, Float64}
 
 const TypeConversionFunctions = Dict(

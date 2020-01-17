@@ -20,6 +20,8 @@
 
 #include "polymake_sparsematrix.h"
 
+#include "polymake_tropicalnumber.h"
+
 #include "polymake_caller.h"
 
 #include "polymake_direct_calls.h"
@@ -48,6 +50,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_array(polymake);
 
+    polymake_module_add_tropicalnumber(polymake);
+  
     polymake_module_add_direct_calls(polymake);
 
     polymake.method("initialize_polymake", &initialize_polymake);

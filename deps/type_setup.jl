@@ -29,6 +29,10 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "pm_SparseMatrix_pm_Rational",   "pm::SparseMatrix<pm::Rational>",     "pm_SparseMatrix{pm_Rational}",    "to_pm_sparsematrix_Rational"),
 ( "pm_SparseMatrix_int",           "pm::SparseMatrix<int>",              "pm_SparseMatrix{Int32}",          "to_pm_sparsematrix_int"),
 ( "pm_SparseMatrix_double",        "pm::SparseMatrix<double>",           "pm_SparseMatrix{Float64}",        "to_pm_sparsematrix_double"),
+( "pm_TropicalNumber_pm_Max_pm_Rational",   "pm::TropicalNumber<pm::Max,pm::Rational>",  "pm_TropicalNumber{pm_Max,pm_Rational}", "to_pm_tropicalnumber_max_Rational"),
+( "pm_TropicalNumber_pm_Min_pm_Rational",   "pm::TropicalNumber<pm::Min,pm::Rational>",  "pm_TropicalNumber{pm_Min,pm_Rational}", "to_pm_tropicalnumber_min_Rational"),
+# ( "pm_TropicalNumber_pm_Max_pm_Integer",    "pm::TropicalNumber<pm::Max,pm::Integer>",   "pm_TropicalNumber{pm_Max,pm_Integer}",  "to_pm_tropicalnumber_max_Integer"),
+# ( "pm_TropicalNumber_pm_Min_pm_Integer",    "pm::TropicalNumber<pm::Min,pm::Integer>",   "pm_TropicalNumber{pm_Min,pm_Integer}",  "to_pm_tropicalnumber_min_Integer"),
 ]
     NT.(type_tuples)
 end
