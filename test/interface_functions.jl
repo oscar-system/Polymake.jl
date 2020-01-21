@@ -18,6 +18,8 @@
 
     @test (@pm tropical.cyclic{Max}(3,5)) isa pm_perl_Object
 
+    @test Base.Docs.getdoc(polytope.Polytope) isa Polymake.Meta.PolymakeDocstring
+    @test Base.Docs.getdoc(polytope.cube) isa Polymake.Meta.PolymakeDocstring
 end
 
 @testset "Indexing helpers" begin
