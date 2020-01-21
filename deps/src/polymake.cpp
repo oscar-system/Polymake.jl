@@ -70,7 +70,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         bool full=false, bool html=false){
         std::vector<std::string> ctx_help =
             data.main_polymake_session->shell_context_help(input, pos, full, html);
-        return jlcxx::make_julia_array(&ctx_help[0], ctx_help.size());
+        jlcxx::Array<std::string> jlarr;
+        for (const auto& s : ctx_help)
+            jlarr.push_back(s);
+        return jlarr;
     });
 
 #include "generated/map_inserts.h"
