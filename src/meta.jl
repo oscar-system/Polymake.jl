@@ -374,9 +374,8 @@ module_imports() = quote
     import Polymake: convert_from_property_value,
     internal_call_function, internal_call_method,
     internal_call_function_void, internal_call_method_void,
-    perlobj, pm_perl_Object, pm_perl_OptionSet;
-    import Polymake.Meta: pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
-    import Markdown;
+    perlobj, pm_perl_Object, pm_perl_OptionSet
+    import Polymake.Meta: PolymakeDocstring, pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
 end
 
 function jl_code(pa::PolymakeApp)
