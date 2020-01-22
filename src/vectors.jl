@@ -11,7 +11,7 @@ pm_Vector(vec::AbstractVector{T}) where T <: Integer = pm_Vector{pm_Integer}(vec
 pm_Vector(vec::AbstractVector{T}) where T <: Union{Rational, pm_Rational} = pm_Vector{pm_Rational}(vec)
 pm_Vector(vec::AbstractVector{T}) where T <: AbstractFloat = pm_Vector{Float64}(vec)
 
-Base.size(v::pm_Vector) = (length(v),)
+Base.size(v::pm_Vector) = (Int(length(v)),)
 
 Base.@propagate_inbounds function Base.getindex(V::pm_Vector, n::Integer)
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
