@@ -115,4 +115,6 @@ include("polynomial.jl")
 include("polymake_direct_calls.jl")
 
 include("generate_applications.jl")
+
+include("polydb.jl")
 end # of module Polymake
