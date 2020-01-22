@@ -1,24 +1,24 @@
-@inline function pm_Vector{T}(vec::AbstractVector) where T <: pm_VecOrMat_eltypes
-    res = pm_Vector{T}(size(vec)...)
+@inline function Vector{T}(vec::AbstractVector) where T <: VecOrMat_eltypes
+    res = Vector{T}(size(vec)...)
     @inbounds res .= vec
     return res
 end
 
 # we can't use convert_to_pm_type(T) below:
-# only types in pm_VecOrMat_eltypes are available
-pm_Vector(vec::AbstractVector{Int32}) = pm_Vector{Int32}(vec)
-pm_Vector(vec::AbstractVector{T}) where T <: Integer = pm_Vector{pm_Integer}(vec)
-pm_Vector(vec::AbstractVector{T}) where T <: Union{Rational, pm_Rational} = pm_Vector{pm_Rational}(vec)
-pm_Vector(vec::AbstractVector{T}) where T <: AbstractFloat = pm_Vector{Float64}(vec)
+# only types in VecOrMat_eltypes are available
+Vector(vec::AbstractVector{Int64}) = Vector{Int64}(vec)
+Vector(vec::AbstractVector{T}) where T <: Base.Integer = Vector{Integer}(vec)
+Vector(vec::AbstractVector{T}) where T <: Union{Base.Rational, Rational} = Vector{Rational}(vec)
+Vector(vec::AbstractVector{T}) where T <: AbstractFloat = Vector{Float64}(vec)
 
-Base.size(v::pm_Vector) = (Int(length(v)),)
+Base.size(v::Vector) = (Int(length(v)),)
 
-Base.@propagate_inbounds function Base.getindex(V::pm_Vector, n::Integer)
+Base.@propagate_inbounds function Base.getindex(V::Vector, n::Base.Integer)
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
     return _getindex(V, convert(Int64, n))
 end
 
-Base.@propagate_inbounds function Base.setindex!(V::pm_Vector{T}, val, n::Integer) where T
+Base.@propagate_inbounds function Base.setindex!(V::Vector{T}, val, n::Base.Integer) where T
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
     _setindex!(V, convert(T, val), convert(Int64, n))
     return V

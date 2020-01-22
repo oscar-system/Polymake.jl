@@ -17,7 +17,7 @@ sub type_for_julia($$;$) {
    }
    my $type = application($appname)->eval_type($typename,1);
    if ($type) {
-      if (instanceof Polymake::Core::ObjectType($type)) {
+      if (instanceof Polymake::Core::BigObjectType($type)) {
          $type = $type->generic while $type->generic;
          return "BigObject<". ($type->name) .">";
       } elsif (instanceof Polymake::Core::PropertyType($type)) {

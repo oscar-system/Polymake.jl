@@ -1,10 +1,6 @@
 module Polymake
 
-export pm_Integer, pm_Rational,
-    pm_perl_Object, pm_perl_PropertyValue,
-    pm_Set, pm_Vector, pm_Array, pm_Matrix,
-    pm_SparseMatrix,
-    pm_TropicalNumber, pm_Min, pm_Max,
+export BigObject, PropertyValue,
     PolymakeError, application, dual_zero, orientation
 
 

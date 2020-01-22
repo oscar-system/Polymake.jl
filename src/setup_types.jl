@@ -1,5 +1,5 @@
-const SmallObject = Union{pm_Integer, pm_Rational, pm_Matrix, pm_Vector, pm_Set, pm_Array, pm_SparseMatrix, pm_TropicalNumber}
-const pm_VecOrMat_eltypes = Union{Int32, pm_Integer, pm_Rational, Float64}
+const SmallObject = Union{Integer, Rational, Matrix, Vector, Set, Array, SparseMatrix, TropicalNumber}
+const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64}
 
 const TypeConversionFunctions = Dict(
     Symbol("int") => to_int,

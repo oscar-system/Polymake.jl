@@ -1,7 +1,7 @@
 # polymake helper functions returning various information for julia
 
 
-# list completions for property names for a given perl::Object
+# list completions for property names for a given BigObject
 # (does not show any user_methods!)
 function complete_property($$) {
    my ($po,$prefix) = @_;
@@ -27,11 +27,11 @@ function list_big_objects($) {
 # map some perl based types without typeinfo to c++ types
 function classify_perl_pv($) {
    my ($pv) = @_;
-   return "pm::perl::Object"
-      if instanceof Polymake::Core::Object($pv);
-   return "pm::perl::ObjectType"
-      if instanceof Polymake::Core::ObjectType($pv);
-   return "pm::Array<pm::perl::Object>"
+   return "pm::perl::BigObject"
+      if instanceof Polymake::Core::BigObject($pv);
+   return "pm::perl::BigObjectType"
+      if instanceof Polymake::Core::BigObjectType($pv);
+   return "pm::perl::Array<pm::perl::BigObject>"
       if instanceof Polymake::Core::BigObjectArray($pv);
    # a plain perl string is also done here
    return "std::string"

@@ -1,62 +1,62 @@
 # specialized Int32, Int64 constructors handled by Cxx side
-pm_Rational(a::BigInt, b::BigInt) = pm_Rational(pm_Integer(a), pm_Integer(b))
+Rational(a::BigInt, b::BigInt) = Rational(Integer(a), Integer(b))
 # for the rest we have a blanket
-@inline pm_Rational(a::Integer, b::Integer) = pm_Rational(pm_Integer(a), pm_Integer(b))
-pm_Rational(x::Rational{<:Integer}) = pm_Rational(numerator(x), denominator(x))
+@inline Rational(a::Base.Integer, b::Base.Integer) = Rational(Integer(a), Integer(b))
+Rational(x::Base.Rational{<:Base.Integer}) = Rational(numerator(x), denominator(x))
 
-pm_Rational(int::Integer) = pm_Rational(int, one(int))
-pm_Rational(x::Number) = pm_Rational(Rational(x))
+Rational(int::Base.Integer) = Rational(int, one(int))
+Rational(x::Number) = Rational(Base.Rational(x))
 
-Base.one(i::Type{<:pm_Rational}) = pm_Rational(1)
-Base.one(i::pm_Rational) = pm_Rational(1)
-Base.zero(i::pm_Rational) = pm_Rational(0)
-Base.zero(i::Type{<:pm_Rational}) = pm_Rational(0)
+Base.one(i::Type{<:Rational}) = Rational(1)
+Base.one(i::Rational) = Rational(1)
+Base.zero(i::Rational) = Rational(0)
+Base.zero(i::Type{<:Rational}) = Rational(0)
 
 import Base: ==, <, <=
 # These are operations we delegate to gmp
 for op in (:(==), :(<), :(<=))
     @eval begin
         # These are all necessary to avoid ambiguities
-        $op(lhs::BigInt, rhs::pm_Rational) = $op(pm_Integer(lhs),rhs)
-        $op(lhs::pm_Rational, rhs::BigInt) = $op(lhs, pm_Integer(rhs))
+        $op(lhs::BigInt, rhs::Rational) = $op(Integer(lhs),rhs)
+        $op(lhs::Rational, rhs::BigInt) = $op(lhs, Integer(rhs))
     end
 end
 
-function Base.promote_rule(::Type{<:pm_Rational},
-    ::Type{<:Union{Integer, Rational{<:Integer}}})
-    return pm_Rational
+function Base.promote_rule(::Type{<:Rational},
+    ::Type{<:Union{Base.Integer, Base.Rational{<:Base.Integer}}})
+    return Rational
 end
 
-Base.promote_rule(::Type{<:pm_Rational}, ::Type{<:AbstractFloat}) = Float64
-Base.promote_rule(::Type{<:pm_Integer}, ::Type{<:Rational}) = pm_Rational
+Base.promote_rule(::Type{<:Rational}, ::Type{<:AbstractFloat}) = Float64
+Base.promote_rule(::Type{<:Integer}, ::Type{<:Base.Rational}) = Rational
 
-# Rational{<:Integer} constructors from pm_Rational (provides converts as well)
-@inline function Base.Rational{T}(rat::pm_Rational) where T<:Integer
-    return Rational(convert(T, numerator(rat)),convert(T, denominator(rat)))
+# Base.Rational{<:Base.Integer} constructors from Rational (provides converts as well)
+@inline function Base.Rational{T}(rat::Rational) where T<:Base.Integer
+    return Base.Rational(convert(T, numerator(rat)),convert(T, denominator(rat)))
 end
 
-Base.Rational(rat::pm_Rational) = Rational{BigInt}(rat)
-Base.big(rat::pm_Rational) = Rational{BigInt}(rat)
+Base.Rational(rat::Rational) = Base.Rational{BigInt}(rat)
+Base.big(rat::Rational) = Base.Rational{BigInt}(rat)
 
-convert(::Type{T}, rat::pm_Rational) where T<:Number = convert(T, big(rat))
-convert(::Type{T}, rat::pm_Rational) where T<:AbstractFloat = convert(T, Float64(rat))
-Base.float(rat::pm_Rational) = Float64(rat)
+convert(::Type{T}, rat::Rational) where T<:Number = convert(T, big(rat))
+convert(::Type{T}, rat::Rational) where T<:AbstractFloat = convert(T, Float64(rat))
+Base.float(rat::Rational) = Float64(rat)
 
 # no-copy convert
-convert(::Type{<:pm_Rational}, rat::T) where T <: pm_Rational = rat
+convert(::Type{<:Rational}, rat::T) where T <: Rational = rat
 
 # Rational division:
 
-Base.://(x::pm_Integer, y::pm_Integer) = pm_Rational(x, y)
+Base.://(x::Integer, y::Integer) = Rational(x, y)
 # ala promotion rules
-Base.://(x::pm_Integer, y::Integer) = pm_Rational(x, pm_Integer(y))
-Base.://(x::Integer, y::pm_Integer) = pm_Rational(pm_Integer(x), y)
+Base.://(x::Integer, y::Base.Integer) = Rational(x, Integer(y))
+Base.://(x::Base.Integer, y::Integer) = Rational(Integer(x), y)
 
-Base.://(x::Rational, y::pm_Integer) = pm_Rational(numerator(x), denominator(x)*y)
-Base.://(x::pm_Integer, y::Rational) = pm_Rational(x*numerator(y), denominator(y))
+Base.://(x::Base.Rational, y::Integer) = Rational(numerator(x), denominator(x)*y)
+Base.://(x::Integer, y::Base.Rational) = Rational(x*numerator(y), denominator(y))
 
-# division by Int32, Int64, pm_Integer defined on the Cxx side
-Base.://(x::pm_Rational, y::Union{Int8, Int16, BigInt, Unsigned}) = x//pm_Integer(y)
-Base.://(x::Union{Int8, Int16, BigInt, Unsigned}, y::pm_Rational) = pm_Integer(x)//y
-Base.://(x::pm_Rational, y::Rational{<:Integer}) = x//pm_Rational(y)
-Base.://(x::Rational{<:Integer}, y::pm_Rational) = pm_Rational(x)//y
+# division by Int64, Integer defined on the Cxx side
+Base.://(x::Rational, y::Union{Int8, Int16, Int32, BigInt, Unsigned}) = x//Integer(y)
+Base.://(x::Union{Int8, Int16, Int32, BigInt, Unsigned}, y::Rational) = Integer(x)//y
+Base.://(x::Rational, y::Base.Rational{<:Base.Integer}) = x//Rational(y)
+Base.://(x::Base.Rational{<:Base.Integer}, y::Rational) = Rational(x)//y

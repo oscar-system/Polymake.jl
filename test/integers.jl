@@ -1,26 +1,26 @@
-@testset "pm_Integer" begin
+@testset "Polymake.Integer" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
 
     @testset "Constructors/Conversions" begin
-        @test pm_Integer <: Integer
+        @test Polymake.Integer <: Base.Integer
 
         # constructors
         for T in [IntTypes; [Float64, BigFloat]]
-            @test pm_Integer(T(2)) isa pm_Integer
+            @test Polymake.Integer(T(2)) isa Polymake.Integer
         end
 
-        a = pm_Integer(5)
+        a = Polymake.Integer(5)
 
         # no copy conversions
-        @test convert(Integer,a) === a
-        @test convert(pm_Integer, a) === a
+        @test convert(Base.Integer,a) === a
+        @test convert(Polymake.Integer, a) === a
 
-        # conversions to Integer types
+        # conversions to Base.Integer types
         for T in IntTypes
             @test T(a) isa T
             @test convert(T, a) isa T
-            @test convert(pm_Integer, T(a)) isa pm_Integer
-            @test convert(pm_Integer, T(a)) isa Polymake.pm_IntegerAllocated
+            @test convert(Polymake.Integer, T(a)) isa Polymake.Integer
+            @test convert(Polymake.Integer, T(a)) isa Polymake.IntegerAllocated
         end
         @test big(a) isa BigInt
 
@@ -31,15 +31,15 @@
         @test float(a) == convert(BigFloat, a)
 
         # julia arrays
-        @test Array{Any,1}([a,1])[1] isa Polymake.pm_IntegerAllocated
-        @test [a,1] isa Vector{pm_Integer}
-        @test [a,a] isa Vector{Polymake.pm_IntegerAllocated}
+        @test Base.Array{Any,1}([a,1])[1] isa Polymake.IntegerAllocated
+        @test [a,1] isa Base.Vector{Polymake.Integer}
+        @test [a,a] isa Base.Vector{Polymake.IntegerAllocated}
     end
 
     @testset "Arithmetic" begin
-        a = pm_Integer(2)
+        a = Polymake.Integer(2)
         @test -a == -2
-        # for T in [IntTypes; pm_Integer]
+        # for T in [IntTypes; Polymake.Integer]
         for T in IntTypes
             b = T(5)
             # Equality
@@ -47,12 +47,12 @@
             @test T(2) == a
 
             # check promotion
-            @test a + b isa pm_Integer
-            @test b + a isa pm_Integer
-            @test a - b isa pm_Integer
-            @test b - a isa pm_Integer
-            @test a * b isa pm_Integer
-            @test b * a isa pm_Integer
+            @test a + b isa Polymake.Integer
+            @test b + a isa Polymake.Integer
+            @test a - b isa Polymake.Integer
+            @test b - a isa Polymake.Integer
+            @test a * b isa Polymake.Integer
+            @test b * a isa Polymake.Integer
 
             # check arithmetic results
             @test a + b == b + a == 7
@@ -68,15 +68,15 @@
     end
 
     @testset "zero / one" begin
-        ZERO = pm_Integer(0)
-        ONE = pm_Integer(1)
+        ZERO = Polymake.Integer(0)
+        ONE = Polymake.Integer(1)
 
-        @test one(ZERO) isa pm_Integer
-        @test zero(ZERO) isa pm_Integer
-        @test one(pm_Integer) isa pm_Integer
-        @test zero(pm_Integer) isa pm_Integer
+        @test one(ZERO) isa Polymake.Integer
+        @test zero(ZERO) isa Polymake.Integer
+        @test one(Polymake.Integer) isa Polymake.Integer
+        @test zero(Polymake.Integer) isa Polymake.Integer
 
-        @test zero(pm_Integer) == zero(ONE) == ZERO
-        @test one(pm_Integer) == one(ZERO) == ONE
+        @test zero(Polymake.Integer) == zero(ONE) == ZERO
+        @test one(Polymake.Integer) == one(ZERO) == ONE
     end
 end

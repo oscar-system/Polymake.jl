@@ -2,11 +2,11 @@ import Base: convert
 ####################  Converting to polymake types  ####################
 
 for (pm_T, jl_T) in [
-        (pm_Vector, AbstractVector),
-        (pm_Matrix, AbstractMatrix),
-        (pm_Array, AbstractVector),
-        (pm_Set, AbstractSet),
-        (pm_SparseMatrix, AbstractMatrix)
+        (Vector, AbstractVector),
+        (Matrix, AbstractMatrix),
+        (Array, AbstractVector),
+        (Set, AbstractSet),
+        (SparseMatrix, AbstractMatrix)
         ]
     @eval begin
         convert(::Type{$pm_T}, itr::$jl_T) = $pm_T(itr)
@@ -16,7 +16,7 @@ for (pm_T, jl_T) in [
     end
 end
 
-convert(::Type{pm_Set{T}}, itr::AbstractArray) where T = pm_Set{T}(itr)
+convert(::Type{Set{T}}, itr::AbstractArray) where T = Set{T}(itr)
 
 ###########  Converting to objects polymake understands  ###############
 
@@ -24,49 +24,50 @@ struct PolymakeType end
 
 convert(::Type{PolymakeType}, x::T) where T = convert(convert_to_pm_type(T), x)
 convert(::Type{PolymakeType}, v::Visual) = v.obj
-convert(::Type{pm_perl_OptionSet}, dict) = pm_perl_OptionSet(dict)
+convert(::Type{OptionSet}, dict) = OptionSet(dict)
 
 ####################  Guessing the polymake type  ######################
 
 # By default we throw an error:
 convert_to_pm_type(T::Type) = throw(ArgumentError("Unrecognized argument type: $T.\nYou need to convert to polymake compatible type first."))
 
-convert_to_pm_type(::Type{T}) where T <: Union{Int32, Int64, Float64} = T
-convert_to_pm_type(::Type{T}) where T <: Union{pm_perl_Object, pm_perl_PropertyValue, pm_perl_OptionSet} = T
+convert_to_pm_type(::Type{T}) where T <: Union{Int64, Float64} = T
+convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet} = T
 
+convert_to_pm_type(::Type{<:Int32}) = Int64
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
-convert_to_pm_type(::Type{<:Union{Integer, pm_Integer}}) = pm_Integer
-convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational
-convert_to_pm_type(::Type{<:Union{AbstractVector, pm_Vector}}) = pm_Vector
-convert_to_pm_type(::Type{<:Union{AbstractMatrix, pm_Matrix}}) = pm_Matrix
-convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, pm_SparseMatrix}}) = pm_SparseMatrix
-convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
-convert_to_pm_type(::Type{<:Union{AbstractSet, pm_Set}}) = pm_Set
+convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
+convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
+convert_to_pm_type(::Type{<:Union{AbstractVector, Vector}}) = Vector
+convert_to_pm_type(::Type{<:Union{AbstractMatrix, Matrix}}) = Matrix
+convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = SparseMatrix
+convert_to_pm_type(::Type{<:Array}) = Array
+convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
 # specific converts for container types we wrap:
-# pm_Set{Int32} is the natural type for polymake
-convert_to_pm_type(::Type{<:Union{AbstractSet{T}, pm_Set{T}}}) where T<:Integer = pm_Set{Int32}
-# convert_to_pm_type(::Type{<:Union{AbstractSet{Int64}, pm_Set{Int64}}}) = pm_Set{Int64}
+# Set{Int64} is the natural type for polymake - FIXME: needed?
+convert_to_pm_type(::Type{<:Union{AbstractSet{T}, Set{T}}}) where T<:Integer = Set{Int64}
+# convert_to_pm_type(::Type{<:Union{AbstractSet{Int64}, Set{Int64}}}) = Set{Int64}
 
-for (pmT, jlT) in [(pm_Integer, Integer),
-                   (pm_Rational, Union{Rational, pm_Rational})]
+for (pmT, jlT) in [(Integer, Base.Integer),
+                   (Rational, Union{Base.Rational, Rational})]
     @eval begin
-        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = pm_Matrix{$pmT}
-        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = pm_Vector{$pmT}
+        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{$pmT}
+        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{$pmT}
     end
 end
 
-convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:AbstractFloat = pm_Matrix{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:AbstractFloat = Matrix{convert_to_pm_type(T)}
 
-convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractSet} = pm_Array{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractSet} = Array{convert_to_pm_type(T)}
 
-# this catches all pm_Arrays of pm_Arrays we have right now:
-convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = pm_Array{pm_Array{convert_to_pm_type(T)}}
+# this catches all Arrays of Arrays we have right now:
+convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = Array{Array{convert_to_pm_type(T)}}
 
 # 2-argument version: the first is the container type
 promote_to_pm_type(::Type, S::Type) = convert_to_pm_type(S) #catch all
-function promote_to_pm_type(::Type{<:Union{pm_Vector, pm_Matrix, pm_SparseMatrix}}, S::Type{<:Integer})
-    promote_type(S, Int32) == Int32 && return Int32
-    return pm_Integer
+function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix}}, S::Type{<:Integer})
+    promote_type(S, Int64) == Int64 && return Int64
+    return Integer
 end

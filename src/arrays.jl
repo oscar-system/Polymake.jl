@@ -1,35 +1,35 @@
-const pm_Array_suppT = Union{Int32, Int64, pm_Integer, pm_Rational,
-                      String, AbstractString, pm_Set{Int32},
-                      pm_Array{Int32}, pm_Array{Int64}, pm_Array{pm_Integer},
-                      pm_Matrix{pm_Integer}}
+const Array_suppT = Union{Int64, Integer, Rational,
+                      String, AbstractString, Set{Int64},
+                      Array{Int64}, Array{Integer},
+                      Matrix{Integer}}
 
-function pm_Array{T}(vec::AbstractVector) where T <: pm_Array_suppT
-    arr = pm_Array{T}(length(vec))
+function Array{T}(vec::AbstractVector) where T <: Array_suppT
+    arr = Array{T}(length(vec))
     @inbounds arr .= vec
     return arr
 end
 
-pm_Array{T}(n::Integer, elt) where T<:pm_Array_suppT = pm_Array{T}(Int64(n), T(elt))
-pm_Array(n::Integer, elt::T) where T = pm_Array{T}(Int64(n), elt)
+Array{T}(n::Base.Integer, elt) where T<:Array_suppT = Array{T}(Int64(n), T(elt))
+Array(n::Base.Integer, elt::T) where T = Array{T}(Int64(n), elt)
 
-pm_Array(vec::AbstractVector) = pm_Array{convert_to_pm_type(eltype(vec))}(vec)
+Array(vec::AbstractVector) = Array{convert_to_pm_type(eltype(vec))}(vec)
 
-pm_ArrayAllocated{T}(v) where T = pm_Array{T}(v)
+ArrayAllocated{T}(v) where T = Array{T}(v)
 
-Base.size(a::pm_Array) = (length(a),)
+Base.size(a::Array) = (length(a),)
 
-Base.@propagate_inbounds function getindex(A::pm_Array, n::Integer)
+Base.@propagate_inbounds function getindex(A::Array, n::Base.Integer)
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
     return _getindex(A, convert(Int64, n))
 end
 
-Base.@propagate_inbounds function Base.setindex!(A::pm_Array{T}, val, n::Integer) where T
+Base.@propagate_inbounds function Base.setindex!(A::Array{T}, val, n::Base.Integer) where T
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
     _setindex!(A, convert(T, val), convert(Int64, n))
     return A
 end
 
-function Base.append!(A::pm_Array{T}, itr) where T
+function Base.append!(A::Array{T}, itr) where T
     n = length(A)
     m = length(itr)
     resize!(A, n+m)
@@ -39,13 +39,19 @@ function Base.append!(A::pm_Array{T}, itr) where T
     return A
 end
 
-# workarounds for pm_Array{String}
-pm_Array{T}(n::Integer) where T<:AbstractString = pm_Array{AbstractString}(Int64(n))
-pm_Array{T}(n::Integer, elt::T) where T<:AbstractString =
-pm_Array{AbstractString}(Int64(n), elt)
+# workarounds for Array{String}
+Array{T}(n::Base.Integer) where T<:AbstractString = Array{AbstractString}(Int64(n))
+Array{T}(n::Base.Integer, elt::T) where T<:AbstractString =
+Array{AbstractString}(Int64(n), elt)
 
-Base.@propagate_inbounds function Base.setindex!(A::pm_Array{S}, val, n::Integer) where {S<:AbstractString}
+Base.@propagate_inbounds function Base.setindex!(A::Array{S}, val, n::Base.Integer) where {S<:AbstractString}
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
     _setindex!(A, string(val), convert(Int64, n))
     return A
 end
+
+#Base.@propagate_inbounds function Base.getindex(A::Array{S}, n::Base.Integer) where {S<:AbstractString}
+#    @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
+#    _getindex(A, convert(Int64, n))
+#    return A
+#end

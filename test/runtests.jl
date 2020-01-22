@@ -18,14 +18,14 @@ struct MyInt x::Int end # needed in test/convert.jl
 
 @testset "Polymake" begin
     include("integers.jl")
-    include("rationals.jl")
-    include("vectors.jl")
-    include("matrices.jl")
-    include("sets.jl")
-    include("arrays.jl")
-    include("convert.jl")
+#    include("rationals.jl")
+#    include("vectors.jl")
+#    include("matrices.jl")
+#    include("sets.jl")
+#    include("arrays.jl")
+#    include("convert.jl")
     include("perlobj.jl")
     include("interface_functions.jl")
-    include("sparsematrix.jl")
+#    include("sparsematrix.jl")
     include("tropicalnumber.jl")
 end

@@ -44,7 +44,7 @@ class PropertyValueHelper : public pm::perl::PropertyValue {
 
 struct Polymake_Data {
     polymake::Main*        main_polymake_session;
-    polymake::perl::Scope* main_polymake_scope;
+    polymake::Scope* main_polymake_scope;
 };
 
 extern Polymake_Data data;
