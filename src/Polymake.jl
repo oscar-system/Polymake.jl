@@ -3,6 +3,7 @@ module Polymake
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
     pm_Set, pm_Vector, pm_Array, pm_Matrix,
+    pm_SparseMatrix,
     pm_TropicalNumber, pm_Min, pm_Max,
     PolymakeError, application, dual_zero, orientation
 
@@ -14,6 +15,9 @@ import Base: ==, <, <=, *, -, +, //, div, rem, one, zero,
     length, numerator, push!, resize!,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
+
+using SparseArrays
+import SparseArrays: AbstractSparseMatrix, findnz
 
 using CxxWrap
 import Libdl.dlext
@@ -98,6 +102,7 @@ include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("sparsematrix.jl")
 include("broadcast.jl")
 include("arrays.jl")
 include("tropicalnumber.jl")

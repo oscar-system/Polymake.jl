@@ -18,6 +18,8 @@
 
 #include "polymake_arrays.h"
 
+#include "polymake_sparsematrix.h"
+
 #include "polymake_tropicalnumber.h"
 
 #include "polymake_caller.h"
@@ -39,6 +41,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     polymake_module_add_rational(polymake);
 
     polymake_module_add_matrix(polymake);
+
+    polymake_module_add_sparsematrix(polymake);
 
     polymake_module_add_vector(polymake);
 
