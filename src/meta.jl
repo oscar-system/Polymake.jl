@@ -276,7 +276,7 @@ function jl_code(pf::PolymakeFunction)
         end;
         function $(Base.Docs).getdoc(::typeof($(jl_symbol(pf))))
             docstrs = get_docs($func_name, full=true)
-            return PolymakeDocstring((join(docstrs, "\n\n---\n\n")))
+            return PolymakeDocstring(join(docstrs, "\n\n---\n\n"))
         end;
         export $(jl_symbol(pf));
     end
