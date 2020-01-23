@@ -58,12 +58,12 @@ Base.@propagate_inbounds function Base.setindex!(M::pm_IncidenceMatrix, val, i::
 end
 
 Base.@propagate_inbounds function row(M::pm_IncidenceMatrix, i::Integer)
-    @boundscheck checkbounds(M, i, 1)
+    @boundscheck checkbounds(M, i, :)
     return to_one_based_indexing(_row(M, convert(Int64, i)))
 end
 
 Base.@propagate_inbounds function col(M::pm_IncidenceMatrix, j::Integer)
-    @boundscheck checkbounds(M, 1, j)
+    @boundscheck checkbounds(M, :, j)
     return to_one_based_indexing(_col(M, convert(Int64, j)))
 end
 
