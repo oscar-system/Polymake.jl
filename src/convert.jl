@@ -5,12 +5,13 @@ for (pm_T, jl_T) in [
         (pm_Vector, AbstractVector),
         (pm_Matrix, AbstractMatrix),
         (pm_Array, AbstractVector),
-        (pm_Set, AbstractSet)
+        (pm_Set, AbstractSet),
+        (pm_SparseMatrix, AbstractMatrix)
         ]
     @eval begin
         convert(::Type{$pm_T}, itr::$jl_T) = $pm_T(itr)
         convert(::Type{$pm_T{T}}, itr::$jl_T) where T = $pm_T{T}(itr)
-        convert(::Type{$pm_T}, itr::$pm_T) where T = itr
+        convert(::Type{$pm_T}, itr::$pm_T) = itr
         convert(::Type{$pm_T{T}}, itr::$pm_T) where T = itr
     end
 end
@@ -39,6 +40,7 @@ convert_to_pm_type(::Type{<:Union{Integer, pm_Integer}}) = pm_Integer
 convert_to_pm_type(::Type{<:Union{Rational, pm_Rational}}) = pm_Rational
 convert_to_pm_type(::Type{<:Union{AbstractVector, pm_Vector}}) = pm_Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, pm_Matrix}}) = pm_Matrix
+convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, pm_SparseMatrix}}) = pm_SparseMatrix
 convert_to_pm_type(::Type{<:pm_Array}) = pm_Array
 convert_to_pm_type(::Type{<:Union{AbstractSet, pm_Set}}) = pm_Set
 
@@ -64,7 +66,7 @@ convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = pm_Ar
 
 # 2-argument version: the first is the container type
 promote_to_pm_type(::Type, S::Type) = convert_to_pm_type(S) #catch all
-function promote_to_pm_type(::Type{<:Union{pm_Vector, pm_Matrix}}, S::Type{<:Integer})
+function promote_to_pm_type(::Type{<:Union{pm_Vector, pm_Matrix, pm_SparseMatrix}}, S::Type{<:Integer})
     promote_type(S, Int32) == Int32 && return Int32
     return pm_Integer
 end

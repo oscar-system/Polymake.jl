@@ -14,7 +14,7 @@ pm_Matrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = pm_Matrix{Float64}(
 # no-copy constructor for pm_Matrix{Float64} (it's stored as a continuous block)
 pm_Matrix(mat::M) where M <: pm_Matrix{Float64} = mat
 
-Base.size(m::pm_Matrix) = (rows(m), cols(m))
+Base.size(m::pm_Matrix) = (Int(rows(m)), Int(cols(m)))
 
 Base.@propagate_inbounds function Base.getindex(M::pm_Matrix , i::Integer, j::Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
@@ -27,4 +27,14 @@ Base.@propagate_inbounds function Base.setindex!(M::pm_Matrix{T}, val, i::Intege
     @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
     _setindex!(M, convert(T, val), convert(Int64, i), convert(Int64, j))
     return M
+end
+
+#create pm_Matrix from a sparse matrix
+function pm_Matrix{T}(mat::AbstractSparseMatrix) where T <: pm_VecOrMat_eltypes
+    r,c,v = SparseArrays.findnz(mat)
+    res = pm_Matrix{T}(size(mat))
+    for i = 1:length(r)
+        res[r[i],c[i]] = v[i]
+    end
+    return res
 end

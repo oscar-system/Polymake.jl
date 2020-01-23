@@ -276,7 +276,7 @@ function jl_code(pf::PolymakeFunction)
         end;
         function $(Base.Docs).getdoc(::typeof($(jl_symbol(pf))))
             docstrs = get_docs($func_name, full=true)
-            return Markdown.parse(join(docstrs, "\n\n---\n\n"))
+            return PolymakeDocstring(join(docstrs, "\n\n---\n\n"))
         end;
         export $(jl_symbol(pf));
     end
@@ -360,17 +360,22 @@ function jl_code(obj::PolymakeObject)
 
     return quote
         $struct_def;
-        Base.Docs.getdoc(::Type{$(jl_symbol(obj))}) = Markdown.parse($(docstring(obj)))
+        Base.Docs.getdoc(::Type{$(jl_symbol(obj))}) = PolymakeDocstring($(docstring(obj)))
     end
 end
+
+struct PolymakeDocstring
+    s::String
+end
+# if someone wants to implement something prettier, overload this
+Base.show(io::IO, doc::PolymakeDocstring) = print(io, doc.s)
 
 module_imports() = quote
     import Polymake: convert_from_property_value,
     internal_call_function, internal_call_method,
     internal_call_function_void, internal_call_method_void,
-    perlobj, pm_perl_Object;
-    import Polymake.Meta: pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
-    import Markdown;
+    perlobj, pm_perl_Object, pm_perl_OptionSet
+    import Polymake.Meta: PolymakeDocstring, pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
 end
 
 function jl_code(pa::PolymakeApp)
