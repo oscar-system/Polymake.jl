@@ -33,6 +33,22 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "pm_TropicalNumber_pm_Min_pm_Rational",   "pm::TropicalNumber<pm::Min,pm::Rational>",  "pm_TropicalNumber{pm_Min,pm_Rational}", "to_pm_tropicalnumber_min_Rational"),
 # ( "pm_TropicalNumber_pm_Max_pm_Integer",    "pm::TropicalNumber<pm::Max,pm::Integer>",   "pm_TropicalNumber{pm_Max,pm_Integer}",  "to_pm_tropicalnumber_max_Integer"),
 # ( "pm_TropicalNumber_pm_Min_pm_Integer",    "pm::TropicalNumber<pm::Min,pm::Integer>",   "pm_TropicalNumber{pm_Min,pm_Integer}",  "to_pm_tropicalnumber_min_Integer"),
+( "pm_Polynomial_int_int",                  "pm::Polynomial<int,int>",                   "pm_Polynomial{Int32,Int32}",            "to_pm_polynomial_int_int"),
+( "pm_Polynomial_int_pm_Integer",           "pm::Polynomial<int,pm::Integer>",           "pm_Polynomial{Int32,pm_Integer}",       "to_pm_polynomial_int_Integer"),
+( "pm_Polynomial_int_pm_Rational",          "pm::Polynomial<int,pm::Rational>",          "pm_Polynomial{Int32,pm_Rational}",      "to_pm_polynomial_int_Rational"),
+( "pm_Polynomial_int_double",               "pm::Polynomial<int,double>",                "pm_Polynomial{Int32,Float64}",          "to_pm_polynomial_int_double"),
+( "pm_Polynomial_pm_Integer_int",           "pm::Polynomial<pm::Integer,int>",           "pm_Polynomial{pm_Integer,Int32}",       "to_pm_polynomial_Integer_int"),
+( "pm_Polynomial_pm_Integer_pm_Integer",    "pm::Polynomial<pm::Integer,pm::Integer>",   "pm_Polynomial{pm_Integer,pm_Integer}",  "to_pm_polynomial_Integer_Integer"),
+( "pm_Polynomial_pm_Integer_pm_Rational",   "pm::Polynomial<pm::Integer,pm::Rational>",  "pm_Polynomial{pm_Integer,pm_Rational}", "to_pm_polynomial_Integer_Rational"),
+( "pm_Polynomial_pm_Integer_double",        "pm::Polynomial<pm::Integer,double>",        "pm_Polynomial{pm_Integer,Float64}",     "to_pm_polynomial_Integer_double"),
+( "pm_Polynomial_pm_Rational_int",          "pm::Polynomial<pm::Rational,int>",          "pm_Polynomial{pm_Rational,Int32}",      "to_pm_polynomial_Rational_int"),
+( "pm_Polynomial_pm_Rational_pm_Integer",   "pm::Polynomial<pm::Rational,pm::Integer>",  "pm_Polynomial{pm_Rational,pm_Integer}", "to_pm_polynomial_Rational_Integer"),
+( "pm_Polynomial_pm_Rational_pm_Rational",  "pm::Polynomial<pm::Rational,pm::Rational>", "pm_Polynomial{pm_Rational,pm_Rational}","to_pm_polynomial_Rational_Rational"),
+( "pm_Polynomial_pm_Rational_double",       "pm::Polynomial<pm::Rational,double>",       "pm_Polynomial{pm_Rational,Float64}",    "to_pm_polynomial_Rational_double"),
+( "pm_Polynomial_double_int",               "pm::Polynomial<double,int>",                "pm_Polynomial{Float64,Int32}",          "to_pm_polynomial_double_int"),
+( "pm_Polynomial_double_pm_Integer",        "pm::Polynomial<double,pm::Integer>",        "pm_Polynomial{Float64,pm_Integer}",     "to_pm_polynomial_double_Integer"),
+( "pm_Polynomial_double_pm_Rational",       "pm::Polynomial<double,pm::Rational>",       "pm_Polynomial{Float64,pm_Rational}",    "to_pm_polynomial_double_Rational"),
+( "pm_Polynomial_double_double",            "pm::Polynomial<double,double>",             "pm_Polynomial{Float64,Float64}",        "to_pm_polynomial_double_double"),
 ]
     NT.(type_tuples)
 end

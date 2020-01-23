@@ -5,11 +5,12 @@ export pm_Integer, pm_Rational,
     pm_Set, pm_Vector, pm_Array, pm_Matrix,
     pm_SparseMatrix,
     pm_TropicalNumber, pm_Min, pm_Max,
+    pm_Polynomial, coefficients_as_vector, monomials_as_matrix, set_var_names, get_var_names,
     PolymakeError, application, dual_zero, orientation
 
 
 # We need to import all functions which will be extended on the Cxx side
-import Base: ==, <, <=, *, -, +, //, div, rem, one, zero,
+import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     append!, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty,
     length, numerator, push!, resize!,
@@ -106,6 +107,7 @@ include("sparsematrix.jl")
 include("broadcast.jl")
 include("arrays.jl")
 include("tropicalnumber.jl")
+include("polynomial.jl")
 
 include("polymake_direct_calls.jl")
 

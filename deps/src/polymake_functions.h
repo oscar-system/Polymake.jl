@@ -34,4 +34,10 @@ struct pm_VecOrMat_supported
     typedef jlcxx::ParameterList<int, pm::Integer, pm::Rational, double> value_type;
 };
 
+struct pm_Polynomial_supported
+{
+    typedef jlcxx::ParameterList<int, pm::Integer, pm::Rational, double,
+        pm::Polynomial<int,int>, pm::Polynomial<pm::Integer,int>, pm::Polynomial<pm::Rational,int>, pm::Polynomial<double,int>> value_type;
+};
+
 #endif
