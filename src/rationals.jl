@@ -7,10 +7,10 @@ pm_Rational(x::Rational{<:Integer}) = pm_Rational(numerator(x), denominator(x))
 pm_Rational(int::Integer) = pm_Rational(int, one(int))
 pm_Rational(x::Number) = pm_Rational(Rational(x))
 
-Base.one(i::Type{<:pm_Rational}) = pm_Rational(1)
-Base.one(i::pm_Rational) = pm_Rational(1)
-Base.zero(i::pm_Rational) = pm_Rational(0)
-Base.zero(i::Type{<:pm_Rational}) = pm_Rational(0)
+Base.one(::Type{<:pm_Rational}) = pm_Rational(1)
+Base.one(::pm_Rational) = pm_Rational(1)
+Base.zero(::pm_Rational) = pm_Rational(0)
+Base.zero(::Type{<:pm_Rational}) = pm_Rational(0)
 
 import Base: ==, <, <=
 # These are operations we delegate to gmp
@@ -60,3 +60,4 @@ Base.://(x::pm_Rational, y::Union{Int8, Int16, BigInt, Unsigned}) = x//pm_Intege
 Base.://(x::Union{Int8, Int16, BigInt, Unsigned}, y::pm_Rational) = pm_Integer(x)//y
 Base.://(x::pm_Rational, y::Rational{<:Integer}) = x//pm_Rational(y)
 Base.://(x::Rational{<:Integer}, y::pm_Rational) = pm_Rational(x)//y
+Base.://(x::Bool, y::pm_Rational) = pm_Rational(x)//y

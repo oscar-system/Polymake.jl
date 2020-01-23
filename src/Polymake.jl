@@ -2,7 +2,9 @@ module Polymake
 
 export pm_Integer, pm_Rational,
     pm_perl_Object, pm_perl_PropertyValue,
-    pm_Set, pm_Vector, pm_Array, pm_Matrix,
+    pm_Set, pm_Vector, pm_Array, pm_Matrix, pm_IncidenceMatrix,
+    pm_NonSymmetric, pm_Symmetric,
+    row, col,
     pm_SparseMatrix,
     pm_TropicalNumber, pm_Min, pm_Max,
     PolymakeError, application, dual_zero, orientation
@@ -21,6 +23,8 @@ import SparseArrays: AbstractSparseMatrix, findnz
 
 using CxxWrap
 import Libdl.dlext
+
+import SparseArrays
 
 struct PolymakeError <: Exception
     msg
@@ -105,6 +109,7 @@ include("matrices.jl")
 include("sparsematrix.jl")
 include("broadcast.jl")
 include("arrays.jl")
+include("incidencematrix.jl")
 include("tropicalnumber.jl")
 
 include("polymake_direct_calls.jl")
