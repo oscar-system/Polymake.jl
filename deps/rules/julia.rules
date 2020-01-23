@@ -59,7 +59,7 @@ function jupyter_visual_threejs(Visual::Object+) {
 
 function jupyter_visual_svg(Visual::Object+) {
    die "polymake svg.rules disabled: perl module SVG probably missing"
-      unless application("common")->configured->{"svg.rules"} > 0;
+      unless User::application("common")->configured->{"svg.rules"} > 0;
    my $string = "";
    open my $handle, ">", \$string;
    svg(@_,File=>$handle);
