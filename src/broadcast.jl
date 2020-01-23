@@ -35,7 +35,7 @@ function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{pm_Matrix}}
 end
 
 function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{T}},
-    ::Type{ElType}) where {T<:pm_IncidenceMatrix, ElType <: Bool}
+    ::Type{Bool}) where {T<:pm_IncidenceMatrix}
     return pm_IncidenceMatrix{pm_NonSymmetric}(axes(bc)...)
 end
 
