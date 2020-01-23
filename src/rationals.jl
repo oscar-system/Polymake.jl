@@ -5,7 +5,7 @@ pm_Rational(a::BigInt, b::BigInt) = pm_Rational(pm_Integer(a), pm_Integer(b))
 pm_Rational(x::Rational{<:Integer}) = pm_Rational(numerator(x), denominator(x))
 
 pm_Rational(int::Integer) = pm_Rational(int, one(int))
-pm_Rational(x::Union{Number, Bool}) = pm_Rational(Rational(x))
+pm_Rational(x::Number) = pm_Rational(Rational(x))
 
 Base.one(::Type{<:pm_Rational}) = pm_Rational(1)
 Base.one(::pm_Rational) = pm_Rational(1)
@@ -23,7 +23,7 @@ for op in (:(==), :(<), :(<=))
 end
 
 function Base.promote_rule(::Type{<:pm_Rational},
-    ::Type{<:Union{Integer, Rational{<:Integer}, Bool}})
+    ::Type{<:Union{Integer, Rational{<:Integer}}})
     return pm_Rational
 end
 
@@ -59,5 +59,5 @@ Base.://(x::pm_Integer, y::Rational) = pm_Rational(x*numerator(y), denominator(y
 Base.://(x::pm_Rational, y::Union{Int8, Int16, BigInt, Unsigned}) = x//pm_Integer(y)
 Base.://(x::Union{Int8, Int16, BigInt, Unsigned}, y::pm_Rational) = pm_Integer(x)//y
 Base.://(x::pm_Rational, y::Rational{<:Integer}) = x//pm_Rational(y)
-Base.://(x::Rational{<:Union{Integer, Bool}}, y::pm_Rational) = pm_Rational(x)//y
+Base.://(x::Rational{<:Integer}, y::pm_Rational) = pm_Rational(x)//y
 Base.://(x::Bool, y::pm_Rational) = pm_Rational(x)//y

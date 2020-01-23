@@ -5,8 +5,6 @@ pm_Integer(int::Number) = pm_Integer(BigInt(int))
 # to avoid ambiguities:
 pm_Integer(rat::Rational) = pm_Integer(BigInt(rat))
 pm_Integer(flt::BigFloat) = pm_Integer(BigInt(flt))
-# to allow conversion from bool
-pm_Integer(b::Bool) = pm_Integer(BigInt(b))
 
 Base.one(::Type{<:pm_Integer}) = pm_Integer(1)
 Base.one(::pm_Integer) = pm_Integer(1)

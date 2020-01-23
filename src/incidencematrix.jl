@@ -1,12 +1,12 @@
 using SparseArrays
 
-@inline function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractMatrix)
+function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractMatrix)
     res = pm_IncidenceMatrix{pm_NonSymmetric}(size(mat)...)
     @inbounds res .= mat
     return res
 end
 
-@inline function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractMatrix)
+function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractMatrix)
     m,n = size(mat)
     m == n || throw(ArgumentError("a symmetric matrix needs to be quadratic"))
     res = pm_IncidenceMatrix{pm_Symmetric}(m,n)
@@ -20,7 +20,7 @@ end
     return res
 end
 
-@inline function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractSparseMatrix)
+function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractSparseMatrix)
     res = pm_IncidenceMatrix{pm_NonSymmetric}(size(mat)...)
     r,c,v = findnz(mat)
     for i = 1:length(r)
@@ -29,7 +29,7 @@ end
     return res
 end
 
-@inline function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractSparseMatrix)
+function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractSparseMatrix)
     m,n = size(mat)
     m == n || throw(ArgumentError("a symmetric matrix needs to be quadratic"))
     res = pm_IncidenceMatrix{pm_Symmetric}(m,n)
@@ -47,25 +47,23 @@ pm_IncidenceMatrix(x...) = pm_IncidenceMatrix{pm_NonSymmetric}(x...)
 Base.size(m::pm_IncidenceMatrix) = (rows(m), cols(m))
 
 Base.@propagate_inbounds function Base.getindex(M::pm_IncidenceMatrix , i::Integer, j::Integer)
-    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck checkbounds(M, i, j)
     return _getindex(M, convert(Int64, i), convert(Int64, j))
 end
 
 Base.@propagate_inbounds function Base.setindex!(M::pm_IncidenceMatrix, val, i::Integer, j::Integer)
-    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck checkbounds(M, i, j)
     _setindex!(M, !iszero(val), convert(Int64, i), convert(Int64, j))
     return val
 end
 
 Base.@propagate_inbounds function row(M::pm_IncidenceMatrix, i::Integer)
-    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,1]))
+    @boundscheck checkbounds(M, i, 1)
     return to_one_based_indexing(_row(M, convert(Int64, i)))
 end
 
 Base.@propagate_inbounds function col(M::pm_IncidenceMatrix, j::Integer)
-    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [1,j]))
+    @boundscheck checkbounds(M, 1, j)
     return to_one_based_indexing(_col(M, convert(Int64, j)))
 end
 

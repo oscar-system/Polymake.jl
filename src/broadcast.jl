@@ -1,8 +1,8 @@
-@inline function pm_Matrix{T}(rows::UR, cols::UR) where {T <: pm_VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
+function pm_Matrix{T}(rows::UR, cols::UR) where {T <: pm_VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
     return pm_Matrix{T}(length(rows), length(cols))
 end
 
-@inline function pm_IncidenceMatrix{pm_NonSymmetric}(rows::UR, cols::UR) where {UR<:Base.AbstractUnitRange}
+function pm_IncidenceMatrix{pm_NonSymmetric}(rows::UR, cols::UR) where {UR<:Base.AbstractUnitRange}
     return pm_IncidenceMatrix{pm_NonSymmetric}(length(rows), length(cols))
 end
 
@@ -16,9 +16,9 @@ Base.similar(X::Union{pm_Vector, pm_Matrix, pm_IncidenceMatrix}, ::Type{S}, dims
 
 Base.similar(X::Union{pm_Vector, pm_Matrix, pm_IncidenceMatrix}, ::Type{S}, dims::Dims{2}) where {S} = Matrix{S}(dims...)
 
-Base.similar(X::pm_IncidenceMatrix, ::Type{S}, dims::Dims{1}) where {S <: Bool} = BitArray{1}(undef, dims...)
+Base.similar(X::pm_IncidenceMatrix, ::Type{Bool}, dims::Dims{1}) = BitArray{1}(undef, dims...)
 
-Base.similar(X::pm_IncidenceMatrix, ::Type{S}, dims::Dims{2}) where {S <: Bool} = pm_IncidenceMatrix{pm_NonSymmetric}(dims...)
+Base.similar(X::pm_IncidenceMatrix, ::Type{Bool}, dims::Dims{2}) = pm_IncidenceMatrix{pm_NonSymmetric}(dims...)
 
 Base.BroadcastStyle(::Type{<:pm_Vector}) = Broadcast.ArrayStyle{pm_Vector}()
 Base.BroadcastStyle(::Type{<:pm_Matrix}) = Broadcast.ArrayStyle{pm_Matrix}()
