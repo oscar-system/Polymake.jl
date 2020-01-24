@@ -1,5 +1,5 @@
-function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
-    perl_obj = pm_perl_Object(name)
+function bigobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
+    perl_obj = BigObject(name)
     for value in input_data
         key = string(value[1])
         val = convert(PolymakeType, value[2])
@@ -8,8 +8,8 @@ function perlobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) wher
     return perl_obj
 end
 
-function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwargsdata...)
-    obj = pm_perl_Object(name)
+function bigobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwargsdata...)
+    obj = BigObject(name)
     for (key, val) in input_data
         setproperty!(obj, string(key), val)
     end
@@ -19,17 +19,17 @@ function perlobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwar
     return obj
 end
 
-Base.propertynames(p::Polymake.pm_perl_Object) = Symbol.(Polymake.complete_property(p, ""))
+Base.propertynames(p::Polymake.BigObject) = Symbol.(Polymake.complete_property(p, ""))
 
-function Base.setproperty!(obj::pm_perl_Object, prop::String, val)
+function Base.setproperty!(obj::BigObject, prop::String, val)
     return take(obj, prop, convert(PolymakeType, val))
 end
 
-function Base.setproperty!(obj::pm_perl_Object, prop::Symbol, val)
+function Base.setproperty!(obj::BigObject, prop::Symbol, val)
     return take(obj, string(prop), convert(PolymakeType, val))
 end
 
-function give(obj::Polymake.pm_perl_Object, prop::String)
+function give(obj::Polymake.BigObject, prop::String)
     return_obj = try
         internal_give(obj, prop)
     catch ex
@@ -38,13 +38,13 @@ function give(obj::Polymake.pm_perl_Object, prop::String)
     return convert_from_property_value(return_obj)
 end
 
-Base.getproperty(obj::pm_perl_Object, prop::Symbol) = give(obj, string(prop))
+Base.getproperty(obj::BigObject, prop::Symbol) = give(obj, string(prop))
 
-function complete_property(obj::pm_perl_Object, prefix::String)
+function complete_property(obj::BigObject, prefix::String)
    call_function(:common, :complete_property, obj, prefix)
 end
 
-function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
+function convert_from_property_value(obj::Polymake.PropertyValue)
     type_name = Polymake.typeinfo_string(obj,true)
     T = Symbol(replace(type_name," "=>""))
     if haskey(TypeConversionFunctions, T)
@@ -57,8 +57,8 @@ function convert_from_property_value(obj::Polymake.pm_perl_PropertyValue)
     end
 end
 
-function pm_perl_OptionSet(iter)
-    opt_set = pm_perl_OptionSet()
+function OptionSet(iter)
+    opt_set = OptionSet()
     for (key, value) in iter
         option_set_take(opt_set, string(key), value)
     end
