@@ -175,4 +175,8 @@
 
         @test p.MILP.MINIMAL_VALUE == -7
     end
+
+    @testset "toplevel visual" begin
+        @test visual(polytope.cube(3)) isa Polymake.Visual
+    end
 end
