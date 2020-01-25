@@ -11,12 +11,11 @@ void polymake_module_add_matrix(jlcxx::Module& polymake)
 
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
-            "pm_Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
-        .apply_combination<pm::Matrix, pm_VecOrMat_supported::value_type>(
+            "Matrix", jlcxx::julia_type("AbstractMatrix", "Base"))
+        .apply_combination<pm::Matrix, VecOrMat_supported::value_type>(
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type             WrappedT;
                 typedef typename decltype(wrapped)::type::value_type elemType;
-                wrapped.template constructor<int32_t, int32_t>();
                 wrapped.template constructor<int64_t, int64_t>();
 
                 wrapped.method("_getindex",
@@ -32,19 +31,19 @@ void polymake_module_add_matrix(jlcxx::Module& polymake)
                                             int64_t j) { M.resize(i, j); });
 
                 wrapped.method("take",
-                               [](pm::perl::Object p, const std::string& s,
+                               [](pm::perl::BigObject p, const std::string& s,
                                   WrappedT& M) { p.take(s) << M; });
                 wrapped.method("show_small_obj", [](WrappedT& M) {
                     return show_small_object<WrappedT>(M);
                 });
             });
     polymake.method("to_matrix_int", [](pm::perl::PropertyValue pv) {
-        return to_SmallObject<pm::Matrix<int>>(pv);
+        return to_SmallObject<pm::Matrix<pm::Int>>(pv);
     });
-    polymake.method("to_matrix_Integer", [](pm::perl::PropertyValue pv) {
+    polymake.method("to_matrix_integer", [](pm::perl::PropertyValue pv) {
         return to_SmallObject<pm::Matrix<pm::Integer>>(pv);
     });
-    polymake.method("to_matrix_Rational", [](pm::perl::PropertyValue pv) {
+    polymake.method("to_matrix_rational", [](pm::perl::PropertyValue pv) {
         return to_SmallObject<pm::Matrix<pm::Rational>>(pv);
     });
     polymake.method("to_matrix_double", [](pm::perl::PropertyValue pv) {

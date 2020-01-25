@@ -8,11 +8,11 @@
 
 void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
 {
-    polymake.add_type<pm::Max>("pm_Max");
-    polymake.add_type<pm::Min>("pm_Min");
+    polymake.add_type<pm::Max>("Max");
+    polymake.add_type<pm::Min>("Min");
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
-            "pm_TropicalNumber", jlcxx::julia_type("Number", "Base"))
+            "TropicalNumber", jlcxx::julia_type("Number", "Base"))
             .apply_combination<pm::TropicalNumber,
             jlcxx::ParameterList<pm::Min,pm::Max>,
                 jlcxx::ParameterList<pm::Rational>>(
@@ -34,19 +34,19 @@ void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
                         return show_small_object<tropType>(S);
                     });
             });
-    polymake.method("to_pm_tropicalnumber_max_Rational",
+    polymake.method("to_tropicalnumber_max_rational",
         [](pm::perl::PropertyValue pv) {
             return to_SmallObject<pm::TropicalNumber<pm::Max,pm::Rational>>(pv);
         });
-    polymake.method("to_pm_tropicalnumber_min_Rational",
+    polymake.method("to_tropicalnumber_min_rational",
         [](pm::perl::PropertyValue pv) {
             return to_SmallObject<pm::TropicalNumber<pm::Min,pm::Rational>>(pv);
     });
-    // polymake.method("to_pm_tropicalnumber_max_Integer",
+    // polymake.method("to_tropicalnumber_max_integer",
     //     [](pm::perl::PropertyValue pv) {
     //         return to_SmallObject<pm::TropicalNumber<pm::Max,pm::Integer>>(pv);
     //     });
-    // polymake.method("to_pm_tropicalnumber_min_Integer",
+    // polymake.method("to_tropicalnumber_min_integer",
     //     [](pm::perl::PropertyValue pv) {
     //         return to_SmallObject<pm::TropicalNumber<pm::Min,pm::Integer>>(pv);
     //     });

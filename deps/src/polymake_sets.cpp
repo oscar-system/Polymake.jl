@@ -8,13 +8,13 @@
 
 void polymake_module_add_set(jlcxx::Module& polymake)
 {
-    polymake.add_type<pm::operations::cmp>("pm_operations_cmp");
+    polymake.add_type<pm::operations::cmp>("operations_cmp");
 
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
-            "pm_Set", jlcxx::julia_type("AbstractSet", "Base"))
-        .apply<pm::Set<int32_t>, pm::Set<long>>([](auto wrapped) {
-            typedef typename decltype(wrapped)::type             pm_Set;
+            "Set", jlcxx::julia_type("AbstractSet", "Base"))
+        .apply<pm::Set<pm::Int>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type             WrappedT;
             typedef typename decltype(wrapped)::type::value_type elemType;
 
             wrapped.template constructor<pm::Set<elemType>>();
@@ -24,79 +24,76 @@ void polymake_module_add_set(jlcxx::Module& polymake)
                 return s;
             });
 
-            wrapped.method("swap", &pm_Set::swap);
+            wrapped.method("swap", &WrappedT::swap);
 
-            wrapped.method("isempty", &pm_Set::empty);
-            wrapped.method("length", &pm_Set::size);
+            wrapped.method("isempty", &WrappedT::empty);
+            wrapped.method("length", &WrappedT::size);
 
-            wrapped.method("empty!", [](pm_Set& S) {
+            wrapped.method("empty!", [](WrappedT& S) {
                 S.clear();
                 return S;
             });
-            wrapped.method("==", [](pm_Set& S, pm_Set& T) { return S == T; });
+            wrapped.method("==", [](WrappedT& S, WrappedT& T) { return S == T; });
             wrapped.method(
-                "in", [](elemType i, pm_Set& S) { return S.contains(i); });
+                "in", [](elemType i, WrappedT& S) { return S.contains(i); });
 
-            wrapped.method("push!", [](pm_Set& S, elemType i) {
+            wrapped.method("push!", [](WrappedT& S, elemType i) {
                 S += i;
                 return S;
             });
 
-            wrapped.method("delete!", [](pm_Set& S, elemType i) {
+            wrapped.method("delete!", [](WrappedT& S, elemType i) {
                 S -= i;
                 return S;
             });
 
             wrapped.method("union!",
-                           [](pm_Set& S, pm_Set& T) { return S += T; });
+                           [](WrappedT& S, WrappedT& T) { return S += T; });
             wrapped.method("intersect!",
-                           [](pm_Set& S, pm_Set& T) { return S *= T; });
+                           [](WrappedT& S, WrappedT& T) { return S *= T; });
             wrapped.method("setdiff!",
-                           [](pm_Set& S, pm_Set& T) { return S -= T; });
+                           [](WrappedT& S, WrappedT& T) { return S -= T; });
             wrapped.method("symdiff!",
-                           [](pm_Set& S, pm_Set& T) { return S ^= T; });
+                           [](WrappedT& S, WrappedT& T) { return S ^= T; });
 
             wrapped.method(
-                "union", [](pm_Set& S, pm_Set& T) { return pm_Set{S + T}; });
-            wrapped.method("intersect", [](pm_Set& S, pm_Set& T) {
-                return pm_Set{S * T};
+                "union", [](WrappedT& S, WrappedT& T) { return WrappedT{S + T}; });
+            wrapped.method("intersect", [](WrappedT& S, WrappedT& T) {
+                return WrappedT{S * T};
             });
-            wrapped.method("setdiff", [](pm_Set& S, pm_Set& T) {
-                return pm_Set{S - T};
+            wrapped.method("setdiff", [](WrappedT& S, WrappedT& T) {
+                return WrappedT{S - T};
             });
-            wrapped.method("symdiff", [](pm_Set& S, pm_Set& T) {
-                return pm_Set{S ^ T};
+            wrapped.method("symdiff", [](WrappedT& S, WrappedT& T) {
+                return WrappedT{S ^ T};
             });
 
-            wrapped.method("getindex", [](pm_Set& S, pm_Set& T) {
-                return pm_Set{pm::select(pm::wary(S), T)};
+            wrapped.method("getindex", [](WrappedT& S, WrappedT& T) {
+                return WrappedT{pm::select(pm::wary(S), T)};
             });
             wrapped.method("range", [](elemType a, elemType b) {
-                return pm_Set{pm::range(a, b)};
+                return WrappedT{pm::range(a, b)};
             });
             wrapped.method("sequence", [](elemType a, elemType c) {
-                return pm_Set{pm::sequence(a, c)};
+                return WrappedT{pm::sequence(a, c)};
             });
             wrapped.method("scalar2set", [](elemType s) {
-                return pm_Set{pm::scalar2set(s)};
+                return WrappedT{pm::scalar2set(s)};
             });
-            wrapped.method("show_small_obj", [](pm_Set& S) {
-                return show_small_object<pm_Set>(S);
+            wrapped.method("show_small_obj", [](WrappedT& S) {
+                return show_small_object<WrappedT>(S);
             });
             wrapped.method("take",
-                [](pm::perl::Object p, const std::string& s,
-                    pm_Set& S){ p.take(s) << S; });
+                [](pm::perl::BigObject p, const std::string& s,
+                    WrappedT& S){ p.take(s) << S; });
         });
 
-    polymake.method("to_set_int32", [](pm::perl::PropertyValue v) {
-        return to_SmallObject<pm::Set<int32_t>>(v);
-    });
-    polymake.method("to_set_int64", [](pm::perl::PropertyValue v) {
-        return to_SmallObject<pm::Set<long>>(v);
+    polymake.method("to_set_int", [](pm::perl::PropertyValue v) {
+        return to_SmallObject<pm::Set<pm::Int>>(v);
     });
 
     polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("SetIterator")
-        .apply<WrappedSetIterator<int32_t>, WrappedSetIterator<long>>(
+        .apply<WrappedSetIterator<pm::Int>>(
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type WrappedSetIter;
                 typedef typename decltype(wrapped)::type::value_type elemType;
@@ -118,16 +115,7 @@ void polymake_module_add_set(jlcxx::Module& polymake)
                 });
             });
 
-    polymake.method("incl", [](pm::Set<int32_t> s1, pm::Set<int32_t> s2) {
-        return pm::incl(s1, s2);
-    });
-    polymake.method("incl", [](pm::Set<int32_t> s1, pm::Set<long> s2) {
-        return pm::incl(s1, s2);
-    });
-    polymake.method("incl", [](pm::Set<long> s1, pm::Set<int32_t> s2) {
-        return pm::incl(s1, s2);
-    });
-    polymake.method("incl", [](pm::Set<long> s1, pm::Set<long> s2) {
+    polymake.method("incl", [](pm::Set<pm::Int> s1, pm::Set<pm::Int> s2) {
         return pm::incl(s1, s2);
     });
 }

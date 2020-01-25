@@ -1,6 +1,6 @@
-Base.show(io::IO,::MIME"text/plain", obj::pm_perl_Object) = print(io, properties(obj))
+Base.show(io::IO,::MIME"text/plain", obj::BigObject) = print(io, properties(obj))
 
-function Base.show(io::IO,::MIME"text/html",obj::pm_perl_Object)
+function Base.show(io::IO,::MIME"text/html",obj::BigObject)
     return_string = properties(obj)
     summary, description = split(return_string,"\n";limit=2)
     if startswith(summary, "type: ")
@@ -23,21 +23,21 @@ function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, show_small_obj(obj))
 end
 # fallback for non-wrapped types
-function Base.show(io::IO, ::MIME"text/plain", pv::pm_perl_PropertyValue)
+function Base.show(io::IO, ::MIME"text/plain", pv::PropertyValue)
     type_info = typeinfo_string(pv, true)
-    println(io, "pm::perl::PropertyValue wrapping $type_info")
+    println(io, "PropertyValue wrapping $type_info")
     if  type_info != "undefined"
         print(io, to_string(pv))
     end
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::pm_Array{pm_perl_Object})
-    print(io, "pm_Array{pm_perl_Object} of size ",length(a))
+function Base.show(io::IO, ::MIME"text/plain", a::Array{BigObject})
+    print(io, "Array{BigObject} of size ",length(a))
 end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
 
 struct Visual
-    obj::Polymake.pm_perl_PropertyValue
+    obj::Polymake.PropertyValue
 end
 
 function Base.show(io::IO, v::Visual)
