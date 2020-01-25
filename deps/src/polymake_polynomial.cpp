@@ -23,7 +23,7 @@ void polymake_module_add_polynomial(jlcxx::Module& polymake)
                 wrapped.method("+", [](polyT& a, polyT& b) { return a + b; });
                 wrapped.method("-", [](polyT& a, polyT& b) { return a - b; });
                 wrapped.method("*", [](polyT& a, polyT& b) { return a * b; });
-                wrapped.method("^", [](polyT& a, int32_t b) { return a ^ b; });
+                wrapped.method("^", [](polyT& a, int64_t b) { return a ^ b; });
                 // wrapped.method("^", [](polyT& a, pm::Integer b) { return a ^ b; });
                 // wrapped.method("^", [](polyT& a, pm::Rational b) { return a ^ b; });
                 // wrapped.method("^", [](polyT& a, double b) { return a ^ b; });
