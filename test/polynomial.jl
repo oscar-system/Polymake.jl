@@ -22,14 +22,16 @@ using SparseArrays
     pm_v = pm_Vector(jl_v)
     # pm_sv = pm_SparseVector(jl_v) #TODO add when pm_sparsevector is merged
     jl_m = [3 4 5; 6 7 8]
-    jl_sm = SparseMatrixCSC{Int32,Int32}(jl_m)
+    jl_sm = sparse(jl_m)
     pm_m = pm_Matrix(jl_m)
     pm_sm = pm_SparseMatrix(jl_m)
-    TestVecs = [jl_v, jl_sv] #TODO add pm_sv
-    TestMats = [jl_m]
+    VecTypes = [Vector, sparsevec, pm_Vector]
+    MatTypes = [Matrix, sparse, pm_Matrix, pm_SparseMatrix]
     @testset "Constructors/Converts" begin
-        for A in TestVecs, B in TestMats, C in [IntTypes; pm_Integer], E in [IntTypes; pm_Integer], (V,S) in [(C.(A), C == Int32 ? Int32 : pm_Integer), (A//1, pm_Rational), (A/1, Float64)], (M,T) in [(E.(B), E == Int32 ? Int32 : pm_Integer), (B//1, pm_Rational), (B/1, Float64)]
-            @test pm_Polynomial(V,M) isa pm_Polynomial{S,T}
+        # Rational{I} for I in IntTypes
+        for V in VecTypes, M in MatTypes, C in [IntTypes; FloatTypes; pm_Integer; pm_Rational], E in [IntTypes; FloatTypes; pm_Integer; pm_Rational]
+            @test pm_Polynomial(V(C.(jl_v)), M(E.(jl_m))) isa pm_Polynomial{Polymake.promote_to_pm_type(pm_Vector, C),Polymake.promote_to_pm_type(pm_Matrix, E)}
+            # @test pm_Polynomial(V,M) isa pm_Polynomial{S,T}
             # for CoeffType in [pm_Integer, pm_Rational, Float64], ExpType in [pm_Integer, pm_Rational, Float64]
             #     for v in [jl_v, jl_v//T(1), jl_v/T(1)] m in [jl_m, jl_m//T(1), jl_m/T(1)]
             #         @test pm_Polynomial{CoeffType}(m) isa pm_Polynomial{CoeffType}
