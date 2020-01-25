@@ -70,3 +70,12 @@ function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix}}, S::Ty
     promote_type(S, Int64) == Int64 && return Int64
     return Integer
 end
+
+macro convert_to(expr1, expr2)
+    try
+        :(@pm common.convert_to{$expr1}($expr2))
+    catch ex
+        throw(ArgumentError("Can not parse the expression passed to @convert_to macro:\n$expr\n Only `@convert_to PerlType argument` syntax is recognized"))
+        rethrow(ex)
+    end
+end
