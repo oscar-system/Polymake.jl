@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_perl_objects.h"
+#include "polymake_bigobjects.h"
 
 #include "polymake_integers.h"
 
@@ -36,7 +36,7 @@ Polymake_Data data{nullptr, nullptr};
 
 JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 {
-    polymake_module_add_perl_object(polymake);
+    polymake_module_add_bigobject(polymake);
 
     polymake_module_add_integer(polymake);
 
@@ -72,7 +72,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         std::vector<std::string> props = std::get<2>(res);
         jl_value_t**             output = new jl_value_t*[props.size() + 1];
         output[0] = jl_box_int64(std::get<0>(res));
-        for (int i = 0; i < props.size(); ++i)
+        for (size_t i = 0; i < props.size(); ++i)
             output[i + 1] = jl_cstr_to_string(props[i].c_str());
         return jlcxx::make_julia_array(output, props.size() + 1);
     });

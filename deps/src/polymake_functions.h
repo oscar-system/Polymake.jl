@@ -4,7 +4,7 @@
 
 void initialize_polymake(bool interactive);
 
-pm::perl::Object to_perl_object(const pm::perl::PropertyValue&);
+pm::perl::BigObject to_bigobject(const pm::perl::PropertyValue&);
 
 std::string typeinfo_helper(const pm::perl::PropertyValue& p, bool demangle);
 
@@ -29,9 +29,9 @@ std::string show_small_object(const T& obj, bool print_typename = true)
     return buffer.str();
 }
 
-struct pm_VecOrMat_supported
+struct VecOrMat_supported
 {
-    typedef jlcxx::ParameterList<int, pm::Integer, pm::Rational, double> value_type;
+    typedef jlcxx::ParameterList<pm::Int, pm::Integer, pm::Rational, double> value_type;
 };
 
 #endif

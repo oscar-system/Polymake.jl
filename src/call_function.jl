@@ -5,7 +5,7 @@ export @pm, call_function, call_method
 
 Call a polymake function `func` from application `app` with given arguments `args`.
 """
-function call_function(app::Symbol, func::Symbol, args...; template_parameters::Array{String,1}=String[], unwrap::Bool=true, kwargs...)
+function call_function(app::Symbol, func::Symbol, args...; template_parameters::Base.Array{String,1}=String[], unwrap=true, kwargs...)
     fname = "$app::$func"
     cargs = Any[args...]
     if isempty(kwargs)
@@ -21,7 +21,7 @@ function call_function(app::Symbol, func::Symbol, args...; template_parameters::
 end
 
 """
-    call_method(obj::pm_perl_Object, func::Symbol, args...; kwargs...)
+    call_method(obj::BigObject, func::Symbol, args...; kwargs...)
 
 Call a polymake method on the object `obj` with the given `func` name and given arguments `args`.
 """
@@ -99,7 +99,7 @@ macro pm(expr)
         polymake_func_name =
             Meta.pm_name_qualified(polymake_app, polymake_func, templates)
         return :(
-            perlobj($polymake_func_name, $(esc.(args)...), $(esc.(kwargs)...))
+            bigobj($polymake_func_name, $(esc.(args)...), $(esc.(kwargs)...))
             )
     else # we presume it's a function
         polymake_func_name =

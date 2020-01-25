@@ -65,7 +65,7 @@ auto polymake_call_function(
 template<bool VoidContext = false>
 auto polymake_call_method(
     std::string                     function_name,
-    pm::perl::Object*               object,
+    pm::perl::BigObject*            object,
     jlcxx::ArrayRef<jl_value_t*, 1> arguments)
     -> funcall_type<VoidContext>
 {

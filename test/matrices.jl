@@ -1,13 +1,13 @@
-@testset "pm_Matrix" begin
+@testset "Polymake.Matrix" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
-    for T in [Int32, pm_Integer, pm_Rational, Float64]
-        @test pm_Matrix{T} <: AbstractMatrix
-        @test pm_Matrix{T}(3,4) isa AbstractMatrix
-        @test pm_Matrix{T}(3,4) isa pm_Matrix
-        @test pm_Matrix{T}(3,4) isa pm_Matrix{T}
-        M = pm_Matrix{T}(3,4)
+    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+        @test Polymake.Matrix{T} <: AbstractMatrix
+        @test Polymake.Matrix{T}(3,4) isa AbstractMatrix
+        @test Polymake.Matrix{T}(3,4) isa Polymake.Matrix
+        @test Polymake.Matrix{T}(3,4) isa Polymake.Matrix{T}
+        M = Polymake.Matrix{T}(3,4)
         M[1,1] = 10
         M[end] = 100
         @test M[1,1] isa T
@@ -18,59 +18,59 @@
 
     jl_m = [1 2 3; 4 5 6]
     @testset "Constructors/Converts" begin
-        @test pm_Matrix(jl_m//1) isa pm_Matrix{pm_Rational}
-        @test pm_Matrix(jl_m/1) isa pm_Matrix{Float64}
+        @test Polymake.Matrix(jl_m//1) isa Polymake.Matrix{Polymake.Rational}
+        @test Polymake.Matrix(jl_m/1) isa Polymake.Matrix{Float64}
 
-        for T in [IntTypes; pm_Integer]
-            @test pm_Matrix(T.(jl_m)) isa pm_Matrix{T == Int32 ? Int32 : pm_Integer}
+        for T in [IntTypes; Polymake.Integer]
+            @test Polymake.Matrix(T.(jl_m)) isa Polymake.Matrix{T<:Union{Int32,Int64} ? Int64 : Polymake.Integer}
 
-            for ElType in [pm_Integer, pm_Rational, Float64]
+            for ElType in [Polymake.Integer, Polymake.Rational, Float64]
                 for m in [jl_m, jl_m//T(1), jl_m/T(1)]
-                    @test pm_Matrix{ElType}(m) isa pm_Matrix{ElType}
-                    @test convert(pm_Matrix{ElType}, m) isa pm_Matrix{ElType}
+                    @test Polymake.Matrix{ElType}(m) isa Polymake.Matrix{ElType}
+                    @test convert(Polymake.Matrix{ElType}, m) isa Polymake.Matrix{ElType}
 
-                    M = pm_Matrix(m)
-                    @test convert(Matrix{T}, M) isa Matrix{T}
-                    @test jl_m == convert(Matrix{T}, M)
+                    M = Polymake.Matrix(m)
+                    @test convert(Base.Matrix{T}, M) isa Base.Matrix{T}
+                    @test jl_m == convert(Base.Matrix{T}, M)
                 end
             end
 
             for m in [jl_m, jl_m//T(1), jl_m/T(1)]
-                M = pm_Matrix(m)
+                M = Polymake.Matrix(m)
                 @test Polymake.convert(Polymake.PolymakeType, M) === M
-                @test float.(M) isa pm_Matrix{Float64}
-                @test Float64.(M) isa pm_Matrix{Float64}
-                @test Matrix{Float64}(M) isa Matrix{Float64}
-                @test convert.(Float64, M) isa pm_Matrix{Float64}
+                @test float.(M) isa Polymake.Matrix{Float64}
+                @test Float64.(M) isa Polymake.Matrix{Float64}
+                @test Base.Matrix{Float64}(M) isa Base.Matrix{Float64}
+                @test convert.(Float64, M) isa Polymake.Matrix{Float64}
             end
 
-            let W = pm_Matrix{pm_Rational}(jl_m)
-                for T in [Rational{I} for I in IntTypes]
-                    @test convert(Matrix{T}, W) isa Matrix{T}
-                    @test jl_m == convert(Matrix{T}, W)
+            let W = Polymake.Matrix{Polymake.Rational}(jl_m)
+                for T in [Base.Rational{I} for I in IntTypes]
+                    @test convert(Base.Matrix{T}, W) isa Base.Matrix{T}
+                    @test jl_m == convert(Base.Matrix{T}, W)
                 end
             end
 
-            let U = pm_Matrix{Float64}(jl_m)
+            let U = Polymake.Matrix{Float64}(jl_m)
                 for T in FloatTypes
-                    @test convert(Matrix{T}, U) isa Matrix{T}
-                    @test jl_m == convert(Matrix{T}, U)
+                    @test convert(Base.Matrix{T}, U) isa Base.Matrix{T}
+                    @test jl_m == convert(Base.Matrix{T}, U)
                 end
             end
         end
     end
 
     @testset "Low-level operations" begin
-        @testset "pm_Matrix{Int32}" begin
+        @testset "Polymake.Matrix{Int64}" begin
             jl_m_32 = Int32.(jl_m)
-            @test pm_Matrix(jl_m_32) isa pm_Matrix{Int32}
-            M = pm_Matrix{Int32}(jl_m_32)
+            @test Polymake.Matrix(jl_m_32) isa Polymake.Matrix{Int64}
+            M = Polymake.Matrix{Int64}(jl_m_32)
 
             # linear indexing:
             @test M[1] == 1
             @test M[2] == 4
 
-            @test eltype(M) == Int32
+            @test eltype(M) == Int64
 
             @test_throws BoundsError M[0, 1]
             @test_throws BoundsError M[2, 5]
@@ -79,26 +79,26 @@
             @test length(M) == 6
             @test size(M) == (2,3)
 
-            for T in [IntTypes; pm_Integer]
-                M = pm_Matrix{Int32}(jl_m_32) # local copy
-                @test setindex!(M, T(5), 1, 1) isa pm_Matrix{Int32}
-                @test M[T(1), 1] isa Int32
+            for T in [IntTypes; Polymake.Integer]
+                M = Polymake.Matrix{Int64}(jl_m_32) # local copy
+                @test setindex!(M, T(5), 1, 1) isa Polymake.Matrix{Int64}
+                @test M[T(1), 1] isa Int64
                 @test M[1, T(1)] == 5
                 # testing the return value of brackets operator
                 @test M[2, 1] = T(10) isa T
                 M[2, 1] = T(10)
                 @test M[2, 1] == 10
-                @test string(M) == "pm::Matrix<int>\n5 2 3\n10 5 6\n"
+                @test string(M) == "pm::Matrix<long>\n5 2 3\n10 5 6\n"
             end
         end
 
-        @testset "pm_Matrix{pm_Integer}" begin
-            V = pm_Matrix{pm_Integer}(jl_m)
+        @testset "Polymake.Matrix{Polymake.Integer}" begin
+            V = Polymake.Matrix{Polymake.Integer}(jl_m)
             # linear indexing:
             @test V[1] == 1
             @test V[2] == 4
 
-            @test eltype(V) == pm_Integer
+            @test eltype(V) == Polymake.Integer
 
             @test_throws BoundsError V[0, 1]
             @test_throws BoundsError V[2, 5]
@@ -107,10 +107,10 @@
             @test length(V) == 6
             @test size(V) == (2,3)
 
-            for T in [IntTypes; pm_Integer]
-                V = pm_Matrix{pm_Integer}(jl_m) # local copy
-                @test setindex!(V, T(5), 1, 1) isa pm_Matrix{pm_Integer}
-                @test V[T(1), 1] isa Polymake.pm_IntegerAllocated
+            for T in [IntTypes; Polymake.Integer]
+                V = Polymake.Matrix{Polymake.Integer}(jl_m) # local copy
+                @test setindex!(V, T(5), 1, 1) isa Polymake.Matrix{Polymake.Integer}
+                @test V[T(1), 1] isa Polymake.Polymake.IntegerAllocated
                 @test V[1, T(1)] == 5
                 # testing the return value of brackets operator
                 @test V[2, 1] = T(10) isa T
@@ -120,13 +120,13 @@
             end
         end
 
-        @testset "pm_Matrix{pm_Rational}" begin
-            V = pm_Matrix{pm_Rational}(jl_m)
+        @testset "Polymake.Matrix{Polymake.Rational}" begin
+            V = Polymake.Matrix{Polymake.Rational}(jl_m)
             # linear indexing:
             @test V[1] == 1//1
             @test V[2] == 4//1
 
-            @test eltype(V) == pm_Rational
+            @test eltype(V) == Polymake.Rational
 
             @test_throws BoundsError V[0, 1]
             @test_throws BoundsError V[2, 5]
@@ -135,10 +135,10 @@
             @test length(V) == 6
             @test size(V) == (2,3)
 
-            for T in [IntTypes; pm_Integer]
-                V = pm_Matrix{pm_Rational}(jl_m) # local copy
-                @test setindex!(V, T(5)//T(3), 1, 1) isa pm_Matrix{pm_Rational}
-                @test V[T(1), 1] isa Polymake.pm_RationalAllocated
+            for T in [IntTypes; Polymake.Integer]
+                V = Polymake.Matrix{Polymake.Rational}(jl_m) # local copy
+                @test setindex!(V, T(5)//T(3), 1, 1) isa Polymake.Matrix{Polymake.Rational}
+                @test V[T(1), 1] isa Polymake.Polymake.RationalAllocated
                 @test V[1, T(1)] == 5//3
                 # testing the return value of brackets operator
                 @test V[2] = T(10)//T(3) isa typeof(T(10)//T(3))
@@ -148,8 +148,8 @@
             end
         end
 
-        @testset "pm_Matrix{Float64}" begin
-            V = pm_Matrix{Float64}(jl_m)
+        @testset "Polymake.Matrix{Float64}" begin
+            V = Polymake.Matrix{Float64}(jl_m)
             # linear indexing:
             @test V[1] == 1.0
             @test V[2] == 4.0
@@ -163,10 +163,10 @@
             @test length(V) == 6
             @test size(V) == (2,3)
 
-            for T in [IntTypes; pm_Integer]
-                V = pm_Matrix{Float64}(jl_m) # local copy
+            for T in [IntTypes; Polymake.Integer]
+                V = Polymake.Matrix{Float64}(jl_m) # local copy
                 for S in FloatTypes
-                    @test setindex!(V, S(5)/T(3), 1, 1) isa pm_Matrix{Float64}
+                    @test setindex!(V, S(5)/T(3), 1, 1) isa Polymake.Matrix{Float64}
                     @test V[T(1), 1] isa Float64
                     @test V[1, T(1)] ≈ S(5)/T(3)
                     # testing the return value of brackets operator
@@ -179,127 +179,127 @@
         end
 
         @testset "Equality" begin
-            for T in [IntTypes; pm_Integer]
-                X = pm_Matrix{Int32}(2, 3)
-                V = pm_Matrix{pm_Integer}(2, 3)
-                W = pm_Matrix{pm_Rational}(2, 3)
-                U = pm_Matrix{Float64}(2, 3)
+            for T in [IntTypes; Polymake.Integer]
+                X = Polymake.Matrix{Int64}(2, 3)
+                V = Polymake.Matrix{Polymake.Integer}(2, 3)
+                W = Polymake.Matrix{Polymake.Rational}(2, 3)
+                U = Polymake.Matrix{Float64}(2, 3)
 
-                @test (X .= T.(jl_m)) isa pm_Matrix{Int32}
-                @test (X .= T.(jl_m).//1) isa pm_Matrix{Int32}
+                @test (X .= T.(jl_m)) isa Polymake.Matrix{Int64}
+                @test (X .= T.(jl_m).//1) isa Polymake.Matrix{Int64}
 
-                @test (V .= T.(jl_m)) isa pm_Matrix{pm_Integer}
-                @test (V .= T.(jl_m).//1) isa pm_Matrix{pm_Integer}
+                @test (V .= T.(jl_m)) isa Polymake.Matrix{Polymake.Integer}
+                @test (V .= T.(jl_m).//1) isa Polymake.Matrix{Polymake.Integer}
 
-                @test (W .= T.(jl_m)) isa pm_Matrix{pm_Rational}
-                @test (W .= T.(jl_m).//1) isa pm_Matrix{pm_Rational}
+                @test (W .= T.(jl_m)) isa Polymake.Matrix{Polymake.Rational}
+                @test (W .= T.(jl_m).//1) isa Polymake.Matrix{Polymake.Rational}
 
-                @test (U .= T.(jl_m)) isa pm_Matrix{Float64}
-                @test (U .= T.(jl_m).//1) isa pm_Matrix{Float64}
+                @test (U .= T.(jl_m)) isa Polymake.Matrix{Float64}
+                @test (U .= T.(jl_m).//1) isa Polymake.Matrix{Float64}
 
                 @test X == U == V == W
 
                 # TODO:
-                # @test (V .== jl_m) isa BitArray
+                # @test (V .== jl_m) isa BitPolymake.Array
                 # @test all(V .== jl_m)
             end
 
-            V = pm_Matrix{pm_Integer}(jl_m)
+            V = Polymake.Matrix{Polymake.Integer}(jl_m)
             for S in FloatTypes
-                U = pm_Matrix{Float64}(2, 3)
-                @test (U .= jl_m./S(1)) isa pm_Matrix{Float64}
+                U = Polymake.Matrix{Float64}(2, 3)
+                @test (U .= jl_m./S(1)) isa Polymake.Matrix{Float64}
                 @test U == V
             end
         end
     end
 
     @testset "Arithmetic" begin
-        V = pm_Matrix{pm_Integer}(jl_m)
-        @test float.(V) isa Polymake.pm_MatrixAllocated{Float64}
-        @test V[1, :] isa Polymake.pm_VectorAllocated{pm_Integer}
-        @test float.(V)[1, :] isa pm_Vector{Float64}
+        V = Polymake.Matrix{Polymake.Integer}(jl_m)
+        @test float.(V) isa Polymake.Polymake.MatrixAllocated{Float64}
+        @test V[1, :] isa Polymake.Polymake.VectorAllocated{Polymake.Integer}
+        @test float.(V)[1, :] isa Polymake.Vector{Float64}
 
-        @test similar(V, Float64) isa Polymake.pm_MatrixAllocated{Float64}
-        @test similar(V, Float64, 10) isa Polymake.pm_VectorAllocated{Float64}
-        @test similar(V, Float64, 10, 10) isa Polymake.pm_MatrixAllocated{Float64}
+        @test similar(V, Float64) isa Polymake.Polymake.MatrixAllocated{Float64}
+        @test similar(V, Float64, 10) isa Polymake.Polymake.VectorAllocated{Float64}
+        @test similar(V, Float64, 10, 10) isa Polymake.Polymake.MatrixAllocated{Float64}
 
-        X = pm_Matrix{Int32}(jl_m)
-        V = pm_Matrix{pm_Integer}(jl_m)
+        X = Polymake.Matrix{Int64}(jl_m)
+        V = Polymake.Matrix{Polymake.Integer}(jl_m)
         jl_w = jl_m//4
-        W = pm_Matrix{pm_Rational}(jl_w)
+        W = Polymake.Matrix{Polymake.Rational}(jl_w)
         jl_u = jl_m/4
-        U = pm_Matrix{Float64}(jl_u)
+        U = Polymake.Matrix{Float64}(jl_u)
 
-        @test -X isa Polymake.pm_MatrixAllocated{Int32}
+        @test -X isa Polymake.Polymake.MatrixAllocated{Int64}
         @test -X == -jl_m
 
-        @test -V isa Polymake.pm_MatrixAllocated{pm_Integer}
+        @test -V isa Polymake.Polymake.MatrixAllocated{Polymake.Integer}
         @test -V == -jl_m
 
-        @test -W isa Polymake.pm_MatrixAllocated{pm_Rational}
+        @test -W isa Polymake.Polymake.MatrixAllocated{Polymake.Rational}
         @test -W == -jl_w
 
-        @test -U isa Polymake.pm_MatrixAllocated{Float64}
+        @test -U isa Polymake.Polymake.MatrixAllocated{Float64}
         @test -U == -jl_u
 
-        int_scalar_types = [IntTypes; pm_Integer]
-        rational_scalar_types = [[Rational{T} for T in IntTypes]; pm_Rational]
+        int_scalar_types = [IntTypes; Polymake.Integer]
+        rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
-        @test 2X isa pm_Matrix{pm_Integer}
-        @test Int32(2)X isa pm_Matrix{Int32}
+        @test 2X isa Polymake.Matrix{Int64}
+        @test Int32(2)X isa Polymake.Matrix{Int64}
 
         for T in int_scalar_types
-            for (mat, ElType) in [(V, pm_Integer), (W, pm_Rational), (U, Float64)]
+            for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]
                 op = *
-                @test op(T(2), mat) isa pm_Matrix{ElType}
-                @test op(mat, T(2)) isa pm_Matrix{ElType}
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                @test op(T(2), mat) isa Polymake.Matrix{ElType}
+                @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
 
                 op = +
-                @test op(mat, T.(jl_m)) isa pm_Matrix{ElType}
-                @test op(T.(jl_m), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T.(jl_m)) isa pm_Matrix{ElType}
-                @test broadcast(op, T.(jl_m), mat) isa pm_Matrix{ElType}
+                @test op(mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+                @test op(T.(jl_m), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T.(jl_m), mat) isa Polymake.Matrix{ElType}
 
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
             end
 
-            let (op, ElType) = (//, pm_Rational)
+            let (op, ElType) = (//, Polymake.Rational)
                 for mat in [V, W]
 
-                    @test op(mat, T(2)) isa pm_Matrix{ElType}
-                    @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                    @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                    @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+                    @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                    @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
                 end
             end
             let (op, ElType) = (/, Float64)
                 mat = U
-                @test op(mat, T(2)) isa pm_Matrix{ElType}
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
             end
         end
 
         for T in rational_scalar_types
-            for (mat, ElType) in [(V, pm_Rational), (W, pm_Rational), (U, Float64)]
+            for (mat, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64)]
 
                 op = *
-                @test op(T(2), mat) isa pm_Matrix{ElType}
-                @test op(mat, T(2)) isa pm_Matrix{ElType}
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                @test op(T(2), mat) isa Polymake.Matrix{ElType}
+                @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
 
                 op = +
-                @test op(mat, T.(jl_m)) isa pm_Matrix{ElType}
-                @test op(T.(jl_m), mat) isa pm_Matrix{ElType}
+                @test op(mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+                @test op(T.(jl_m), mat) isa Polymake.Matrix{ElType}
 
-                @test broadcast(op, mat, T.(jl_m)) isa pm_Matrix{ElType}
-                @test broadcast(op, T.(jl_m), mat) isa pm_Matrix{ElType}
+                @test broadcast(op, mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T.(jl_m), mat) isa Polymake.Matrix{ElType}
 
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
 
                 if ElType == Float64
                     op = /
@@ -307,34 +307,34 @@
                     op = //
                 end
 
-                @test op(mat, T(2)) isa pm_Matrix{ElType}
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
             end
         end
         for T in FloatTypes
             let mat = U, ElType = Float64
                 op = *
-                @test op(T(2), mat) isa pm_Matrix{ElType}
-                @test op(mat, T(2)) isa pm_Matrix{ElType}
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                @test op(T(2), mat) isa Polymake.Matrix{ElType}
+                @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
 
                 op = +
-                @test op(mat, T.(jl_m)) isa pm_Matrix{ElType}
-                @test op(T.(jl_m), mat) isa pm_Matrix{ElType}
+                @test op(mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+                @test op(T.(jl_m), mat) isa Polymake.Matrix{ElType}
 
-                @test broadcast(op, mat, T.(jl_m)) isa pm_Matrix{ElType}
-                @test broadcast(op, T.(jl_m), mat) isa pm_Matrix{ElType}
+                @test broadcast(op, mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T.(jl_m), mat) isa Polymake.Matrix{ElType}
 
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
 
                 op = /
-                # @test op(T(2), mat) isa pm_Matrix{ElType}
-                @test op(mat, T(2)) isa pm_Matrix{ElType}
-                @test broadcast(op, T(2), mat) isa pm_Matrix{ElType}
-                @test broadcast(op, mat, T(2)) isa pm_Matrix{ElType}
+                # @test op(T(2), mat) isa Polymake.Matrix{ElType}
+                @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
             end
         end
 

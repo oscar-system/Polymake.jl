@@ -1,7 +1,7 @@
-const AbstractRational = Union{Rational, pm_Rational}
+const AbstractRational = Union{Base.Rational, Rational}
 
 for (pm_solve_LP, scalarT, concreteT) in [
-    (:direct_call_solve_LP, AbstractRational, pm_Rational),
+    (:direct_call_solve_LP, AbstractRational, Rational),
     (:direct_call_solve_LP_float, AbstractFloat, Float64),
     ]
     for (m, flag) in [(:min, false), (:max, true)]
@@ -13,9 +13,9 @@ for (pm_solve_LP, scalarT, concreteT) in [
                 sense::typeof($m))
 
                 return $pm_solve_LP(
-                    convert(pm_Matrix{$concreteT}, inequalities),
-                    convert(pm_Matrix{$concreteT}, equalities),
-                    convert(pm_Vector{$concreteT}, objective),
+                    convert(Matrix{$concreteT}, inequalities),
+                    convert(Matrix{$concreteT}, equalities),
+                    convert(Vector{$concreteT}, objective),
                     $flag
                 )
             end

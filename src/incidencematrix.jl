@@ -1,15 +1,15 @@
 using SparseArrays
 
-function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractMatrix)
-    res = pm_IncidenceMatrix{pm_NonSymmetric}(size(mat)...)
+function IncidenceMatrix{NonSymmetric}(mat::AbstractMatrix)
+    res = IncidenceMatrix{NonSymmetric}(size(mat)...)
     @inbounds res .= mat
     return res
 end
 
-function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractMatrix)
+function IncidenceMatrix{Symmetric}(mat::AbstractMatrix)
     m,n = size(mat)
     m == n || throw(ArgumentError("a symmetric matrix needs to be quadratic"))
-    res = pm_IncidenceMatrix{pm_Symmetric}(m,n)
+    res = IncidenceMatrix{Symmetric}(m,n)
     for i = 1:m
         for j = 1:i
             temp = mat[i,j]
@@ -20,8 +20,8 @@ function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractMatrix)
     return res
 end
 
-function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractSparseMatrix)
-    res = pm_IncidenceMatrix{pm_NonSymmetric}(size(mat)...)
+function IncidenceMatrix{NonSymmetric}(mat::AbstractSparseMatrix)
+    res = IncidenceMatrix{NonSymmetric}(size(mat)...)
     r,c,v = findnz(mat)
     for i = 1:length(r)
         res[r[i],c[i]] = v[i]
@@ -29,10 +29,10 @@ function pm_IncidenceMatrix{pm_NonSymmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
-function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractSparseMatrix)
+function IncidenceMatrix{Symmetric}(mat::AbstractSparseMatrix)
     m,n = size(mat)
     m == n || throw(ArgumentError("a symmetric matrix needs to be quadratic"))
-    res = pm_IncidenceMatrix{pm_Symmetric}(m,n)
+    res = IncidenceMatrix{Symmetric}(m,n)
     r,c,v = findnz(mat)
     for i = 1:length(r)
         ((v[i] == mat[c[i],r[i]] == 0) | ((v[i] != 0) & (mat[c[i],r[i]] != 0))) || throw(ArgumentError("input matrix is not symmetric"))
@@ -41,39 +41,39 @@ function pm_IncidenceMatrix{pm_Symmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
-# set default parameter to pm_NonSymmetric
-pm_IncidenceMatrix(x...) = pm_IncidenceMatrix{pm_NonSymmetric}(x...)
+# set default parameter to NonSymmetric
+IncidenceMatrix(x...) = IncidenceMatrix{NonSymmetric}(x...)
 
-Base.size(m::pm_IncidenceMatrix) = (rows(m), cols(m))
+Base.size(m::IncidenceMatrix) = (rows(m), cols(m))
 
-Base.@propagate_inbounds function Base.getindex(M::pm_IncidenceMatrix , i::Integer, j::Integer)
+Base.@propagate_inbounds function Base.getindex(M::IncidenceMatrix , i::Base.Integer, j::Base.Integer)
     @boundscheck checkbounds(M, i, j)
     return _getindex(M, convert(Int64, i), convert(Int64, j))
 end
 
-Base.@propagate_inbounds function Base.setindex!(M::pm_IncidenceMatrix, val, i::Integer, j::Integer)
+Base.@propagate_inbounds function Base.setindex!(M::IncidenceMatrix, val, i::Base.Integer, j::Base.Integer)
     @boundscheck checkbounds(M, i, j)
     _setindex!(M, !iszero(val), convert(Int64, i), convert(Int64, j))
     return val
 end
 
-Base.@propagate_inbounds function row(M::pm_IncidenceMatrix, i::Integer)
+Base.@propagate_inbounds function row(M::IncidenceMatrix, i::Base.Integer)
     @boundscheck checkbounds(M, i, :)
     return to_one_based_indexing(_row(M, convert(Int64, i)))
 end
 
-Base.@propagate_inbounds function col(M::pm_IncidenceMatrix, j::Integer)
+Base.@propagate_inbounds function col(M::IncidenceMatrix, j::Base.Integer)
     @boundscheck checkbounds(M, :, j)
     return to_one_based_indexing(_col(M, convert(Int64, j)))
 end
 
-function Base.resize!(M::pm_IncidenceMatrix{pm_NonSymmetric}, m::Integer, n::Integer)
+function Base.resize!(M::IncidenceMatrix{NonSymmetric}, m::Base.Integer, n::Base.Integer)
     m >= 0 || throw(DomainError(m, "can not resize to a negative length"))
     n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
     _resize!(M,Int64(m),Int64(n))
 end
 
-function Base.resize!(M::pm_IncidenceMatrix{pm_Symmetric}, n::Integer)
+function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
     n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
     _resize!(M,Int64(n),Int64(n))
 end
