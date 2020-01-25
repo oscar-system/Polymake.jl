@@ -21,3 +21,10 @@ function cite(;format=:bibtex)
         throw("The only supported citation format is :bibtex")
     end
 end
+
+"""
+    prefer(label_expression::String)
+
+Make the production rules, user functions, or methods (further called items) matching the given `label_expression` be preferred over competing rules (functions, methods).
+"""
+prefer(label_expression::String) = set_preference(label_expression)

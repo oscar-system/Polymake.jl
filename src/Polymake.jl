@@ -1,7 +1,8 @@
 module Polymake
 
 export BigObject, PropertyValue,
-       PolymakeError, application, dual_zero, orientation
+       PolymakeError, application, dual_zero, orientation,
+       prefer
 
 
 # We need to import all functions which will be extended on the Cxx side

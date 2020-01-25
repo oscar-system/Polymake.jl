@@ -88,6 +88,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         return jlarr;
     });
 
+    polymake.method("set_preference", [](const std::string x) {
+        return data.main_polymake_session->set_preference(x);
+    });
+
 #include "generated/map_inserts.h"
 
     polymake_module_add_caller(polymake);
