@@ -189,7 +189,7 @@ special_points = pm::Matrix<pm::Rational>
 ```
 As can be seen we show consecutive steps of computations: the input `matrix`, `FACETS`, then we ask for `VERTEX_SIZES`, which triggers the convex hull computation. Then we show vertices and print those corresponding to simple vertices. Finally we collect them in `special_points`.
 
-Observe that a `polymake` matrix (`pm_Matrix`) implements julia abstract array interface: `p.VERTICES[2,:]` returns a `1`-dimensional slice (i.e. `pm_Vector`), while passing a set of indices (`p.VERTICES[special_points, :]`) returns a `2`-dimensional one.
+Observe that a `polymake` matrix (`Polymake.Matrix`) implements julia abstract array interface: `p.VERTICES[2,:]` returns a `1`-dimensional slice (i.e. `Polymake.Vector`), while passing a set of indices (`p.VERTICES[special_points, :]`) returns a `2`-dimensional one.
 
 #### Notes:
 
@@ -197,7 +197,7 @@ The same minor (up to permutation of rows) could be obtained by using sets: eith
 ```julia
 simple_verts = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)) # Julia set of Int64s
 
-simple_verts = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)) # polymake set of longs
+simple_verts = Polymake.Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)) # polymake set of longs
 
 special_points = p.VERTICES[collect(simple_verts), :]
 ```
@@ -276,13 +276,13 @@ The following tables explain by example how to quickly translate `polymake` synt
 
 * Big objects, e.g., Polytopes, can be handled in Julia.
 * Several small objects (data types) from `polymake` are available in `Polymake.jl`:
-    * Integers (`pm_Integer <: Integer`)
-    * Rationals (`pm_Rational <: Real`)
-    * Vectors (`pm_Vector <: AbstractVector`) of of `Float64`s, `pm_Integer`s and `pm_Rational`s
-    * Matrices (`pm_Matrix <: AbstractMatrix`) of `Float64`s, `pm_Integer`s and `pm_Rational`s
-    * Sets (`pm_Set <: AbstractSet`) of `Int32`s and `Int64`s
-    * Arrays (`pm_Array <: AbstractVector`, as `pm_Arrays` are one-dimensional) of `Int32`s, `Int64`s and `pm_Integers`
-    * some combinations thereof, e.g., `pm_Array`s of `pm_Sets` of `Int32`s.
+    * Integers (`Polymake.Integer <: Integer`)
+    * Rationals (`Polymake.Rational <: Real`)
+    * Vectors (`Polymake.Vector <: AbstractVector`) of `Int64`s, `Float64`s, `Polymake.Integer`s and `Polymake.Rational`s
+    * Matrices (`Polymake.Matrix <: AbstractMatrix`) of `Int64`s, `Float64`s, `Polymake.Integer`s and `Polymake.Rational`s
+    * Sets (`Polymake.Set <: AbstractSet`) of `Int64`s
+    * Arrays (`Polymake.Array <: AbstractVector`, as `Polymake.Arrays` are one-dimensional) of `Int64`s and `Polymake.Integers`
+    * some combinations thereof, e.g., `Polymake.Array`s of `Polymake.Sets` of `Int32`s.
 
 These data types can be converted to appropriate Julia types,
 but are also subtypes of the corresponding Julia abstract types (as indicated above),
@@ -322,12 +322,12 @@ $obj = new BigObject<Template,Parameters>(args)
 ```
 becomes
 ```julia
-obj = @pm Appname.BigObject{Template, Parameters}(args)
+obj = @pm appname.BigObject{Template, Parameters}(args)
 ```
 
 Examples:
 ```julia
-tropical.Polytope{max, pm_Rational}(POINTS=[1 0 0; 1 1 0; 1 1 1])
+tropical.Polytope{max, Polymake.Rational}(POINTS=[1 0 0; 1 1 0; 1 1 1])
 # call to constructor, note that max is a julia function, hence a valid object
 @pm tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])
 # macro call: none of the types in templates need to exist in julia
@@ -345,7 +345,7 @@ julia> c = polytope.cube(3);
 julia> f = c.FACETS;
 
 julia> f[1,1] # f is an opaque pm::perl::PropertyValue to julia
-ERROR: MethodError: no method matching getindex(::Polymake.pm_perl_PropertyValueAllocated, ::Int64, ::Int64)
+ERROR: MethodError: no method matching getindex(::Polymake.PropertyValueAllocated, ::Int64, ::Int64)
 Stacktrace:
   [...]
 
@@ -368,11 +368,10 @@ julia> m[1,1]
 
 Functions in `Polymake.jl` accept the following types for their arguments:
 * simple data types (bools, machine integers, floats)
-* wrapped native types (`pm_Integer`, `pm_Rational`, `pm_Vector`, `pm_Matrix`, `pm_Set` etc.)
+* wrapped native types (`Polymake.Integer`, `Polymake.Rational`, `Polymake.Vector`, `Polymake.Matrix`, `Polymake.Set` etc.)
 * other objects returned by polymake:
-  *  `pm_perl_Object` (essentially Big Objects),
-  *  `pm_perl_PropertyValue` (containers opaque to Julia)
-<!-- *  `pm_perl_OptionSet` -->
+  *  `Polymake.BigObject`,
+  *  `Polymake.PropertyValue` (containers opaque to Julia)
 
 If an object passed to `Polymake.jl` function is of a different type the software will try its best to convert it to a known one. However, if the conversion doesn't work an `ArgumentError` will be thrown:
 ```julia
@@ -386,13 +385,13 @@ Base.convert(::Type{Polymake.PolymakeType}, x::SomeType)
 ```
 The returned value must be of one of the types as above. For example to use `AbstractAlgebra.jl` matrices as input to `Polymake.jl` one may define
 ```julia
-Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = pm_Matrix(M.entries)
+Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = Polymake.Matrix(M.entries)
 ```
 and the following should run smoothly.
 ```julia
 julia> using AbstractAlgebra, Polymake
-polymake version 3.4
-Copyright (c) 1997-2019
+polymake version 4.0
+Copyright (c) 1997-2020
 Ewgenij Gawrilow, Michael Joswig (TU Berlin)
 https://polymake.org
 
@@ -409,7 +408,7 @@ ERROR: ArgumentError: Unrecognized argument type: AbstractAlgebra.Generic.MatSpa
 You need to convert to polymake compatible type first.
   [...]
 
-julia> Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = pm_Matrix(M.entries)
+julia> Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = Polymake.Matrix(M.entries)
 
 julia> polytope.Polytope(POINTS=mm)
 type: Polytope<Rational>
