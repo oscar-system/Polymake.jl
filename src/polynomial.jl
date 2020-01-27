@@ -1,11 +1,11 @@
-@inline function Polynomial{C,E}(vec::AbstractVector, mat::AbstractMatrix) where {C <: VecOrMat_eltypes, E <: VecOrMat_eltypes}
+@inline function Polynomial{C,E}(vec::AbstractVector, mat::AbstractMatrix) where {C <: VecOrMat_eltypes, E <: Int64}
     vec = Vector{C}(vec)
     mat = Matrix{E}(mat)
     return Polynomial{C,E}(vec, mat)
 end
 
-Polynomial(vec::AbstractVector{C}, mat::AbstractMatrix{E}) where {C,E} = Polynomial{promote_to_pm_type(Vector,C),promote_to_pm_type(Matrix,E)}(vec, mat)
-Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C <: VecOrMat_eltypes ,E} = Polynomial{C,promote_to_pm_type(Matrix,E)}(vec, mat)
+Polynomial(vec::AbstractVector{C}, mat::AbstractMatrix{E}) where {C,E} = Polynomial{promote_to_pm_type(Vector,C),Int64}(vec, mat)
+Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C <: VecOrMat_eltypes,E} = Polynomial{C,promote_to_pm_type(Matrix,E)}(vec, mat)
 
 # Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C <: VecOrMat_eltypes, E <: Int32} = Polynomial{C,Int32}(vec, mat)
 # Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C <: VecOrMat_eltypes, E <: Integer} = Polynomial{C,Integer}(vec, mat)

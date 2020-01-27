@@ -31,7 +31,8 @@ end
 #create Matrix from a sparse matrix
 function Matrix{T}(mat::AbstractSparseMatrix) where T <: VecOrMat_eltypes
     r,c,v = SparseArrays.findnz(mat)
-    res = Matrix{T}(size(mat))
+    (m,n) = size(mat)
+    res = Matrix{T}(m,n)
     for i = 1:length(r)
         res[r[i],c[i]] = v[i]
     end

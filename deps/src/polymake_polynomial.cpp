@@ -11,7 +11,7 @@ void polymake_module_add_polynomial(jlcxx::Module& polymake)
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
             "Polynomial", jlcxx::julia_type("Any", "Base"))
-        .apply_combination<pm::Polynomial, VecOrMat_supported::value_type, VecOrMat_supported::value_type>(
+        .apply_combination<pm::Polynomial, VecOrMat_supported::value_type, jlcxx::ParameterList<pm::Int>>(
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type polyT;
                 typedef typename decltype(wrapped)::type::coefficient_type coeffT;
@@ -38,56 +38,56 @@ void polymake_module_add_polynomial(jlcxx::Module& polymake)
                     return show_small_object<polyT>(P);
                 });
                 wrapped.method("take",
-                    [](pm::perl::Object p, const std::string& s,
+                    [](pm::perl::BigObject p, const std::string& s,
                         polyT& P){ p.take(s) << P; });
         });
 
     polymake.method("to_polynomial_int_int", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<int,int>>(v);
+            return to_SmallObject<pm::Polynomial<pm::Int,pm::Int>>(v);
         });
-    polymake.method("to_polynomial_int_Integer", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<int,pm::Integer>>(v);
+    // polymake.method("to_polynomial_Int_Integer", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Int,pm::Integer>>(v);
+    //     });
+    // polymake.method("to_polynomial_Int_Rational", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Int,pm::Rational>>(v);
+    //     });
+    // polymake.method("to_polynomial_Int_double", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Int,double>>(v);
+    //     });
+    polymake.method("to_polynomial_integer_int", [](pm::perl::PropertyValue v) {
+            return to_SmallObject<pm::Polynomial<pm::Integer,pm::Int>>(v);
         });
-    polymake.method("to_polynomial_int_Rational", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<int,pm::Rational>>(v);
+    // polymake.method("to_polynomial_Integer_Integer", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Integer,pm::Integer>>(v);
+    //     });
+    // polymake.method("to_polynomial_Integer_Rational", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Integer,pm::Rational>>(v);
+    //     });
+    // polymake.method("to_polynomial_Integer_double", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Integer,double>>(v);
+    //     });
+    polymake.method("to_polynomial_rational_int", [](pm::perl::PropertyValue v) {
+            return to_SmallObject<pm::Polynomial<pm::Rational,pm::Int>>(v);
         });
-    polymake.method("to_polynomial_int_double", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<int,double>>(v);
-        });
-    polymake.method("to_polynomial_Integer_int", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Integer,int>>(v);
-        });
-    polymake.method("to_polynomial_Integer_Integer", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Integer,pm::Integer>>(v);
-        });
-    polymake.method("to_polynomial_Integer_Rational", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Integer,pm::Rational>>(v);
-        });
-    polymake.method("to_polynomial_Integer_double", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Integer,double>>(v);
-        });
-    polymake.method("to_polynomial_Rational_int", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Rational,int>>(v);
-        });
-    polymake.method("to_polynomial_Rational_Integer", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Rational,pm::Integer>>(v);
-        });
-    polymake.method("to_polynomial_Rational_Rational", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Rational,pm::Rational>>(v);
-        });
-    polymake.method("to_polynomial_Rational_double", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<pm::Rational,double>>(v);
-        });
+    // polymake.method("to_polynomial_Rational_Integer", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Rational,pm::Integer>>(v);
+    //     });
+    // polymake.method("to_polynomial_Rational_Rational", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Rational,pm::Rational>>(v);
+    //     });
+    // polymake.method("to_polynomial_Rational_double", [](pm::perl::PropertyValue v) {
+    //         return to_SmallObject<pm::Polynomial<pm::Rational,double>>(v);
+    //     });
     polymake.method("to_polynomial_double_int", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<double,int>>(v);
+            return to_SmallObject<pm::Polynomial<double,pm::Int>>(v);
         });
-    polymake.method("to_polynomial_double_Integer", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<double,pm::Integer>>(v);
-        });
-    polymake.method("to_polynomial_double_Rational", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<double,pm::Rational>>(v);
-        });
-    polymake.method("to_polynomial_double_double", [](pm::perl::PropertyValue v) {
-            return to_SmallObject<pm::Polynomial<double,double>>(v);
-        });
+//     polymake.method("to_polynomial_double_Integer", [](pm::perl::PropertyValue v) {
+//             return to_SmallObject<pm::Polynomial<double,pm::Integer>>(v);
+//         });
+//     polymake.method("to_polynomial_double_Rational", [](pm::perl::PropertyValue v) {
+//             return to_SmallObject<pm::Polynomial<double,pm::Rational>>(v);
+//         });
+//     polymake.method("to_polynomial_double_double", [](pm::perl::PropertyValue v) {
+//             return to_SmallObject<pm::Polynomial<double,double>>(v);
+//         });
 }
