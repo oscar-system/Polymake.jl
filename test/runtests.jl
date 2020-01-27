@@ -8,6 +8,7 @@ end
 
 using Polymake
 using Test
+using Random: seed!
 
 # make wrapper compilation verbose on travis
 if (haskey(ENV, "TRAVIS"))
