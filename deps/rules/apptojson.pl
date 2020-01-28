@@ -40,6 +40,7 @@ sub help_to_hash($$$) {
    # return \%fun if $ov->text eq "UNDOCUMENTED\n";
    my $ann = $ov->annex;
    $fun{name} = $help->name;
+   $fun{doc} = $ov->text;
    my $numparam = $ann->{param} ? scalar(@{$ann->{param}}) : 0;
    $fun{args} = [map { type_for_julia($appname,$_->[0]) } @{$ann->{param}}];
    $fun{mandatory} = defined $ann->{mandatory} ? $ann->{mandatory} + 1 : $numparam;
