@@ -390,7 +390,7 @@ using SparseArrays
     end
 
     @testset "findnz" begin
-        jsm = sprand(1015,1841,.14)
+        jsm = sprand(10150,1841,.001)
         psm = Polymake.SparseMatrix(jsm)
         jr, jc, jv = findnz(jsm)
         pr, pc, pv = findnz(psm)

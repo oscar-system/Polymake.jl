@@ -8,6 +8,11 @@
 
 void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
 {
+
+    polymake
+        .add_type<pm::local_epsilon_keeper>("local_epsilon_keeper")
+        .constructor<double>();
+
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>, jlcxx::ParameterList<jlcxx::TypeVar<1>,int>>(
             "SparseMatrix", jlcxx::julia_type("AbstractSparseMatrix", "SparseArrays"))

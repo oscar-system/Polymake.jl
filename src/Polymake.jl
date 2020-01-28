@@ -84,6 +84,11 @@ function __init__()
         prepare_jupyter_kernel_for_visualization()
     end
 
+    # setting the local_epsilon_keeper for Float64 precision
+    # affects Polymake.SparseMatrix
+    global _pm_local_epsilon_keeper = Polymake.local_epsilon_keeper(eps(Float64)/2)
+
+
 end
 
 include("setup_apps.jl")
