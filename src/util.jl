@@ -21,3 +21,22 @@ function cite(;format=:bibtex)
         throw("The only supported citation format is :bibtex")
     end
 end
+
+"""
+    prefer(label_expression::String)
+
+Make the production rules, user functions, or methods (further called items) matching the given `label_expression` be preferred over competing rules (functions, methods).
+
+## Examples
+
+If you prefer to use lrs as the default for the convex hull computation set
+```
+prefer("lrs.convex_hull")
+```
+
+Another example
+```
+prefer("cdd.simplex")
+```
+"""
+prefer(label_expression::String) = set_preference(label_expression)
