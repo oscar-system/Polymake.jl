@@ -24,14 +24,10 @@ void polymake_module_add_polynomial(jlcxx::Module& polymake)
                 wrapped.method("-", [](polyT& a, polyT& b) { return a - b; });
                 wrapped.method("*", [](polyT& a, polyT& b) { return a * b; });
                 wrapped.method("^", [](polyT& a, int64_t b) { return a ^ b; });
-                // wrapped.method("^", [](polyT& a, pm::Integer b) { return a ^ b; });
-                // wrapped.method("^", [](polyT& a, pm::Rational b) { return a ^ b; });
-                // wrapped.method("^", [](polyT& a, double b) { return a ^ b; });
                 wrapped.method("/", [](polyT& a, coeffT& c) { return a / c; });
                 wrapped.method("coefficients_as_vector", &polyT::coefficients_as_vector);
                 wrapped.method("monomials_as_matrix", [](polyT& a) { return a.monomials_as_matrix(); });
                 wrapped.method("set_var_names", [](polyT& a, Array<std::string>& names) { a.set_var_names(names); });
-                // wrapped.method("get_var_names", &polyT::get_var_names);
                 wrapped.method("get_var_names", [](polyT& a) { return a.get_var_names(); });
 
                 wrapped.method("show_small_obj", [](polyT& P) {

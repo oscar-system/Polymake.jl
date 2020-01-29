@@ -17,48 +17,29 @@ using SparseArrays
     end
 
     jl_v = [1, 2]
-    jl_sv = sparsevec(jl_v)
-    pm_v = Polymake.Vector(jl_v)
-    # pm_sv = Polymake.SparseVector(jl_v) #TODO add when sparsevector is merged
-    jl_m = [3 4 5; 6 7 8]
-    jl_sm = sparse(jl_m)
-    pm_m = Polymake.Matrix(jl_m)
-    pm_sm = Polymake.SparseMatrix(jl_m)
-    JuliaVecs = [(jl_v, Base.Vector), (jl_sv, SparseArrays.SparseVector)]
-    JuliaMats = [(jl_m, Base.Matrix), (jl_sm, SparseArrays.SparseMatrixCSC)]
-    PMVecs = [(pm_v, Polymake.Vector)] #TODO
-    PMMats = [(pm_m, Polymake.Matrix)]
+    jl_m = [3 4 5; 6 7 0]
     @testset "Constructors/Converts" begin
-        for (V, VT) in JuliaVecs, (M, MT) in JuliaMats, C in [IntTypes; FloatTypes; RationalTypes; Polymake.Integer; Polymake.Rational], E in [IntTypes; FloatTypes; RationalTypes; Polymake.Integer; Polymake.Rational], CoeffType in [Int64; Polymake.Integer; Polymake.Rational; Float64], ExpType in [Int64]
-            @test Polymake.Polynomial(VT{C}(V), MT{E}(M)) isa Polymake.Polynomial{Polymake.promote_to_pm_type(Vector, C),Polymake.promote_to_pm_type(Matrix, Int64)}
-            @test Polymake.Polynomial{CoeffType}(VT{C}(V), MT{E}(M)) isa Polymake.Polynomial{CoeffType,Polymake.promote_to_pm_type(Matrix, Int64)}
-            @test Polymake.Polynomial{CoeffType,ExpType}(VT{C}(V), MT{E}(M)) isa Polymake.Polynomial{CoeffType,ExpType}
+        for C in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+            @test Polymake.Polynomial(C.(jl_v), jl_m) isa Polymake.Polynomial{C,Int64}
+            @test Polymake.Polynomial{Float64}(C.(jl_v), jl_m) isa Polymake.Polynomial{Float64,Int64}
+            @test Polymake.Polynomial{Polymake.Rational,Int64}(C.(jl_v), jl_m) isa Polymake.Polynomial{Polymake.Rational,Int64}
         end
-        for (V, VT) in PMVecs, (M, MT) in PMMats, C in [Int64; Polymake.Integer; Polymake.Rational; Float64], CoeffType in [Int64; Polymake.Integer; Polymake.Rational; Float64], ExpType in [Int64]
-            @test Polymake.Polynomial(VT{C}(V), MT{E}(M)) isa Polymake.Polynomial{C,E}
-            @test Polymake.Polynomial{CoeffType}(VT{C}(V), MT{E}(M)) isa Polymake.Polynomial{CoeffType,E}
-            @test Polymake.Polynomial{CoeffType,ExpType}(VT{C}(V), MT{E}(M)) isa Polymake.Polynomial{CoeffType,ExpType}
+    end
+
+    @testset "Low-level operations" begin
+        for (C,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double")]
+            p = Polymake.Polynomial(C.(jl_v),jl_m)
+            @test string(p) == string("pm::Polynomial<", s, ", long>\n2*x_0^6*x_1^7 + x_0^3*x_1^4*x_2^5")
+            Polymake.set_var_names(p,["x", "y", "z"])
+            @test Polymake.get_var_names(p) == ["x", "y", "z"]
+            @test string(p) == string("pm::Polynomial<", s, ", long>\n2*x^6*y^7 + x^3*y^4*z^5")
         end
-            # for CoeffType in [Integer, Rational, Float64], ExpType in [Integer, Rational, Float64]
-            #     for v in [jl_v, jl_v//T(1), jl_v/T(1)], m in [jl_m, jl_m//T(1), jl_m/T(1)]
-            #         @test Polymake.Polynomial{CoeffType}(m) isa Polymake.Polynomial{CoeffType}
-            #         @test Polymake.Polynomial{CoeffType}(m) isa Polymake.Polynomial{CoeffType,Int32}
-            #         @test convert(SparseMatrix{ElType}, m) isa SparseMatrix{ElType}
-            #
-            #         M = SparseMatrix(m)
-            #         @test convert(Matrix{T}, M) isa Matrix{T}
-            #         @test jl_m == convert(Matrix{T}, M)
-            #     end
-            # end
-            #
-            # for m in [jl_m, jl_m//T(1), jl_m/T(1), jl_s, jl_s//T(1), jl_s/T(1)]
-            #     M = SparseMatrix(m)
-            #     @test Polymake.convert(Polymake.PolymakeType, M) === M
-            #     @test float.(M) isa SparseMatrix{Float64}
-            #     @test Float64.(M) isa SparseMatrix{Float64}
-            #     @test Matrix{Float64}(M) isa Matrix{Float64}
-            #     @test convert.(Float64, M) isa SparseMatrix{Float64}
-            # end
+    end
+
+    @testset "Equality" begin
+        for C1 in [Int64, Polymake.Integer, Polymake.Rational, Float64], C2 in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+            @test Polymake.Polynomial(C1.(jl_v),jl_m) == Polymake.Polynomial(C2.(jl_v),jl_m)
+        end
     end
 
 end

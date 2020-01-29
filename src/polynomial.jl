@@ -1,6 +1,12 @@
-@inline function Polynomial{C,E}(vec::AbstractVector, mat::AbstractMatrix) where {C <: VecOrMat_eltypes, E <: Int64}
+function Polynomial{C,E}(vec::AbstractVector, mat::AbstractMatrix) where {C <: VecOrMat_eltypes, E <: Int64}
     vec = Vector{C}(vec)
     mat = Matrix{E}(mat)
+    return Polynomial{C,E}(vec, mat)
+end
+
+function Polynomial{C,E}(p::Polynomial) where {C <: VecOrMat_eltypes, E <: Int64}
+    vec = C.(coefficients_as_vector(p))
+    mat = E.(monomials_as_matrix(p))
     return Polynomial{C,E}(vec, mat)
 end
 
@@ -19,4 +25,11 @@ Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C <: VecOrMat_
 
 set_var_names(p::Polynomial, names::AbstractArray{S}) where {S <: AbstractString} = set_var_names(p, Array{String}(names))
 
-Base.promote_rule(::Type{<:Polynomial{C1,E1}}, ::Type{<:Polynomial{C2,E2}}) where {C1,C2,E1,E2} = Polynomial{promote_type(C1,C2),promote_type(E1,E2)}
+Base.promote_rule(::Type{<:Polynomial{C1,E1}}, ::Type{<:Polynomial{C2,E2}}) where {C1,C2,E1,E2} = Polynomial{Base.promote_type(C1,C2),Base.promote_type(E1,E2)}
+
+function Base.:(==)(p::Polynomial, q::Polynomial)
+    a,b = promote(p,q)
+    return a == b
+end
+
+Base.:^(p::Polynomial, i::Integer) = p^(Int64(i))
