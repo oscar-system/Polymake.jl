@@ -66,7 +66,7 @@ function Base.show(io::IO,::MIME"text/html",v::Visual)
     print(io,_get_visual_string_threejs(v))
 end
 
-function Base.show(io::IO,::MIME"text/svg+xml",v::Visual)
+function Base.show(io::IO,::MIME"image/svg+xml",v::Visual)
     print(io,_get_visual_string_svg(v))
 end
 
