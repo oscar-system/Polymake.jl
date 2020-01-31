@@ -19,6 +19,7 @@ end
 convert(::Type{Set{T}}, itr::AbstractArray) where T = Set{T}(itr)
 
 convert(::Type{<:Polynomial{C,E}}, itr::Polynomial) where {C,E} = Polynomial{C,E}(itr)
+convert(::Type{<:Polynomial{C,E}}, itr::Number) where {C,E} = Polynomial{C,E}(itr)
 
 ###########  Converting to objects polymake understands  ###############
 
