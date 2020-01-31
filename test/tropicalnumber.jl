@@ -1,0 +1,159 @@
+@testset "Polymake.TropicalNumber" begin
+    NumberTypes = [Int32, Int64, UInt64, BigInt, Float32, Float64, BigFloat, Polymake.Integer, Polymake.Rational]
+    AdditionTypes = [Polymake.Min, Polymake.Max]
+
+    @testset "Constructors/Conversions" begin
+        for T in [NumberTypes; Polymake.TropicalNumber{Polymake.Min}; Polymake.TropicalNumber{Polymake.Max}]
+            @test_throws ArgumentError Polymake.TropicalNumber(T(2))
+        end
+
+        for A in AdditionTypes
+            # constructors
+            for T in [NumberTypes; Polymake.TropicalNumber{Polymake.Min}; Polymake.TropicalNumber{Polymake.Max}]
+                @test Polymake.TropicalNumber{A}(T(1)) isa Polymake.TropicalNumber
+                @test Polymake.TropicalNumber{A}(T(1)) isa Polymake.TropicalNumber{A}
+            end
+
+            a = Polymake.TropicalNumber{A}(5)
+
+            # no copy conversion:
+            @test convert(Polymake.TropicalNumber{A}, a) === a
+
+            for R in [Base.Rational{Polymake.Int}, Polymake.Rational]
+              r = R(1//3)
+              @test convert(Polymake.TropicalNumber{Polymake.Max}, r) isa Polymake.TropicalNumber
+              tr = convert(Polymake.TropicalNumber{Polymake.Max}, r)
+              @test convert(R, tr) isa R
+              @test convert(R, tr) == r
+            end
+
+            # julia arrays
+            @test Array{Any,1}([a,1])[1] isa Polymake.TropicalNumberAllocated
+            @test [a,a] isa Vector{Polymake.TropicalNumberAllocated{A,Polymake.Rational}}
+        end
+    end
+
+    @testset "Arithmetic" begin
+
+        for A in AdditionTypes
+            @testset "(In-)Equality $A" begin
+                a = Polymake.TropicalNumber{A}(Polymake.Rational(5))
+                for T in [NumberTypes; Polymake.TropicalNumber{Polymake.Min}; Polymake.TropicalNumber{Polymake.Max}]
+                    b = Polymake.TropicalNumber{A}(T(5))
+                    @test a == b
+                    @test b == a
+                end
+                b = Polymake.TropicalNumber{A}(17)
+                @test a == a
+                @test a <= a
+                @test a >= a
+                @test a != b
+                @test a <= b
+                @test a < b
+                @test b >= a
+                @test b > a
+            end
+
+            @testset "Multiplication $A" begin
+                a = Polymake.TropicalNumber{A}(5)
+                b = Polymake.TropicalNumber{A}(17)
+                @test a * b isa Polymake.TropicalNumber{A}
+                @test a * b == b * a == Polymake.TropicalNumber{A}(22)
+                a *= b
+                @test a == Polymake.TropicalNumber{A}(22)
+            end
+
+            @testset "Division $A" begin
+                a = Polymake.TropicalNumber{A}(5)
+                b = Polymake.TropicalNumber{A}(17)
+                @test a // b isa Polymake.TropicalNumber{A}
+                @test a // b == Polymake.TropicalNumber{A}(-12)
+                @test b // a == Polymake.TropicalNumber{A}(12)
+                @test a / b isa Polymake.TropicalNumber{A}
+                @test a / b == Polymake.TropicalNumber{A}(-12)
+                @test b / a == Polymake.TropicalNumber{A}(12)
+                a //= b
+                @test a == Polymake.TropicalNumber{A}(-12)
+                a /= b
+                @test a == Polymake.TropicalNumber{A}(-29)
+            end
+        end
+
+        @testset "Addition" begin
+            a = Polymake.TropicalNumber{Polymake.Min}(5)
+            b = Polymake.TropicalNumber{Polymake.Min}(17)
+            c = Polymake.TropicalNumber{Polymake.Max}(5)
+            d = Polymake.TropicalNumber{Polymake.Max}(17)
+            @test a + b isa Polymake.TropicalNumber{Polymake.Min}
+            @test a + b == b + a == a
+            @test c + d isa Polymake.TropicalNumber{Polymake.Max}
+            @test c + d == d + c == d
+            a += b
+            @test a == Polymake.TropicalNumber{Polymake.Min}(5)
+            b += a
+            @test b == a
+            d += c
+            @test d == Polymake.TropicalNumber{Polymake.Max}(17)
+            c += d
+            @test c == d
+        end
+
+        @testset "Catching mismatching parameters" begin
+            a = Polymake.TropicalNumber{Polymake.Min}(5)
+            b = Polymake.TropicalNumber{Polymake.Max}(17)
+            @test_throws DomainError a + b
+            @test_throws DomainError b + a
+            @test_throws DomainError a * b
+            @test_throws DomainError b * a
+            @test_throws DomainError a // b
+            @test_throws DomainError b // a
+            @test_throws DomainError a / b
+            @test_throws DomainError b / a
+            @test_throws DomainError a < b
+            @test_throws DomainError b < a
+            @test_throws DomainError a > b
+            @test_throws DomainError b > a
+        end
+    end
+
+    @testset "zero / one" begin
+        ZEROmin = Polymake.TropicalNumber{Polymake.Min}()
+        ONEmin = Polymake.TropicalNumber{Polymake.Min}(0)
+        DZEROmin = Polymake.TropicalNumber{Polymake.Min}(-Inf)
+        ZEROmax = Polymake.TropicalNumber{Polymake.Max}()
+        ONEmax = Polymake.TropicalNumber{Polymake.Max}(0)
+        DZEROmax = Polymake.TropicalNumber{Polymake.Max}(Inf)
+
+        @test one(ZEROmin) isa Polymake.TropicalNumber{Polymake.Min}
+        @test zero(ZEROmin) isa Polymake.TropicalNumber{Polymake.Min}
+        @test dual_zero(ZEROmin) isa Polymake.TropicalNumber{Polymake.Min}
+        @test one(Polymake.TropicalNumber{Polymake.Min}) isa Polymake.TropicalNumber{Polymake.Min}
+        @test zero(Polymake.TropicalNumber{Polymake.Min}) isa Polymake.TropicalNumber{Polymake.Min}
+        @test dual_zero(Polymake.TropicalNumber{Polymake.Min}) isa Polymake.TropicalNumber{Polymake.Min}
+        @test one(ZEROmax) isa Polymake.TropicalNumber{Polymake.Max}
+        @test zero(ZEROmax) isa Polymake.TropicalNumber{Polymake.Max}
+        @test dual_zero(ZEROmax) isa Polymake.TropicalNumber{Polymake.Max}
+        @test one(Polymake.TropicalNumber{Polymake.Max}) isa Polymake.TropicalNumber{Polymake.Max}
+        @test zero(Polymake.TropicalNumber{Polymake.Max}) isa Polymake.TropicalNumber{Polymake.Max}
+        @test dual_zero(Polymake.TropicalNumber{Polymake.Max}) isa Polymake.TropicalNumber{Polymake.Max}
+
+        @test zero(Polymake.TropicalNumber{Polymake.Min}) == zero(ONEmin) == ZEROmin
+        @test dual_zero(Polymake.TropicalNumber{Polymake.Min}) == dual_zero(ONEmin) == Polymake.TropicalNumber{Polymake.Min}(-Inf)
+        @test one(Polymake.TropicalNumber{Polymake.Min}) == one(ZEROmin) == ONEmin
+        @test zero(Polymake.TropicalNumber{Polymake.Max}) == zero(ONEmax) == ZEROmax
+        @test dual_zero(Polymake.TropicalNumber{Polymake.Max}) == dual_zero(ONEmax) == Polymake.TropicalNumber{Polymake.Max}(Inf)
+        @test one(Polymake.TropicalNumber{Polymake.Max}) == one(ZEROmax) == ONEmax
+
+        @test orientation(Polymake.TropicalNumber{Polymake.Min}) == orientation(ZEROmin) == -orientation(Polymake.TropicalNumber{Polymake.Max}) == - orientation(ZEROmax) == 1
+    end
+
+    @testset "Promotion (equality)" begin
+        for A in AdditionTypes
+            for T in NumberTypes
+                a = Polymake.TropicalNumber{A}(5)
+                @test a == T(5)
+                @test T(5) == a
+            end
+        end
+    end
+end

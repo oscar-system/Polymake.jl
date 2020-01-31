@@ -12,11 +12,13 @@
 
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
+#include <polymake/SparseMatrix.h>
 #include <polymake/Vector.h>
 #include <polymake/Set.h>
 #include <polymake/Array.h>
 #include <polymake/Rational.h>
 #include <polymake/QuadraticExtension.h>
+#include <polymake/TropicalNumber.h>
 #include <polymake/polytope/solve_LP.h>
 #include <polymake/SparseVector.h>
 

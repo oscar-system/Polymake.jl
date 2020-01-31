@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_perl_objects.h"
+#include "polymake_bigobjects.h"
 
 #include "polymake_integers.h"
 
@@ -18,7 +18,13 @@
 
 #include "polymake_arrays.h"
 
+#include "polymake_incidencematrix.h"
+
+#include "polymake_sparsematrix.h"
+
 #include "polymake_sparsevector.h"
+
+#include "polymake_tropicalnumber.h"
 
 #include "polymake_caller.h"
 
@@ -32,7 +38,7 @@ Polymake_Data data{nullptr, nullptr};
 
 JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 {
-    polymake_module_add_perl_object(polymake);
+    polymake_module_add_bigobject(polymake);
 
     polymake_module_add_integer(polymake);
 
@@ -40,13 +46,19 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_matrix(polymake);
 
+    polymake_module_add_sparsematrix(polymake);
+
+    polymake_module_add_sparsevector(polymake);
+
     polymake_module_add_vector(polymake);
 
     polymake_module_add_set(polymake);
 
     polymake_module_add_array(polymake);
 
-    polymake_module_add_sparsevector(polymake);
+    polymake_module_add_incidencematrix(polymake);
+
+    polymake_module_add_tropicalnumber(polymake);
 
     polymake_module_add_direct_calls(polymake);
 
@@ -64,7 +76,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         std::vector<std::string> props = std::get<2>(res);
         jl_value_t**             output = new jl_value_t*[props.size() + 1];
         output[0] = jl_box_int64(std::get<0>(res));
-        for (int i = 0; i < props.size(); ++i)
+        for (size_t i = 0; i < props.size(); ++i)
             output[i + 1] = jl_cstr_to_string(props[i].c_str());
         return jlcxx::make_julia_array(output, props.size() + 1);
     });
@@ -74,7 +86,14 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         bool full=false, bool html=false){
         std::vector<std::string> ctx_help =
             data.main_polymake_session->shell_context_help(input, pos, full, html);
-        return jlcxx::make_julia_array(&ctx_help[0], ctx_help.size());
+        jlcxx::Array<std::string> jlarr;
+        for (const auto& s : ctx_help)
+            jlarr.push_back(s);
+        return jlarr;
+    });
+
+    polymake.method("set_preference", [](const std::string x) {
+        return data.main_polymake_session->set_preference(x);
     });
 
 #include "generated/map_inserts.h"

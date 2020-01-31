@@ -13,7 +13,7 @@ void initialize_polymake(bool interactive = true)
             data.main_polymake_session = new polymake::Main;
             data.main_polymake_session->shell_enable();
             data.main_polymake_session->set_interrupt_signal(SIGINT);
-            data.main_polymake_scope = new polymake::perl::Scope(
+            data.main_polymake_scope = new polymake::Scope(
                 data.main_polymake_session->newScope());
             if (interactive){
                 std::cout << data.main_polymake_session->greeting() << std::endl;
@@ -25,9 +25,9 @@ void initialize_polymake(bool interactive = true)
     }
 }
 
-pm::perl::Object to_perl_object(const pm::perl::PropertyValue& v)
+pm::perl::BigObject to_bigobject(const pm::perl::PropertyValue& v)
 {
-    pm::perl::Object obj;
+    pm::perl::BigObject obj;
     v >> obj;
     return v;
 }
@@ -46,7 +46,7 @@ std::string typeinfo_helper(const pm::perl::PropertyValue& p, bool demangle)
         // primitives
         case PropertyValueHelper::number_is_zero:
         case PropertyValueHelper::number_is_int:
-            return "int";
+            return "Int";
         case PropertyValueHelper::number_is_float:
             return "double";
 
@@ -62,9 +62,9 @@ std::string typeinfo_helper(const pm::perl::PropertyValue& p, bool demangle)
                     return call_function("classify_perl_pv", p);
                 }
                 // demangle:
-                int                                    status = -1;
+                int status = -1;
                 std::unique_ptr<char, void (*)(void*)> res{
-                    abi::__cxa_demangle(ti->name(), NULL, NULL, &status),
+                    abi::__cxa_demangle(ti->name(), nullptr, nullptr, &status),
                     std::free};
                 return (status == 0 && demangle) ? res.get() : ti->name();
             }

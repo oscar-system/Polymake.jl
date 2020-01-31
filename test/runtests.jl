@@ -24,7 +24,10 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("matrices.jl")
     include("sets.jl")
     include("arrays.jl")
+    include("incidencematrix.jl")
     include("convert.jl")
     include("perlobj.jl")
     include("interface_functions.jl")
+    include("sparsematrix.jl")
+    include("tropicalnumber.jl")
 end

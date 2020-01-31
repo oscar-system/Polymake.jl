@@ -17,36 +17,28 @@ void polymake_module_add_integer(jlcxx::Module& polymake)
 {
 
     polymake
-        .add_type<pm::Integer>("pm_Integer",
+        .add_type<pm::Integer>("Integer",
                                jlcxx::julia_type("Integer", "Base"))
-        .constructor<int32_t>()
         .constructor<int64_t>()
         .method("==", [](pm::Integer& a, pm::Integer& b) { return a == b; })
         .method("==", [](pm::Integer& a,
-                         int64_t b) { return a == static_cast<long>(b); })
-        .method("==", [](pm::Integer& a, int32_t b) { return a == b; })
+                         int64_t b) { return a == static_cast<pm::Int>(b); })
         .method("==",
                 [](int64_t a, pm::Integer& b) {
-                    return static_cast<long>(a) == b;
+                    return static_cast<pm::Int>(a) == b;
                 })
-        .method("==", [](int32_t a, pm::Integer& b) { return a == b; })
         .method("<", [](pm::Integer& a, pm::Integer& b) { return a < b; })
         .method("<", [](pm::Integer& a,
-                        int64_t      b) { return a < static_cast<long>(b); })
-        .method("<", [](pm::Integer& a, int32_t b) { return a < b; })
+                        int64_t      b) { return a < static_cast<pm::Int>(b); })
         .method("<", [](int64_t      a,
-                        pm::Integer& b) { return static_cast<long>(a) < b; })
-        .method("<", [](int32_t      a,
-                        pm::Integer& b) { return static_cast<long>(a) < b; })
+                        pm::Integer& b) { return static_cast<pm::Int>(a) < b; })
         .method("<=", [](pm::Integer& a, pm::Integer& b) { return a <= b; })
         .method("<=", [](pm::Integer& a,
-                         int64_t b) { return a <= static_cast<long>(b); })
-        .method("<=", [](pm::Integer& a, int32_t b) { return a <= b; })
+                         int64_t b) { return a <= static_cast<pm::Int>(b); })
         .method("<=",
                 [](int64_t a, pm::Integer& b) {
-                    return static_cast<long>(a) <= b;
+                    return static_cast<pm::Int>(a) <= b;
                 })
-        .method("<=", [](int32_t a, pm::Integer& b) { return a <= b; })
 
         .method("show_small_obj",
                 [](pm::Integer& i) {
@@ -57,52 +49,42 @@ void polymake_module_add_integer(jlcxx::Module& polymake)
         // the symmetric definitions are on the julia side
         .method("+", [](pm::Integer& a, pm::Integer& b) { return a + b; })
         .method("+", [](pm::Integer& a,
-                        int64_t      b) { return a + static_cast<long>(b); })
-        .method("+", [](pm::Integer& a, int32_t b) { return a + b; })
+                        int64_t      b) { return a + static_cast<pm::Int>(b); })
         .method("+", [](int64_t      a,
-                        pm::Integer& b) { return static_cast<long>(a) + b; })
-        .method("+", [](int32_t a, pm::Integer& b) { return a + b; })
+                        pm::Integer& b) { return static_cast<pm::Int>(a) + b; })
 
         .method("*", [](pm::Integer& a, pm::Integer& b) { return a * b; })
         .method("*", [](pm::Integer& a,
-                        int64_t      b) { return a * static_cast<long>(b); })
-        .method("*", [](pm::Integer& a, int32_t b) { return a * b; })
+                        int64_t      b) { return a * static_cast<pm::Int>(b); })
         .method("*", [](int64_t      a,
-                        pm::Integer& b) { return static_cast<long>(a) * b; })
-        .method("*", [](int32_t a, pm::Integer& b) { return a * b; })
+                        pm::Integer& b) { return static_cast<pm::Int>(a) * b; })
 
         .method("-", [](pm::Integer& a, pm::Integer& b) { return a - b; })
         .method("-", [](pm::Integer& a,
-                        int64_t      b) { return a - static_cast<long>(b); })
-        .method("-", [](pm::Integer& a, int32_t b) { return a - b; })
+                        int64_t      b) { return a - static_cast<pm::Int>(b); })
         .method("-", [](int64_t      a,
-                        pm::Integer& b) { return static_cast<long>(a) - b; })
-        .method("-", [](int32_t a, pm::Integer& b) { return a - b; })
+                        pm::Integer& b) { return static_cast<pm::Int>(a) - b; })
         // unary minus
         .method("-", [](pm::Integer& a) { return -a; })
 
         .method("div", [](pm::Integer& a, pm::Integer& b) { return a / b; })
         .method("div", [](pm::Integer& a,
-                          int64_t b) { return a / static_cast<long>(b); })
-        .method("div", [](pm::Integer& a, int32_t b) { return a / b; })
+                          int64_t b) { return a / static_cast<pm::Int>(b); })
         .method("div",
                 [](int64_t a, pm::Integer& b) {
-                    return static_cast<long>(a) / b;
+                    return static_cast<pm::Int>(a) / b;
                 })
-        .method("div", [](int32_t a, pm::Integer& b) { return a / b; })
 
         .method("rem", [](pm::Integer& a, pm::Integer& b) { return a % b; })
         .method("rem", [](pm::Integer& a,
-                          int64_t b) { return a % static_cast<long>(b); })
-        .method("rem", [](pm::Integer& a, int32_t b) { return a % b; })
+                          int64_t b) { return a % static_cast<pm::Int>(b); })
         .method("rem",
                 [](int64_t a, pm::Integer& b) {
-                    return static_cast<long>(a) % b;
-                })
-        .method("rem", [](int32_t a, pm::Integer& b) { return a % b; });
+                    return static_cast<pm::Int>(a) % b;
+                });
 
-    polymake.method("new_pm_Integer_from_bigint", new_integer_from_bigint);
-    polymake.method("to_pm_Integer", [](pm::perl::PropertyValue pv) {
+    polymake.method("new_integer_from_bigint", new_integer_from_bigint);
+    polymake.method("to_integer", [](pm::perl::PropertyValue pv) {
         return to_SmallObject<pm::Integer>(pv);
     });
 }

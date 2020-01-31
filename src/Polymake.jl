@@ -1,14 +1,12 @@
 module Polymake
 
-export pm_Integer, pm_Rational,
-    pm_perl_Object, pm_perl_PropertyValue,
-    pm_Set, pm_Vector, pm_Array, pm_Matrix,
-    pm_SparseVector,
-    PolymakeError, application
+export BigObject, PropertyValue,
+       PolymakeError, application, dual_zero, orientation,
+       prefer
 
 
 # We need to import all functions which will be extended on the Cxx side
-import Base: ==, <, <=, *, -, +, //, div, rem,
+import Base: ==, <, <=, *, -, +, //, div, rem, one, zero,
     append!, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty,
     length, numerator, push!, resize!,
@@ -16,9 +14,12 @@ import Base: ==, <, <=, *, -, +, //, div, rem,
     union, union!
 
 using SparseArrays
+import SparseArrays: AbstractSparseMatrix, findnz
 
 using CxxWrap
 import Libdl.dlext
+
+import SparseArrays
 
 struct PolymakeError <: Exception
     msg
@@ -100,9 +101,12 @@ include("rationals.jl")
 include("sets.jl")
 include("vectors.jl")
 include("matrices.jl")
+include("sparsematrix.jl")
+include("sparsevector.jl")
 include("broadcast.jl")
 include("arrays.jl")
-include("sparsevector.jl")
+include("incidencematrix.jl")
+include("tropicalnumber.jl")
 
 include("polymake_direct_calls.jl")
 

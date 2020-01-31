@@ -10,7 +10,7 @@ void polymake_module_add_sparsevector(jlcxx::Module& polymake)
 {
     polymake
     .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>, jlcxx::ParameterList<jlcxx::TypeVar<1>,int>>(
-        "pm_SparseVector", jlcxx::julia_type("AbstractSparseVector", "SparseArrays"))
+        "SparseVector", jlcxx::julia_type("AbstractSparseVector", "SparseArrays"))
         .apply_combination<pm::SparseVector, pm_VecOrMat_supported::value_type>(
             [](auto wrapped) {
                     typedef typename decltype(wrapped)::type vecType;
@@ -34,11 +34,11 @@ void polymake_module_add_sparsevector(jlcxx::Module& polymake)
                         return show_small_object<vecType>(S);
                     });
             });
-    polymake.method("to_pm_sparsevector_Rational",
+    polymake.method("to_pm_sparsevector_rational",
         [](pm::perl::PropertyValue pv) {
             return to_SmallObject<pm::SparseVector<pm::Rational>>(pv);
     });
-    polymake.method("to_pm_sparsevector_Integer",
+    polymake.method("to_pm_sparsevector_integer",
         [](pm::perl::PropertyValue pv) {
             return to_SmallObject<pm::SparseVector<pm::Integer>>(pv);
     });

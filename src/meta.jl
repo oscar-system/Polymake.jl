@@ -1,7 +1,7 @@
 module Meta
 import JSON
 import Polymake: appname_module_dict, module_appname_dict, shell_context_help
-import Polymake: pm_Rational, PolymakeType
+import Polymake: Rational, PolymakeType
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
@@ -12,7 +12,7 @@ end
 
 function polymake_arguments(args...; kwargs...)
     isempty(kwargs) && return Any[ convert.(PolymakeType, args)... ]
-    return Any[ convert.(PolymakeType, args); pm_perl_OptionSet(kwargs) ]
+    return Any[ convert.(PolymakeType, args); OptionSet(kwargs) ]
 end
 
 function get_docs(input::AbstractString; full::Bool=true, html::Bool=false)
@@ -26,11 +26,11 @@ function pm_name_qualified(app_name, func_name, templates=String[])
 end
 
 translate_type_to_pm_string(::Type{Bool}) = "bool"
-translate_type_to_pm_string(::Type{Int32}) = "int"
+translate_type_to_pm_string(::Type{Int64}) = "pm::Int"
 translate_type_to_pm_string(::Type{<:AbstractFloat}) = "Float"
 translate_type_to_pm_string(::Type{<:Rational}) = "Rational"
-translate_type_to_pm_string(::Type{<:pm_Rational}) = "Rational"
-translate_type_to_pm_string(::Type{<:Integer}) = "Integer"
+translate_type_to_pm_string(::Type{<:Base.Rational}) = "Rational"
+translate_type_to_pm_string(::Type{<:Base.Integer}) = "Integer"
 translate_type_to_pm_string(::typeof(min)) = "Min"
 translate_type_to_pm_string(::typeof(max)) = "Max"
 
@@ -276,7 +276,7 @@ function jl_code(pf::PolymakeFunction)
         end;
         function $(Base.Docs).getdoc(::typeof($(jl_symbol(pf))))
             docstrs = get_docs($func_name, full=true)
-            return Markdown.parse(join(docstrs, "\n\n---\n\n"))
+            return PolymakeDocstring(join(docstrs, "\n\n---\n\n"))
         end;
         export $(jl_symbol(pf));
     end
@@ -286,7 +286,7 @@ function jl_code(pf::PolymakeMethod)
     func_name = pm_name(pf)
 
     return quote
-        function $(jl_symbol(pf))(object::pm_perl_Object, args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
+        function $(jl_symbol(pf))(object::BigObject, args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
             if call_as_void
                 $(callable_void(pf))($func_name, object, polymake_arguments(args...; kwargs...))
                 return nothing
@@ -308,7 +308,7 @@ function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String)
     return quote
         function $(jl_name)(args...; kwargs...)
             # name created at compile-time
-            return perlobj($(pm_name_qualified(app_name, pm_name)),
+            return bigobj($(pm_name_qualified(app_name, pm_name)),
                 args..., kwargs...)
         end
     end
@@ -320,7 +320,7 @@ function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String, temp
             Ts = translate_type_to_pm_string.([$(templates...)])
             # name created at run-time
             pm_full_name = pm_name_qualified($(app_name), $(pm_name), Ts)
-            return perlobj(pm_full_name, args..., kwargs...)
+            return bigobj(pm_full_name, args..., kwargs...)
         end
     end
 end
@@ -360,17 +360,21 @@ function jl_code(obj::PolymakeObject)
 
     return quote
         $struct_def;
-        Base.Docs.getdoc(::Type{$(jl_symbol(obj))}) = Markdown.parse($(docstring(obj)))
+        Base.Docs.getdoc(::Type{$(jl_symbol(obj))}) = PolymakeDocstring($(docstring(obj)))
     end
 end
+
+struct PolymakeDocstring
+    s::String
+end
+# if someone wants to implement something prettier, overload this
+Base.show(io::IO, doc::PolymakeDocstring) = print(io, doc.s)
 
 module_imports() = quote
     import Polymake: convert_from_property_value,
     internal_call_function, internal_call_method,
-    internal_call_function_void, internal_call_method_void,
-    perlobj, pm_perl_Object;
-    import Polymake.Meta: pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
-    import Markdown;
+    bigobj, BigObject, OptionSet
+    import Polymake.Meta: PolymakeDocstring, pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
 end
 
 function jl_code(pa::PolymakeApp)
