@@ -44,7 +44,7 @@ void polymake_module_add_sparsevector(jlcxx::Module& polymake)
     });
     polymake.method("to_sparsevector_int",
         [](pm::perl::PropertyValue pv) {
-            return to_SmallObject<pm::SparseVector<int>>(pv);
+            return to_SmallObject<pm::SparseVector<pm::Int>>(pv);
     });
     polymake.method("to_sparsevector_double",
         [](pm::perl::PropertyValue pv) {

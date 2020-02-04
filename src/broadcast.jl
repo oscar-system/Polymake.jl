@@ -44,7 +44,7 @@ Base.similar(X::Union{SparseVector, SparseMatrix}, ::Type{S}, dims::Dims{2}) whe
 
 Base.BroadcastStyle(::Type{<:Vector}) = Broadcast.ArrayStyle{Vector}()
 Base.BroadcastStyle(::Type{<:Matrix}) = Broadcast.ArrayStyle{Matrix}()
-Base.BroadcastStyle(::Type{<:SparseVector}) = Broadcast.ArrayStyle{SparseMatrix}()
+Base.BroadcastStyle(::Type{<:SparseVector}) = Broadcast.ArrayStyle{SparseVector}()
 Base.BroadcastStyle(::Type{<:SparseMatrix}) = Broadcast.ArrayStyle{SparseMatrix}()
 Base.BroadcastStyle(::Type{<:IncidenceMatrix}) = Broadcast.ArrayStyle{IncidenceMatrix{NonSymmetric}}()
 
@@ -72,7 +72,7 @@ end
 #Overloading some of julia's broadcast functions to allow correct typing when
 #broadcasting julia sparse matrices with polymake element type output
 SparseVecOrMat{T} =
-Union{SparseVector{T},SparseArrays.AbstractSparseMatrix{T}}
+Union{SparseArrays.SparseVector{T},SparseArrays.AbstractSparseMatrix{T}}
 
 function Base.Broadcast.combine_eltypes(f::Tf,
 args::Tuple{SparseVecOrMat{ElType},N}) where {N, Tf, ElType<:Union{Integer,

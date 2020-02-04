@@ -24,6 +24,9 @@ end
 function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
     print(io, show_small_obj(obj))
 end
+function Base.show(io::IOContext, ::MIME"text/plain", obj::SmallObject)
+    print(io, show_small_obj(obj))
+end
 # fallback for non-wrapped types
 function Base.show(io::IO, ::MIME"text/plain", pv::PropertyValue)
     type_info = typeinfo_string(pv, true)
@@ -37,6 +40,7 @@ function Base.show(io::IO, ::MIME"text/plain", a::Array{BigObject})
     print(io, "Array{BigObject} of size ",length(a))
 end
 Base.show(io::IO, obj::SmallObject) = show(io, MIME("text/plain"), obj)
+Base.show(io::IOContext, obj::SmallObject) = show(io, MIME("text/plain"), obj)
 
 struct Visual
     obj::Polymake.PropertyValue

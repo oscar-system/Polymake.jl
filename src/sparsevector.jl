@@ -26,18 +26,18 @@ end
 end
 
 SparseVector(vec::AbstractVector{Int64}) = SparseVector{Int64}(vec)
-SparseVector(vec::AbstractVector{T}) where T <: Integer = SparseVector{Integer}(vec)
-SparseVector(vec::AbstractVector{T}) where T <: Union{Rational, Rational} = SparseVector{Rational}(vec)
+SparseVector(vec::AbstractVector{T}) where T <: Base.Integer = SparseVector{Integer}(vec)
+SparseVector(vec::AbstractVector{T}) where T <: Union{Base.Rational, Rational} = SparseVector{Rational}(vec)
 SparseVector(vec::AbstractVector{T}) where T <: AbstractFloat = SparseVector{Float64}(vec)
 
 Base.size(v::SparseVector) = (Int(length(v)),)
 
-Base.@propagate_inbounds function Base.getindex(V::SparseVector, n::Integer)
+Base.@propagate_inbounds function Base.getindex(V::SparseVector, n::Base.Integer)
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
     return _getindex(V, convert(Int64, n))
 end
 
-Base.@propagate_inbounds function Base.setindex!(V::SparseVector{T}, val, n::Integer) where T
+Base.@propagate_inbounds function Base.setindex!(V::SparseVector{T}, val, n::Base.Integer) where T
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))
     _setindex!(V, convert(T, val), convert(Int64, n))
     return val
