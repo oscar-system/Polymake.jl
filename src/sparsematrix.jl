@@ -36,8 +36,8 @@ SparseMatrix(mat::AbstractMatrix{T}) where T <: Union{Base.Rational, Rational} =
 SparseMatrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = SparseMatrix{Float64}(mat)
 
 SparseMatrix(mat::M) where M <: SparseMatrix{Float64} = mat
+Base.size(m::SparseMatrix) = (nrows(m), ncols(m))
 
-Base.size(m::SparseMatrix) = (Int(rows(m)), Int(cols(m)))
 
 Base.@propagate_inbounds function Base.getindex(M::SparseMatrix , i::Base.Integer, j::Base.Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))

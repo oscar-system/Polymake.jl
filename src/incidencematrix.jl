@@ -44,7 +44,8 @@ end
 # set default parameter to NonSymmetric
 IncidenceMatrix(x...) = IncidenceMatrix{NonSymmetric}(x...)
 
-Base.size(m::IncidenceMatrix) = (rows(m), cols(m))
+Base.size(m::IncidenceMatrix) = (nrows(m), ncols(m))
+
 
 Base.@propagate_inbounds function Base.getindex(M::IncidenceMatrix , i::Base.Integer, j::Base.Integer)
     @boundscheck checkbounds(M, i, j)

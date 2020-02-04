@@ -12,8 +12,8 @@ Matrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = Matrix{Float64}(mat)
 
 # no-copy constructor for Matrix{Float64} (it's stored as a continuous block)
 Matrix(mat::M) where M <: Matrix{Float64} = mat
+Base.size(m::Matrix) = (nrows(m), ncols(m))
 
-Base.size(m::Matrix) = (Int(rows(m)), Int(cols(m)))
 
 Base.@propagate_inbounds function Base.getindex(M::Matrix , i::Base.Integer, j::Base.Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
