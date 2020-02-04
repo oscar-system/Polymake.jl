@@ -6,10 +6,14 @@
 
 #include "polymake_tropicalnumber.h"
 
+template<> struct jlcxx::IsMirroredType<pm::Max> : std::false_type { };
+template<> struct jlcxx::IsMirroredType<pm::Min> : std::false_type { };
+
 void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
 {
     polymake.add_type<pm::Max>("Max");
     polymake.add_type<pm::Min>("Min");
+
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
             "TropicalNumber", jlcxx::julia_type("Number", "Base"))

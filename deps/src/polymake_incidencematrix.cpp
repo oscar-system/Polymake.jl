@@ -6,6 +6,9 @@
 
 #include "polymake_incidencematrix.h"
 
+template<> struct jlcxx::IsMirroredType<pm::NonSymmetric> : std::false_type { };
+template<> struct jlcxx::IsMirroredType<pm::Symmetric> : std::false_type { };
+
 void polymake_module_add_incidencematrix(jlcxx::Module& polymake)
 {
     polymake.add_type<pm::NonSymmetric>("NonSymmetric");

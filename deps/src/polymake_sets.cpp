@@ -6,6 +6,8 @@
 
 #include "polymake_sets.h"
 
+template<> struct jlcxx::IsMirroredType<pm::operations::cmp> : std::false_type { };
+
 void polymake_module_add_set(jlcxx::Module& polymake)
 {
     polymake.add_type<pm::operations::cmp>("operations_cmp");
