@@ -33,29 +33,22 @@ end
     return sm
 end
 
-# we can't use convert_to_pm_type(T) below:
-# only types in Matrix_suppT are available
-SparseMatrix(mat::AbstractMatrix{Int64}) = SparseMatrix{Int64}(mat)
-SparseMatrix(mat::AbstractMatrix{T}) where T <: Base.Integer = SparseMatrix{Integer}(mat)
-SparseMatrix(mat::AbstractMatrix{T}) where T <: Union{Base.Rational, Rational} = SparseMatrix{Rational}(mat)
-SparseMatrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = SparseMatrix{Float64}(mat)
+SparseMatrix(mat::AbstractMatrix{T}) where T =
+    SparseMatrix{promote_to_pm_type(SparseMatrix, T)}(mat)
 
-SparseMatrix(mat::M) where M <: SparseMatrix{Float64} = mat
 Base.size(m::SparseMatrix) = (nrows(m), ncols(m))
 
 Base.eltype(m::SparseMatrix{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(M::SparseMatrix , i::Base.Integer, j::Base.Integer)
-    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck checkbounds(M, i, j)
     return _getindex(M, convert(Int64, i), convert(Int64, j))
 end
 
 Base.@propagate_inbounds function Base.setindex!(M::SparseMatrix{T}, val, i::Base.Integer, j::Base.Integer) where T
-    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck checkbounds(M, i, j)
     _setindex!(M, convert(T, val), convert(Int64, i), convert(Int64, j))
-    return val
+    return M
 end
 
 function SparseArrays.findnz(mat::SparseMatrix{T}) where T <: VecOrMat_eltypes
