@@ -1,5 +1,10 @@
-@inline function Vector{T}(vec::AbstractVector) where T <: VecOrMat_eltypes
-    res = Vector{T}(size(vec)...)
+function Vector{T}(::UndefInitializer, n::Base.Integer) where
+    T <: VecOrMat_eltypes
+    return Vector{to_cxx_type(T)}(convert(Int64, n))
+end
+
+function Vector{T}(vec::AbstractVector) where T
+    res = Vector{T}(undef, size(vec)...)
     @inbounds res .= vec
     return res
 end
@@ -10,7 +15,9 @@ Vector(vec::AbstractVector{T}) where T <: Base.Integer = Vector{promote_type(T,I
 Vector(vec::AbstractVector{T}) where T <: Union{Base.Rational, Rational} = Vector{Rational}(vec)
 Vector(vec::AbstractVector{T}) where T <: AbstractFloat = Vector{Float64}(vec)
 
-Base.size(v::Vector) = (Int(length(v)),)
+Base.size(v::Vector) = (length(v),)
+
+Base.eltype(v::Vector{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(V::Vector, n::Base.Integer)
     @boundscheck 1 <= n <= length(V) || throw(BoundsError(V, n))

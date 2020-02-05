@@ -1,10 +1,22 @@
-const Array_suppT = Union{Int64, Integer, Rational,
-                      String, AbstractString, Set{Int64},
-                      Array{Int64}, Array{Integer},
-                      Matrix{Integer}}
+const Array_suppT = Union{Int64, CxxWrap.CxxLong,
+                        Integer, Rational,
+                        String, CxxWrap.StdString,
+                        Set{Int64}, Set{CxxWrap.CxxLong},
+                        Array{Int64}, Array{CxxWrap.CxxLong},
+                        Array{Integer}, Matrix{Integer}}
 
-function Array{T}(vec::AbstractVector) where T <: Array_suppT
-    arr = Array{T}(length(vec))
+function Array{T}(::UndefInitializer, n::Base.Integer) where
+    T <: Array_suppT
+    return Array{to_cxx_type(T)}(convert(Int64, n))
+end
+
+function Array{T}(n::Base.Integer, elt) where T <: Array_suppT
+    S = to_cxx_type(T)
+    return Array{S}(convert(Int64, n), convert(S, elt))
+end
+
+function Array{T}(vec::AbstractVector) where T
+    arr = Array{T}(undef, length(vec))
     @inbounds arr .= vec
     return arr
 end
@@ -17,6 +29,7 @@ Array(vec::AbstractVector) = Array{convert_to_pm_type(eltype(vec))}(vec)
 ArrayAllocated{T}(v) where T = Array{T}(v)
 
 Base.size(a::Array) = (length(a),)
+Base.eltype(v::Array{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function getindex(A::Array, n::Base.Integer)
     @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))

@@ -1,5 +1,10 @@
-@inline function Matrix{T}(mat::AbstractMatrix) where T <: VecOrMat_eltypes
-    res = Matrix{T}(size(mat)...)
+function Matrix{T}(::UndefInitializer, m::Base.Integer, n::Base.Integer) where
+    T <:VecOrMat_eltypes
+    return Matrix{to_cxx_type(T)}(convert(Int64, m), convert(Int64,n))
+end
+
+function Matrix{T}(mat::AbstractMatrix) where T
+    res = Matrix{T}(undef, size(mat)...)
     @inbounds res .= mat
     return res
 end
@@ -14,6 +19,7 @@ Matrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = Matrix{Float64}(mat)
 Matrix(mat::M) where M <: Matrix{Float64} = mat
 Base.size(m::Matrix) = (nrows(m), ncols(m))
 
+Base.eltype(v::Matrix{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(M::Matrix , i::Base.Integer, j::Base.Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))

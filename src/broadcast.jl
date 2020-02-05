@@ -1,35 +1,48 @@
-function Matrix{T}(rows::UR, cols::UR) where {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
-    return Matrix{T}(length(rows), length(cols))
+function Vector{T}(len::UR) where
+    {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
+    return Vector{T}(undef, length(len))
 end
 
-function IncidenceMatrix{NonSymmetric}(rows::UR, cols::UR) where {UR<:Base.AbstractUnitRange}
-    return IncidenceMatrix{NonSymmetric}(length(rows), length(cols))
+function Matrix{T}(rows::UR, cols::UR) where
+    {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
+    return Matrix{T}(undef, length(rows), length(cols))
 end
 
-function Vector{T}(len::UR) where {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
-    return Vector{T}(length(len))
+function IncidenceMatrix{NonSymmetric}(rows::UR, cols::UR) where
+    UR<:Base.AbstractUnitRange
+    return IncidenceMatrix{NonSymmetric}(undef, length(rows), length(cols))
 end
 
 function SparseMatrix{T}(rows::UR, cols::UR) where {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
     return SparseMatrix{T}(length(rows), length(cols))
 end
 
-Base.similar(X::Union{Vector, Matrix, IncidenceMatrix}, ::Type{S}, dims::Dims{1}) where
-    {S <: VecOrMat_eltypes} = Vector{convert_to_pm_type(S)}(dims...)
+for (dim, T) in ((1, :Vector), (2, :Matrix))
+    @eval begin
+        function Base.similar(X::Union{Vector, Matrix, IncidenceMatrix},
+            ::Type{S}, dims::Dims{$dim}) where S <: VecOrMat_eltypes
+            return Polymake.$T{convert_to_pm_type(S)}(undef, dims...)
+        end
+        function Base.similar(X::Union{Vector, Matrix, IncidenceMatrix},
+            ::Type{S}, dims::Dims{$dim}) where S
+            return Base.$T{S}(undef, dims...)
+        end
+    end
+end
 
-Base.similar(X::Union{Vector, Matrix, IncidenceMatrix}, ::Type{S}, dims::Dims{1}) where {S} = Base.Vector{S}(dims...)
-
-Base.similar(X::Union{Vector, Matrix, IncidenceMatrix}, ::Type{S}, dims::Dims{2}) where
-    {S <: VecOrMat_eltypes} = Matrix{convert_to_pm_type(S)}(dims...)
-
-Base.similar(X::Union{Vector, Matrix, IncidenceMatrix}, ::Type{S}, dims::Dims{2}) where {S} = Base.Matrix{S}(dims...)
+function Base.similar(X::IncidenceMatrix,
+    ::Type{<:Union{Bool, CxxWrap.CxxBool}}, dims::Dims{1})
+    return BitArray{1}(undef, dims...)
+end
 
 Base.similar(X::IncidenceMatrix, ::Type{Bool}, dims::Dims{1}) = BitArray{1}(undef, dims...)
 
 Base.similar(X::IncidenceMatrix, ::Type{Bool}, dims::Dims{2}) = IncidenceMatrix{NonSymmetric}(dims...)
 
-Base.similar(X::SparseMatrix, ::Type{S}, dims::Dims{2}) where
-    {S <: VecOrMat_eltypes} = SparseMatrix{convert_to_pm_type(S)}(dims...)
+function Base.similar(X::SparseMatrix, ::Type{S},
+    dims::Dims{1}) where S <: VecOrMat_eltypes
+    return Vector{convert_to_pm_type(S)}(undef, dims...)
+end
 
 Base.similar(X::SparseMatrix, ::Type{S}, dims::Dims{2}) where {S} = SparseMatrixCSC{S}(dims...)
 
