@@ -44,9 +44,8 @@ end
 
 function call_function_feed_argument_if(juliatype, ctype)
     return """
-\tif (jl_subtype(current_type, POLYMAKETYPE_$juliatype)) {
+\telse if (jl_subtype(current_type, POLYMAKETYPE_$juliatype)) {
         function << *reinterpret_cast<$ctype*>(get_ptr_from_cxxwrap_obj(argument));
-        return;
     }"""
 end
 
@@ -63,26 +62,23 @@ void polymake_call_function_feed_argument(T& function, jl_value_t* argument)
         // check size of long, to be sure
         static_assert(sizeof(long) == 8, "long must be 64 bit");
         function << static_cast<long>(jl_unbox_int64(argument));
-        return;
-    }
-    if (jl_is_bool(argument)) {
+    } else if (jl_is_bool(argument)) {
         function << jl_unbox_bool(argument);
-        return;
-    }
-    if (jl_is_string(argument)) {
+    } else if (jl_is_string(argument)) {
         function << std::string(jl_string_data(argument));
-        return;
+    } $feeding_ifs
+    else {
+        std::cerr << "While feeding arguments: conversion failed with: jl_typeof=" << jl_typeof(argument) << std::endl;
     }
-$feeding_ifs
+    return;
 }
 """
 end
 
 function option_set_take_if(type_string, ctype)
     return """
-\tif (jl_subtype(current_type, POLYMAKETYPE_$type_string)) {
+\telse if (jl_subtype(current_type, POLYMAKETYPE_$type_string)) {
         optset[key] << *reinterpret_cast<$ctype*>(get_ptr_from_cxxwrap_obj(value));
-        return;
     }"""
 end
 
@@ -100,17 +96,15 @@ void option_set_take(pm::perl::OptionSet optset,
         // check size of long, to be sure
         static_assert(sizeof(long) == 8, "long must be 64 bit");
         optset[key] << static_cast<long>(jl_unbox_int64(value));
-        return;
-    }
-    if (jl_is_bool(value)) {
+    } else if (jl_is_bool(value)) {
         optset[key] << jl_unbox_bool(value);
-        return;
-    }
-    if (jl_is_string(value)) {
+    } else if (jl_is_string(value)) {
         optset[key] << std::string(jl_string_data(value));
-        return;
+    } $option_set_ifs
+    else {
+        std::cerr << "While constructing OpitonSet: conversion failed with: " << key << std::endl;
     }
-$option_set_ifs
+    return;
 }
 """
     return content

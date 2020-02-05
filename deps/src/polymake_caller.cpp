@@ -20,7 +20,7 @@ void set_julia_type(std::string name, void* type_address)
         address = (*type_map_translator)[name];
     }
     catch (std::exception& e) {
-        std::cerr << "This should never happen: " << name << std::endl;
+        std::cerr << "In 'set_julia_type': type translation failed for " << name << std::endl;
         return;
     }
     memcpy(address, &type_address, sizeof(jl_value_t*));
