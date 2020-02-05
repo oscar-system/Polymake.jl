@@ -274,7 +274,7 @@ function jl_code(pf::PolymakeFunction)
                 template_parameters=template_parameters, kwargs...)
         end;
         function $(Base.Docs).getdoc(::typeof($(jlfunc_name)))
-            docstrs = get_docs($func_name, full=true)
+            docstrs = get_docs($(pm_name_qualified(app, func_name)), full=true)
             return PolymakeDocstring(join(docstrs, "\n\n---\n\n"))
         end;
         export $(jlfunc_name);
