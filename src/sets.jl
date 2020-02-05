@@ -1,15 +1,15 @@
 export incl, swap
 
-const Set_suppT = Union{Int64}
+const Set_suppT = Union{Int64, CxxWrap.CxxLong}
 
 ### convert TO polymake object
-
-Set(v::Base.Vector{T}) where T<:Set_suppT = _new_set(v)
+Set{T}() where T<:Set_suppT = Set{to_cxx_type(T)}()
+Set{T}(v::Base.Vector{S}) where {S<:Set_suppT, T<:Set_suppT} = _new_set(v)
+Set{T}(n::Base.Integer) where T<:Set_suppT = scalar2set(T(n))
 Set{T}(s::Set{T}) where T<:Set_suppT = s
-Set{S}(n::Base.Integer) where S<:Set_suppT = scalar2set(S(n))
 
 Set{T}(v::S) where {T, S <: Union{AbstractVector, AbstractSet}} = Set(collect(T, v))
-Set{T}(itr) where T = union!(Set{T}(), itr)
+Set{T}(itr) where T = union!(Set{to_cxx_type(T)}(), itr)
 
 function Set(itr)
     T = Base.@default_eltype(itr)
@@ -17,7 +17,7 @@ function Set(itr)
     return union!(Set{T}(), itr)
 end
 
-SetAllocated{T}(v::Base.Vector{T}) where T = Set{T}(v)
+Base.eltype(::Set{T}) where T = to_jl_type(T)
 
 ### convert FROM polymake object
 
