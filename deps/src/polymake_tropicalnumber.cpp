@@ -26,10 +26,10 @@ void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
                     wrapped.method("zero", [](tropType& a) { return a.zero(); });
                     wrapped.method("dual_zero", [](tropType& a) { return a.dual_zero(); });
                     wrapped.method("one", [](tropType& a) { return a.one(); });
-                    wrapped.method("+", [](tropType& a, tropType& b) { return a + b; });
-                    wrapped.method("*", [](tropType& a, tropType& b) { return a * b; });
+                    wrapped.method("_add", [](tropType& a, tropType& b) { return a + b; });
+                    wrapped.method("_mul", [](tropType& a, tropType& b) { return a * b; });
                     wrapped.method("//", [](tropType& a, tropType& b) { return a / b; });
-                    wrapped.method("==", [](tropType& a,
+                    wrapped.method("_isequal", [](tropType& a,
                             tropType& b) { return a == b; });
                     wrapped.method("<", [](tropType& a,
                             tropType& b) { return a < b; });

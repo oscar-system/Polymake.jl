@@ -17,6 +17,16 @@ function Set(itr)
     return union!(Set{T}(), itr)
 end
 
+# workaround for https://github.com/JuliaInterop/CxxWrap.jl/issues/199
+for (jlF, pmF) in (
+    (:(==), :_isequal),
+    (:getindex, :_getindex),
+    )
+    @eval begin
+        Base.$jlF(s::S, t::S) where S<:Set = $pmF(s,t)
+    end
+end
+
 Base.eltype(::Set{T}) where T = to_jl_type(T)
 
 ### convert FROM polymake object
