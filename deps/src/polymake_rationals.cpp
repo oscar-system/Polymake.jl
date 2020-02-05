@@ -14,8 +14,12 @@ void polymake_module_add_rational(jlcxx::Module& polymake)
     polymake
         .add_type<pm::Rational>("Rational",
                                 jlcxx::julia_type("Real", "Base"))
-        .constructor<int64_t, int64_t>()
         .constructor<pm::Integer, pm::Integer>()
+        .method("rational_si_si", [](
+            const jlcxx::StrictlyTypedNumber<int64_t>& num,
+            const jlcxx::StrictlyTypedNumber<int64_t>& den) {
+            return pm::Rational(num.value, den.value);
+        })
         .method("<", [](pm::Rational& a, pm::Rational& b) { return a < b; })
         .method("<", [](pm::Rational& a, pm::Integer& b) { return a < b; })
         .method("<", [](pm::Rational& a,
@@ -29,8 +33,7 @@ void polymake_module_add_rational(jlcxx::Module& polymake)
         .method("<=", [](pm::Rational& a,
                          int64_t b) { return a <= static_cast<pm::Int>(b); })
         .method("<=", [](pm::Integer& a, pm::Rational& b) { return a <= b; })
-        .method("<=",
-                [](int64_t a, pm::Rational& b) {
+        .method("<=", [](int64_t a, pm::Rational& b) {
                     return static_cast<pm::Int>(a) <= b;
                 })
 
