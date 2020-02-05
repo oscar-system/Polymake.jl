@@ -292,6 +292,7 @@ using SparseArrays
 
     @testset "findnz" begin
         jsv = sprand(10151821,.0000014)
+        droptol!(jsm,Polymake._get_global_epsilon())
         psv = Polymake.SparseVector(jsv)
         je, jv = findnz(jsv)
         pe, pv = findnz(psv)
