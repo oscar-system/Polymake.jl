@@ -21,23 +21,22 @@ function Array{T}(vec::AbstractVector) where T
     return arr
 end
 
-Array{T}(n::Base.Integer, elt) where T<:Array_suppT = Array{T}(Int64(n), T(elt))
-Array(n::Base.Integer, elt::T) where T = Array{T}(Int64(n), elt)
+Array(n::Base.Integer, elt::T) where T =
+    Array{convert_to_pm_type(T)}(n, elt)
 
-Array(vec::AbstractVector) = Array{convert_to_pm_type(eltype(vec))}(vec)
-
-ArrayAllocated{T}(v) where T = Array{T}(v)
+Array(vec::AbstractVector) =
+    Array{convert_to_pm_type(eltype(vec))}(vec)
 
 Base.size(a::Array) = (length(a),)
 Base.eltype(v::Array{T}) where T = to_jl_type(T)
 
-Base.@propagate_inbounds function getindex(A::Array, n::Base.Integer)
-    @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
-    return _getindex(A, convert(Int64, n))
+Base.@propagate_inbounds function getindex(A::Array{T}, n::Base.Integer) where T
+    @boundscheck checkbounds(A, n)
+    return convert(to_jl_type(T), _getindex(A, convert(Int64, n)))
 end
 
 Base.@propagate_inbounds function Base.setindex!(A::Array{T}, val, n::Base.Integer) where T
-    @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
+    @boundscheck checkbounds(A, n)
     _setindex!(A, convert(T, val), convert(Int64, n))
     return A
 end
@@ -49,16 +48,5 @@ function Base.append!(A::Array{T}, itr) where T
     for i in 1:m
         A[n+i] = itr[i]
     end
-    return A
-end
-
-# workarounds for Array{String}
-Array{T}(n::Base.Integer) where T<:AbstractString = Array{AbstractString}(Int64(n))
-Array{T}(n::Base.Integer, elt::T) where T<:AbstractString =
-Array{AbstractString}(Int64(n), elt)
-
-Base.@propagate_inbounds function Base.setindex!(A::Array{S}, val, n::Base.Integer) where {S<:AbstractString}
-    @boundscheck 1 <= n <= length(A) || throw(BoundsError(A, n))
-    _setindex!(A, string(val), Int64(n))
     return A
 end
