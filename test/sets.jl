@@ -5,15 +5,18 @@
         for T in IntTypes
             @test Polymake.Set{T}() isa Polymake.Set
             @test Polymake.Set{T}() isa AbstractSet
-            @test Polymake.Set(T[1]) isa Polymake.Set{T}
-            @test Polymake.Set(T[1,1]) isa Polymake.Set{T}
-            @test Polymake.Set(T[-1,1]) isa Polymake.Set{T}
-            @test Polymake.Set(Base.Set{T}([-1,1])) isa Polymake.Set{T}
+            @test Polymake.Set(T[1]) isa Polymake.Set{Polymake.to_cxx_type(T)}
+            @test Polymake.Set(T[1,1]) isa Polymake.Set{Polymake.to_cxx_type(T)}
+            @test Polymake.Set(T[-1,1]) isa Polymake.Set{Polymake.to_cxx_type(T)}
+            @test Polymake.Set(Base.Set{T}([-1,1])) isa
+                Polymake.Set{Polymake.to_cxx_type(T)}
         end
         for T in IntTypes, S in IntTypes
-            @test Polymake.Set{T}(S[-1,1]) isa Polymake.Set{T}
-            @test Polymake.Set{T}(Base.Set(S[-1,1])) isa Polymake.Set{T}
-            @test Polymake.Set{T}(Polymake.Set(S[1,2])) isa Polymake.Set{T}
+            @test Polymake.Set{T}(S[-1,1]) isa Polymake.Set{Polymake.to_cxx_type(T)}
+            @test Polymake.Set{T}(Base.Set(S[-1,1])) isa
+                Polymake.Set{Polymake.to_cxx_type(T)}
+            @test Polymake.Set{T}(Polymake.Set(S[1,2])) isa
+                Polymake.Set{Polymake.to_cxx_type(T)}
         end
     end
 
@@ -269,9 +272,9 @@ end
 
     @testset "Construction" begin
         let f17741 = x -> x < 0 ? 0 : 1
-            @test isa(Polymake.Set(x for x = 1:3), Polymake.Set{Base.Int})
-            @test isa(Polymake.Set(x for x = 1:3 for j = 1:1), Polymake.Set{Base.Int})
-            @test isa(Polymake.Set(f17741(x) for x = 1:3), Polymake.Set{Base.Int})
+            @test isa(Polymake.Set(x for x = 1:3), Polymake.Set{Polymake.to_cxx_type(Int)})
+            @test isa(Polymake.Set(x for x = 1:3 for j = 1:1), Polymake.Set{Polymake.to_cxx_type(Int)})
+            @test isa(Polymake.Set(f17741(x) for x = 1:3), Polymake.Set{Polymake.to_cxx_type(Int)})
             @test isa(Polymake.Set(f17741(x) for x = -1:1), AbstractSet)
         end
         let s1 = Polymake.Set([1, 2]), s2 = Polymake.Set(s1)
@@ -322,10 +325,10 @@ end
 
     @testset "eltype, empty" begin
         s1 = empty(Polymake.Set([1,2]))
-        @test isequal(s1, Polymake.Set{Base.Int}())
+        @test isequal(s1, Polymake.Set{Int}())
         @test ===(eltype(s1), Base.Int)
         s2 = empty(Polymake.Set{Base.Int}([2.0,3.0,4.0]))
-        @test isequal(s2, Polymake.Set{Base.Int}())
+        @test isequal(s2, Polymake.Set{Int}())
         @test ===(eltype(s2), Base.Int)
         s3 = empty(Polymake.Set([1,2]),Int64)
         @test isequal(s3, Polymake.Set{Int64}())
@@ -397,7 +400,7 @@ end
     end
 
     @testset "union" begin
-        S = Polymake.Set{Base.Int}
+        S = Polymake.Set{Polymake.to_cxx_type(Int)}
         s = ∪(S([1,2]), S([3,4]))
         @test s == S([1,2,3,4])
         s = union(S([5,6,7,8]), S([7,8,9]))
@@ -415,11 +418,11 @@ end
 
         @test union(S([1]), S()) isa S
         @test union(S(Base.Int[]), S()) isa S
-        @test union([1], S()) isa Base.Vector{Base.Int}
+        @test union([1], S()) isa Base.Vector{Int}
     end
 
     @testset "intersect" begin
-        S = Polymake.Set{Base.Int}
+        S = Polymake.Set{Int}
         s = S([1,2]) ∩ S([3,4])
         @test s == S()
         s = intersect(S([5,6,7,8]), S([7,8,9]))
@@ -433,13 +436,13 @@ end
             @test s1 === intersect!(s1, [2,3,4], 3:4) == S([3])
         end
 
-        @test intersect(S([1]), S()) isa S
-        @test intersect(S(), S([])) isa S
-        @test intersect([1], S()) isa Base.Vector{Base.Int}
+        @test intersect(S([1]), S()) isa Polymake.Set{Polymake.to_cxx_type(Int)}
+        @test intersect(S(), S([])) isa Polymake.Set{Polymake.to_cxx_type(Int)}
+        @test intersect([1], S()) isa Base.Vector{Int}
     end
 
     @testset "setdiff" begin
-        S = Polymake.Set{Base.Int}
+        S = Polymake.Set{Polymake.to_cxx_type(Int)}
         @test setdiff(S([1,2,3]), S())        == S([1,2,3])
         @test setdiff(S([1,2,3]), S([1]))     == S([2,3])
         @test setdiff(S([1,2,3]), S([1,2]))   == S([3])
@@ -456,7 +459,7 @@ end
 
         @test setdiff(S([1]), S()) isa S
         @test setdiff(S([1]), S([])) isa S
-        @test setdiff([1], S()) isa Base.Vector{Base.Int}
+        @test setdiff([1], S()) isa Base.Vector{Int}
 
         s = S([1,3,5,7])
         setdiff!(s,(3,5))
@@ -517,13 +520,13 @@ end
             @test s1 === symdiff!(s1, S([2,4,5,6]), [1,6,7]) == S([3,5,7])
         end
         @test symdiff(S([1,2,3,4]), S([2,4,5,6])) == S([1,3,5,6])
-        @test symdiff(S([1]), S()) isa S
-        @test symdiff(S([]), S()) isa S
-        @test symdiff([1], S()) isa Base.Vector{Base.Int}
+        @test symdiff(S([1]), S()) isa Polymake.Set{Polymake.to_cxx_type(Int)}
+        @test symdiff(S([]), S()) isa Polymake.Set{Polymake.to_cxx_type(Int)}
+        @test symdiff([1], S()) isa Base.Vector{Int}
     end
 
     @testset "filter(f, ::Polymake.Set), first" begin
-        S = Polymake.Set{Base.Int}
+        S = Polymake.Set{Int}
         s = S([1,2,3,4])
         @test s !== filter( isodd, s) == S([1,3])
         @test s === filter!(isodd, s) == S([1,3])

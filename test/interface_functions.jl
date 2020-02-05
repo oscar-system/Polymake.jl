@@ -1,16 +1,16 @@
 @testset "Interface functions" begin
     for (args, val) in [((4,2), 5), ((Polymake.Integer(4), 2), 5)]
-        @test call_function(:polytope, :pseudopower, args...) == val
+        @test Polymake.call_function(:polytope, :pseudopower, args...) == val
         @test (@pm polytope.pseudopower(args...)) == val
         @test polytope.pseudopower(args...) == val
     end
 
-    @test call_function(:polytope, :cube, 2) isa BigObject
+    @test Polymake.call_function(:polytope, :cube, 2) isa BigObject
     @test polytope.cube( 2 ) isa BigObject
     @test (@pm polytope.cube{Rational}( 3 )) isa BigObject
     c = @pm polytope.cube{Rational}( 3 )
     cc = polytope.cube( 3 )
-    @test call_function(:polytope, :equal_polyhedra,c,cc)
+    @test Polymake.call_function(:polytope, :equal_polyhedra,c,cc)
     @test @pm polytope.equal_polyhedra(c, cc)
     @test polytope.equal_polyhedra(c, cc)
 
