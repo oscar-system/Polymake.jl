@@ -1,10 +1,15 @@
 import SparseArrays
 
+# not overloading SparseArrays.spzero on purpose
+function spzeros(::Type{T}, n::Base.Integer, m::Base.Integer) where T <:VecOrMat_eltypes
+    return SparseMatrix{to_cxx_type(T)}(n,m)
+end
+
 #functions for input of julia sparse matrix type
-@inline function SparseMatrix{T}(mat::SparseArrays.SparseMatrixCSC) where T <: VecOrMat_eltypes
+function SparseMatrix{T}(mat::SparseArrays.SparseMatrixCSC) where T
     (m,n) = size(mat)
     (r,c,v) = SparseArrays.findnz(mat)
-    sm = SparseMatrix{T}(m,n)
+    sm = Polymake.spzeros(T, m, n)
     for i = 1:length(r)
         sm[r[i],c[i]] = v[i]
     end
@@ -13,10 +18,10 @@ end
 
 
 #functions for input of dense matrix type
-@inline function SparseMatrix{T}(mat::AbstractMatrix) where T <: VecOrMat_eltypes
+@inline function SparseMatrix{T}(mat::AbstractMatrix) where T
     (m,n) = size(mat)
-    sm = SparseMatrix{T}(m,n)
-    temp = T(0)
+    sm = Polymake.spzeros(T, m, n)
+    temp = zero(T)
     for i = 1:m
         for j = 1:n
             temp = mat[i,j]
@@ -38,6 +43,7 @@ SparseMatrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = SparseMatrix{Flo
 SparseMatrix(mat::M) where M <: SparseMatrix{Float64} = mat
 Base.size(m::SparseMatrix) = (nrows(m), ncols(m))
 
+Base.eltype(m::SparseMatrix{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(M::SparseMatrix , i::Base.Integer, j::Base.Integer)
     @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
