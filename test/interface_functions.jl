@@ -19,7 +19,12 @@
     @test (@pm tropical.cyclic{Max}(3,5)) isa BigObject
 
     @test Base.Docs.getdoc(polytope.Polytope) isa Polymake.Meta.PolymakeDocstring
+    a = Base.Docs.getdoc(polytope.Polytope)
+    @test !isempty(a.s) # we actually got some help
     @test Base.Docs.getdoc(polytope.cube) isa Polymake.Meta.PolymakeDocstring
+    a = Base.Docs.getdoc(polytope.cube)
+    @test !isempty(a.s) # we actually got some help
+    @test !isempty(Polymake.get_docs("polytope::cube"))
 end
 
 @testset "Indexing helpers" begin
