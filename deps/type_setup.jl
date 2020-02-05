@@ -45,7 +45,7 @@ end
 function call_function_feed_argument_if(juliatype, ctype)
     return """
 \telse if (jl_subtype(current_type, POLYMAKETYPE_$juliatype)) {
-        function << *reinterpret_cast<$ctype*>(get_ptr_from_cxxwrap_obj(argument));
+        function << jlcxx::unbox<const $ctype&>(argument);
     }"""
 end
 
@@ -78,7 +78,7 @@ end
 function option_set_take_if(type_string, ctype)
     return """
 \telse if (jl_subtype(current_type, POLYMAKETYPE_$type_string)) {
-        optset[key] << *reinterpret_cast<$ctype*>(get_ptr_from_cxxwrap_obj(value));
+        optset[key] << jlcxx::unbox<const $ctype&>(value);
     }"""
 end
 
