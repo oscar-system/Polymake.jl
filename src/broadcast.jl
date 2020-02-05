@@ -36,7 +36,10 @@ function Base.similar(X::IncidenceMatrix,
     return BitArray{1}(undef, dims...)
 end
 
-Base.similar(X::IncidenceMatrix, ::Type{Bool}, dims::Dims{1}) = BitArray{1}(undef, dims...)
+function Base.similar(X::IncidenceMatrix,
+    ::Type{<:Union{Bool, CxxWrap.CxxBool}}, dims::Dims{2})
+    return IncidenceMatrix{NonSymmetric}(undef, dims...)
+end
 
 function Base.similar(X::SparseMatrix, ::Type{S},
     dims::Dims{2}) where S <: VecOrMat_eltypes
