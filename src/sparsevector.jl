@@ -42,3 +42,17 @@ Base.@propagate_inbounds function Base.setindex!(V::SparseVector{T}, val, n::Bas
     _setindex!(V, convert(T, val), convert(Int64, n))
     return val
 end
+
+function SparseArrays.findnz(vec::SparseVector{T}) where T <: VecOrMat_eltypes
+    nzi = nzindices(vec)
+    len = length(nzi)
+    ei = Base.Vector{Int64}(undef, len)
+    v = Base.Vector{T}(undef, len)
+    k = 1
+    for e in nzi
+        ei[k] = e + 1
+        v[k] = vec[e + 1]
+        k += 1
+    end
+    return (ei,v)
+end

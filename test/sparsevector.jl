@@ -1,5 +1,5 @@
 using SparseArrays
-@testset "SparseMatrix" begin
+@testset "Polymake.SparseVector" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
@@ -43,8 +43,8 @@ using SparseArrays
                     @test convert(Polymake.SparseVector{ElType}, s) isa Polymake.SparseVector{ElType}
 
                     S = Polymake.SparseVector(s)
-                    # @test convert(SparseArrays.SparseMatrixCSC{T,}, S) isa SparseArrays.SparseMatrixCSC{T}
-                    # @test jl_s == convert(SparseArrays.SparseMatrixCSC{T}, S)
+                    # @test convert(SparseArrays.Polymake.SparseVectorCSC{T,}, S) isa SparseArrays.Polymake.SparseVectorCSC{T}
+                    # @test jl_s == convert(SparseArrays.Polymake.SparseVectorCSC{T}, S)
                 end
             end
 
@@ -86,320 +86,216 @@ using SparseArrays
             end
         end
     end
-    #
-    # @testset "Low-level operations" begin
-    #     @testset "SparseMatrix{Int64}" begin
-    #         jl_m_64 = Int64.(jl_m)
-    #         V = SparseMatrix{Int64}(jl_m_64)
-    #         # linear indexing:
-    #         @test V[1] == 1
-    #         @test V[2] == 4
-    #
-    #         @test eltype(V) == Int64
-    #
-    #         @test_throws BoundsError V[0, 1]
-    #         @test_throws BoundsError V[2, 5]
-    #         @test_throws BoundsError V[3, 1]
-    #
-    #         @test length(V) == 6
-    #         @test size(V) == (2,3)
-    #
-    #         for T in [IntTypes; Integer]
-    #             V = SparseMatrix{Int64}(jl_m_64) # local copy
-    #             setindex!(V, T(5), 1, 1)
-    #             @test V isa SparseMatrix{Int64}
-    #             @test V[T(1), 1] isa Int64
-    #             @test V[1, T(1)] == 5
-    #             # testing the return value of brackets operator
-    #             @test V[2, 1] = T(10) isa T
-    #             V[2, 1] = T(10)
-    #             @test V[2, 1] == 10
-    #             @test string(V) == "pm::SparseMatrix<int, pm::NonSymmetric>\n5 2 3\n10 5 6\n"
-    #         end
-    #
-    #         @test string(SparseMatrix{Int64}(jl_s)) == "pm::SparseMatrix<int, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
-    #     end
-    #
-    #     @testset "SparseMatrix{Integer}" begin
-    #         V = SparseMatrix{Integer}(jl_m)
-    #         # linear indexing:
-    #         @test V[1] == 1
-    #         @test V[2] == 4
-    #
-    #         @test eltype(V) == Integer
-    #
-    #         @test_throws BoundsError V[0, 1]
-    #         @test_throws BoundsError V[2, 5]
-    #         @test_throws BoundsError V[3, 1]
-    #
-    #         @test length(V) == 6
-    #         @test size(V) == (2,3)
-    #
-    #         for T in [IntTypes; Integer]
-    #             V = SparseMatrix{Integer}(jl_m) # local copy
-    #             setindex!(V, T(5), 1, 1)
-    #             @test V isa SparseMatrix{Integer}
-    #             @test V[T(1), 1] isa Polymake.IntegerAllocated
-    #             @test V[1, T(1)] == 5
-    #             # testing the return value of brackets operator
-    #             @test V[2, 1] = T(10) isa T
-    #             V[2, 1] = T(10)
-    #             @test V[2, 1] == 10
-    #             @test string(V) == "pm::SparseMatrix<pm::Integer, pm::NonSymmetric>\n5 2 3\n10 5 6\n"
-    #         end
-    #
-    #         @test string(SparseMatrix{Integer}(jl_s)) == "pm::SparseMatrix<pm::Integer, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
-    #     end
-    #
-    #     @testset "SparseMatrix{Rational}" begin
-    #         V = SparseMatrix{Rational}(jl_m)
-    #         # linear indexing:
-    #         @test V[1] == 1//1
-    #         @test V[2] == 4//1
-    #
-    #         @test eltype(V) == Rational
-    #
-    #         @test_throws BoundsError V[0, 1]
-    #         @test_throws BoundsError V[2, 5]
-    #         @test_throws BoundsError V[3, 1]
-    #
-    #         @test length(V) == 6
-    #         @test size(V) == (2,3)
-    #
-    #         for T in [IntTypes; Integer]
-    #             V = SparseMatrix{Rational}(jl_m) # local copy
-    #             setindex!(V, T(5)//T(3), 1, 1)
-    #             @test V isa SparseMatrix{Rational}
-    #             @test V[T(1), 1] isa Polymake.RationalAllocated
-    #             @test V[1, T(1)] == 5//3
-    #             # testing the return value of brackets operator
-    #             if T != Integer
-    #                 @test V[2] = T(10)//T(3) isa Rational{T}
-    #             else
-    #                 @test V[2] = T(10)//T(3) isa Rational
-    #             end
-    #             V[2] = T(10)//T(3)
-    #             @test V[2] == 10//3
-    #             @test string(V) == "pm::SparseMatrix<pm::Rational, pm::NonSymmetric>\n5/3 2 3\n10/3 5 6\n"
-    #         end
-    #
-    #         @test string(SparseMatrix{Rational}(jl_s)) == "pm::SparseMatrix<pm::Rational, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
-    #     end
-    #
-    #     @testset "SparseMatrix{Float64}" begin
-    #         V = SparseMatrix{Float64}(jl_m)
-    #         # linear indexing:
-    #         @test V[1] == 1.0
-    #         @test V[2] == 4.0
-    #
-    #         @test eltype(V) == Float64
-    #
-    #         @test_throws BoundsError V[0, 1]
-    #         @test_throws BoundsError V[2, 5]
-    #         @test_throws BoundsError V[3, 1]
-    #
-    #         @test length(V) == 6
-    #         @test size(V) == (2,3)
-    #
-    #         for T in [IntTypes; Integer]
-    #             V = SparseMatrix{Float64}(jl_m) # local copy
-    #             for S in FloatTypes
-    #                 setindex!(V, S(5)/T(3), 1, 1)
-    #                 @test V isa SparseMatrix{Float64}
-    #                 @test V[T(1), 1] isa Float64
-    #                 @test V[1, T(1)] ≈ S(5)/T(3)
-    #                 # testing the return value of brackets operator
-    #                 @test V[2] = S(10)/T(3) isa typeof(S(10)/T(3))
-    #                 V[2] = S(10)/T(3)
-    #                 @test V[2] ≈ S(10)/T(3)
-    #             end
-    #             @test string(V) == "pm::SparseMatrix<double, pm::NonSymmetric>\n1.66667 2 3\n3.33333 5 6\n"
-    #         end
-    #
-    #         @test string(SparseMatrix{Float64}(jl_s)) == "pm::SparseMatrix<double, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
-    #     end
-    #
-    #     @testset "Equality" begin
-    #         for T in [IntTypes; Integer]
-    #             V = SparseMatrix{Integer}(2, 3)
-    #             W = SparseMatrix{Rational}(2, 3)
-    #             U = SparseMatrix{Float64}(2, 3)
-    #
-    #             #TODO T.(jl_s)
-    #             @test (V .= T.(jl_m)) isa SparseMatrix{Integer}
-    #             @test (V .= T.(jl_m).//1) isa SparseMatrix{Integer}
-    #
-    #             @test (W .= T.(jl_m)) isa SparseMatrix{Rational}
-    #             @test (W .= T.(jl_m).//1) isa SparseMatrix{Rational}
-    #
-    #             @test (U .= T.(jl_m)) isa SparseMatrix{Float64}
-    #             @test (U .= T.(jl_m).//1) isa SparseMatrix{Float64}
-    #
-    #             @test U == V == W
-    #
-    #             # TODO:
-    #             # @test (V .== jl_m) isa BitArray
-    #             # @test all(V .== jl_m)
-    #         end
-    #
-    #         V = SparseMatrix{Integer}(jl_m)
-    #         for S in FloatTypes
-    #             U = SparseMatrix{Float64}(2, 3)
-    #             @test (U .= jl_m./S(1)) isa SparseMatrix{Float64}
-    #             @test U == V
-    #         end
-    #     end
-    # end
-    #
-    # @testset "Arithmetic" begin
-    #     V = SparseMatrix{Integer}(jl_m)
-    #     @test float.(V) isa Polymake.SparseMatrixAllocated{Float64}
-    #     # @test V[1, :] isa Polymake.SparseVectorAllocated{Integer}
-    #     # @test float.(V)[1, :] isa SparseVector{Float64}
-    #
-    #     @test similar(V, Float64) isa Polymake.SparseMatrixAllocated{Float64}
-    #     # @test similar(V, Float64, 10) isa Polymake.SparseVectorAllocated{Float64}
-    #     @test similar(V, Float64, 10, 10) isa Polymake.SparseMatrixAllocated{Float64}
-    #
-    #     X = SparseMatrix{Int64}(jl_m)
-    #     V = SparseMatrix{Integer}(jl_m)
-    #     jl_w = jl_m//4
-    #     W = SparseMatrix{Rational}(jl_w)
-    #     jl_u = jl_m/4
-    #     U = SparseMatrix{Float64}(jl_u)
-    #
-    #     @test -X isa Polymake.SparseMatrixAllocated{Int64}
-    #     @test -X == -jl_m
-    #
-    #     @test -V isa Polymake.SparseMatrixAllocated{Integer}
-    #     @test -V == -jl_m
-    #
-    #     @test -W isa Polymake.SparseMatrixAllocated{Rational}
-    #     @test -W == -jl_w
-    #
-    #     @test -U isa Polymake.SparseMatrixAllocated{Float64}
-    #     @test -U == -jl_u
-    #
-    #     int_scalar_types = [IntTypes; Integer]
-    #     rational_scalar_types = [[Rational{T} for T in IntTypes]; Rational]
-    #
-    #     @test 2X isa SparseMatrix{Integer}
-    #     @test Int64(2)X isa SparseMatrix{Int64}
-    #
-    #     for T in int_scalar_types
-    #         for (mat, ElType) in [(V, Integer), (W, Rational), (U, Float64)]
-    #             op = *
-    #             @test op(T(2), mat) isa SparseMatrix{ElType}
-    #             @test op(mat, T(2)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #
-    #             op = +
-    #             @test op(mat, T.(jl_m)) isa SparseMatrix{ElType}
-    #             @test op(T.(jl_m), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T.(jl_m)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T.(jl_m), mat) isa SparseMatrix{ElType}
-    #
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #         end
-    #
-    #         let (op, ElType) = (//, Rational)
-    #             for mat in [V, W]
-    #
-    #                 @test op(mat, T(2)) isa SparseMatrix{ElType}
-    #                 @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #                 @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #             end
-    #         end
-    #         let (op, ElType) = (/, Float64)
-    #             mat = U
-    #             @test op(mat, T(2)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #         end
-    #     end
-    #
-    #     for T in rational_scalar_types
-    #         for (mat, ElType) in [(V, Rational), (W, Rational), (U, Float64)]
-    #
-    #             op = *
-    #             @test op(T(2), mat) isa SparseMatrix{ElType}
-    #             @test op(mat, T(2)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #
-    #             op = +
-    #             @test op(mat, T.(jl_m)) isa SparseMatrix{ElType}
-    #             @test op(T.(jl_m), mat) isa SparseMatrix{ElType}
-    #
-    #             @test broadcast(op, mat, T.(jl_m)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T.(jl_m), mat) isa SparseMatrix{ElType}
-    #
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #
-    #             if ElType == Float64
-    #                 op = /
-    #             else
-    #                 op = //
-    #             end
-    #
-    #             @test op(mat, T(2)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #         end
-    #     end
-    #     for T in FloatTypes
-    #         let mat = U, ElType = Float64
-    #             op = *
-    #             @test op(T(2), mat) isa SparseMatrix{ElType}
-    #             @test op(mat, T(2)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #
-    #             op = +
-    #             @test op(mat, T.(jl_m)) isa SparseMatrix{ElType}
-    #             @test op(T.(jl_m), mat) isa SparseMatrix{ElType}
-    #
-    #             @test broadcast(op, mat, T.(jl_m)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T.(jl_m), mat) isa SparseMatrix{ElType}
-    #
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #
-    #             op = /
-    #             # @test op(T(2), mat) isa Matrix{ElType}
-    #             @test op(mat, T(2)) isa SparseMatrix{ElType}
-    #             @test broadcast(op, T(2), mat) isa SparseMatrix{ElType}
-    #             @test broadcast(op, mat, T(2)) isa SparseMatrix{ElType}
-    #         end
-    #     end
-    #
-    #     for T in [int_scalar_types; rational_scalar_types; FloatTypes]
-    #         @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_m
-    #         @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_m
-    #         @test T(2)*W == W*T(2) == T(2) .* W == W .* T(2) == 2jl_w
-    #         @test T(2)*U == U*T(2) == T(2) .* U == U .* T(2) == 2jl_u
-    #
-    #         @test X + T.(jl_m) == T.(jl_m) + X == X .+ T.(jl_m) == T.(jl_m) .+ X == 2jl_m
-    #
-    #         @test V + T.(jl_m) == T.(jl_m) + V == V .+ T.(jl_m) == T.(jl_m) .+ V == 2jl_m
-    #
-    #         @test W + T.(4jl_w) == T.(4jl_w) + W == W .+ T.(4jl_w) == T.(4jl_w) .+ W == 5jl_w
-    #
-    #         @test U + T.(4jl_u) == T.(4jl_u) + U == U .+ T.(4jl_u) == T.(4jl_u) .+ U == 5jl_u
-    #     end
-    # end
-    #
-    # @testset "findnz" begin
-    #     jsm = sprand(1015,1841,.14)
-    #     psm = SparseMatrix(jsm)
-    #     jr, jc, jv = findnz(jsm)
-    #     pr, pc, pv = findnz(psm)
-    #     p = sortperm(pc)
-    #     @test jr == pr[p]
-    #     @test jc == pc[p]
-    #     @test jv == pv[p]
-    # end
+
+    @testset "Low-level operations" begin
+        for (E,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double")]
+            @testset "Polymake.SparseVector{$E}" begin
+                V = Polymake.SparseVector{E}(jl_v)
+
+                @test eltype(V) == E
+
+                @test_throws BoundsError V[0]
+                @test_throws BoundsError V[4]
+
+                @test length(V) == 3
+                @test size(V) == (3,)
+
+                for T in [IntTypes; Polymake.Integer]
+                    V = Polymake.SparseVector{E}(jl_v) # local copy
+                    setindex!(V, T(5), 1)
+                    @test V isa Polymake.SparseVector{E}
+                    @test V[T(1)] isa E
+                    @test V[T(1)] == 5
+                    # testing the return value of brackets operator
+                    @test V[2] = T(10) isa T
+                    V[2] = T(10)
+                    @test V[2] == 10
+                    @test string(V) == string("pm::SparseVector<", s, ">\n5 10 3")
+                end
+
+                @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 1)")
+            end
+        end
+
+        @testset "Equality" begin
+            for T in [IntTypes; Polymake.Integer]
+                V = Polymake.SparseVector{Polymake.Integer}(3)
+                W = Polymake.SparseVector{Polymake.Rational}(3)
+                U = Polymake.SparseVector{Float64}(3)
+
+                #TODO T.(jl_s)
+                @test (V .= T.(jl_v)) isa Polymake.SparseVector{Polymake.Integer}
+                @test (V .= T.(jl_v).//1) isa Polymake.SparseVector{Polymake.Integer}
+
+                @test (W .= T.(jl_v)) isa Polymake.SparseVector{Polymake.Rational}
+                @test (W .= T.(jl_v).//1) isa Polymake.SparseVector{Polymake.Rational}
+
+                @test (U .= T.(jl_v)) isa Polymake.SparseVector{Float64}
+                @test (U .= T.(jl_v).//1) isa Polymake.SparseVector{Float64}
+
+                @test U == V == W
+
+                # TODO:
+                # @test (V .== jl_v) isa BitArray
+                # @test all(V .== jl_v)
+            end
+
+            V = Polymake.SparseVector{Polymake.Integer}(jl_v)
+            for S in FloatTypes
+                U = Polymake.SparseVector{Float64}(3)
+                @test (U .= jl_v./S(1)) isa Polymake.SparseVector{Float64}
+                @test U == V
+            end
+        end
+    end
+
+    @testset "Arithmetic" begin
+        V = Polymake.SparseVector{Polymake.Integer}(jl_v)
+        @test float.(V) isa Polymake.SparseVectorAllocated{Float64}
+        # @test V[1, :] isa Polymake.SparseVectorAllocated{Polymake.Integer}
+        # @test float.(V)[1, :] isa SparseVector{Float64}
+
+        @test similar(V, Float64) isa Polymake.SparseVectorAllocated{Float64}
+        # @test similar(V, Float64, 10) isa Polymake.SparseVectorAllocated{Float64}
+        @test similar(V, Float64, 10) isa Polymake.SparseVectorAllocated{Float64}
+
+        X = Polymake.SparseVector{Int64}(jl_v)
+        V = Polymake.SparseVector{Polymake.Integer}(jl_v)
+        jl_w = jl_v//4
+        W = Polymake.SparseVector{Polymake.Rational}(jl_w)
+        jl_u = jl_v/4
+        U = Polymake.SparseVector{Float64}(jl_u)
+
+        @test -X isa Polymake.SparseVectorAllocated{Int64}
+        @test -X == -jl_v
+
+        @test -V isa Polymake.SparseVectorAllocated{Polymake.Integer}
+        @test -V == -jl_v
+
+        @test -W isa Polymake.SparseVectorAllocated{Polymake.Rational}
+        @test -W == -jl_w
+
+        @test -U isa Polymake.SparseVectorAllocated{Float64}
+        @test -U == -jl_u
+
+        int_scalar_types = [IntTypes; Polymake.Integer]
+        rational_scalar_types = [[Rational{T} for T in IntTypes]; Polymake.Rational]
+
+        @test 2X isa Polymake.SparseVector{Int64}
+        @test Int32(2)X isa Polymake.SparseVector{Int64}
+
+        for T in int_scalar_types
+            for (vec, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]
+                op = *
+                @test op(T(2), vec) isa Polymake.SparseVector{ElType}
+                @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+
+                op = +
+                @test op(vec, T.(jl_v)) isa Polymake.SparseVector{ElType}
+                @test op(T.(jl_v), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T.(jl_v)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T.(jl_v), vec) isa Polymake.SparseVector{ElType}
+
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+            end
+
+            let (op, ElType) = (//, Polymake.Rational)
+                for vec in [V, W]
+
+                    @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                    @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                    @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+                end
+            end
+            let (op, ElType) = (/, Float64)
+                vec = U
+                @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+            end
+        end
+
+        for T in rational_scalar_types
+            for (vec, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64)]
+
+                op = *
+                @test op(T(2), vec) isa Polymake.SparseVector{ElType}
+                @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+
+                op = +
+                @test op(vec, T.(jl_v)) isa Polymake.SparseVector{ElType}
+                @test op(T.(jl_v), vec) isa Polymake.SparseVector{ElType}
+
+                @test broadcast(op, vec, T.(jl_v)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T.(jl_v), vec) isa Polymake.SparseVector{ElType}
+
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+
+                if ElType == Float64
+                    op = /
+                else
+                    op = //
+                end
+
+                @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+            end
+        end
+        for T in FloatTypes
+            let vec = U, ElType = Float64
+                op = *
+                @test op(T(2), vec) isa Polymake.SparseVector{ElType}
+                @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+
+                op = +
+                @test op(vec, T.(jl_v)) isa Polymake.SparseVector{ElType}
+                @test op(T.(jl_v), vec) isa Polymake.SparseVector{ElType}
+
+                @test broadcast(op, vec, T.(jl_v)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T.(jl_v), vec) isa Polymake.SparseVector{ElType}
+
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+
+                op = /
+                # @test op(T(2), vec) isa Matrix{ElType}
+                @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+            end
+        end
+
+        for T in [int_scalar_types; rational_scalar_types; FloatTypes]
+            @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_v
+            @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_v
+            @test T(2)*W == W*T(2) == T(2) .* W == W .* T(2) == 2jl_w
+            @test T(2)*U == U*T(2) == T(2) .* U == U .* T(2) == 2jl_u
+
+            @test X + T.(jl_v) == T.(jl_v) + X == X .+ T.(jl_v) == T.(jl_v) .+ X == 2jl_v
+
+            @test V + T.(jl_v) == T.(jl_v) + V == V .+ T.(jl_v) == T.(jl_v) .+ V == 2jl_v
+
+            @test W + T.(4jl_w) == T.(4jl_w) + W == W .+ T.(4jl_w) == T.(4jl_w) .+ W == 5jl_w
+
+            @test U + T.(4jl_u) == T.(4jl_u) + U == U .+ T.(4jl_u) == T.(4jl_u) .+ U == 5jl_u
+        end
+    end
+
+    @testset "findnz" begin
+        jsv = sprand(10151821,.0000014)
+        psv = Polymake.SparseVector(jsv)
+        je, jv = findnz(jsv)
+        pe, pv = findnz(psv)
+        @test je == pe
+        @test jv == pv
+    end
 end

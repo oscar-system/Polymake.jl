@@ -28,6 +28,9 @@ void polymake_module_add_sparsevector(jlcxx::Module& polymake)
                             V[i - 1] = r;
                     });
                     wrapped.method("length", &vecType::dim);
+                    wrapped.method("nzindices", [](vecType& S) {
+                        return Set<pm::Int>(pm::indices(S));
+                    });
                     wrapped.method("resize!",
                                    [](vecType& V, int64_t sz) { V.resize(sz); });
                     wrapped.method("show_small_obj", [](vecType& S) {
