@@ -10,7 +10,8 @@ import REPL: LineEdit, REPLCompletions
 struct PolymakeCompletions <: LineEdit.CompletionProvider end
 
 function shell_execute_print(s::String)
-   res = shell_execute(s)
+   res = convert(Tuple{Bool, String, String, String}, shell_execute(s))
+
    if res[1]
       print(Base.stdout, res[2])
       print(Base.stderr, res[3])
@@ -29,9 +30,9 @@ end
 function LineEdit.complete_line(c::PolymakeCompletions, s)
    partial = REPL.beforecursor(LineEdit.buffer(s))
    full = LineEdit.input_string(s)
-   res = shell_complete(full)
-   offset = res[1]
-   proposals = res[2:end]
+   res = convert(Tuple{Int, String}, shell_complete(full))
+   offset = first(res)
+   proposals = res[2]
    return proposals, partial[end-offset+1:end], size(proposals,1) > 0
 end
 

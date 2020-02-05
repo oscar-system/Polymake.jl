@@ -69,23 +69,20 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake.method("shell_complete", [](const std::string x) {
         auto res = data.main_polymake_session->shell_complete(x);
-        std::vector<std::string> props = std::get<2>(res);
-        jl_value_t**             output = new jl_value_t*[props.size() + 1];
-        output[0] = jl_box_int64(std::get<0>(res));
-        for (size_t i = 0; i < props.size(); ++i)
-            output[i + 1] = jl_cstr_to_string(props[i].c_str());
-        return jlcxx::make_julia_array(output, props.size() + 1);
+        return std::tuple<int64_t, std::vector<std::string>>{
+            std::get<0>(res),
+            std::get<2>(res)
+        };
     });
 
     polymake.method("shell_context_help", [](
-        const std::string input, size_t pos=std::string::npos,
-        bool full=false, bool html=false){
+        const std::string& input,
+        size_t pos=std::string::npos,
+        bool full=false,
+        bool html=false){
         std::vector<std::string> ctx_help =
             data.main_polymake_session->shell_context_help(input, pos, full, html);
-        jlcxx::Array<std::string> jlarr;
-        for (const auto& s : ctx_help)
-            jlarr.push_back(s);
-        return jlarr;
+        return ctx_help;
     });
 
     polymake.method("set_preference", [](const std::string x) {
