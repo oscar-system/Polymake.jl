@@ -19,15 +19,19 @@ function bigobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwarg
     return obj
 end
 
-Base.propertynames(p::Polymake.BigObject) = Symbol.(Polymake.complete_property(p, ""))
-
-function Base.setproperty!(obj::BigObject, prop::String, val)
-    return take(obj, prop, convert(PolymakeType, val))
-end
+Base.propertynames(p::Polymake.BigObject) = Symbol.(complete_property(p, ""))
 
 function Base.setproperty!(obj::BigObject, prop::Symbol, val)
+    @assert prop != :cpp_object
     return take(obj, string(prop), convert(PolymakeType, val))
 end
+
+function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Nothing})
+    @assert prop == :cpp_object
+    return setfield!(obj, prop, val)
+end
+
+Base.setproperty!(obj::BigObject, prop::String, val) = setproperty!(obj, Symbol(prop), val)
 
 function give(obj::Polymake.BigObject, prop::String)
     return_obj = try
@@ -38,7 +42,13 @@ function give(obj::Polymake.BigObject, prop::String)
     return convert_from_property_value(return_obj)
 end
 
-Base.getproperty(obj::BigObject, prop::Symbol) = give(obj, string(prop))
+function Base.getproperty(obj::BigObject, prop::Symbol)
+    if prop == :cpp_object
+        return getfield(obj, :cpp_object)
+    else
+        return give(obj, string(prop))
+    end
+end
 
 function complete_property(obj::BigObject, prefix::String)
    call_function(:common, :complete_property, obj, prefix)
