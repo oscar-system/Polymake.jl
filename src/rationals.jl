@@ -1,9 +1,13 @@
-# specialized Int32, Int64 constructors handled by Cxx side
-Rational(a::BigInt, b::BigInt) = Rational(Integer(a), Integer(b))
-# for the rest we have a blanket
-@inline Rational(a::Base.Integer, b::Base.Integer) = Rational(Integer(a), Integer(b))
-Rational(x::Base.Rational{<:Base.Integer}) = Rational(numerator(x), denominator(x))
+Rational(num::Int64, den::Int64) =
+    rational_si_si(convert(CxxLong, num), convert(CxxLong, den))
 
+function Rational(num::T, den::S) where {T<:Base.Integer, S<:Base.Integer}
+    R = promote_type(promote_type(T, Int64), promote_type(S, Int64))
+    R == Int64 && return Rational(convert(Int64, num), convert(Int64, den))
+    return Rational(Integer(convert(BigInt, num)), Integer(convert(BigInt, den)))
+end
+
+Rational(x::Base.Rational) = Rational(numerator(x), denominator(x))
 Rational(int::Base.Integer) = Rational(int, one(int))
 Rational(x::Number) = Rational(Base.Rational(x))
 

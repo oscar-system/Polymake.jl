@@ -1,7 +1,12 @@
 using SparseArrays
 
+function IncidenceMatrix{T}(::UndefInitializer, n::Base.Integer, m::Base.Integer) where
+    T <: Union{NonSymmetric, Symmetric}
+    return IncidenceMatrix{T}(convert(Int64, n), convert(Int64, m))
+end
+
 function IncidenceMatrix{NonSymmetric}(mat::AbstractMatrix)
-    res = IncidenceMatrix{NonSymmetric}(size(mat)...)
+    res = IncidenceMatrix{NonSymmetric}(undef, size(mat)...)
     @inbounds res .= mat
     return res
 end
@@ -9,7 +14,7 @@ end
 function IncidenceMatrix{Symmetric}(mat::AbstractMatrix)
     m,n = size(mat)
     m == n || throw(ArgumentError("a symmetric matrix needs to be quadratic"))
-    res = IncidenceMatrix{Symmetric}(m,n)
+    res = IncidenceMatrix{Symmetric}(undef, m,n)
     for i = 1:m
         for j = 1:i
             temp = mat[i,j]
@@ -44,7 +49,9 @@ end
 # set default parameter to NonSymmetric
 IncidenceMatrix(x...) = IncidenceMatrix{NonSymmetric}(x...)
 
-Base.size(m::IncidenceMatrix) = (rows(m), cols(m))
+Base.size(m::IncidenceMatrix) = (nrows(m), ncols(m))
+
+Base.eltype(::IncidenceMatrix) = Bool
 
 Base.@propagate_inbounds function Base.getindex(M::IncidenceMatrix , i::Base.Integer, j::Base.Integer)
     @boundscheck checkbounds(M, i, j)

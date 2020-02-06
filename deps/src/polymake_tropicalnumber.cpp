@@ -6,10 +6,14 @@
 
 #include "polymake_tropicalnumber.h"
 
+template<> struct jlcxx::IsMirroredType<pm::Max> : std::false_type { };
+template<> struct jlcxx::IsMirroredType<pm::Min> : std::false_type { };
+
 void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
 {
     polymake.add_type<pm::Max>("Max");
     polymake.add_type<pm::Min>("Min");
+
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
             "TropicalNumber", jlcxx::julia_type("Number", "Base"))
@@ -22,10 +26,10 @@ void polymake_module_add_tropicalnumber(jlcxx::Module& polymake)
                     wrapped.method("zero", [](tropType& a) { return a.zero(); });
                     wrapped.method("dual_zero", [](tropType& a) { return a.dual_zero(); });
                     wrapped.method("one", [](tropType& a) { return a.one(); });
-                    wrapped.method("+", [](tropType& a, tropType& b) { return a + b; });
-                    wrapped.method("*", [](tropType& a, tropType& b) { return a * b; });
+                    wrapped.method("_add", [](tropType& a, tropType& b) { return a + b; });
+                    wrapped.method("_mul", [](tropType& a, tropType& b) { return a * b; });
                     wrapped.method("//", [](tropType& a, tropType& b) { return a / b; });
-                    wrapped.method("==", [](tropType& a,
+                    wrapped.method("_isequal", [](tropType& a,
                             tropType& b) { return a == b; });
                     wrapped.method("<", [](tropType& a,
                             tropType& b) { return a < b; });

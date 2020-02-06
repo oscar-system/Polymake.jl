@@ -28,11 +28,15 @@
         function test_pm_macro()
             P = @pm polytope.cube(3)
             Pfl = @pm common.convert_to{Float}(P)
-            d = polytope.dim(Pfl)
+            d = polytope.dim(Pfl)::Int
             return d+1
         end
 
         @test test_pm_macro() == 4
+
+        @test polytope.cube(Polymake.PropertyValue, 3) isa Polymake.PropertyValue
+        c = polytope.cube(Polymake.PropertyValue, 3);
+        @test polytope.spherize(c) isa BigObject
     end
 
     @testset "template parameters" begin
@@ -161,7 +165,7 @@
     @testset "polymake MILP" begin
         p = @pm polytope.Polytope( :INEQUALITIES => [1 1 -1; -1 0 1; 7 -1 -1] )
         intvar = Polymake.Set([0,1,2])
-        @test Polymake.convert(Polymake.PolymakeType, intvar) isa Polymake.Set{Int64}
+        @test Polymake.convert(Polymake.PolymakeType, intvar) isa Polymake.Set{Polymake.to_cxx_type(Int64)}
 
         obj = [0,-1,-1]
 
@@ -174,5 +178,9 @@
         p.MILP = @pm polytope.MixedIntegerLinearProgram( LINEAR_OBJECTIVE = obj, INTEGER_VARIABLES = intvar)
 
         @test p.MILP.MINIMAL_VALUE == -7
+    end
+
+    @testset "toplevel visual" begin
+        @test visual(polytope.cube(3)) isa Polymake.Visual
     end
 end
