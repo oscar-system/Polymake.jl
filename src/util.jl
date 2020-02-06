@@ -8,6 +8,8 @@ for f in [:to_one_based_indexing, :to_zero_based_indexing]
     end
 end
 
+get_current_app() = shell_execute("print \$User::application->name;")[2]
+
 function get_docs(input::String; full::Bool=true, html::Bool=false)
     pos = UInt(max(length(input)-1, 0))
     return shell_context_help(input, pos, full, html)

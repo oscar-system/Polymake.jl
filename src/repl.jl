@@ -9,8 +9,9 @@ import REPL: LineEdit, REPLCompletions
 
 struct PolymakeCompletions <: LineEdit.CompletionProvider end
 
-function shell_execute_print(s::String)
+function shell_execute_print(s::String, panel::LineEdit.Prompt)
    res = convert(Tuple{Bool, String, String, String}, shell_execute(s))
+   panel.prompt=Polymake.get_current_app()*" > "
 
    if res[1]
       print(Base.stdout, res[2])
@@ -30,14 +31,14 @@ end
 function LineEdit.complete_line(c::PolymakeCompletions, s)
    partial = REPL.beforecursor(LineEdit.buffer(s))
    full = LineEdit.input_string(s)
-   res = convert(Tuple{Int, String}, shell_complete(full))
+   res = convert(Tuple{Int, Array{String}}, shell_complete(full))
    offset = first(res)
    proposals = res[2]
    return proposals, partial[end-offset+1:end], size(proposals,1) > 0
 end
 
 
-function CreatePolymakeREPL(; prompt = "polymake > ", name = :pm, repl = Base.active_repl, main_mode = repl.interface.modes[1])
+function CreatePolymakeREPL(; prompt = Polymake.get_current_app() * " > ", name = :pm, repl = Base.active_repl, main_mode = repl.interface.modes[1])
    mirepl = isdefined(repl,:mi) ? repl.mi : repl
    # Setup polymake panel
    panel = LineEdit.Prompt(prompt;
@@ -49,7 +50,7 @@ function CreatePolymakeREPL(; prompt = "polymake > ", name = :pm, repl = Base.ac
 
    panel.on_done = REPL.respond(repl,panel; pass_empty = false) do line
        if !isempty(line)
-           :(Polymake.shell_execute_print($line) )
+           :(Polymake.shell_execute_print($line, $panel) )
        else
            :(  )
        end
@@ -59,11 +60,6 @@ function CreatePolymakeREPL(; prompt = "polymake > ", name = :pm, repl = Base.ac
 
    main_mode == mirepl.interface.modes[1] &&
        push!(mirepl.interface.modes,panel)
-
-   # 0.7 compat
-   if isdefined(main_mode, :repl)
-       panel.repl = main_mode.repl
-   end
 
    hp = main_mode.hist
    hp.mode_mapping[name] = panel
@@ -78,7 +74,10 @@ function CreatePolymakeREPL(; prompt = "polymake > ", name = :pm, repl = Base.ac
    panel
 end
 
-global function run_polymake_repl(; prompt = "polymake > ", name = :pm, key = '$')
+global function run_polymake_repl(;
+                     prompt = Polymake.get_current_app() * " > ",
+                     name = :pm,
+                     key = '$')
    repl = Base.active_repl
    mirepl = isdefined(repl,:mi) ? repl.mi : repl
    main_mode = mirepl.interface.modes[1]
