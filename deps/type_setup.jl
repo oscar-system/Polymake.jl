@@ -68,7 +68,7 @@ void polymake_call_function_feed_argument(T& function, jl_value_t* argument)
         function << std::string(jl_string_data(argument));
     } $feeding_ifs
     else {
-        std::cerr << "While feeding arguments: conversion failed with: jl_typeof=" << jl_typeof(argument) << std::endl;
+        throw std::runtime_error("Cannot pass function argument: conversion failed for jl_typeof=" + jl_typeof(argument));
     }
     return;
 }
@@ -102,7 +102,7 @@ void option_set_take(pm::perl::OptionSet optset,
         optset[key] << std::string(jl_string_data(value));
     } $option_set_ifs
     else {
-        std::cerr << "While constructing OpitonSet: conversion failed with: " << key << std::endl;
+        throw std::runtime_error("Cannot create OptionSet: conversion failed for key " + key);
     }
     return;
 }
