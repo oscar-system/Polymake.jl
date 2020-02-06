@@ -10,10 +10,10 @@ function Polynomial{C,E}(p::Polynomial) where {C <: VecOrMat_eltypes, E <: Int64
     return Polynomial{C,E}(vec, mat)
 end
 
-# function Polynomial{C,E}(n::Number) where {C <: VecOrMat_eltypes, E <: Int64}
-#     mat = zeros(1,i)
-#     return Polynomial{C,E}([n],mat)
-# end
+function Polynomial{C,E}(n::Number, d::Base.Integer) where {C <: VecOrMat_eltypes, E <: Int64}
+    mat = zeros(1,d)
+    return Polynomial{C,E}([n],mat)
+end
 
 Polynomial(vec::AbstractVector{C}, mat::AbstractMatrix{E}) where {C,E} = Polynomial{promote_to_pm_type(Vector,C),Int64}(vec, mat)
 Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C <: VecOrMat_eltypes,E} = Polynomial{C,promote_to_pm_type(Matrix,E)}(vec, mat)
@@ -21,20 +21,18 @@ Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C <: VecOrMat_
 set_var_names(p::Polynomial, names::AbstractArray{S}) where {S <: AbstractString} = set_var_names(p, Array{String}(names))
 
 Base.promote_rule(::Type{<:Polynomial{C1,E1}}, ::Type{<:Polynomial{C2,E2}}) where {C1,C2,E1,E2} = Polynomial{Base.promote_type(C1,C2),Base.promote_type(E1,E2)}
-# Base.promote_rule(::Type{<:Polynomial{C,E}}, ::Type{<:Number}, i::Number) where {C,E} = Polynomial{C,E, i}
-# Base.promote_rule(::Type{<:Number}, ::Type{<:Polynomial{C,E}}) where {C,E} = Polynomial{C,E}
 
 for op in (:+, :-, :*, :(==))
     @eval begin
         function Base.$(op)(p::Polynomial, q::Polynomial)
             return $(op)(promote(p,q)...)
         end
-        # function Base.$(op)(p::Number, q::Polynomial)
-        #     return $(op)(promote(p,q,size(monomials_as_matrix(q)[2]))...)
-        # end
-        # function Base.$(op)(p::Polynomial, q::Number)
-        #     return $(op)(promote(p,q,size(monomials_as_matrix(p)[2]))...)
-        # end
+        function Base.$(op)(p::Number, q::Polynomial{C,E}) where {C,E}
+            return $(op)(Polynomial{C,E}(p,(size(monomials_as_matrix(q)))[2]),q)
+        end
+        function Base.$(op)(p::Polynomial{C,E}, q::Number) where {C,E}
+            return $(op)(p,Polynomial{C,E}(q,(size(monomials_as_matrix(p)))[2]))
+        end
     end
 end
 

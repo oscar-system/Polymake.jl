@@ -65,13 +65,26 @@ using SparseArrays
             @test p^3 isa Polymake.Polynomial{C1}
             @test p^3 == Polymake.Polynomial([8, 12, 6, 1],[18 21 0; 15 18 5; 12 15 10; 9 12 15])
             # @test p/2 isa Polymake.Polynomial{C1}
-            # @test p/2 == Polymake.Polynomial{C1}(jl_v/2,jl_m)
-            # @test -p isa Polymake.Polynomial{C1}
-            # @test -p == Polymake.Polynomial(-jl_v,-jl_m)
-            # @test p + 8 isa Polymake.Polynomial{C1}
-            # @test 8 + p isa Polymake.Polynomial{C1}
-            # @test p + 8 == Polymake.Polynomial(jl_v2, jl_m2)
-            # @test 8 + p == Polymake.Polynomial(jl_v2, jl_m2)
+            # @test p/2 == Polymake.Polynomial{C1}(C1 <: Integer ? floor.(jl_v/2) : jl_v/2,jl_m)
+            @test -p isa Polymake.Polynomial{C1}
+            @test -p == Polymake.Polynomial(-jl_v,jl_m)
+            @test p + (-p) == 0
+            @test p + 8 isa Polymake.Polynomial{C1}
+            @test 8 + p isa Polymake.Polynomial{C1}
+            @test p + 8 == Polymake.Polynomial([jl_v; 8], [jl_m; 0 0 0])
+            @test 8 + p == Polymake.Polynomial([jl_v; 8], [jl_m; 0 0 0])
+            @test p - 7 isa Polymake.Polynomial{C1}
+            @test 7 - p isa Polymake.Polynomial{C1}
+            @test p - 7 == Polymake.Polynomial([jl_v; -7], [jl_m; 0 0 0])
+            @test 7 - p == Polymake.Polynomial([-jl_v; 7], [jl_m; 0 0 0])
+            @test p * 6 isa Polymake.Polynomial{C1}
+            @test 6 * p isa Polymake.Polynomial{C1}
+            @test p * 6 == Polymake.Polynomial(6jl_v, jl_m)
+            @test 6 * p == Polymake.Polynomial(6jl_v, jl_m)
+            @test 8 + p - p == 8
+            @test 8 == 8 + p - p
+            @test (5 * p) / 5 isa Polymake.Polynomial{C1}
+            @test (5 * p) / 5 == p
         end
     end
 
