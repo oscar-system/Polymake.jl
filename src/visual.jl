@@ -1,3 +1,5 @@
+export visual
+
 Base.show(io::IO,::MIME"text/plain", obj::BigObject) = print(io, properties(obj))
 
 function Base.show(io::IO,::MIME"text/html",obj::BigObject)
@@ -64,6 +66,20 @@ function Base.show(io::IO,::MIME"text/html",v::Visual)
     print(io,_get_visual_string_threejs(v))
 end
 
-function Base.show(io::IO,::MIME"text/svg+xml",v::Visual)
+function Base.show(io::IO,::MIME"image/svg+xml",v::Visual)
     print(io,_get_visual_string_svg(v))
 end
+
+"""
+    visual(obj::BigObject; options...)
+
+Visualize the given big object.
+
+## Example
+
+```
+c = polytope.cube(3)
+visual(c)
+```
+"""
+visual(obj::BigObject; kwargs...) = call_method(obj, :VISUAL; kwargs...)

@@ -390,7 +390,8 @@ using SparseArrays
     end
 
     @testset "findnz" begin
-        jsm = sprand(1015,1841,.14)
+        jsm = sprand(1015,1841,.00014)
+        droptol!(jsm,Polymake._get_global_epsilon())
         psm = Polymake.SparseMatrix(jsm)
         jr, jc, jv = findnz(jsm)
         pr, pc, pv = findnz(psm)

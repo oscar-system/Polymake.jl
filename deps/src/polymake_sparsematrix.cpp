@@ -8,6 +8,9 @@
 
 void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
 {
+
+    polymake.method("_get_global_epsilon", []() { return pm::spec_object_traits<double>::global_epsilon; });
+    polymake.method("_set_global_epsilon", [](double e) { pm::spec_object_traits<double>::global_epsilon = e; });
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>, jlcxx::ParameterList<jlcxx::TypeVar<1>,int>>(
             "SparseMatrix", jlcxx::julia_type("AbstractSparseMatrix", "SparseArrays"))
