@@ -1,10 +1,15 @@
 import SparseArrays
 
+# not overloading SparseArrays.spzero on purpose
+function spzeros(::Type{T}, n::Base.Integer, m::Base.Integer) where T <:VecOrMat_eltypes
+    return SparseMatrix{to_cxx_type(T)}(n,m)
+end
+
 #functions for input of julia sparse matrix type
-@inline function SparseMatrix{T}(mat::SparseArrays.SparseMatrixCSC) where T <: VecOrMat_eltypes
+function SparseMatrix{T}(mat::SparseArrays.SparseMatrixCSC) where T
     (m,n) = size(mat)
     (r,c,v) = SparseArrays.findnz(mat)
-    sm = SparseMatrix{T}(m,n)
+    sm = Polymake.spzeros(T, m, n)
     for i = 1:length(r)
         sm[r[i],c[i]] = v[i]
     end
@@ -13,10 +18,10 @@ end
 
 
 #functions for input of dense matrix type
-@inline function SparseMatrix{T}(mat::AbstractMatrix) where T <: VecOrMat_eltypes
+@inline function SparseMatrix{T}(mat::AbstractMatrix) where T
     (m,n) = size(mat)
-    sm = SparseMatrix{T}(m,n)
-    temp = T(0)
+    sm = Polymake.spzeros(T, m, n)
+    temp = zero(T)
     for i = 1:m
         for j = 1:n
             temp = mat[i,j]
@@ -28,36 +33,30 @@ end
     return sm
 end
 
-# we can't use convert_to_pm_type(T) below:
-# only types in Matrix_suppT are available
-SparseMatrix(mat::AbstractMatrix{Int64}) = SparseMatrix{Int64}(mat)
-SparseMatrix(mat::AbstractMatrix{T}) where T <: Base.Integer = SparseMatrix{Integer}(mat)
-SparseMatrix(mat::AbstractMatrix{T}) where T <: Union{Base.Rational, Rational} = SparseMatrix{Rational}(mat)
-SparseMatrix(mat::AbstractMatrix{T}) where T <: AbstractFloat = SparseMatrix{Float64}(mat)
+SparseMatrix(mat::AbstractMatrix{T}) where T =
+    SparseMatrix{promote_to_pm_type(SparseMatrix, T)}(mat)
 
-SparseMatrix(mat::M) where M <: SparseMatrix{Float64} = mat
+Base.size(m::SparseMatrix) = (nrows(m), ncols(m))
 
-Base.size(m::SparseMatrix) = (Int(rows(m)), Int(cols(m)))
+Base.eltype(m::SparseMatrix{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(M::SparseMatrix , i::Base.Integer, j::Base.Integer)
-    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck checkbounds(M, i, j)
     return _getindex(M, convert(Int64, i), convert(Int64, j))
 end
 
 Base.@propagate_inbounds function Base.setindex!(M::SparseMatrix{T}, val, i::Base.Integer, j::Base.Integer) where T
-    @boundscheck 1 <= i <= rows(M) || throw(BoundsError(M, [i,j]))
-    @boundscheck 1 <= j <= cols(M) || throw(BoundsError(M, [i,j]))
+    @boundscheck checkbounds(M, i, j)
     _setindex!(M, convert(T, val), convert(Int64, i), convert(Int64, j))
-    return val
+    return M
 end
 
-function SparseArrays.findnz(mat::SparseMatrix{T}) where T <: VecOrMat_eltypes
+function SparseArrays.findnz(mat::SparseMatrix{T}) where T
     nzi = nzindices(mat)
     len = sum(length, nzi)
     ri = Base.Vector{Int64}(undef, len)
     ci = Base.Vector{Int64}(undef, len)
-    v = Base.Vector{T}(undef, len)
+    v = Base.Vector{to_jl_type(T)}(undef, len)
     k = 1
     for r = 1:length(nzi)
         for c in nzi[r]

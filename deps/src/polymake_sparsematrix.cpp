@@ -28,8 +28,8 @@ void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
                         int64_t j) {
                             M(i - 1, j - 1) = r;
                     });
-                    wrapped.method("rows", &matType::rows);
-                    wrapped.method("cols", &matType::cols);
+                    wrapped.method("nrows", &matType::rows);
+                    wrapped.method("ncols", &matType::cols);
                     wrapped.method("nzindices", [](matType& S) {
                         return Array<Set<pm::Int>>(pm::rows(pm::index_matrix(S)));
                     });

@@ -20,24 +20,13 @@ void set_julia_type(std::string name, void* type_address)
         address = (*type_map_translator)[name];
     }
     catch (std::exception& e) {
-        std::cerr << "This should never happen: " << name << std::endl;
+        std::cerr << "In 'set_julia_type': type translation failed for " << name << std::endl;
         return;
     }
     memcpy(address, &type_address, sizeof(jl_value_t*));
 }
 
 #include "generated/polymake_call_function_feed_argument.h"
-
-std::vector<std::string>
-create_template_vector(jlcxx::ArrayRef<std::string> template_parameters)
-{
-    size_t                   number_templates = template_parameters.size();
-    std::vector<std::string> return_vector(number_templates);
-    for (size_t i = 0; i < number_templates; i++) {
-        return_vector[i] = template_parameters[i];
-    }
-    return return_vector;
-}
 
 template <bool VoidContext = false>
 using funcall_type = std::conditional_t<VoidContext,void,pm::perl::PropertyValue>;
@@ -46,14 +35,11 @@ using funcall_type = std::conditional_t<VoidContext,void,pm::perl::PropertyValue
 // then immediately released,i.e. not converted to a property value
 template<bool VoidContext = false>
 auto polymake_call_function(
-    std::string                     function_name,
-    jlcxx::ArrayRef<std::string, 1> template_parameters,
-    jlcxx::ArrayRef<jl_value_t*, 1> arguments)
+    const std::string&                     function_name,
+    const std::vector<std::string>&        template_vector,
+    const jlcxx::ArrayRef<jl_value_t*, 1> arguments)
     -> funcall_type<VoidContext>
 {
-    std::vector<std::string> template_vector =
-        create_template_vector(template_parameters);
-    size_t argument_list = arguments.size();
     auto   function = polymake::prepare_call_function(function_name, template_vector);
     for (auto arg : arguments)
         polymake_call_function_feed_argument(function, arg);
@@ -64,12 +50,12 @@ auto polymake_call_function(
 // then immediately released,i.e. not converted to a property value
 template<bool VoidContext = false>
 auto polymake_call_method(
-    std::string                     function_name,
-    pm::perl::BigObject*            object,
-    jlcxx::ArrayRef<jl_value_t*, 1> arguments)
+    const std::string&                     function_name,
+    pm::perl::BigObject             object,
+    const jlcxx::ArrayRef<jl_value_t*, 1> arguments)
     -> funcall_type<VoidContext>
 {
-    auto   function = object->prepare_call_method(function_name);
+    auto   function = object.prepare_call_method(function_name);
     for (auto arg : arguments)
         polymake_call_function_feed_argument(function, arg);
     return static_cast<funcall_type<VoidContext>>(function());

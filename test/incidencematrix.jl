@@ -8,9 +8,9 @@ using SparseArrays
     for S in SymTypes
         for N in [IntTypes; FloatTypes; Polymake.Integer; Polymake.Rational]
             @test Polymake.IncidenceMatrix{S} <: AbstractSparseMatrix
-            @test Polymake.IncidenceMatrix{S} <: AbstractSparseMatrix{Bool}
+            @test Polymake.IncidenceMatrix{S} <: AbstractSparseMatrix{Polymake.to_cxx_type(Bool)}
             @test Polymake.IncidenceMatrix{S}(3,4) isa AbstractSparseMatrix
-            @test Polymake.IncidenceMatrix{S}(3,4) isa AbstractSparseMatrix{Bool}
+            @test Polymake.IncidenceMatrix{S}(3,4) isa AbstractSparseMatrix{Polymake.to_cxx_type(Bool)}
             @test Polymake.IncidenceMatrix{S}(3,4) isa Polymake.IncidenceMatrix
             @test Polymake.IncidenceMatrix{S}(3,4) isa Polymake.IncidenceMatrix{S}
             M = Polymake.IncidenceMatrix{S}(3,4)
@@ -91,9 +91,9 @@ using SparseArrays
                 @test N[2, 2] == true
                 @test string(N) == "pm::IncidenceMatrix<pm::NonSymmetric>\n{0 2}\n{0 1}\n"
                 # testing the return value when asking for a single row or column
-                @test Polymake.row(N, T(1)) isa Polymake.Set{Int64}
+                @test Polymake.row(N, T(1)) isa Polymake.Set{Polymake.to_cxx_type(Int)}
                 @test Polymake.row(N, T(1)) == Set([1, 3])
-                @test Polymake.col(N, T(2)) isa Polymake.Set{Int64}
+                @test Polymake.col(N, T(2)) isa Polymake.Set{Polymake.to_cxx_type(Int)}
                 @test Polymake.col(N, T(2)) == Set([2])
 
                 @test_throws BoundsError Polymake.row(N, T(0))
@@ -128,9 +128,9 @@ using SparseArrays
                 @test S[3, 1] == false
                 @test string(S) == "pm::IncidenceMatrix<pm::Symmetric>\n{0}\n{}\n{2}\n"
                 # testing the return value when asking for a single row or column
-                @test Polymake.row(S, T(2)) isa Polymake.Set{Int64}
+                @test Polymake.row(S, T(2)) isa Polymake.Set{Polymake.to_cxx_type(Int)}
                 @test Polymake.row(S, T(2)) == Set([])
-                @test Polymake.col(S, T(3)) isa Polymake.Set{Int64}
+                @test Polymake.col(S, T(3)) isa Polymake.Set{Polymake.to_cxx_type(Int)}
                 @test Polymake.col(S, T(3)) == Set([3])
 
                 @test_throws BoundsError Polymake.row(S, T(0))
@@ -157,17 +157,18 @@ using SparseArrays
             @test (!).(V) isa Polymake.IncidenceMatrixAllocated{Polymake.NonSymmetric}
             @test ((&).(V, (!).(V))) == zeros(3,3)
             @test ((|).(V, (!).(V))) == ones(3,3)
-            @test -V isa Polymake.MatrixAllocated{Polymake.Int64}
+            @test -V isa Polymake.MatrixAllocated{Polymake.to_cxx_type(Int)}
             @test -V == -jl_s
 
             int_scalar_types = [IntTypes; Polymake.Integer]
             rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
-            @test 2V isa Polymake.Matrix{Polymake.Int64}
-            @test Int32(2)V isa Polymake.Matrix{Int64}
+            @test 2V isa Polymake.Matrix{Polymake.to_cxx_type(Int)}
+            @test Int32(2)V isa Polymake.Matrix{Polymake.to_cxx_type(Int)}
 
             for T in int_scalar_types
-                U = Polymake.promote_to_pm_type(Polymake.Matrix,T)
+                U = Polymake.promote_to_pm_type(Polymake.Matrix, T)
+                U = Polymake.to_cxx_type(U)
 
                 op = *
                 @test op(T(2), V) isa Polymake.Matrix{U}
