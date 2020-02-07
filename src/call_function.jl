@@ -6,7 +6,7 @@ end
 
 """
     call_function([::Type{PropertyValue},] app::Symbol, func::Symbol, args...;
-        template_parameters=String[], unwrap=true, kwargs...)
+        template_parameters=String[], kwargs...)
 
 Call a polymake function `func` from application `app` with given arguments `args`.
 If `PropertyValue` is specified as the first argument no unwrapping is performed
