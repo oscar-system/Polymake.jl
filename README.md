@@ -23,16 +23,13 @@ This will fetch a pre-built binary of `polymake`. You are ready to start `using 
 
 Note: Pre-built binaries are available for the `Linux` and `macOS` platform, but the `macOS` binaries are considered experimental. Windows users are encouraged to try running Julia inside Window Subsystem for Linux and reporting back ;)
 
-To skip the test for `polymake-config` in the `PATH` and directly use the pre-built binaries you need to set `POLYMAKE_CONFIG=no` in your environment.
-
 Note: Pre-built polymake will use a separate `.polymake` config directory (usually `joinpath(homedir(), ".julia", "polymake_user")`).
 
 ### Your own installation of `polymake`
 
-If you already have a recent enough version of `polymake` (i.e. `>=3.3`) on your system,
-you either need to make `polymake-config` available in your `PATH` or
-the environment variable `POLYMAKE_CONFIG` needs to point to the correct
-`polymake-config` file.
+If you already have a recent enough version of `polymake` (i.e. `>=4.0`) on your system and you want to use this version of `polymake`, you either need to
+ * set the environment variable `POLYMAKE_CONFIG=yes` and make `polymake-config` available in your `PATH` or
+ * set the environment variable `POLYMAKE_CONFIG` to the full path of the `polymake-config` executable.
 
 After this just `add` the package as above (or `build` if the package has been already added), the build script will use your `polymake` installation.
 
@@ -59,14 +56,14 @@ After this start Julia and follow the instructions above.
 Note: Self-built polymake will use the standard `.polymake` config directory (usually `$HOME/.polymake`).
 
 ### `Polymake.jl` in a separate environment:
-First clone `Polymake.jl`:
 ```
-git clone https://github.com/oscar-system/Polymake.jl.git
+mkdir my_new_env
+cd my_new_env
 ```
-In the same directory start Julia and press `]` for `pkg` mode. Then run
+Then start Julia in the directory and press `]` for `pkg` mode.
 ```julia
-(v1.0) pkg> activate Polymake.jl
-(Polymake) pkg> instantiate
+(v1.3) pkg> activate .
+(Polymake) pkg> dev --local Polymake
 (Polymake) pkg> build Polymake # fetches the prebuild polymake binaries
 (Polymake) pkg> test Polymake # and You are good to go!
 ```
