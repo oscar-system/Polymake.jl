@@ -1,10 +1,8 @@
-function Vector{T}(len::UR) where
-    {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
+function Vector{T}(len::UR) where {T, UR<:Base.AbstractUnitRange}
     return Vector{T}(undef, length(len))
 end
 
-function Matrix{T}(rows::UR, cols::UR) where
-    {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
+function Matrix{T}(rows::UR, cols::UR) where {T , UR<:Base.AbstractUnitRange}
     return Matrix{T}(undef, length(rows), length(cols))
 end
 
@@ -13,8 +11,7 @@ function IncidenceMatrix{NonSymmetric}(rows::UR, cols::UR) where
     return IncidenceMatrix{NonSymmetric}(undef, length(rows), length(cols))
 end
 
-function spzeros(::Type{T}, rows::UR, cols::UR) where
-    {T <: VecOrMat_eltypes, UR<:Base.AbstractUnitRange}
+function spzeros(::Type{T}, rows::UR, cols::UR) where {T , UR<:Base.AbstractUnitRange}
     return Polymake.spzeros(T, length(rows), length(cols))
 end
 
