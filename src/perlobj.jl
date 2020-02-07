@@ -26,7 +26,7 @@ function Base.setproperty!(obj::BigObject, prop::Symbol, val)
     return take(obj, string(prop), convert(PolymakeType, val))
 end
 
-function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Nothing})
+function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Cvoid})
     @assert prop == :cpp_object
     return setfield!(obj, prop, val)
 end
