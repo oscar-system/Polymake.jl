@@ -28,9 +28,9 @@ Base.@propagate_inbounds function Base.setindex!(M::Matrix{T}, val, i::Base.Inte
 end
 
 #create Matrix from a sparse matrix
-function Matrix{T}(mat::AbstractSparseMatrix) where T <: VecOrMat_eltypes
+function Matrix(mat::AbstractSparseMatrix{T}) where T
     row, col, val = SparseArrays.findnz(mat)
-    res = Polymake.spzeros(T, size(mat)...)
+    res = Matrix{T}(undef, size(mat)...)
     for (r, c, v) in zip(row, col, val)
         res[r, c] = v
     end
