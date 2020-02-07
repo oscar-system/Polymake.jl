@@ -1,7 +1,7 @@
 function Polynomial{C,E}(vec::AbstractVector, mat::AbstractMatrix) where {C <: VecOrMat_eltypes, E <: Int64}
-    vec = Vector{C}(vec)
-    mat = Matrix{E}(mat)
-    return Polynomial{C,E}(vec, mat)
+    vec = Vector{to_cxx_type(C)}(vec)
+    mat = Matrix{to_cxx_type(E)}(mat)
+    return Polynomial{to_cxx_type(C),to_cxx_type(E)}(vec, mat)
 end
 
 function Polynomial{C,E}(p::Polynomial) where {C <: VecOrMat_eltypes, E <: Int64}
