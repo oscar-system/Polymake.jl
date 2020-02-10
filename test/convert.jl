@@ -27,12 +27,11 @@
     end
 
     @testset "@convert_to" begin
-        Polymake.@convert_to Integer 64 isa Polymake.Integer
-        @test eval(Polymake.@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]) isa Polymake.Array{Polymake.Set{Int64}}
-        @test eval(Polymake.@convert_to Vector{Float} [10, 11, 12]) isa Polymake.Vector{Float64}
-        @test eval(Polymake.@convert_to Matrix{Rational} [10/1 11/1 12/1]) isa Polymake.Matrix{Polymake.Rational}
-        @test_throws ArgumentError Polymake.@convert_to Array{Set{Int}}
-        @test_throws ArgumentError Polymake.@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])] Set([4, 3])
-        # @test_throws
+        @convert_to Integer 64 isa Polymake.Integer
+        @test eval(@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]) isa Polymake.Array{Polymake.Set{Int64}}
+        @test eval(@convert_to Vector{Float} [10, 11, 12]) isa Polymake.Vector{Float64}
+        @test eval(@convert_to Matrix{Rational} [10/1 11/1 12/1]) isa Polymake.Matrix{Polymake.Rational}
+        @test_throws ArgumentError @convert_to Array{Set{Int}}
+        @test_throws ArgumentError @convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])] Set([4, 3])
     end
 end
