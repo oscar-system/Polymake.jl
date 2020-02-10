@@ -8,16 +8,16 @@ using SparseArrays
         @test Polymake.Polynomial{C,Int64} <: Any
         @test Polymake.Polynomial{C,Int64}([1, 2],[3 4 5; 6 7 8]) isa Any
         @test Polymake.Polynomial{C,Int64}([1, 2],[3 4 5; 6 7 8]) isa Polymake.Polynomial
-        @test Polymake.Polynomial{C,Int64}([1, 2],[3 4 5; 6 7 8]) isa Polymake.Polynomial{C,Int64}
+        @test Polymake.Polynomial{C,Int64}([1, 2],[3 4 5; 6 7 8]) isa Polymake.Polynomial{Polymake.to_cxx_type(C),Polymake.to_cxx_type(Int64)}
     end
 
     jl_v = [1, 2]
     jl_m = [3 4 5; 6 7 0]
     # @testset "Constructors/Converts" begin
     #     for C in [Int64, Polymake.Integer, Polymake.Rational, Float64]
-    #         @test Polymake.Polynomial(C.(jl_v), jl_m) isa Polymake.Polynomial{C,Int64}
-    #         @test Polymake.Polynomial{Float64}(C.(jl_v), jl_m) isa Polymake.Polynomial{Float64,Int64}
-    #         @test Polymake.Polynomial{Polymake.Rational,Int64}(C.(jl_v), jl_m) isa Polymake.Polynomial{Polymake.Rational,Int64}
+    #         @test Polymake.Polynomial(C.(jl_v), jl_m) isa Polymake.Polynomial{Polymake.to_cxx_type(C),Polymake.to_cxx_type(Int64)}
+    #         @test Polymake.Polynomial{Float64}(C.(jl_v), jl_m) isa Polymake.Polynomial{Polymake.to_cxx_type(Float64),Polymake.to_cxx_type(Int64)}
+    #         @test Polymake.Polynomial{Polymake.Rational,Int64}(C.(jl_v), jl_m) isa Polymake.Polynomial{Polymake.Rational,Polymake.to_cxx_type(Int64)}
     #     end
     # end
     #
@@ -30,13 +30,13 @@ using SparseArrays
     #         @test Polymake.get_var_names(p) == ["x", "y", "z"]
     #         @test string(p) == string("pm::Polynomial<", s, ", long>\n2*x^6*y^7 + x^3*y^4*z^5")
     #         @test Polymake.coefficients_as_vector(p) isa Polymake.Vector
-    #         @test Polymake.coefficients_as_vector(p) isa Polymake.Vector{C}
+    #         @test Polymake.coefficients_as_vector(p) isa Polymake.Vector{Polymake.to_cxx_type(C)}
     #         v = Polymake.coefficients_as_vector(p)
     #         perm1 = sortperm(jl_v)
     #         perm2 = sortperm(v)
     #         @test  v[perm2] == jl_v[perm1]
     #         @test Polymake.monomials_as_matrix(p) isa Polymake.SparseMatrix
-    #         @test Polymake.monomials_as_matrix(p) isa Polymake.SparseMatrix{Int64}
+    #         @test Polymake.monomials_as_matrix(p) isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int64)}
     #         m = Polymake.monomials_as_matrix(p)
     #         @test m[perm2, :] == jl_m[perm1, :]
     #     end

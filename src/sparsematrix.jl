@@ -56,7 +56,7 @@ function SparseArrays.findnz(mat::SparseMatrix{T}) where T <: VecOrMat_eltypes
     len = sum(length, nzi)
     ri = Base.Vector{Int64}(undef, len)
     ci = Base.Vector{Int64}(undef, len)
-    v = Base.Vector{T}(undef, len)
+    v = Base.Vector{eltype(mat)}(undef, len)
     k = 1
     for r = 1:length(nzi)
         for c in nzi[r]
