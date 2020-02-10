@@ -90,12 +90,8 @@ POINTS
 1 0 0
 
 ```
-Parameters could be passed as
-* keyword arguments (as above),
-* `Pair{Symbol, ...}`s e.g. `polytope.Polytope(:POINTS=>[ ... ])`
-* dictionaries e.g. `polytope.Polytope(Dict( "POINTS" => [ ... ] )`)
-
-The dictionary may hold many different attributes. All the keys *must* be compatible with `polymake`.
+Parameters to constructors can be passed as keyword arguments only.
+All the keys *must* be compatible with `polymake` input attribute names.
 
 Properties of such objects can be accessed by the `.` syntax:
 ```
