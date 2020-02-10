@@ -12,6 +12,19 @@ TropicalNumber{A}() where A = TropicalNumber{A, Rational}()
 TropicalNumber(x...) = throw(ArgumentError("TropicalNumber needs to be called with type parameter 'Max' or 'Min'."))
 TropicalNumber(::TropicalNumber) = TropicalNumber()
 
+# workaround for https://github.com/JuliaInterop/CxxWrap.jl/issues/199
+for (jlF, pmF) in (
+    (:(==), :_isequal),
+    (:+, :_add),
+    (:*, :_mul),
+    )
+    @eval begin
+        function Base.$(jlF)(x::TropicalNumber{A,S}, y::TropicalNumber{A,S}) where {A,S}
+            return $pmF(x, y)
+        end
+    end
+end
+
 function Base.:(==)(x::TropicalNumber{A,S},y::Real) where {A, S}
     return x == TropicalNumber{A,S}(y)
 end

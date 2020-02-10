@@ -6,6 +6,8 @@
 
 #include "polymake_sets.h"
 
+template<> struct jlcxx::IsMirroredType<pm::operations::cmp> : std::false_type { };
+
 void polymake_module_add_set(jlcxx::Module& polymake)
 {
     polymake.add_type<pm::operations::cmp>("operations_cmp");
@@ -33,7 +35,7 @@ void polymake_module_add_set(jlcxx::Module& polymake)
                 S.clear();
                 return S;
             });
-            wrapped.method("==", [](WrappedT& S, WrappedT& T) { return S == T; });
+            wrapped.method("_isequal", [](WrappedT& S, WrappedT& T) { return S == T; });
             wrapped.method(
                 "in", [](elemType i, WrappedT& S) { return S.contains(i); });
 
@@ -68,7 +70,7 @@ void polymake_module_add_set(jlcxx::Module& polymake)
                 return WrappedT{S ^ T};
             });
 
-            wrapped.method("getindex", [](WrappedT& S, WrappedT& T) {
+            wrapped.method("_getindex", [](WrappedT& S, WrappedT& T) {
                 return WrappedT{pm::select(pm::wary(S), T)};
             });
             wrapped.method("range", [](elemType a, elemType b) {

@@ -6,6 +6,9 @@
 
 #include "polymake_incidencematrix.h"
 
+template<> struct jlcxx::IsMirroredType<pm::NonSymmetric> : std::false_type { };
+template<> struct jlcxx::IsMirroredType<pm::Symmetric> : std::false_type { };
+
 void polymake_module_add_incidencematrix(jlcxx::Module& polymake)
 {
     polymake.add_type<pm::NonSymmetric>("NonSymmetric");
@@ -26,9 +29,9 @@ void polymake_module_add_incidencematrix(jlcxx::Module& polymake)
             int64_t j) {
                 M(i - 1, j - 1) = r;
         });
-        wrapped.method("rows", &WrappedT::rows);
+        wrapped.method("nrows", &WrappedT::rows);
         wrapped.method("_row", [](WrappedT& M, int64_t i) { return pm::Set<pm::Int>(M.row(i - 1)); });
-        wrapped.method("cols", &WrappedT::cols);
+        wrapped.method("ncols", &WrappedT::cols);
         wrapped.method("_col", [](WrappedT& M, int64_t i) { return pm::Set<pm::Int>(M.col(i - 1)); });
         wrapped.method("_resize!", [](WrappedT& M, int64_t i,
                                     int64_t j) { M.resize(i, j); });

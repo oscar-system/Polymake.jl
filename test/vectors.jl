@@ -4,10 +4,11 @@
 
     for T in [Int64, Polymake.Integer, Polymake.Rational, Float64]
         @test Polymake.Vector{T} <: AbstractVector
-        @test Polymake.Vector{T}(3) isa AbstractVector
-        @test Polymake.Vector{T}(3) isa Polymake.Vector
-        @test Polymake.Vector{T}(3) isa Polymake.Vector{T}
-        V = Polymake.Vector{T}(4)
+        @test Polymake.Vector{T}(undef, 3) isa AbstractVector
+        @test Polymake.Vector{T}(undef, 3) isa Polymake.Vector
+        @test Polymake.Vector{T}(undef, 3) isa AbstractVector{<:supertype(T)}
+        @test Polymake.Vector{T}(undef, 3) isa Polymake.Vector{Polymake.to_cxx_type(T)}
+        V = Polymake.Vector{T}(undef, 4)
         V[1] = 10
         V[end] = 4
         @test V[1] isa T
@@ -22,7 +23,8 @@
         @test Polymake.Vector(jl_v/1) isa Polymake.Vector{Float64}
 
         for T in [IntTypes; Polymake.Integer]
-            @test Polymake.Vector(T.(jl_v)) isa Polymake.Vector{T<:Union{Int32,Int64} ? Int64 : Polymake.Integer}
+            @test Polymake.Vector(T.(jl_v)) isa
+                Polymake.Vector{T<:Union{Int32,Int64} ? Polymake.to_cxx_type(Int64) : Polymake.Integer}
 
             for ElType in [Polymake.Integer, Polymake.Rational, Float64]
                 for v in [jl_v, jl_v//T(1), jl_v/T(1)]
@@ -64,7 +66,7 @@
 
         @testset "Polymake.Vector{Int64}" begin
             jl_v_32 = Int32.(jl_v)
-            @test Polymake.Vector(jl_v_32) isa Polymake.Vector{Int64}
+            @test Polymake.Vector(jl_v_32) isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
             V = Polymake.Vector{Int64}(jl_v_32)
 
             @test eltype(V) == Int64
@@ -76,7 +78,7 @@
 
             for T in [IntTypes; Polymake.Integer]
                 V = Polymake.Vector{Int64}(jl_v_32) # local copy
-                @test setindex!(V, T(5), 1) isa Polymake.Vector{Int64}
+                @test setindex!(V, T(5), 1) isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
                 @test V[T(1)] isa Int64
                 @test V[T(1)] == 5
                 # testing the return value of brackets operator
@@ -162,14 +164,14 @@
         end
 
         @testset "Equality" begin
-            X = Polymake.Vector{Int64}(3)
-            V = Polymake.Vector{Polymake.Integer}(3)
-            W = Polymake.Vector{Polymake.Rational}(3)
-            U = Polymake.Vector{Float64}(3)
+            X = Polymake.Vector{Int64}(undef, 3)
+            V = Polymake.Vector{Polymake.Integer}(undef, 3)
+            W = Polymake.Vector{Polymake.Rational}(undef, 3)
+            U = Polymake.Vector{Float64}(undef, 3)
 
             for T in [IntTypes; Polymake.Integer]
-                @test (X .= T.(jl_v)) isa Polymake.Vector{Int64}
-                @test (X .= T.(jl_v).//1) isa Polymake.Vector{Int64}
+                @test (X .= T.(jl_v)) isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
+                @test (X .= T.(jl_v).//1) isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
 
                 @test (V .= T.(jl_v)) isa Polymake.Vector{Polymake.Integer}
                 @test (V .= T.(jl_v).//1) isa Polymake.Vector{Polymake.Integer}
@@ -211,7 +213,7 @@
 
         @test float.(V) isa Polymake.Polymake.VectorAllocated{Float64}
 
-        @test -X isa Polymake.Polymake.VectorAllocated{Int64}
+        @test -X isa Polymake.Polymake.VectorAllocated{Polymake.to_cxx_type(Int64)}
         @test -X == -jl_v
 
         @test -V isa Polymake.Polymake.VectorAllocated{Polymake.Integer}
@@ -226,8 +228,8 @@
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
-        @test 2X isa Polymake.Vector{Polymake.Int64}
-        @test Int32(2)X isa Polymake.Vector{Int64}
+        @test 2X isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
+        @test Int32(2)X isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
 
         for T in int_scalar_types
             for (vec, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]

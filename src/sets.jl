@@ -1,15 +1,15 @@
 export incl, swap
 
-const Set_suppT = Union{Int64}
+const Set_suppT = Union{Int64, CxxWrap.CxxLong}
 
 ### convert TO polymake object
-
-Set(v::Base.Vector{T}) where T<:Set_suppT = _new_set(v)
+Set{T}() where T<:Set_suppT = Set{to_cxx_type(T)}()
+Set{T}(v::Base.Vector{S}) where {S<:Set_suppT, T<:Set_suppT} = _new_set(v)
+Set{T}(n::Base.Integer) where T<:Set_suppT = scalar2set(T(n))
 Set{T}(s::Set{T}) where T<:Set_suppT = s
-Set{S}(n::Base.Integer) where S<:Set_suppT = scalar2set(S(n))
 
 Set{T}(v::S) where {T, S <: Union{AbstractVector, AbstractSet}} = Set(collect(T, v))
-Set{T}(itr) where T = union!(Set{T}(), itr)
+Set{T}(itr) where T = union!(Set{to_cxx_type(T)}(), itr)
 
 function Set(itr)
     T = Base.@default_eltype(itr)
@@ -17,7 +17,17 @@ function Set(itr)
     return union!(Set{T}(), itr)
 end
 
-SetAllocated{T}(v::Base.Vector{T}) where T = Set{T}(v)
+# workaround for https://github.com/JuliaInterop/CxxWrap.jl/issues/199
+for (jlF, pmF) in (
+    (:(==), :_isequal),
+    (:getindex, :_getindex),
+    )
+    @eval begin
+        Base.$jlF(s::S, t::S) where S<:Set = $pmF(s,t)
+    end
+end
+
+Base.eltype(::Set{T}) where T = to_jl_type(T)
 
 ### convert FROM polymake object
 
@@ -31,7 +41,7 @@ end
 
 Base.Vector(s::Set) = collect(s)
 
-Base.Set(s::Set{T}) where T = Base.Set{T}(Base.Vector(s))
+Base.Set(s::Set{T}) where T = Base.Set{to_jl_type(T)}(Base.Vector(s))
 
 function Base.Set{T}(s::Set{S}) where {T, S}
     jls = Base.Set{T}()
@@ -44,7 +54,11 @@ end
 
 ### Promotion rules
 
-Base.promote_rule(::Type{Base.Set{S}}, ::Type{Base.Set{T}}) where {S,T} = Base.Set{promote_type(S,T)}
+Base.promote_rule(::Type{<:Set{S}}, ::Type{Base.Set{T}}) where {S,T} = Base.Set{promote_type(to_jl_type(S),T)}
+
+Base.emptymutable(s::Set{T}, ::Type{U}=to_jl_type(T)) where {T,U} =
+    Base.emptymutable(Base.Set{to_jl_type(T)}(), U)
+Base.copymutable(s::Set{T}) where T = Base.Set{to_jl_type(T)}(s)
 
 ### julia functions for sets
 
@@ -53,10 +67,7 @@ Base.promote_rule(::Type{Base.Set{S}}, ::Type{Base.Set{T}}) where {S,T} = Base.S
 
 function ==(S::Set, jlS::AbstractSet)
     length(S) == length(jlS) || return false
-    for s in jlS
-        s in S || return false
-    end
-    return true
+    return all(s in S for s in jlS)
 end
 
 ==(T::AbstractSet, S::Set) = S == T
@@ -68,9 +79,10 @@ Base.copy(S::Set) = deepcopy(S)
 # delete! : Defined on the C++ side
 Base.delete!(s::Set{T}, x) where T = delete!(s, T(x))
 # empty!  : Defined on the C++ side
+Base.empty(s::Set{T}, ::Type{U}=T) where {T, U} = Set{to_cxx_type(U)}()
 #
 function Base.filter!(pred, s::Set{T}) where T
-    to_delete = Base.Set{T}()
+    to_delete = Base.Set{to_jl_type(T)}()
     for x in s
         !pred(x) && push!(to_delete, x)
     end
@@ -81,9 +93,8 @@ function Base.filter!(pred, s::Set{T}) where T
 end
 
 # in      : Defined on the C++ side
-function Base.in(x::Base.Integer, s::Set{T}) where T
-    in(T(x), s)
-end
+Base.in(x::Base.Integer, s::Set{T}) where T = in(T(x), s)
+
 #
 # # isempty : Defined on the C++
 
@@ -108,22 +119,8 @@ end
 
 # length : Defined on the C++
 
-function Base.pop!(s::Set{T}, x) where T
-    if x in s
-        delete!(s, x)
-        return x
-    else
-        throw(KeyError(x))
-    end
-end
-
-function Base.pop!(s::Set{T}, x, default) where T
-    if x in s
-        return pop!(s, x)
-    else
-        return default
-    end
-end
+Base.pop!(s::Set{T}, x) where T = (x in s ? (delete!(s,x); x) : throw(KeyError(x)))
+Base.pop!(s::Set{T}, x, default) where T = (x in s ? pop!(s,x) : default)
 
 function Base.pop!(s::Set{T}) where T
     isempty(s) && throw(ArgumentError("set must be non-empty"))
@@ -132,7 +129,7 @@ end
 
 # push! : Defined on the C++ side
 Base.push!(s::Set{T}, x::Base.Integer) where T = push!(s, T(x))
-# show! : Defined on the C++ side
+# show : Defined on the C++ side
 
 Base.sizehint!(s::Set, newsz) = s
 

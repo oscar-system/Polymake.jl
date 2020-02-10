@@ -27,6 +27,35 @@ convert(::Type{PolymakeType}, x::T) where T = convert(convert_to_pm_type(T), x)
 convert(::Type{PolymakeType}, v::Visual) = v.obj
 convert(::Type{OptionSet}, dict) = OptionSet(dict)
 
+###############  Adjusting type parameter to CxxWrap  ##################
+
+to_cxx_type(::Type{T}) where T = T
+to_cxx_type(::Type{Bool}) = CxxWrap.CxxBool
+to_cxx_type(::Type{Int64}) = CxxWrap.CxxLong
+to_cxx_type(::Type{UInt64}) = CxxWrap.CxxULong
+to_cxx_type(::Type{<:AbstractString}) = CxxWrap.StdString
+to_cxx_type(::Type{<:AbstractVector{T}}) where T =
+    Vector{to_cxx_type(T)}
+to_cxx_type(::Type{<:AbstractMatrix{T}}) where T =
+    Matrix{to_cxx_type(T)}
+to_cxx_type(::Type{<:AbstractSet{T}}) where T =
+    Set{to_cxx_type(T)}
+to_cxx_type(::Type{<:Array{T}}) where T =
+    Array{to_cxx_type(T)}
+
+to_jl_type(::Type{T}) where T = T
+to_jl_type(::Type{CxxWrap.CxxBool}) = Bool
+to_jl_type(::Type{CxxWrap.CxxLong}) = Int64
+to_jl_type(::Type{CxxWrap.CxxULong}) = UInt64
+to_jl_type(::Type{CxxWrap.StdString}) = String
+
+Base.convert(::Type{CxxWrap.CxxLong}, n::Integer) = Int64(n)
+
+function Base.convert(::Type{CxxWrap.CxxLong}, r::Rational)
+    isone(denominator(r)) || throw(InexactError(:convert, Int64, r))
+    return Int64(numerator(r))
+end
+
 ####################  Guessing the polymake type  ######################
 
 # By default we throw an error:

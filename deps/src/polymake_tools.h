@@ -58,15 +58,4 @@ template <typename T> struct WrappedSetIterator {
     }
 };
 
-
-static inline void* get_ptr_from_cxxwrap_obj(jl_value_t* obj)
-{
-    return *reinterpret_cast<void**>(obj);
-}
-
-    // Safe way
-    // void* get_ptr_from_cxxwrap_obj(jl_value_t* obj){
-    //     return jl_unbox_voidpointer(jl_get_field(obj,"cpp_object"));
-    // }
-
 #endif
