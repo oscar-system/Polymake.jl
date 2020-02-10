@@ -78,7 +78,7 @@
     @testset "PolymakeException" begin
         test_polytope = @pm polytope.Polytope(POINTS=points_int)
         @test !(:STH in Base.propertynames(test_polytope))
-        @test_throws PolymakeError test_polytope.STH
+        @test_throws Polymake.PolymakeError test_polytope.STH
     end
 
     @testset "properties" begin
