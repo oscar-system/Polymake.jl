@@ -106,6 +106,9 @@ function Base.show(io::IO,::MIME"image/svg+xml",v::Visual)
     print(io,_get_visual_string_svg(v))
 end
 
+display_svg(obj::BigObject) = display_svg(visual(obj))
+display_svg(v::Visual) = display(MIME"image/svg+xml"(), v)
+
 """
     visual(obj::BigObject; options...)
 
