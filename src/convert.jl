@@ -71,13 +71,30 @@ function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix}}, S::Ty
     return Integer
 end
 
-macro convert_to(expr1, expr2)
-    :(
-        try
-            @pm common.convert_to{$expr1}($expr2)
-        catch ex
-            throw(ArgumentError("Can not parse the expression passed to @convert_to macro:\n$expr1 $expr2\n Only `@convert_to PerlType argument` syntax is recognized"))
-            rethrow(ex)
-        end
-    )
+# allowing conversion based on the Polymake's common.convert
+# as this method is rooted in Perl, the stated type also has to be understandable by Polymake's Perl
+macro convert_to(args...)
+    # Catch case that only one or more than two arguments are given
+    if length(args) != 2
+        :(throw(ArgumentError("@convert_to needs to be called with 2 arguments, e.g., `@convert_to Matrix{Integer} A`.")))
+    else
+        expr1, expr2 = args
+        :(
+            try
+                # expr2 needs to be escaped
+                @pm common.convert_to{$expr1}($(esc(expr2)))
+            catch ex
+                # To not catch things like UndefVarError only catch ErrorException
+                # since this is currently thrown if something invalid is parsed.
+                if ex == ErrorException
+                    # Use QuoteNodes to keep expr1 and expr2 as Expr around
+                    expr1 = $(QuoteNode(expr1))
+                    expr2 = $(QuoteNode(expr2))
+                    throw(ArgumentError("Can not parse the expression passed to @convert_to macro:\n$expr1 $expr2\n Only `@convert_to PerlType argument` syntax is recognized"))
+                else
+                    rethrow(ex)
+                end
+            end
+        )
+    end
 end
