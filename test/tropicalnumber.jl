@@ -126,25 +126,25 @@
 
         @test one(ZEROmin) isa Polymake.TropicalNumber{Polymake.Min}
         @test zero(ZEROmin) isa Polymake.TropicalNumber{Polymake.Min}
-        @test dual_zero(ZEROmin) isa Polymake.TropicalNumber{Polymake.Min}
+        @test Polymake.dual_zero(ZEROmin) isa Polymake.TropicalNumber{Polymake.Min}
         @test one(Polymake.TropicalNumber{Polymake.Min}) isa Polymake.TropicalNumber{Polymake.Min}
         @test zero(Polymake.TropicalNumber{Polymake.Min}) isa Polymake.TropicalNumber{Polymake.Min}
-        @test dual_zero(Polymake.TropicalNumber{Polymake.Min}) isa Polymake.TropicalNumber{Polymake.Min}
+        @test Polymake.dual_zero(Polymake.TropicalNumber{Polymake.Min}) isa Polymake.TropicalNumber{Polymake.Min}
         @test one(ZEROmax) isa Polymake.TropicalNumber{Polymake.Max}
         @test zero(ZEROmax) isa Polymake.TropicalNumber{Polymake.Max}
-        @test dual_zero(ZEROmax) isa Polymake.TropicalNumber{Polymake.Max}
+        @test Polymake.dual_zero(ZEROmax) isa Polymake.TropicalNumber{Polymake.Max}
         @test one(Polymake.TropicalNumber{Polymake.Max}) isa Polymake.TropicalNumber{Polymake.Max}
         @test zero(Polymake.TropicalNumber{Polymake.Max}) isa Polymake.TropicalNumber{Polymake.Max}
-        @test dual_zero(Polymake.TropicalNumber{Polymake.Max}) isa Polymake.TropicalNumber{Polymake.Max}
+        @test Polymake.dual_zero(Polymake.TropicalNumber{Polymake.Max}) isa Polymake.TropicalNumber{Polymake.Max}
 
         @test zero(Polymake.TropicalNumber{Polymake.Min}) == zero(ONEmin) == ZEROmin
-        @test dual_zero(Polymake.TropicalNumber{Polymake.Min}) == dual_zero(ONEmin) == Polymake.TropicalNumber{Polymake.Min}(-Inf)
+        @test Polymake.dual_zero(Polymake.TropicalNumber{Polymake.Min}) == Polymake.dual_zero(ONEmin) == Polymake.TropicalNumber{Polymake.Min}(-Inf)
         @test one(Polymake.TropicalNumber{Polymake.Min}) == one(ZEROmin) == ONEmin
         @test zero(Polymake.TropicalNumber{Polymake.Max}) == zero(ONEmax) == ZEROmax
-        @test dual_zero(Polymake.TropicalNumber{Polymake.Max}) == dual_zero(ONEmax) == Polymake.TropicalNumber{Polymake.Max}(Inf)
+        @test Polymake.dual_zero(Polymake.TropicalNumber{Polymake.Max}) == Polymake.dual_zero(ONEmax) == Polymake.TropicalNumber{Polymake.Max}(Inf)
         @test one(Polymake.TropicalNumber{Polymake.Max}) == one(ZEROmax) == ONEmax
 
-        @test orientation(Polymake.TropicalNumber{Polymake.Min}) == orientation(ZEROmin) == -orientation(Polymake.TropicalNumber{Polymake.Max}) == - orientation(ZEROmax) == 1
+        @test Polymake.orientation(Polymake.TropicalNumber{Polymake.Min}) == Polymake.orientation(ZEROmin) == -Polymake.orientation(Polymake.TropicalNumber{Polymake.Max}) == - Polymake.orientation(ZEROmax) == 1
     end
 
     @testset "Promotion (equality)" begin

@@ -60,6 +60,9 @@ void polymake_module_add_bigobject(jlcxx::Module& polymake)
     });
     polymake.method("to_bigobject", &to_bigobject);
 
+    polymake.method("setname!", [](pm::perl::BigObject p, const std::string& s){
+        p.set_name(s);
+    });
     polymake.method("take", [](pm::perl::BigObject p, const std::string& s,
                                const std::string& t) { p.take(s) << t; });
     polymake.method("take",
