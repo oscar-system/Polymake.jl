@@ -5,18 +5,18 @@
         @test polytope.pseudopower(args...) == val
     end
 
-    @test Polymake.call_function(:polytope, :cube, 2) isa BigObject
-    @test polytope.cube( 2 ) isa BigObject
-    @test (@pm polytope.cube{Rational}( 3 )) isa BigObject
+    @test Polymake.call_function(:polytope, :cube, 2) isa Polymake.BigObject
+    @test polytope.cube( 2 ) isa Polymake.BigObject
+    @test (@pm polytope.cube{Rational}( 3 )) isa Polymake.BigObject
     c = @pm polytope.cube{Rational}( 3 )
     cc = polytope.cube( 3 )
     @test Polymake.call_function(:polytope, :equal_polyhedra,c,cc)
     @test @pm polytope.equal_polyhedra(c, cc)
     @test polytope.equal_polyhedra(c, cc)
 
-    @test tropical.cyclic(3,5,template_parameters=["Max"]) isa BigObject
+    @test tropical.cyclic(3,5,template_parameters=["Max"]) isa Polymake.BigObject
 
-    @test (@pm tropical.cyclic{Max}(3,5)) isa BigObject
+    @test (@pm tropical.cyclic{Max}(3,5)) isa Polymake.BigObject
 
     @test Base.Docs.getdoc(polytope.Polytope) isa Polymake.Meta.PolymakeDocstring
     a = Base.Docs.getdoc(polytope.Polytope)
