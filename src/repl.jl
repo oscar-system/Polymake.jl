@@ -9,9 +9,13 @@ import REPL: LineEdit, REPLCompletions
 
 struct PolymakeCompletions <: LineEdit.CompletionProvider end
 
+_color(str, magic_number=37) = Base.text_colors[(sum(Int, str) + magic_number) % 0xff]
+
 function shell_execute_print(s::String, panel::LineEdit.Prompt)
    res = convert(Tuple{Bool, String, String, String}, shell_execute(s))
    panel.prompt=Polymake.get_current_app()*" > "
+
+   panel.prompt_prefix=_color(panel.prompt)
 
    if res[1]
       print(Base.stdout, res[2])
@@ -43,7 +47,7 @@ function CreatePolymakeREPL(; prompt = Polymake.get_current_app() * " > ", name 
    # Setup polymake panel
    panel = LineEdit.Prompt(prompt;
         # Copy colors from the prompt object
-        prompt_prefix=Base.text_colors[:yellow],
+        prompt_prefix=_color(prompt),
         prompt_suffix=Base.text_colors[:white],
         on_enter = REPL.return_callback)
         #on_enter = s->isExpressionComplete(C,push!(copy(LineEdit.buffer(s).data),0)))
