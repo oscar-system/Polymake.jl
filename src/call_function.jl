@@ -1,5 +1,3 @@
-export @pm
-
 function CxxWrap.StdVector{CxxWrap.StdString}(vec::AbstractVector{<:AbstractString})
     return CxxWrap.StdVector(convert.(CxxWrap.StdString, vec))
 end
@@ -115,7 +113,7 @@ macro pm(expr)
         polymake_func_name =
             Meta.pm_name_qualified(polymake_app, polymake_func, templates)
         return :(
-            bigobj($polymake_func_name, $(esc.(args)...), $(esc.(kwargs)...))
+            bigobject($polymake_func_name, $(esc.(args)...); $(esc.(kwargs)...))
             )
     else # we presume it's a function
         app = "$polymake_app"

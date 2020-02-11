@@ -32,18 +32,22 @@ perl = joinpath(@__DIR__,"usr","bin","perl")
 use_binary = true
 depsjl = ""
 
-if !( haskey(ENV, "POLYMAKE_CONFIG") && ENV["POLYMAKE_CONFIG"] == "no" )
+if haskey(ENV, "POLYMAKE_CONFIG") && ENV["POLYMAKE_CONFIG"] != "no"
     try
-        # test whether polymake config is available in path
-        global pm_config = chomp(read(`command -v polymake-config`, String))
+        if ENV["POLYMAKE_CONFIG"] == "yes"
+            # test whether polymake config is available in path
+            global pm_config = chomp(read(`command -v polymake-config`, String))
+        else
+            global pm_config = ENV["POLYMAKE_CONFIG"]
+        end
+        @assert ispath(pm_config)
         global perl ="perl"
         global use_binary = false
-    catch
-        if haskey(ENV, "POLYMAKE_CONFIG")
-            global pm_config = ENV["POLYMAKE_CONFIG"]
-            global perl ="perl"
-            global use_binary = false
+    catch err
+        if err isa AssertionError
+            @error("Environment variable POLYMAKE_CONFIG does not point to a valid `polymake-config` executable.")
         end
+        rethrow(err)
     end
 end
 

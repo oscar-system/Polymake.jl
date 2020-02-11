@@ -1,43 +1,42 @@
-function bigobj(name::String, input_data::Dict{<:Union{String, Symbol},T}) where T
-    perl_obj = BigObject(name)
-    for value in input_data
-        key = string(value[1])
-        val = convert(PolymakeType, value[2])
-        take(perl_obj,key,val)
-    end
-    return perl_obj
+function bigobject(fname::String; kwargsdata...)
+    obj = BigObject(fname)
+    setproperties!(obj; kwargsdata...)
+    return obj
 end
 
-function bigobj(name::String, input_data::Pair{<:Union{Symbol,String}}...; kwargsdata...)
-    obj = BigObject(name)
-    for (key, val) in input_data
-        setproperty!(obj, string(key), val)
-    end
+function bigobject(fname::String, name::String; kwargsdata...)
+    obj = bigobject(fname; kwargsdata...)
+    setname!(obj, name)
+    return obj
+end
+
+function setproperties!(obj::BigObject; kwargsdata...)
     for (key, val) in kwargsdata
         setproperty!(obj, string(key), val)
     end
     return obj
 end
 
-Base.propertynames(p::Polymake.BigObject) = Symbol.(complete_property(p, ""))
+Base.propertynames(p::BigObject) = Symbol.(Polymake.complete_property(p, ""))
 
 function Base.setproperty!(obj::BigObject, prop::Symbol, val)
     @assert prop != :cpp_object
     return take(obj, string(prop), convert(PolymakeType, val))
 end
 
-function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Nothing})
+function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Cvoid})
     @assert prop == :cpp_object
     return setfield!(obj, prop, val)
 end
 
 Base.setproperty!(obj::BigObject, prop::String, val) = setproperty!(obj, Symbol(prop), val)
 
-function give(obj::Polymake.BigObject, prop::String)
+function give(obj::BigObject, prop::String)
     return_obj = try
         internal_give(obj, prop)
     catch ex
-        throw(PolymakeError(ex.msg))
+        ex isa ErrorException && throw(PolymakeError(ex.msg))
+        rethrow(ex)
     end
     return convert_from_property_value(return_obj)
 end
@@ -54,8 +53,8 @@ function complete_property(obj::BigObject, prefix::String)
    call_function(:common, :complete_property, obj, prefix)
 end
 
-function convert_from_property_value(obj::Polymake.PropertyValue)
-    type_name = Polymake.typeinfo_string(obj,true)
+function convert_from_property_value(obj::PropertyValue)
+    type_name = typeinfo_string(obj,true)
     T = Symbol(replace(type_name," "=>""))
     if haskey(TypeConversionFunctions, T)
         f = TypeConversionFunctions[T]

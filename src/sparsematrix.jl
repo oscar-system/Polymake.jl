@@ -51,12 +51,12 @@ Base.@propagate_inbounds function Base.setindex!(M::SparseMatrix{T}, val, i::Bas
     return M
 end
 
-function SparseArrays.findnz(mat::SparseMatrix{T}) where T <: VecOrMat_eltypes
+function SparseArrays.findnz(mat::SparseMatrix{T}) where T
     nzi = nzindices(mat)
     len = sum(length, nzi)
     ri = Base.Vector{Int64}(undef, len)
     ci = Base.Vector{Int64}(undef, len)
-    v = Base.Vector{eltype(mat)}(undef, len)
+    v = Base.Vector{to_jl_type(T)}(undef, len)
     k = 1
     for r = 1:length(nzi)
         for c in nzi[r]
