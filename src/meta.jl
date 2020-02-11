@@ -301,8 +301,8 @@ function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String)
     return quote
         function $(jl_name)(args...; kwargs...)
             # name created at compile-time
-            return bigobj($(pm_name_qualified(app_name, pm_name)),
-                args..., kwargs...)
+            return bigobject($(pm_name_qualified(app_name, pm_name)),
+                args...; kwargs...)
         end
     end
 end
@@ -313,7 +313,7 @@ function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String, temp
             Ts = translate_type_to_pm_string.([$(templates...)])
             # name created at run-time
             pm_full_name = pm_name_qualified($(app_name), $(pm_name), Ts)
-            return bigobj(pm_full_name, args..., kwargs...)
+            return bigobject(pm_full_name, args...; kwargs...)
         end
     end
 end
@@ -364,7 +364,7 @@ end
 Base.show(io::IO, doc::PolymakeDocstring) = print(io, doc.s)
 
 module_imports() = quote
-    import Polymake: call_function, call_method, bigobj,
+    import Polymake: call_function, call_method, bigobject,
         BigObject, OptionSet, PropertyValue
     import Polymake.CxxWrap
     import Polymake.Meta: PolymakeDocstring, pm_name_qualified,

@@ -23,16 +23,13 @@ This will fetch a pre-built binary of `polymake`. You are ready to start `using 
 
 Note: Pre-built binaries are available for the `Linux` and `macOS` platform, but the `macOS` binaries are considered experimental. Windows users are encouraged to try running Julia inside Window Subsystem for Linux and reporting back ;)
 
-To skip the test for `polymake-config` in the `PATH` and directly use the pre-built binaries you need to set `POLYMAKE_CONFIG=no` in your environment.
-
 Note: Pre-built polymake will use a separate `.polymake` config directory (usually `joinpath(homedir(), ".julia", "polymake_user")`).
 
 ### Your own installation of `polymake`
 
-If you already have a recent enough version of `polymake` (i.e. `>=3.3`) on your system,
-you either need to make `polymake-config` available in your `PATH` or
-the environment variable `POLYMAKE_CONFIG` needs to point to the correct
-`polymake-config` file.
+If you already have a recent enough version of `polymake` (i.e. `>=4.0`) on your system and you want to use this version of `polymake`, you either need to
+ * set the environment variable `POLYMAKE_CONFIG=yes` and make `polymake-config` available in your `PATH` or
+ * set the environment variable `POLYMAKE_CONFIG` to the full path of the `polymake-config` executable.
 
 After this just `add` the package as above (or `build` if the package has been already added), the build script will use your `polymake` installation.
 
@@ -59,14 +56,14 @@ After this start Julia and follow the instructions above.
 Note: Self-built polymake will use the standard `.polymake` config directory (usually `$HOME/.polymake`).
 
 ### `Polymake.jl` in a separate environment:
-First clone `Polymake.jl`:
 ```
-git clone https://github.com/oscar-system/Polymake.jl.git
+mkdir my_new_env
+cd my_new_env
 ```
-In the same directory start Julia and press `]` for `pkg` mode. Then run
+Then start Julia in the directory and press `]` for `pkg` mode.
 ```julia
-(v1.0) pkg> activate Polymake.jl
-(Polymake) pkg> instantiate
+(v1.3) pkg> activate .
+(Polymake) pkg> dev --local Polymake
 (Polymake) pkg> build Polymake # fetches the prebuild polymake binaries
 (Polymake) pkg> test Polymake # and You are good to go!
 ```
@@ -78,11 +75,11 @@ Just remember that You need to `activate Polymake.jl` to use `Polymake`.
 
 In this section we just highlight various possible uses of `Polymake.jl`. Please refer to [Polymake syntax translation](#polymake-syntax-translation) for more thorough treatment.
 
-`polymake` big objects (like `Polytope`, `Cone`, etc) should be created with the help of `@pm` macro:
+`polymake` big objects (like `Polytope`, `Cone`, etc) constructors live within modules named after `polymake` applications, e.g.
 
 ```julia
 # Call the Polytope constructor
-julia> p = @pm Polytope.Polytope(POINTS=[1 -1 -1; 1 1 -1; 1 -1 1; 1 1 1; 1 0 0])
+julia> p = polytope.Polytope(POINTS=[1 -1 -1; 1 1 -1; 1 -1 1; 1 1 1; 1 0 0])
 type: Polytope<Rational>
 
 POINTS
@@ -93,12 +90,8 @@ POINTS
 1 0 0
 
 ```
-Parameters could be passed as
-* keyword arguments (as above),
-* `Pair{Symbol, ...}`s e.g. `Polytope.Polytope(:POINTS=>[ ... ])`
-* dictionaries e.g. `Polytope.Polytope(Dict( "POINTS" => [ ... ] )`)
-
-The dictionary may hold many different attributes. All the names *must* be compatible with `polymake`.
+Parameters to constructors can be passed as keyword arguments only.
+All the keys *must* be compatible with `polymake` input attribute names.
 
 Properties of such objects can be accessed by the `.` syntax:
 ```
@@ -120,22 +113,22 @@ matrix_str = "["*replace(str, "/"=>"//")*"]"
 matrix = eval(Meta.parse(matrix_str))
 @show matrix
 
-p = @pm Polytope.Polytope(POINTS=matrix)
+p = polytope.Polytope(POINTS=matrix)
 
 @show p.FACETS # polymake matrix of polymake rationals
-@show Polytope.dim(p) # Julia Int64
+@show polytope.dim(p) # Julia Int64
 # note that even in Polymake property DIM is "fake" -- it's actually a function
 @show p.VERTEX_SIZES # polymake array of ints
 @show p.VERTICES
 
 for (i, vsize) in enumerate(p.VERTEX_SIZES)
-  if vsize == Polytope.dim(p)
+  if vsize == polytope.dim(p)
     println("$i : $(p.VERTICES[i,:])")
     # $i will be shifted by one from the polymake version
   end
 end
 
-simple_verts = [i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polytope.dim(p)] # Julia vector of Int64s
+simple_verts = [i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)] # Julia vector of Int64s
 
 special_points = p.VERTICES[simple_verts, :] # polymake Matrix of rationals
 @show special_points;
@@ -189,15 +182,15 @@ special_points = pm::Matrix<pm::Rational>
 ```
 As can be seen we show consecutive steps of computations: the input `matrix`, `FACETS`, then we ask for `VERTEX_SIZES`, which triggers the convex hull computation. Then we show vertices and print those corresponding to simple vertices. Finally we collect them in `special_points`.
 
-Note that a `polymake` matrix tries to mimic the behaviour of Julia arrays: `p.VERTICES[2,:]` returns a `1`-dimensional slice (i.e. `pm_Vector`), while passing a set of indices (`p.VERTICES[special_points, :]`) returns a `2`-dimensional one.
+Observe that a `polymake` matrix (`Polymake.Matrix`) implements julia abstract array interface: `p.VERTICES[2,:]` returns a `1`-dimensional slice (i.e. `Polymake.Vector`), while passing a set of indices (`p.VERTICES[special_points, :]`) returns a `2`-dimensional one.
 
 #### Notes:
 
-The same minor (up to permutation of rows) could be obtained by using sets: either Julia or polymake sets. However since by default one can not index arrays with sets, we need to collect them first:
+The same minor (up to permutation of rows) could be obtained by using sets: either julia or polymake ones. However since by default one can not index arrays with sets, we need to collect them first:
 ```julia
-simple_verts = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polytope.dim(p)) # Julia set of Int64s
+simple_verts = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)) # Julia set of Int64s
 
-simple_verts = pm_Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == Polytope.dim(p)) # polymake set of longs
+simple_verts = Polymake.Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)) # polymake set of longs
 
 special_points = p.VERTICES[collect(simple_verts), :]
 ```
@@ -263,12 +256,12 @@ The following tables explain by example how to quickly translate `polymake` synt
 
 | Polymake                                                     | Julia                                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------- |
-| `$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);`      | `p = @pm Polytope.Polytope(POINTS=Polytope.cube(4).VERTICES)` |
-| `$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);` | `lp = @pm Polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,1,1,1])` |
+| `$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);`      | `p = polytope.Polytope(POINTS=polytope.cube(4).VERTICES)` |
+| `$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);` | `lp = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,1,1,1])` |
 | `$p->LP=$lp;`<br>`$p->LP->MAXIMAL_VALUE;`                  | `p.LP = lp`<br>`p.LP.MAXIMAL_VALUE`                        |
 | `$i = ($p->N_FACETS * $p->N_FACETS) * 15;`                   | `i = (p.N_FACETS * p.N_FACETS) * 15`                         |
-| `$print p->DIM;`                                             | `Polytope.dim(p)`<br> `DIM` is actually a faux property, which hides a function beneath |
-| `application "topaz";`<br>`$p = new Polytope<Max, QuadraticExtension>(POINTS=>[[1,0,0], [1,1,0], [1,1,1]]);` | `p = @pm Tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])` |
+| `$print p->DIM;`                                             | `polytope.dim(p)`<br> `DIM` is actually a faux property, which hides a function beneath |
+| `application "topaz";`<br>`$p = new Polytope<Max, QuadraticExtension>(POINTS=>[[1,0,0], [1,1,0], [1,1,1]]);` | `p = @pm tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])`<br> more information on the @pm macro can be found below |
 
 ## Current state of the `polymake` wrapper
 
@@ -276,35 +269,80 @@ The following tables explain by example how to quickly translate `polymake` synt
 
 * Big objects, e.g., Polytopes, can be handled in Julia.
 * Several small objects (data types) from `polymake` are available in `Polymake.jl`:
-    * Integers (`pm_Integer <: Integer`)
-    * Rationals (`pm_Rational <: Real`)
-    * Vectors (`pm_Vector <: AbstractVector`) of `pm_Integer`s and `pm_Rational`s
-    * Matrices (`pm_Matrix <: AbstractMatrix`) of `Float64`s, `pm_Integer`s and `pm_Rational`
-    * Sets (`pm_Set <: AbstractSet`) of `Int32`s and `Int64`s
-    * Arrays (`pm_Array <: AbstractVector`, as `pm_Arrays` are one-dimensional) of `Int32`s, `Int64`s and `pm_Integers`
-    * some combinations thereof, e.g., `pm_Array`s of `pm_Sets` of `Int32`s.
+    * Integers (`Polymake.Integer <: Integer`)
+    * Rationals (`Polymake.Rational <: Real`)
+    * Vectors (`Polymake.Vector <: AbstractVector`) of `Int64`s, `Float64`s, `Polymake.Integer`s and `Polymake.Rational`s
+    * Matrices (`Polymake.Matrix <: AbstractMatrix`) of `Int64`s, `Float64`s, `Polymake.Integer`s and `Polymake.Rational`s
+    * Sets (`Polymake.Set <: AbstractSet`) of `Int64`s
+    * Arrays (`Polymake.Array <: AbstractVector`, as `Polymake.Arrays` are one-dimensional) of `Int64`s and `Polymake.Integers`
+    * some combinations thereof, e.g., `Polymake.Array`s of `Polymake.Sets` of `Int32`s.
 
 These data types can be converted to appropriate Julia types,
-but are also subtypes of the corresponding Julia abstract types (as indicated above), and so should be accepted by all methods that apply to the abstract types.
+but are also subtypes of the corresponding Julia abstract types (as indicated above),
+and so should be accepted by all methods that apply to the abstract types.
 
 **Note**: If the returned small object has not been wrapped in `Polymake.jl`
 yet, you will not be able to access its content or in general use it **from Julia**,
 however you can always pass it back as an argument to a `polymake` function.
-Moreover you may try to convert to Julia understandable type via
-`@pm Common.convert_to{wrapped{templated, type}}(obj)`.
-For example:
+Moreover you may try to convert to Julia understandable type via macro
+`@pm common.convert_to{C++{templated, type}}(obj)`.
 
+### Functions
+
+* All user functions from `polymake` are available in the appropriate modules, e.g. `homology` function from `topaz` can be called as `topaz.homology(...)` in julia. We pull the docstrings for functions from `polymake` as well, so `?topaz.homology` (in Julia's REPL) returns the `polymake` docstring. Note: the syntax presented in the docstring is a `polymake` syntax, not `Polymake.jl` one.
+* Most of the user functions from `polymake` are available as `appname.funcname(...)` in `Polymake.jl`.  Moreover, any function from `polymake` `C++` library can be called via macro call `@pm appname.funcname{C++{template, names}}(...)`.
+* All big objects of `polymake` can be constructed either via call to constructor, i.e.
 ```julia
-julia> c = Polytope.cube(3);
+obj = appname.BigObject(args)
+```
+One can specify some templates here as well: `polytope.Polytope{Float64}(...)` is a valid call, but the list of supported types is rather limited. Please consider filing a bug if a valid call results in `polymake` error.
+For more advanced use see section on `@pm` macro.
+* Properties of big objects are accessible by `bigobject.property` syntax (as opposed to `$bigobject->property` in `polymake`). If there is a missing property please check if it can be accessed by `appname.property(object)`. For example `polytope.Polytope` does not have `DIM` property in `Polymake.jl` sinc `DIM` is exposed as `polytope.dim(...)` function.
+* Methods are available as functions in the appropriate modules, with the first argument as the object, i.e. `$bigobj->methodname(...)` can be called via `appname.methodname(bigobj, ...)`
+* A function in `Polymake.jl` calling `polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the known data types. This conversion can be deactivated by adding `keep_PropertyValue=true` keyword argument to function/method call.
+
+### `@pm` macro
+
+The `@pm` macro can be used to issue more complicated calls to polymake from julia.
+If You need to pass templates to `BigObject`s, some limited support is provided in costructors.
+For example one can construct `polytope.Polytope{Float64}(...)`.
+However for this to work templates need to be valid julia types/object, hence
+it is not possible to construct a `Polytope<QuadraticExtension>` through such call.
+For this (and in general: for passing more complicated templates) one needs the
+`@pm` macro:
+```perl
+$obj = new BigObject<Template,Parameters>(args)
+```
+becomes
+```julia
+obj = @pm appname.BigObject{Template, Parameters}(args)
+```
+
+Examples:
+```julia
+tropical.Polytope{max, Polymake.Rational}(POINTS=[1 0 0; 1 1 0; 1 1 1])
+# call to constructor, note that max is a julia function, hence a valid object
+@pm tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])
+# macro call: none of the types in templates need to exist in julia
+```
+
+As a rule of thumb any template passed to `@pm` macro needs to be translatable
+on syntax level to a `C++` one. E.g. `Matrix{Integer}` works, as it translates to
+`pm::Matrix<pm::Integer>`.
+
+Such templates can be passed to functions as well. A very useful example is the
+`common.convert_to`:
+```julia
+julia> c = polytope.cube(3);
 
 julia> f = c.FACETS;
 
 julia> f[1,1] # f is an opaque pm::perl::PropertyValue to julia
-ERROR: MethodError: no method matching getindex(::Polymake.pm_perl_PropertyValueAllocated, ::Int64, ::Int64)
+ERROR: MethodError: no method matching getindex(::Polymake.PropertyValueAllocated, ::Int64, ::Int64)
 Stacktrace:
   [...]
 
-julia> m = @pm Common.convert_to{Matrix{Integer}}(f)
+julia> m = @pm common.convert_to{Matrix{Integer}}(f) # the template must consist of C++ names
 pm::Matrix<pm::Integer>
 1 1 0 0
 1 -1 0 0
@@ -318,34 +356,17 @@ julia> m[1,1]
 
 ```
 
-### Functions
-
-* All user functions from `polymake` are available in the appropriate modules, e.g. `homology` function from `topaz` can be called as `Topaz.homology(...)` in Julia. We pull the docstrings for functions from `polymake` as well, so `?Topaz.homology` (in Julia's REPL) returns a `polymake` docstring. Note: the syntax presented in the docstring is a `polymake` syntax, not `Polymake.jl` one.
-* Most of the user functions from `polymake` are available as `Appname.funcname(...)` in `Polymake.jl`.  Moreover, any function from `polymake` `C++` library can be called via `@pm Appname.funcname(...)` macro. If you happen to use a non-user `polymake` function in REPL quite often you might `Polymake.@register Appname.funcname` so that it becomes available for completion. This is a purely convenience macro, as the effects of `@register` will be lost when Julia kernel restarts.
-* All big objects of `polymake` can be constructed via `@pm` macro. For example
-```perl
-$obj = new BigObject<Template,Parameters>(args)
-```
-becomes
-```julia
-obj = @pm Appname.BigObject{Templete,Parameters}(args)
-```
-See Section Polymake syntax translation for concrete examples.
-* Properties of big objects are accessible by `bigobject.property` syntax (as opposed to `$bigobject->property` in `polymake`). If there is a missing property (e.g. `Polytope.Polytope` does not have `DIM` property in `Polymake.jl`), please check if it can be accessed by `Appname.property(object)`. For example property `DIM` is exposed as `Polytope.dim(...)` function.
-* Methods are available as functions in the appropriate modules, with the first argument as the object, i.e. `$bigobj->methodname(...)` can be called via `Appname.methodname(bigobj, ...)`
-* A function in `Polymake.jl` calling `polymake` may return a big or small object, and the generic return (`PropertyValue`) is transparently converted to one of the data types above. If you really care about performance, this conversion can be deactivated by adding `keep_PropertyValue=true` keyword argument to function/method call.
 
 ### Function Arguments
 
 Functions in `Polymake.jl` accept the following types for their arguments:
 * simple data types (bools, machine integers, floats)
-* wrapped native types (`pm_Integer`, `pm_Rational`, `pm_Vector`, `pm_Matrix`, `pm_Set` etc.)
+* wrapped native types (`Polymake.Integer`, `Polymake.Rational`, `Polymake.Vector`, `Polymake.Matrix`, `Polymake.Set` etc.)
 * other objects returned by polymake:
-  *  `pm_perl_Object` (essentially Big Objects),
-  *  `pm_perl_PropertyValue` (containers opaque to Julia)
-<!-- *  `pm_perl_OptionSet` -->
+  *  `Polymake.BigObject`,
+  *  `Polymake.PropertyValue` (containers opaque to Julia)
 
-If an object passed to `Polymake.jl` function is of a different type the software will try its best to convert it to such. However, if the conversion doesn't work the `ArgumentError` will be thrown:
+If an object passed to `Polymake.jl` function is of a different type the software will try its best to convert it to a known one. However, if the conversion doesn't work an `ArgumentError` will be thrown:
 ```julia
 ERROR: ArgumentError: Unrecognized argument type: SomeType.
 You need to convert to polymake compatible type first.
@@ -353,17 +374,17 @@ You need to convert to polymake compatible type first.
 
 You can tell `Polymake.jl` how to convert it by definig
 ```julia
-Base.convert(::Type{Polymake.PolymakeType}, ma::SomeType)
+Base.convert(::Type{Polymake.PolymakeType}, x::SomeType)
 ```
-The returned value must be of one of the types as above. For example to use `AbstractAlgebra` matrices as input to `Polymake.jl` one may define
+The returned value must be of one of the types as above. For example to use `AbstractAlgebra.jl` matrices as input to `Polymake.jl` one may define
 ```julia
-Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = pm_Matrix(M.entries)
+Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = Polymake.Matrix(M.entries)
 ```
 and the following should run smoothly.
 ```julia
 julia> using AbstractAlgebra, Polymake
-polymake version 3.4
-Copyright (c) 1997-2019
+polymake version 4.0
+Copyright (c) 1997-2020
 Ewgenij Gawrilow, Michael Joswig (TU Berlin)
 https://polymake.org
 
@@ -375,14 +396,14 @@ julia> mm = AbstractAlgebra.matrix(ZZ, [1 2 3; 4 5 6])
 [1 2 3]
 [4 5 6]
 
-julia> @pm Polytope.Polytope(POINTS=mm)
+julia> polytope.Polytope(POINTS=mm)
 ERROR: ArgumentError: Unrecognized argument type: AbstractAlgebra.Generic.MatSpaceElem{Int64}.
 You need to convert to polymake compatible type first.
   [...]
 
-julia> Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = pm_Matrix(M.entries)
+julia> Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = Polymake.Matrix(M.entries)
 
-julia> @pm Polytope.Polytope(POINTS=mm)
+julia> polytope.Polytope(POINTS=mm)
 type: Polytope<Rational>
 
 POINTS
