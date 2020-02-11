@@ -54,5 +54,5 @@ Base.:-(p::Polynomial{C,E}) where {C,E} = Polynomial{C,E}(-coefficients_as_vecto
 Base.hash(p::Polymake.Polynomial, h::UInt) = hash(Polynomial, hash(coefficients_as_vector(p), hash(monomials_as_matrix(p), h)))
 
 function nvars(p::Polynomial)
-    return size(monomials_as_matrix(p))[2]
+    return size(monomials_as_matrix(p),2)
 end
