@@ -285,7 +285,7 @@ and so should be accepted by all methods that apply to the abstract types.
 yet, you will not be able to access its content or in general use it **from Julia**,
 however you can always pass it back as an argument to a `polymake` function.
 Moreover you may try to convert to Julia understandable type via macro
-`@convert_to C++{template, names} obj`.
+`@convert_to SomeType{Template, Names} obj`.
 
 ### Functions
 
