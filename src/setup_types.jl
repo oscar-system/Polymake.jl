@@ -1,5 +1,5 @@
 const SmallObject = Union{Integer, Rational, Matrix, Vector, Set, Array, SparseMatrix, SparseVector, TropicalNumber, IncidenceMatrix}
-const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64}
+const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, CxxWrap.CxxLong}
 
 const TypeConversionFunctions = Dict(
     Symbol("Int") => to_int,

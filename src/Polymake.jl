@@ -1,9 +1,6 @@
 module Polymake
 
-export BigObject, PropertyValue,
-       PolymakeError, application, dual_zero, orientation,
-       prefer
-
+export @pm, @convert_to, visual
 
 # We need to import all functions which will be extended on the Cxx side
 import Base: ==, <, <=, *, -, +, //, div, rem, one, zero,

@@ -4,10 +4,11 @@
 
     for T in [Int64, Polymake.Integer, Polymake.Rational, Float64]
         @test Polymake.Matrix{T} <: AbstractMatrix
-        @test Polymake.Matrix{T}(3,4) isa AbstractMatrix
-        @test Polymake.Matrix{T}(3,4) isa Polymake.Matrix
-        @test Polymake.Matrix{T}(3,4) isa Polymake.Matrix{T}
-        M = Polymake.Matrix{T}(3,4)
+        @test Polymake.Matrix{T}(undef, 3,4) isa AbstractMatrix
+        @test Polymake.Matrix{T}(undef, 3,4) isa Polymake.Matrix
+        @test Polymake.Matrix{T}(undef, 3,4) isa Polymake.Matrix{<:supertype(T)}
+        @test Polymake.Matrix{T}(undef, 3,4) isa Polymake.Matrix{Polymake.to_cxx_type(T)}
+        M = Polymake.Matrix{T}(undef, 3,4)
         M[1,1] = 10
         M[end] = 100
         @test M[1,1] isa T
@@ -22,7 +23,8 @@
         @test Polymake.Matrix(jl_m/1) isa Polymake.Matrix{Float64}
 
         for T in [IntTypes; Polymake.Integer]
-            @test Polymake.Matrix(T.(jl_m)) isa Polymake.Matrix{T<:Union{Int32,Int64} ? Int64 : Polymake.Integer}
+            @test Polymake.Matrix(T.(jl_m)) isa
+                Polymake.Matrix{T<:Union{Int32,Int64} ? Polymake.to_cxx_type(Int64) : Polymake.Integer}
 
             for ElType in [Polymake.Integer, Polymake.Rational, Float64]
                 for m in [jl_m, jl_m//T(1), jl_m/T(1)]
@@ -63,7 +65,8 @@
     @testset "Low-level operations" begin
         @testset "Polymake.Matrix{Int64}" begin
             jl_m_32 = Int32.(jl_m)
-            @test Polymake.Matrix(jl_m_32) isa Polymake.Matrix{Int64}
+            @test Polymake.Matrix(jl_m_32) isa
+                Polymake.Matrix{Polymake.to_cxx_type(Int64)}
             M = Polymake.Matrix{Int64}(jl_m_32)
 
             # linear indexing:
@@ -81,7 +84,7 @@
 
             for T in [IntTypes; Polymake.Integer]
                 M = Polymake.Matrix{Int64}(jl_m_32) # local copy
-                @test setindex!(M, T(5), 1, 1) isa Polymake.Matrix{Int64}
+                @test setindex!(M, T(5), 1, 1) isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
                 @test M[T(1), 1] isa Int64
                 @test M[1, T(1)] == 5
                 # testing the return value of brackets operator
@@ -180,13 +183,13 @@
 
         @testset "Equality" begin
             for T in [IntTypes; Polymake.Integer]
-                X = Polymake.Matrix{Int64}(2, 3)
-                V = Polymake.Matrix{Polymake.Integer}(2, 3)
-                W = Polymake.Matrix{Polymake.Rational}(2, 3)
-                U = Polymake.Matrix{Float64}(2, 3)
+                X = Polymake.Matrix{Int64}(undef, 2, 3)
+                V = Polymake.Matrix{Polymake.Integer}(undef, 2, 3)
+                W = Polymake.Matrix{Polymake.Rational}(undef, 2, 3)
+                U = Polymake.Matrix{Float64}(undef, 2, 3)
 
-                @test (X .= T.(jl_m)) isa Polymake.Matrix{Int64}
-                @test (X .= T.(jl_m).//1) isa Polymake.Matrix{Int64}
+                @test (X .= T.(jl_m)) isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
+                @test (X .= T.(jl_m).//1) isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
 
                 @test (V .= T.(jl_m)) isa Polymake.Matrix{Polymake.Integer}
                 @test (V .= T.(jl_m).//1) isa Polymake.Matrix{Polymake.Integer}
@@ -230,7 +233,7 @@
         jl_u = jl_m/4
         U = Polymake.Matrix{Float64}(jl_u)
 
-        @test -X isa Polymake.Polymake.MatrixAllocated{Int64}
+        @test -X isa Polymake.Polymake.MatrixAllocated{Polymake.to_cxx_type(Int64)}
         @test -X == -jl_m
 
         @test -V isa Polymake.Polymake.MatrixAllocated{Polymake.Integer}
@@ -245,8 +248,8 @@
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
-        @test 2X isa Polymake.Matrix{Int64}
-        @test Int32(2)X isa Polymake.Matrix{Int64}
+        @test 2X isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
+        @test Int32(2)X isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
 
         for T in int_scalar_types
             for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]

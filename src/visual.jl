@@ -1,24 +1,60 @@
 export visual
 
-Base.show(io::IO,::MIME"text/plain", obj::BigObject) = print(io, properties(obj))
+function Base.show(io::IO,::MIME"text/plain", obj::BigObject)
+    strs = strip.(split(String(properties(obj)), "\n\n"))
+    summary = strs[1]
+    props = filter!(!isempty, strs[2:end])
+    println(io, summary)
 
-function Base.show(io::IO,::MIME"text/html",obj::BigObject)
-    return_string = properties(obj)
-    summary, description = split(return_string,"\n";limit=2)
-    if startswith(summary, "type: ")
-        summary = summary[7:end]
+    upperbound = 10
+    for p in props
+        if occursin('\n', p)
+            (key, val) = split(p, '\n'; limit=2)
+        else
+            key, val = p, ""
+        end
+
+        if key in ("POINTS", "INEQUALITIES", "FACETS", "VERTICES")
+            println(io, '\n', key)
+            try
+                Base.print_matrix(io, getproperty(obj, Symbol(key)), "  ")
+                println(io, "")
+            catch
+                println(io, "\t", val)
+            end
+        else
+            if count(r"\n", val) > upperbound
+                val = join(
+                        split(val, "\n"; limit=upperbound+1)[1:upperbound],
+                    "\n") * "\n…"
+            end
+            println(io, '\n', key)
+            println(io, "\t", replace(val, "\n"=>"\n\t"))
+        end
     end
-    if startswith(description, "description: ")
-        description = description[14:end]
+end
+
+function Base.show(io::IO, ::MIME"text/html", obj::BigObject)
+
+    strs = strip.(split(String(properties(obj)), "\n\n"))
+    summary = split(strs[1], "\n")
+    attributes = filter!(!isempty, strs[2:end])
+
+    props = Base.Vector{String}(undef, length(attributes))
+
+    for (i, a) in enumerate(attributes)
+        if occursin('\n', a)
+            (key, val) = split(a, '\n'; limit=2)
+        else
+            key, val = a, ""
+        end
+
+        props[i] = "<details><summary>$key</summary><pre>$val</pre></details>"
     end
-    print(io,"""
-<details>
-<summary>$summary</summary>
-    <pre>
-$description
-    </pre>
-</details>
-""")
+
+    preamble = ("<dt>$t</dt><dd>$d</dd>" for (t,d) in split.(summary, ":"; limit=2))
+
+    print(io, "<dl> $(join(preamble, "\n")) </dl>", join(props, "\n"))
 end
 
 function Base.show(io::IO, ::MIME"text/plain", obj::SmallObject)
@@ -73,6 +109,9 @@ end
 function Base.show(io::IO,::MIME"image/svg+xml",v::Visual)
     print(io,_get_visual_string_svg(v))
 end
+
+display_svg(obj::BigObject) = display_svg(visual(obj))
+display_svg(v::Visual) = display(MIME"image/svg+xml"(), v)
 
 """
     visual(obj::BigObject; options...)

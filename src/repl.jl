@@ -9,8 +9,14 @@ import REPL: LineEdit, REPLCompletions
 
 struct PolymakeCompletions <: LineEdit.CompletionProvider end
 
-function shell_execute_print(s::String)
-   res = shell_execute(s)
+_color(str, magic_number=37) = Base.text_colors[(sum(Int, str) + magic_number) % 0xff]
+
+function shell_execute_print(s::String, panel::LineEdit.Prompt)
+   res = convert(Tuple{Bool, String, String, String}, shell_execute(s))
+   panel.prompt=Polymake.get_current_app()*" > "
+
+   panel.prompt_prefix=_color(panel.prompt)
+
    if res[1]
       print(Base.stdout, res[2])
       print(Base.stderr, res[3])
@@ -29,26 +35,26 @@ end
 function LineEdit.complete_line(c::PolymakeCompletions, s)
    partial = REPL.beforecursor(LineEdit.buffer(s))
    full = LineEdit.input_string(s)
-   res = shell_complete(full)
-   offset = res[1]
-   proposals = res[2:end]
+   res = convert(Tuple{Int, Array{String}}, shell_complete(full))
+   offset = first(res)
+   proposals = res[2]
    return proposals, partial[end-offset+1:end], size(proposals,1) > 0
 end
 
 
-function CreatePolymakeREPL(; prompt = "polymake > ", name = :pm, repl = Base.active_repl, main_mode = repl.interface.modes[1])
+function CreatePolymakeREPL(; prompt = Polymake.get_current_app() * " > ", name = :pm, repl = Base.active_repl, main_mode = repl.interface.modes[1])
    mirepl = isdefined(repl,:mi) ? repl.mi : repl
    # Setup polymake panel
    panel = LineEdit.Prompt(prompt;
         # Copy colors from the prompt object
-        prompt_prefix=Base.text_colors[:yellow],
+        prompt_prefix=_color(prompt),
         prompt_suffix=Base.text_colors[:white],
         on_enter = REPL.return_callback)
         #on_enter = s->isExpressionComplete(C,push!(copy(LineEdit.buffer(s).data),0)))
 
    panel.on_done = REPL.respond(repl,panel; pass_empty = false) do line
        if !isempty(line)
-           :(Polymake.shell_execute_print($line) )
+           :(Polymake.shell_execute_print($line, $panel) )
        else
            :(  )
        end
@@ -58,11 +64,6 @@ function CreatePolymakeREPL(; prompt = "polymake > ", name = :pm, repl = Base.ac
 
    main_mode == mirepl.interface.modes[1] &&
        push!(mirepl.interface.modes,panel)
-
-   # 0.7 compat
-   if isdefined(main_mode, :repl)
-       panel.repl = main_mode.repl
-   end
 
    hp = main_mode.hist
    hp.mode_mapping[name] = panel
@@ -77,7 +78,10 @@ function CreatePolymakeREPL(; prompt = "polymake > ", name = :pm, repl = Base.ac
    panel
 end
 
-global function run_polymake_repl(; prompt = "polymake > ", name = :pm, key = '$')
+global function run_polymake_repl(;
+                     prompt = Polymake.get_current_app() * " > ",
+                     name = :pm,
+                     key = '$')
    repl = Base.active_repl
    mirepl = isdefined(repl,:mi) ? repl.mi : repl
    main_mode = mirepl.interface.modes[1]

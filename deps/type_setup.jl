@@ -5,26 +5,26 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "BigObject",                   "pm::perl::BigObject",                      "BigObject",                    "to_bigobject" ),
 ( "Integer",                     "pm::Integer",                              "Integer",                      "to_integer" ),
 ( "Rational",                    "pm::Rational",                             "Rational",                     "to_rational" ),
-( "Matrix_Int",                  "pm::Matrix<long>",                         "Matrix{Int64}",                "to_matrix_int" ),
+( "Matrix_Int",                  "pm::Matrix<long>",                         "Matrix{CxxWrap.CxxLong}",                "to_matrix_int" ),
 ( "Matrix_Integer",              "pm::Matrix<pm::Integer>",                  "Matrix{Integer}",              "to_matrix_integer" ),
 ( "Matrix_Rational",             "pm::Matrix<pm::Rational>",                 "Matrix{Rational}",             "to_matrix_rational" ),
 ( "Matrix_double",               "pm::Matrix<double>",                       "Matrix{Float64}",              "to_matrix_double" ),
-( "Vector_Int",                  "pm::Vector<long>",                         "Vector{Int64}",                "to_vector_int" ),
+( "Vector_Int",                  "pm::Vector<long>",                         "Vector{CxxWrap.CxxLong}",                "to_vector_int" ),
 ( "Vector_Integer",              "pm::Vector<pm::Integer>",                  "Vector{Integer}",              "to_vector_integer" ),
 ( "Vector_Rational",             "pm::Vector<pm::Rational>",                 "Vector{Rational}",             "to_vector_rational" ),
 ( "Vector_double",               "pm::Vector<double>",                       "Vector{Float64}",              "to_vector_double" ),
-( "Set_Int",                     "pm::Set<long>",                            "Set{Int64}",                   "to_set_int" ),
-( "Array_Int",                   "pm::Array<long>",                          "Array{Int64}",                 "to_array_int" ),
+( "Set_Int",                     "pm::Set<long>",                            "Set{CxxWrap.CxxLong}",                   "to_set_int" ),
+( "Array_Int",                   "pm::Array<long>",                          "Array{CxxWrap.CxxLong}",                 "to_array_int" ),
 ( "Array_Integer",               "pm::Array<pm::Integer>",                   "Array{Integer}",               "to_array_integer" ),
 ( "Array_String",                "pm::Array<std::string>",                   "Array{String}",                "to_array_string" ),
-( "Array_Set_Int",               "pm::Array<pm::Set<long>>",                 "Array{Set{Int64}}",            "to_array_set_int" ),
-( "Array_Array_Int",             "pm::Array<pm::Array<long>>",               "Array{Array{Int64}}",          "to_array_array_int" ),
+( "Array_Set_Int",               "pm::Array<pm::Set<long>>",                 "Array{Set{CxxWrap.CxxLong}}",            "to_array_set_int" ),
+( "Array_Array_Int",             "pm::Array<pm::Array<long>>",               "Array{Array{CxxWrap.CxxLong}}",          "to_array_array_int" ),
 ( "Array_Array_Integer",         "pm::Array<pm::Array<pm::Integer>>",        "Array{Array{Integer}}",        "to_array_array_integer" ),
 ( "Array_Matrix_Integer",        "pm::Array<pm::Matrix<pm::Integer>>",       "Array{Matrix{Integer}}",       "to_array_matrix_integer" ),
 ( "Array_BigObject",             "pm::Array<pm::perl::BigObject>",           "Array{BigObject}",             "to_array_bigobject" ),
 ( "SparseMatrix_Integer",        "pm::SparseMatrix<pm::Integer>",            "SparseMatrix{Integer}",        "to_sparsematrix_integer"),
 ( "SparseMatrix_Rational",       "pm::SparseMatrix<pm::Rational>",           "SparseMatrix{Rational}",       "to_sparsematrix_rational"),
-( "SparseMatrix_Int",            "pm::SparseMatrix<long>",                   "SparseMatrix{Int64}",          "to_sparsematrix_int"),
+( "SparseMatrix_Int",            "pm::SparseMatrix<long>",                   "SparseMatrix{CxxWrap.CxxLong}",          "to_sparsematrix_int"),
 ( "SparseMatrix_double",         "pm::SparseMatrix<double>",                 "SparseMatrix{Float64}",        "to_sparsematrix_double"),
 ( "SparseVector_Integer",        "pm::SparseVector<pm::Integer>",            "SparseVector{Integer}",        "to_sparsevector_integer"),
 ( "SparseVector_Rational",       "pm::SparseVector<pm::Rational>",           "SparseVector{Rational}",       "to_sparsevector_rational"),
@@ -48,9 +48,8 @@ end
 
 function call_function_feed_argument_if(juliatype, ctype)
     return """
-\tif (jl_subtype(current_type, POLYMAKETYPE_$juliatype)) {
-        function << *reinterpret_cast<$ctype*>(get_ptr_from_cxxwrap_obj(argument));
-        return;
+\telse if (jl_subtype(current_type, POLYMAKETYPE_$juliatype)) {
+        function << jlcxx::unbox<const $ctype&>(value);
     }"""
 end
 
@@ -60,33 +59,34 @@ function call_function_feed_argument_code(type_tuples)
         "\n")
     return """
 template <typename T>
-void polymake_call_function_feed_argument(T& function, jl_value_t* argument)
+void polymake_call_function_feed_argument(T& function, jl_value_t* value)
 {
-    jl_value_t* current_type = jl_typeof(argument);
-    if (jl_is_int64(argument)) {
+    jl_value_t* current_type = jl_typeof(value);
+    if (jl_is_int64(value)) {
         // check size of long, to be sure
         static_assert(sizeof(long) == 8, "long must be 64 bit");
-        function << static_cast<long>(jl_unbox_int64(argument));
-        return;
+        function << static_cast<long>(jl_unbox_int64(value));
+    } else if (jl_is_bool(value)) {
+        function << jl_unbox_bool(value);
+    } else if (jl_is_string(value)) {
+        function << std::string(jl_string_data(value));
+    } else if (jl_typeis(value, jl_float64_type)){
+        function << jl_unbox_float64(value);
+    } $feeding_ifs
+    else {
+        throw std::runtime_error(
+            "Cannot pass function value: conversion failed for argument of type " + std::string(jl_typeof_str(value))
+        );
     }
-    if (jl_is_bool(argument)) {
-        function << jl_unbox_bool(argument);
-        return;
-    }
-    if (jl_is_string(argument)) {
-        function << std::string(jl_string_data(argument));
-        return;
-    }
-$feeding_ifs
+    return;
 }
 """
 end
 
 function option_set_take_if(type_string, ctype)
     return """
-\tif (jl_subtype(current_type, POLYMAKETYPE_$type_string)) {
-        optset[key] << *reinterpret_cast<$ctype*>(get_ptr_from_cxxwrap_obj(value));
-        return;
+\telse if (jl_subtype(current_type, POLYMAKETYPE_$type_string)) {
+        optset[key] << jlcxx::unbox<const $ctype&>(value);
     }"""
 end
 
@@ -104,17 +104,23 @@ void option_set_take(pm::perl::OptionSet optset,
         // check size of long, to be sure
         static_assert(sizeof(long) == 8, "long must be 64 bit");
         optset[key] << static_cast<long>(jl_unbox_int64(value));
-        return;
-    }
-    if (jl_is_bool(value)) {
+    } else if (jl_is_bool(value)) {
         optset[key] << jl_unbox_bool(value);
-        return;
-    }
-    if (jl_is_string(value)) {
+    } else if (jl_is_string(value)) {
         optset[key] << std::string(jl_string_data(value));
-        return;
+    } else if (jl_typeis(value, jl_float64_type)){
+        optset[key] << jl_unbox_float64(value);
+    } $option_set_ifs
+    else {
+        throw std::runtime_error(
+            "Cannot create OptionSet: conversion failed for (key, value) = (" +
+            key +
+            ", ::" +
+            std::string(jl_typeof_str(value)) +
+            ")"
+        );
     }
-$option_set_ifs
+    return;
 }
 """
     return content

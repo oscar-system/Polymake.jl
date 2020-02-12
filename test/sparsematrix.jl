@@ -5,10 +5,10 @@ using SparseArrays
 
     for T in [Int64, Polymake.Integer, Polymake.Rational, Float64]
         @test Polymake.SparseMatrix{T} <: AbstractSparseMatrix
-        @test Polymake.SparseMatrix{T}(3,4) isa AbstractSparseMatrix
-        @test Polymake.SparseMatrix{T}(3,4) isa Polymake.SparseMatrix
-        @test Polymake.SparseMatrix{T}(3,4) isa Polymake.SparseMatrix{T}
-        M = Polymake.SparseMatrix{T}(3,4)
+        @test Polymake.spzeros(T, 3, 4) isa AbstractSparseMatrix
+        @test Polymake.spzeros(T, 3, 4) isa Polymake.SparseMatrix
+        @test Polymake.spzeros(T, 3, 4) isa Polymake.SparseMatrix{Polymake.to_cxx_type(T)}
+        M = Polymake.spzeros(T, 3, 4)
         M[1,1] = 10
         @test M[1,1] isa T
         @test M[1,1] == 10
@@ -18,11 +18,11 @@ using SparseArrays
     jl_s = sparse([0 0 0; 0 1 0])
     @testset "Constructors/Converts" begin
         for T in IntTypes #TODO Polymake.Integer
-            @test Polymake.SparseMatrix(T.(jl_m)) isa Polymake.SparseMatrix{T == Int64 ? Int64 : Polymake.Integer}
+            @test Polymake.SparseMatrix(T.(jl_m)) isa Polymake.SparseMatrix{Polymake.to_cxx_type(Polymake.convert_to_pm_type(T))}
             @test Polymake.SparseMatrix(jl_m//1) isa Polymake.SparseMatrix{Polymake.Rational}
             @test Polymake.SparseMatrix(jl_m/1) isa Polymake.SparseMatrix{Float64}
 
-            @test Polymake.SparseMatrix(T.(jl_s)) isa Polymake.SparseMatrix{T == Int64 ? Int64 : Polymake.Integer}
+            @test Polymake.SparseMatrix(T.(jl_s)) isa Polymake.SparseMatrix{Polymake.to_cxx_type(Polymake.convert_to_pm_type(T))}
             @test Polymake.SparseMatrix(jl_s//1) isa Polymake.SparseMatrix{Polymake.Rational}
             @test Polymake.SparseMatrix(jl_s/1) isa Polymake.SparseMatrix{Float64}
 
@@ -104,7 +104,7 @@ using SparseArrays
             for T in [IntTypes; Polymake.Integer]
                 V = Polymake.SparseMatrix{Int64}(jl_m_32) # local copy
                 setindex!(V, T(5), 1, 1)
-                @test V isa Polymake.SparseMatrix{Int64}
+                @test V isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int)}
                 @test V[T(1), 1] isa Int64
                 @test V[1, T(1)] == 5
                 # testing the return value of brackets operator
@@ -265,7 +265,7 @@ using SparseArrays
         jl_u = jl_m/4
         U = Polymake.SparseMatrix{Float64}(jl_u)
 
-        @test -X isa Polymake.SparseMatrixAllocated{Int64}
+        @test -X isa Polymake.SparseMatrixAllocated{Polymake.to_cxx_type(Int)}
         @test -X == -jl_m
 
         @test -V isa Polymake.SparseMatrixAllocated{Polymake.Integer}
@@ -280,8 +280,8 @@ using SparseArrays
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
-        @test 2X isa Polymake.SparseMatrix{Polymake.Int64}
-        @test Int32(2)X isa Polymake.SparseMatrix{Int64}
+        @test 2X isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int)}
+        @test Int32(2)X isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int)}
 
         for T in int_scalar_types
             for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]

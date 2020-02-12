@@ -1,7 +1,7 @@
 module Meta
 import JSON
 import Polymake: appname_module_dict, module_appname_dict, shell_context_help
-import Polymake: Rational, PolymakeType
+import Polymake: Rational, PolymakeType, PropertyValue, OptionSet
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
@@ -11,8 +11,8 @@ end
 ############### fuctions used at runtime (imported to App modules)
 
 function polymake_arguments(args...; kwargs...)
-    isempty(kwargs) && return Any[ convert.(PolymakeType, args)... ]
-    return Any[ convert.(PolymakeType, args); OptionSet(kwargs) ]
+    isempty(kwargs) && return Any[convert.(PolymakeType, args)...]
+    return Any[convert.(PolymakeType, args)..., OptionSet(kwargs)]
 end
 
 function get_docs(input::AbstractString; full::Bool=true, html::Bool=false)
@@ -223,10 +223,8 @@ jl_symbol(pc::PolymakeCallable) = lowercase(pc.jl_function)
 jl_symbol(pc::PolymakeObject) = pc.jl_function
 jl_module_name(pa::PolymakeApp) = pa.jl_module
 
-callable(::PolymakeFunction) = :internal_call_function
-callable(::PolymakeMethod) = :internal_call_method
-callable_void(::PolymakeFunction) = :internal_call_function_void
-callable_void(::PolymakeMethod) = :internal_call_method_void
+callable(::PolymakeFunction) = :call_function
+callable(::PolymakeMethod) = :call_method
 
 docstring(obj::PolymakeObject) = get(obj.json, "help", "")
 istemplated(obj::PolymakeObject) = haskey(obj.json, "params")
@@ -256,51 +254,46 @@ end
 ########## code generation
 
 function jl_code(pf::PolymakeFunction)
-    func_name = pm_name_qualified(pf)
+    jlfunc_name = jl_symbol(pf)
+    func_name = pm_name(pf)
+    app = pm_app(pf)
 
     return quote
-        function $(jl_symbol(pf))(args...; template_parameters::Array{String,1}=String[], keep_PropertyValue=false, call_as_void=false, kwargs...)
-            if call_as_void
-                $(callable_void(pf))($func_name, template_parameters,
-                    polymake_arguments(args...; kwargs...))
-                return nothing
-            else
-                return_value = $(callable(pf))($func_name, template_parameters,
-                    polymake_arguments(args...; kwargs...))
-                if keep_PropertyValue
-                    return return_value
-                else
-                    return convert_from_property_value(return_value)
-                end
-            end
+        function $(jlfunc_name)(::Type{PropertyValue}, args...;
+            template_parameters::Base.AbstractVector{<:AbstractString}=String[],
+            kwargs...)
+
+            return $(callable(pf))(PropertyValue, Symbol($app), Symbol($func_name), args...;
+                template_parameters=template_parameters, kwargs...)
         end;
-        function $(Base.Docs).getdoc(::typeof($(jl_symbol(pf))))
-            docstrs = get_docs($func_name, full=true)
+        function $(jlfunc_name)(args...;
+            template_parameters::Base.AbstractVector{<:AbstractString}=String[],
+            kwargs...)
+
+            return $(callable(pf))(Symbol($app), Symbol($func_name), args...;
+                template_parameters=template_parameters, kwargs...)
+        end;
+        function $(Base.Docs).getdoc(::typeof($(jlfunc_name)))
+            docstrs = get_docs($(pm_name_qualified(app, func_name)), full=true)
             return PolymakeDocstring(join(docstrs, "\n\n---\n\n"))
         end;
-        export $(jl_symbol(pf));
+        export $(jlfunc_name);
     end
 end
 
-function jl_code(pf::PolymakeMethod)
-    func_name = pm_name(pf)
-
+function jl_code(pm::PolymakeMethod)
+    func_name = pm_name(pm)
     return quote
-        function $(jl_symbol(pf))(object::BigObject, args...; keep_PropertyValue=false, call_as_void=false, kwargs...)
-            if call_as_void
-                $(callable_void(pf))($func_name, object, polymake_arguments(args...; kwargs...))
-                return nothing
-            else
-                return_value =
-                $(callable(pf))($func_name, object, polymake_arguments(args...; kwargs...))
-                if keep_PropertyValue
-                    return return_value
-                else
-                    return convert_from_property_value(return_value)
-                end
-            end
+        function $(jl_symbol(pm))(::Type{PropertyValue}, object::BigObject,
+            args...; kwargs...)
+            return $(callable(pm))(PropertyValue, object, Symbol($func_name), args...;
+                kwargs...)
         end;
-        export $(jl_symbol(pf));
+        function $(jl_symbol(pm))(object::BigObject, args...;
+                kwargs...)
+            return $(callable(pm))(object, Symbol($func_name), args...; kwargs...)
+        end;
+        export $(jl_symbol(pm));
     end
 end
 
@@ -308,8 +301,8 @@ function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String)
     return quote
         function $(jl_name)(args...; kwargs...)
             # name created at compile-time
-            return bigobj($(pm_name_qualified(app_name, pm_name)),
-                args..., kwargs...)
+            return bigobject($(pm_name_qualified(app_name, pm_name)),
+                args...; kwargs...)
         end
     end
 end
@@ -320,7 +313,7 @@ function jl_constructor(jl_name::Symbol, pm_name::String, app_name::String, temp
             Ts = translate_type_to_pm_string.([$(templates...)])
             # name created at run-time
             pm_full_name = pm_name_qualified($(app_name), $(pm_name), Ts)
-            return bigobj(pm_full_name, args..., kwargs...)
+            return bigobject(pm_full_name, args...; kwargs...)
         end
     end
 end
@@ -333,7 +326,7 @@ jl_constructor(obj::PolymakeObject) =
 
 function jl_code(obj::PolymakeObject)
     jl_object_name = jl_symbol(obj)
-    pm_object_name = pm_name_qualified(obj.app_name, pm_name(obj))
+    pm_object_name = pm_name_qualified(pm_app(obj), pm_name(obj))
 
     if istemplated(obj)
         Ts = templates(obj)
@@ -371,10 +364,11 @@ end
 Base.show(io::IO, doc::PolymakeDocstring) = print(io, doc.s)
 
 module_imports() = quote
-    import Polymake: convert_from_property_value,
-    internal_call_function, internal_call_method,
-    bigobj, BigObject, OptionSet
-    import Polymake.Meta: PolymakeDocstring, pm_name_qualified, translate_type_to_pm_string, get_docs, polymake_arguments
+    import Polymake: call_function, call_method, bigobject,
+        BigObject, OptionSet, PropertyValue
+    import Polymake.CxxWrap
+    import Polymake.Meta: PolymakeDocstring, pm_name_qualified,
+        translate_type_to_pm_string, get_docs, polymake_arguments
 end
 
 function jl_code(pa::PolymakeApp)
