@@ -1,6 +1,6 @@
 module Polymake
 
-export @pm, visual
+export @pm, @convert_to, visual
 
 # We need to import all functions which will be extended on the Cxx side
 import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
