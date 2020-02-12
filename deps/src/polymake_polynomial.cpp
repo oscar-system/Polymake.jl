@@ -19,16 +19,17 @@ void polymake_module_add_polynomial(jlcxx::Module& polymake)
 
                 wrapped.template constructor<pm::Vector<coeffT>, pm::Matrix<expT>>();
 
-                wrapped.method("==", [](polyT& a, polyT& b) { return a == b; });
-                wrapped.method("+", [](polyT& a, polyT& b) { return a + b; });
-                wrapped.method("-", [](polyT& a, polyT& b) { return a - b; });
-                wrapped.method("*", [](polyT& a, polyT& b) { return a * b; });
+                wrapped.method("_isequal", [](polyT& a, polyT& b) { return a == b; });
+                wrapped.method("_add", [](polyT& a, polyT& b) { return a + b; });
+                wrapped.method("_sub", [](polyT& a, polyT& b) { return a - b; });
+                wrapped.method("_mul", [](polyT& a, polyT& b) { return a * b; });
                 wrapped.method("^", [](polyT& a, int64_t b) { return a ^ b; });
                 wrapped.method("/", [](polyT& a, coeffT c) { return a / c; });
                 wrapped.method("coefficients_as_vector", &polyT::coefficients_as_vector);
                 wrapped.method("monomials_as_matrix", [](polyT& a) { return a.monomials_as_matrix(); });
                 wrapped.method("set_var_names", [](polyT& a, Array<std::string>& names) { a.set_var_names(names); });
                 wrapped.method("get_var_names", [](polyT& a) { return a.get_var_names(); });
+                wrapped.method("nvars", &polyT::n_vars);
 
                 wrapped.method("show_small_obj", [](polyT& P) {
                     return show_small_object<polyT>(P);

@@ -32,6 +32,7 @@ using SparseArrays
             Polymake.set_var_names(p,["x", "y", "z"])
             @test Polymake.get_var_names(p) == ["x", "y", "z"]
             @test string(p) == string("pm::Polynomial<", s, ", long>\n2*x^6*y^7 + x^3*y^4*z^5")
+            @test Polymake.nvars(p) == size(jl_m, 2)
             @test Polymake.coefficients_as_vector(p) isa Polymake.Vector
             @test Polymake.coefficients_as_vector(p) isa Polymake.Vector{Polymake.to_cxx_type(C)}
             v = Polymake.coefficients_as_vector(p)
