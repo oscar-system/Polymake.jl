@@ -1,5 +1,4 @@
 import Base: convert
-export @convert_to
 ####################  Converting to polymake types  ####################
 
 for (pm_T, jl_T) in [
