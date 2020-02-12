@@ -46,11 +46,11 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_matrix(polymake);
 
-    polymake_module_add_sparsevector(polymake);
-
     polymake_module_add_vector(polymake);
 
     polymake_module_add_set(polymake);
+
+    polymake_module_add_sparsevector(polymake);;
 
     polymake_module_add_array(polymake);
 

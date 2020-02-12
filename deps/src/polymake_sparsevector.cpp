@@ -15,9 +15,6 @@ void polymake_module_add_sparsevector(jlcxx::Module& polymake)
             [](auto wrapped) {
                     typedef typename decltype(wrapped)::type vecType;
                     typedef typename decltype(wrapped)::type::value_type elemType;
-                    wrapped.template constructor<vecType>();
-                    wrapped.template constructor<pm::Vector<elemType>>();
-                    wrapped.template constructor<int32_t>();
                     wrapped.template constructor<int64_t>();
                     wrapped.method("_getindex",
                         [](vecType& V, int64_t i) {

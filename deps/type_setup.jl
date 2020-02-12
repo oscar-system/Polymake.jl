@@ -28,7 +28,7 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "SparseMatrix_double",         "pm::SparseMatrix<double>",                 "SparseMatrix{Float64}",        "to_sparsematrix_double"),
 ( "SparseVector_Integer",        "pm::SparseVector<pm::Integer>",            "SparseVector{Integer}",        "to_sparsevector_integer"),
 ( "SparseVector_Rational",       "pm::SparseVector<pm::Rational>",           "SparseVector{Rational}",       "to_sparsevector_rational"),
-( "SparseVector_Int",            "pm::SparseVector<long>",                   "SparseVector{Int64}",          "to_sparsevector_int"),
+( "SparseVector_Int",            "pm::SparseVector<long>",                   "SparseVector{CxxWrap.CxxLong}",          "to_sparsevector_int"),
 ( "SparseVector_double",         "pm::SparseVector<double>",                 "SparseVector{Float64}",        "to_sparsevector_double"),
 ( "IncidenceMatrix_NonSymmetric","pm::IncidenceMatrix<pm::NonSymmetric>",    "IncidenceMatrix{NonSymmetric}","to_incidencematrix_nonsymmetric"),
 ( "IncidenceMatrix_Symmetric",   "pm::IncidenceMatrix<pm::Symmetric>",       "IncidenceMatrix{Symmetric}",   "to_incidencematrix_symmetric"),
