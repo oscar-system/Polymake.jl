@@ -28,9 +28,9 @@
 
     @testset "@convert_to" begin
         @convert_to Integer 64 isa Polymake.Integer
-        @test eval(@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int64)}}
-        @test eval(@convert_to Vector{Float} [10, 11, 12]) isa Polymake.Vector{Float64}
-        @test eval(@convert_to Matrix{Rational} [10/1 11/1 12/1]) isa Polymake.Matrix{Polymake.Rational}
+        @test (@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int64)}}
+        @test (@convert_to Vector{Float} [10, 11, 12]) isa Polymake.Vector{Float64}
+        @test (@convert_to Matrix{Rational} [10/1 11/1 12/1]) isa Polymake.Matrix{Polymake.Rational}
         @test_throws LoadError eval(:(@convert_to Array{Set{Int}}))
         @test_throws LoadError eval(:(@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])] Set([4, 3])))
         err = try
@@ -40,10 +40,15 @@
         end
         @test err.error isa ArgumentError
         err = try
-            eval(:(@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])] Set([4, 3])))
+            @eval begin
+                @convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])] Set([4, 3])
+            end
         catch err
             err
         end
         @test err.error isa ArgumentError
+
+        @test_throws ArgumentError @convert_to Matrix{Rational} 2
+        @test_throws UndefVarError @convert_to Matrix{Rational} A
     end
 end

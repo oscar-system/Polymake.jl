@@ -104,7 +104,7 @@ end
 """
     @convert_to PerlType argument
 
-This macro can be used to quickly convert objects using the @pm macro and Polymake's common.convert_to method.
+This macro can be used to quickly convert objects using the [`@pm`](@ref) macro and Polymake's `common.convert_to` method.
 As the latter is rooted in Perl, the stated type also has to be understandable by Polymake's Perl
 
 # Examples
@@ -142,7 +142,7 @@ macro convert_to(args...)
         catch ex
             # To not catch things like UndefVarError only catch ErrorException
             # since this is currently thrown if something invalid is parsed.
-            if ex == ErrorException
+            if ex isa ErrorException
                 # Use QuoteNodes to keep expr1 and expr2 as Expr around
                 expr1 = $(QuoteNode(expr1))
                 expr2 = $(QuoteNode(expr2))

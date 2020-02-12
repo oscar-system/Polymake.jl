@@ -285,7 +285,7 @@ and so should be accepted by all methods that apply to the abstract types.
 yet, you will not be able to access its content or in general use it **from Julia**,
 however you can always pass it back as an argument to a `polymake` function.
 Moreover you may try to convert to Julia understandable type via macro
-`@pm common.convert_to{C++{templated, type}}(obj)`.
+`@convert_to C++{template, names} obj`.
 
 ### Functions
 
@@ -353,9 +353,21 @@ pm::Matrix<pm::Integer>
 
 julia> m[1,1]
 1
-
 ```
 
+Since the combination of the `@pm` macro and `common.convert_to` is quite common there is a
+specialized `@convert_to` macro for this:
+```julia
+
+julia> m = @convert_to Matrix{Integer} f # the template must consist of C++ names
+pm::Matrix<pm::Integer>
+1 1 0 0
+1 -1 0 0
+1 0 1 0
+1 0 -1 0
+1 0 0 1
+1 0 0 -1
+```
 
 ### Function Arguments
 
