@@ -55,19 +55,6 @@ function Base.similar(X::IncidenceMatrix,
     return IncidenceMatrix{NonSymmetric}(undef, dims...)
 end
 
-# function Base.similar(X::Union{SparseVector, SparseMatrix}, ::Type{S},
-#     dims::Dims{2}) where S <: VecOrMat_eltypes
-#     return Polymake.spzeros(convert_to_pm_type(S), dims...)
-# end
-#
-# function Base.similar(X::Union{SparseVector, SparseMatrix}, ::Type{S},
-#     dims::Dims{1}) where S <: VecOrMat_eltypes
-#     return spzeros(convert_to_pm_type(S), dims...)
-# end
-#
-# Base.similar(X::Union{SparseVector, SparseMatrix}, ::Type{S}, dims::Dims{2}) where S =
-#     SparseMatrixCSC{S}(dims...)
-
 Base.BroadcastStyle(::Type{<:Vector}) = Broadcast.ArrayStyle{Vector}()
 Base.BroadcastStyle(::Type{<:Matrix}) = Broadcast.ArrayStyle{Matrix}()
 Base.BroadcastStyle(::Type{<:SparseVector}) = Broadcast.ArrayStyle{SparseVector}()
