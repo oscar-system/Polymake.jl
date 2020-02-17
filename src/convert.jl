@@ -61,7 +61,7 @@ end
 convert_to_pm_type(T::Type) = throw(ArgumentError("Unrecognized argument type: $T.\nYou need to convert to polymake compatible type first."))
 
 convert_to_pm_type(::Type{T}) where T <: Union{Int64, Float64} = T
-convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet} = T
+convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet, TropicalNumber} = T
 
 convert_to_pm_type(::Type{Int32}) = Int64
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
@@ -71,6 +71,7 @@ convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
 convert_to_pm_type(::Type{<:Union{AbstractVector, Vector}}) = Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, Matrix}}) = Matrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = SparseMatrix
+convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}}) = IncidenceMatrix
 convert_to_pm_type(::Type{<:Array}) = Array
 # convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 

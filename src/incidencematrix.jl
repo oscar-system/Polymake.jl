@@ -1,8 +1,12 @@
 using SparseArrays
 
-function IncidenceMatrix{T}(::UndefInitializer, n::Base.Integer, m::Base.Integer) where
-    T <: Union{NonSymmetric, Symmetric}
-    return IncidenceMatrix{T}(convert(Int64, n), convert(Int64, m))
+function IncidenceMatrix{S}(::UndefInitializer, n::Base.Integer, m::Base.Integer) where
+    S <: Union{NonSymmetric, Symmetric}
+    return IncidenceMatrix{S}(convert(Int64, n), convert(Int64, m))
+end
+
+function IncidenceMatrix{Symmetric}(::UndefInitializer, n::Base.Integer)
+    return IncidenceMatrix{Symmetric}(convert(Int64, n), convert(Int64, n))
 end
 
 function IncidenceMatrix{NonSymmetric}(mat::AbstractMatrix)
