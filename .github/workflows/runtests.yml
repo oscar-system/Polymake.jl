@@ -3,12 +3,33 @@ name: Run tests
 on: [push]
 
 jobs:
-  test:
+  test-julia-stable:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        julia-version: ['1.0', '1.2.0', '1.3.0', '^1.4.0-rc1', 'nightly']
+        julia-version: ['1.0', '1.3']
         os: [ubuntu-latest, macOS-latest]
+      fail-fast: true
+    
+    steps:
+      - uses: actions/checkout@v1.0.0
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+      - uses: julia-actions/julia-buildpkg@latest
+      - uses: julia-actions/julia-runtest@latest
+      - uses: julia-actions/julia-uploadcodecov@latest
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  
+  test-julia-nightly:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        julia-version: ['^1.4.0-rc1', 'nightly']
+        os: [ubuntu-latest, macOS-latest]
+      fail-fast: false
     
     steps:
       - uses: actions/checkout@v1.0.0
