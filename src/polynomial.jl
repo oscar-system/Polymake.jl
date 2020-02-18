@@ -23,7 +23,7 @@ Polynomial{C}(vec::AbstractVector, mat::AbstractMatrix{E}) where {C,E} =
 
 # defaulting to {Rational,Int64}
 Polynomial(x...) = Polynomial{Rational,Int64}(x)
-Polynomial{C}(x...) where C = Polynomial{Rational,Int64}(x)
+Polynomial{C}(x...) where C = Polynomial{C,Int64}(x)
 
 set_var_names(p::Polynomial, names::AbstractArray{S}) where {S <: AbstractString} =
     set_var_names(p, Array{String}(names))
@@ -55,8 +55,6 @@ for (jlF,pmF) in (
         end
     end
 end
-
-Base.:^(p::Polynomial, i::Integer) = p^(Int64(i))
 
 Base.:/(p::Polynomial{C}, d::Number) where C = p / C(d)
 
