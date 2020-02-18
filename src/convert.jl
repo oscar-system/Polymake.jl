@@ -102,3 +102,56 @@ function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix}}, S::Ty
     (promote_type(S, Int64) == Int64 || S isa CxxWrap.CxxLong) && return Int64
     return Integer
 end
+
+"""
+    @convert_to PerlType argument
+
+This macro can be used to quickly convert objects using the [`@pm`](@ref) macro and Polymake's `common.convert_to` method.
+As the latter is rooted in Perl, the stated type also has to be understandable by Polymake's Perl
+
+# Examples
+```jldoctest
+julia> @convert_to Integer true
+1
+
+julia> @convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]
+pm::Array<pm::Set<long, pm::operations::cmp>>
+{1 2 4 5 7 8}
+{1}
+{6 9}
+
+
+julia> @convert_to Vector{Float} [10, 11, 12]
+pm::Vector<double>
+10 11 12
+
+julia> @convert_to Matrix{Rational} [10/1 11/1 12/1]
+pm::Matrix<pm::Rational>
+10 11 12
+
+
+"""
+macro convert_to(args...)
+    # Catch case that only one or more than two arguments are given
+    if length(args) != 2
+        throw(ArgumentError("@convert_to needs to be called with 2 arguments, e.g., `@convert_to Matrix{Integer} A`."))
+    end
+    expr1, expr2 = args
+    :(
+        try
+            # expr2 needs to be escaped
+            @pm common.convert_to{$expr1}($(esc(expr2)))
+        catch ex
+            # To not catch things like UndefVarError only catch ErrorException
+            # since this is currently thrown if something invalid is parsed.
+            if ex isa ErrorException
+                # Use QuoteNodes to keep expr1 and expr2 as Expr around
+                expr1 = $(QuoteNode(expr1))
+                expr2 = $(QuoteNode(expr2))
+                throw(ArgumentError("Can not parse the expression passed to @convert_to macro:\n$expr1 $expr2\n Only `@convert_to PerlType argument` syntax is recognized"))
+            else
+                rethrow(ex)
+            end
+        end
+    )
+end
