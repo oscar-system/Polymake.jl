@@ -5,27 +5,21 @@ function spzeros(::Type{T}, n::Base.Integer) where T <:VecOrMat_eltypes
     return SparseVector{to_cxx_type(T)}(n)
 end
 
-#functions for input of julia sparse vector type
+#functions for input of abstract sparse vector type
 function SparseVector{T}(vec::AbstractSparseVector) where T
-    n = length(vec)
-    (p,v) = SparseArrays.findnz(vec)
-    sv = spzeros(T, n)
-    for i = 1:length(p)
-        sv[p[i]] = v[i]
+    sv = spzeros(T, length(vec))
+    for (idx, val) in zip(SparseArrays.findnz(vec)...)
+        sv[idx] = val
     end
     return sv
 end
 
 #functions for input of dense vector type
-@inline function SparseVector{T}(vec::AbstractVector) where T
-    n = length(vec)
-    sv = spzeros(T, n)
-    temp = zero(T)
-    for i = 1:n
-        temp = vec[i]
-        if !iszero(temp)
-            sv[i] = temp
-        end
+function SparseVector{T}(vec::AbstractVector) where T
+    sv = spzeros(T, length(vec))
+    for (idx, val) in enumerate(vec)
+        iszero(val) && continue
+        sv[idx] = val
     end
     return sv
 end
@@ -48,16 +42,8 @@ Base.@propagate_inbounds function Base.setindex!(V::SparseVector{T}, val, n::Bas
     return val
 end
 
-function SparseArrays.findnz(vec::SparseVector{T}) where T
-    nzi = nzindices(vec)
-    len = length(nzi)
-    ei = Base.Vector{Int64}(undef, len)
-    v = Base.Vector{to_jl_type(T)}(undef, len)
-    k = 1
-    for e in nzi
-        ei[k] = e + 1
-        v[k] = vec[e + 1]
-        k += 1
-    end
-    return (ei,v)
+function findnz(vec::SparseVector{T}) where T
+    I = Int[to_one_based_indexing(i) for i in _nzindices(vec)]
+    V = to_jl_type(T)[vec[idx] for idx in I]
+    return (I, V)
 end
