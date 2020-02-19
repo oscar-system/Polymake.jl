@@ -3,7 +3,7 @@ module Polymake
 export @pm, @convert_to, visual
 
 # We need to import all functions which will be extended on the Cxx side
-import Base: ==, <, <=, *, -, +, //, div, rem, one, zero,
+import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     append!, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty,
     length, numerator, push!, resize!,
@@ -103,6 +103,7 @@ include("broadcast.jl")
 include("arrays.jl")
 include("incidencematrix.jl")
 include("tropicalnumber.jl")
+include("polynomial.jl")
 
 include("polymake_direct_calls.jl")
 
