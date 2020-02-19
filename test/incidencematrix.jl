@@ -255,4 +255,7 @@ using SparseArrays
             end
         end
     end
+
+    @test graph.Graph(ADJACENCY=Polymake.IncidenceMatrix(jl_s)) isa Polymake.BigObject
+
 end
