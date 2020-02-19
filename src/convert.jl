@@ -13,11 +13,14 @@ for (pm_T, jl_T) in [
         convert(::Type{$pm_T}, itr::$jl_T) = $pm_T(itr)
         convert(::Type{$pm_T{T}}, itr::$jl_T) where T = $pm_T{T}(itr)
         convert(::Type{$pm_T}, itr::$pm_T) = itr
-        convert(::Type{$pm_T{T}}, itr::$pm_T) where T = itr
+        convert(::Type{$pm_T{T}}, itr::$pm_T{T}) where T = itr
     end
 end
 
 convert(::Type{Set{T}}, itr::AbstractArray) where T = Set{T}(itr)
+
+convert(::Type{<:Polynomial{C,E}}, itr::Polynomial{C,E}) where {C,E} = itr
+convert(::Type{<:Polynomial{C1,E1}}, itr::Polynomial{C2,E2}) where {C1,C2,E1,E2} = Polynomial{C1,E1}(itr)
 
 ###########  Converting to objects polymake understands  ###############
 
@@ -62,7 +65,7 @@ end
 convert_to_pm_type(T::Type) = throw(ArgumentError("Unrecognized argument type: $T.\nYou need to convert to polymake compatible type first."))
 
 convert_to_pm_type(::Type{T}) where T <: Union{Int64, Float64} = T
-convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet} = T
+convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet, TropicalNumber} = T
 
 convert_to_pm_type(::Type{Int32}) = Int64
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
@@ -72,6 +75,7 @@ convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
 convert_to_pm_type(::Type{<:Union{AbstractVector, Vector}}) = Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, Matrix}}) = Matrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = SparseMatrix
+convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}}) = IncidenceMatrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
 # convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
@@ -97,8 +101,13 @@ convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = Array
 
 # 2-argument version: the first is the container type
 promote_to_pm_type(::Type, S::Type) = convert_to_pm_type(S) #catch all
+<<<<<<< HEAD
 function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix, SparseVector}}, S::Type{<:Base.Integer})
     promote_type(S, Int64) == Int64 && return Int64
+=======
+function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix}}, S::Type{<:Union{Base.Integer,CxxWrap.CxxLong}})
+    (promote_type(S, Int64) == Int64 || S isa CxxWrap.CxxLong) && return Int64
+>>>>>>> master
     return Integer
 end
 

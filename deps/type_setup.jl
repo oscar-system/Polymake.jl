@@ -34,8 +34,12 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "IncidenceMatrix_Symmetric",   "pm::IncidenceMatrix<pm::Symmetric>",       "IncidenceMatrix{Symmetric}",   "to_incidencematrix_symmetric"),
 ( "TropicalNumber_Max_Rational", "pm::TropicalNumber<pm::Max,pm::Rational>", "TropicalNumber{Max,Rational}", "to_tropicalnumber_max_rational"),
 ( "TropicalNumber_Min_Rational", "pm::TropicalNumber<pm::Min,pm::Rational>", "TropicalNumber{Min,Rational}", "to_tropicalnumber_min_rational"),
-# ( "pm_TropicalNumber_pm_Max_pm_Integer",    "pm::TropicalNumber<pm::Max,pm::Integer>",   "pm_TropicalNumber{pm_Max,pm_Integer}",  "to_pm_tropicalnumber_max_Integer"),
-# ( "pm_TropicalNumber_pm_Min_pm_Integer",    "pm::TropicalNumber<pm::Min,pm::Integer>",   "pm_TropicalNumber{pm_Min,pm_Integer}",  "to_pm_tropicalnumber_min_Integer"),
+# ( "TropicalNumber_Max_Integer",    "pm::TropicalNumber<pm::Max,pm::Integer>",   "TropicalNumber{Max,Integer}",  "to_tropicalnumber_max_Integer"),
+# ( "TropicalNumber_Min_Integer",    "pm::TropicalNumber<pm::Min,pm::Integer>",   "TropicalNumber{Min,Integer}",  "to_tropicalnumber_min_Integer"),
+( "Polynomial_Int_Int",          "pm::Polynomial<long,long>",                "Polynomial{CxxWrap.CxxLong,CxxWrap.CxxLong}",      "to_polynomial_int_int"),
+( "Polynomial_Integer_Int",      "pm::Polynomial<pm::Integer,long>",         "Polynomial{Integer,CxxWrap.CxxLong}",    "to_polynomial_integer_int"),
+( "Polynomial_Rational_Int",     "pm::Polynomial<pm::Rational,long>",        "Polynomial{Rational,CxxWrap.CxxLong}",   "to_polynomial_rational_int"),
+( "Polynomial_double_Int",       "pm::Polynomial<double,long>",              "Polynomial{Float64,CxxWrap.CxxLong}",    "to_polynomial_double_int"),
 ]
     NT.(type_tuples)
 end
