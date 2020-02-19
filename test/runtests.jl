@@ -29,4 +29,5 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("interface_functions.jl")
     include("sparsematrix.jl")
     include("tropicalnumber.jl")
+    include("polynomial.jl")
 end
