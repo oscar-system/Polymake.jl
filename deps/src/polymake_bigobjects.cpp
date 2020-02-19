@@ -23,8 +23,8 @@ void polymake_module_add_bigobject(jlcxx::Module& polymake)
         .method("type_name", [](pm::perl::BigObjectType p) { return p.name(); });
 
     polymake.add_type<pm::perl::BigObject>("BigObject")
-        .constructor<const std::string&>()
         .constructor<const pm::perl::BigObjectType&>()
+        .constructor<const pm::perl::BigObjectType&, const pm::perl::BigObject&>()
         .method("save_bigobject",
                 [](pm::perl::BigObject p, const std::string& s) {
                     return p.save(s);
@@ -36,8 +36,12 @@ void polymake_module_add_bigobject(jlcxx::Module& polymake)
                 [](pm::perl::BigObject p, const std::string& s) {
                     return p.give(s);
                 })
-        .method("exists", [](pm::perl::BigObject   p,
+        .method("exists", [](pm::perl::BigObject& p,
                              const std::string& s) { return p.exists(s); })
+        .method("_isa", [](const pm::perl::BigObject& p,
+                          const pm::perl::BigObjectType& t) { return p.isa(t); })
+        .method("cast!", [](pm::perl::BigObject& p,
+                            const pm::perl::BigObjectType& t) { return p.cast(t); })
         .method("bigobject_type", [](pm::perl::BigObject p) { return p.type(); })
         .method("type_name",
                 [](pm::perl::BigObject p) { return p.type().name(); })
