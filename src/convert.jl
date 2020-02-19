@@ -101,13 +101,9 @@ convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = Array
 
 # 2-argument version: the first is the container type
 promote_to_pm_type(::Type, S::Type) = convert_to_pm_type(S) #catch all
-<<<<<<< HEAD
-function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix, SparseVector}}, S::Type{<:Base.Integer})
-    promote_type(S, Int64) == Int64 && return Int64
-=======
-function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix}}, S::Type{<:Union{Base.Integer,CxxWrap.CxxLong}})
+
+function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix, SparseVector}}, S::Type{<:Union{Base.Integer,CxxWrap.CxxLong}})
     (promote_type(S, Int64) == Int64 || S isa CxxWrap.CxxLong) && return Int64
->>>>>>> master
     return Integer
 end
 
