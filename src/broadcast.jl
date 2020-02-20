@@ -15,6 +15,10 @@ function spzeros(::Type{T}, rows::UR, cols::UR) where {T , UR<:Base.AbstractUnit
     return Polymake.spzeros(T, length(rows), length(cols))
 end
 
+function spzeros(::Type{T}, len::UR) where {T, UR<:Base.AbstractUnitRange}
+    return Polymake.spzeros(T, length(len))
+end
+
 for (dim, T) in ((1, :Vector), (2, :Matrix))
     @eval begin
         function Base.similar(X::Union{Vector, Matrix, IncidenceMatrix},
@@ -24,6 +28,19 @@ for (dim, T) in ((1, :Vector), (2, :Matrix))
         function Base.similar(X::Union{Vector, Matrix, IncidenceMatrix},
             ::Type{S}, dims::Dims{$dim}) where S
             return Base.$T{S}(undef, dims...)
+        end
+    end
+end
+
+for dim in (1, 2)
+    @eval begin
+        function Base.similar(X::Union{SparseVector, SparseMatrix},
+            ::Type{S}, dims::Dims{$dim}) where S <: VecOrMat_eltypes
+            return Polymake.spzeros(convert_to_pm_type(S), dims...)
+        end
+        function Base.similar(X::Union{SparseVector, SparseMatrix},
+            ::Type{S}, dims::Dims{$dim}) where S
+            return SparseArrays.spzeros(S, dims...)
         end
     end
 end
@@ -38,21 +55,9 @@ function Base.similar(X::IncidenceMatrix,
     return IncidenceMatrix{NonSymmetric}(undef, dims...)
 end
 
-function Base.similar(X::SparseMatrix, ::Type{S},
-    dims::Dims{2}) where S <: VecOrMat_eltypes
-    return Polymake.spzeros(convert_to_pm_type(S), dims...)
-end
-
-function Base.similar(X::SparseMatrix, ::Type{S},
-    dims::Dims{1}) where S <: VecOrMat_eltypes
-    return Vector{convert_to_pm_type(S)}(undef, dims...)
-end
-
-Base.similar(X::SparseMatrix, ::Type{S}, dims::Dims{2}) where S =
-    SparseMatrixCSC{S}(dims...)
-
 Base.BroadcastStyle(::Type{<:Vector}) = Broadcast.ArrayStyle{Vector}()
 Base.BroadcastStyle(::Type{<:Matrix}) = Broadcast.ArrayStyle{Matrix}()
+Base.BroadcastStyle(::Type{<:SparseVector}) = Broadcast.ArrayStyle{SparseVector}()
 Base.BroadcastStyle(::Type{<:SparseMatrix}) = Broadcast.ArrayStyle{SparseMatrix}()
 Base.BroadcastStyle(::Type{<:IncidenceMatrix}) = Broadcast.ArrayStyle{IncidenceMatrix{NonSymmetric}}()
 
@@ -72,10 +77,15 @@ function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SparseMatri
     return Polymake.spzeros(promote_to_pm_type(SparseMatrix, ElType), axes(bc)...)
 end
 
+function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SparseVector}},
+    ::Type{ElType}) where ElType
+    return Polymake.spzeros(promote_to_pm_type(SparseVector, ElType), axes(bc)...)
+end
+
 #Overloading some of julia's broadcast functions to allow correct typing when
 #broadcasting julia sparse matrices with polymake element type output
 SparseVecOrMat{T} =
-Union{SparseVector{T},SparseArrays.AbstractSparseMatrix{T}}
+Union{SparseArrays.SparseVector{T},SparseArrays.AbstractSparseMatrix{T}}
 
 function Base.Broadcast.combine_eltypes(f::Tf,
 args::Tuple{SparseVecOrMat{ElType},N}) where {N, Tf, ElType<:Union{Integer,
