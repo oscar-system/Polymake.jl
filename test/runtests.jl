@@ -20,6 +20,7 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("integers.jl")
     include("rationals.jl")
     include("vectors.jl")
+    include("sparsevector.jl")
     include("matrices.jl")
     include("sets.jl")
     include("arrays.jl")
@@ -29,4 +30,5 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("interface_functions.jl")
     include("sparsematrix.jl")
     include("tropicalnumber.jl")
+    include("polynomial.jl")
 end

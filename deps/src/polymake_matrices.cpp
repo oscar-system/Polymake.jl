@@ -27,7 +27,7 @@ void polymake_module_add_matrix(jlcxx::Module& polymake)
                                   int64_t j) { M(i - 1, j - 1) = r; });
                 wrapped.method("nrows", &WrappedT::rows);
                 wrapped.method("ncols", &WrappedT::cols);
-                wrapped.method("resize", [](WrappedT& M, int64_t i,
+                wrapped.method("resize!", [](WrappedT& M, int64_t i,
                                             int64_t j) { M.resize(i, j); });
 
                 wrapped.method("take",

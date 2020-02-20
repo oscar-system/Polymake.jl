@@ -1,6 +1,11 @@
 function bigobject(fname::String; kwargsdata...)
-    obj = BigObject(fname)
+    obj = BigObject(BigObjectType(fname))
     setproperties!(obj; kwargsdata...)
+    return obj
+end
+
+function bigobject(fname::String, other::BigObject; kwargsdata...)
+    obj = BigObject(BigObjectType(fname), other; kwargsdata...)
     return obj
 end
 
