@@ -133,7 +133,7 @@ julia> @convert_to Matrix{Rational} [10/1 11/1 12/1]
 pm::Matrix<pm::Rational>
 10 11 12
 
-
+```
 """
 macro convert_to(args...)
     # Catch case that only one or more than two arguments are given
