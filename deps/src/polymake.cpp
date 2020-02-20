@@ -63,7 +63,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         data.main_polymake_session->set_application(x);
     });
 
-    polymake.method("shell_execute", [](const std::string x) {
+    polymake.method("_shell_execute", [](const std::string x) {
         return data.main_polymake_session->shell_execute(x);
     });
 

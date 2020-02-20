@@ -12,7 +12,7 @@ struct PolymakeCompletions <: LineEdit.CompletionProvider end
 _color(str, magic_number=37) = Base.text_colors[(sum(Int, str) + magic_number) % 0xff]
 
 function shell_execute_print(s::String, panel::LineEdit.Prompt)
-   res = convert(Tuple{Bool, String, String, String}, shell_execute(s))
+   res = convert(Tuple{Bool, String, String, String}, _shell_execute(s))
    panel.prompt=Polymake.get_current_app()*" > "
 
    panel.prompt_prefix=_color(panel.prompt)
