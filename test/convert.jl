@@ -19,6 +19,13 @@
     y = Base.Vector{Base.Set{Int64}}([Base.Set([3,3]), Base.Set([3]), Base.Set([1,2])])
     @test convert(Polymake.PolymakeType, y) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int)}}
 
+    @testset "convert_to_pm_type(PolymakeType)" begin
+        for T in [Polymake.Integer, Polymake.Rational, Polymake.Array, Polymake.IncidenceMatrix,
+            Polymake.Matrix, Polymake.Set{Int64}, Polymake.SparseMatrix, Polymake.TropicalNumber, Polymake.Vector]
+            @test T == Polymake.convert_to_pm_type(T)
+        end
+    end
+
 
     @testset "convert to PolymakeType" begin
         Base.convert(::Type{Polymake.PolymakeType}, n::MyInt) = n.x

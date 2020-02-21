@@ -22,7 +22,11 @@
 
 #include "polymake_sparsematrix.h"
 
+#include "polymake_sparsevector.h"
+
 #include "polymake_tropicalnumber.h"
+
+#include "polymake_polynomial.h"
 
 #include "polymake_caller.h"
 
@@ -48,6 +52,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_set(polymake);
 
+    polymake_module_add_sparsevector(polymake);;
+
     polymake_module_add_array(polymake);
 
     polymake_module_add_incidencematrix(polymake);
@@ -56,6 +62,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_tropicalnumber(polymake);
 
+    polymake_module_add_polynomial(polymake);
+
     polymake_module_add_direct_calls(polymake);
 
     polymake.method("initialize_polymake", &initialize_polymake);
@@ -63,7 +71,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         data.main_polymake_session->set_application(x);
     });
 
-    polymake.method("shell_execute", [](const std::string x) {
+    polymake.method("_shell_execute", [](const std::string x) {
         return data.main_polymake_session->shell_execute(x);
     });
 

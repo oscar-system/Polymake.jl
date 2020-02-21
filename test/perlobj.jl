@@ -1,21 +1,15 @@
 @testset "bigobject" begin
     points_int = [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]
-    points_rat = [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]
+    points_rat = Rational{Int}[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]
     points_unbounded = [1 0 0; 0 1 1]
 
     @testset "constructors" begin
-        # @test Polymake.bigobject("polytope::Polytope", POINTS=points_int ) isa bigobjectect
-        # @test Polymake.bigobject("polytope::Polytope", POINTS=points_rat ) isa bigobjectect
-        A = [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]
-        @test Polymake.bigobject("polytope::Polytope", POINTS=A) isa Polymake.BigObject
-        # @test Polymake.bigobject("polytope::Polytope", :POINTS => A) isa bigobjectect
+        @test Polymake.bigobject("polytope::Polytope", POINTS=points_int ) isa Polymake.BigObject
+        @test Polymake.bigobject("polytope::Polytope", POINTS=points_rat ) isa Polymake.BigObject
         # macro literals
         @test (@pm polytope.Polytope(POINTS=[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa Polymake.BigObject
-        # @test (@pm polytope.Polytope(:POINTS=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa Polymake.BigObject
-        # @test (@pm polytope.Polytope("POINTS"=>[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ])) isa Polymake.BigObject
-
         # Make sure that we can also handle different matrix types, e.g. adjoint
-        @test (@pm polytope.Polytope(POINTS=A')) isa Polymake.BigObject
+        @test (@pm polytope.Polytope(POINTS=points_int')) isa Polymake.BigObject
 
         pm1 = Polymake.Integer(1)
         pm2 = Polymake.Integer(2)
@@ -43,6 +37,32 @@
             @test polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS) isa Polymake.BigObject
             P = polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS)
             @test occursin("my cuttie", Polymake.properties(P))
+        end
+
+        @testset "conversions" begin
+            p = polytope.rand_sphere(3,20);
+            @test polytope.Cone(p) isa Polymake.BigObject
+
+            # copy
+            @test polytope.Polytope(p) isa Polymake.BigObject
+
+            c = polytope.Cone(p)
+            @test Polymake.type_name(c) == "Cone<Rational>"
+            @test Polymake.bigobject_type(c) isa Polymake.BigObjectType
+
+            conetype = Polymake.bigobject_type(c)
+            @test Polymake.type_name(c) == Polymake.type_name(conetype)
+
+            # a polytope is still a cone
+            @test Polymake._isa(p,conetype)
+
+            @test Polymake.cast!(p,conetype) isa Polymake.BigObject
+            @test Polymake.BigObjectType("polytope::Polytope") isa Polymake.BigObjectType
+            @test Polymake.type_name(p) == "Cone<Rational>"
+
+            @test polytope.Polytope(c) isa Polymake.BigObject
+
+            @test_throws ErrorException Polymake.cast!(c,Polymake.BigObjectType("fan::PolyhedralFan"))
         end
     end
 

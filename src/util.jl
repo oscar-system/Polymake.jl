@@ -8,11 +8,25 @@ for f in [:to_one_based_indexing, :to_zero_based_indexing]
     end
 end
 
-get_current_app() = shell_execute("print \$User::application->name;")[2]
+get_current_app() = shell_execute("print \$User::application->name;").stdout
 
 function get_docs(input::String; full::Bool=true, html::Bool=false)
     pos = UInt(max(length(input)-1, 0))
     return shell_context_help(input, pos, full, html)
+end
+
+function shell_execute(str::AbstractString)
+    correct_input, out, err, msg = convert(Tuple{Bool, String, String, String}, _shell_execute(str))
+    if correct_input
+        isempty(msg) && return (stdout=out, stderr=err)
+        @error "Polymake returned:" out err
+        throw(PolymakeError(msg))
+    elseif isempty(out) && isempty(err) && isempty(msg) # correct_input == false
+        throw(PolymakeError("incomplete input in polymake shell: \"$str\""))
+    else
+        @error "Polymake returned:" out err
+        throw(PolymakeError(msg))
+    end
 end
 
 function cite(;format=:bibtex)
