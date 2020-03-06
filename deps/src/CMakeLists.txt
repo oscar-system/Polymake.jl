@@ -19,6 +19,9 @@ if(CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0
    SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-conversion" )
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
+   message( FATAL_ERROR "gcc version must be at least 7 to build the polymake CxxWrap interface." )
+endif()
 
 file(GLOB polymake_SRC "*.cpp")
 add_library(polymake SHARED ${polymake_SRC})
