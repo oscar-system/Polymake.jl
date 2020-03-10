@@ -12,11 +12,17 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
 
 using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
+import SparseArrays
 
 using CxxWrap
 import Libdl.dlext
 
-import SparseArrays
+# !!!: Nemo is never used in Polymake.jl.
+# However, polymake uses flint and Nemo as well.
+# And Nemo changes the malloc function of flint, so we get
+# a crash if we first load Polymke.jl and then Nemo.
+# See also https://github.com/Nemocas/Nemo.jl/issues/788
+import Nemo
 
 struct PolymakeError <: Exception
     msg
