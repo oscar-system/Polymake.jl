@@ -7,13 +7,14 @@
 #include "polymake_arrays.h"
 
 
-void polymake_module_add_array(jlcxx::Module& polymake)
+tparametric1 polymake_module_add_array(jlcxx::Module& polymake)
 {
 
-    polymake
+    auto type = polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
-            "Array", jlcxx::julia_type("AbstractVector", "Base"))
-        .apply<pm::Array<pm::Int>, pm::Array<pm::Integer>,
+            "Array", jlcxx::julia_type("AbstractVector", "Base"));
+
+        type.apply<pm::Array<pm::Int>, pm::Array<pm::Integer>,
                pm::Array<pm::Rational>,
                pm::Array<std::string>, pm::Array<pm::Set<pm::Int>>,
                pm::Array<pm::Array<pm::Int>>,
@@ -103,4 +104,5 @@ void polymake_module_add_array(jlcxx::Module& polymake)
         "to_array_bigobject", [](const pm::perl::PropertyValue& pv) {
             return to_SmallObject<pm::Array<pm::perl::BigObject>>(pv);
         });
+    return type;
 }
