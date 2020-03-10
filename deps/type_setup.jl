@@ -22,6 +22,8 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "Array_Array_Integer",         "pm::Array<pm::Array<pm::Integer>>",        "Array{Array{Integer}}",        "to_array_array_integer" ),
 ( "Array_Matrix_Integer",        "pm::Array<pm::Matrix<pm::Integer>>",       "Array{Matrix{Integer}}",       "to_array_matrix_integer" ),
 ( "Array_BigObject",             "pm::Array<pm::perl::BigObject>",           "Array{BigObject}",             "to_array_bigobject" ),
+( "Array_Polynomial_Integer_Int",      "pm::Array<pm::Polynomial<pm::Integer,long>>",         "Array{Polynomial{Integer,CxxWrap.CxxLong}}",    "to_array_polynomial_integer_int"),
+( "Array_Polynomial_Rational_Int",     "pm::Array<pm::Polynomial<pm::Rational,long>>",        "Array{Polynomial{Rational,CxxWrap.CxxLong}}",   "to_array_polynomial_rational_int"),
 ( "SparseMatrix_Integer",        "pm::SparseMatrix<pm::Integer>",            "SparseMatrix{Integer}",        "to_sparsematrix_integer"),
 ( "SparseMatrix_Rational",       "pm::SparseMatrix<pm::Rational>",           "SparseMatrix{Rational}",       "to_sparsematrix_rational"),
 ( "SparseMatrix_Int",            "pm::SparseMatrix<long>",                   "SparseMatrix{CxxWrap.CxxLong}",          "to_sparsematrix_int"),
