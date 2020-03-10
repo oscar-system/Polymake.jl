@@ -79,4 +79,13 @@
         @test zero(Polymake.Integer) == zero(ONE) == ZERO
         @test one(Polymake.Integer) == one(ZERO) == ONE
     end
+
+    @testset "Fun with bits" begin
+        @test trailing_zeros(Polymake.Integer(2)) == 1
+        @test trailing_zeros(Polymake.Integer(4)) == 2
+        @test trailing_ones(Polymake.Integer(2)) == 0
+        @test trailing_ones(Polymake.Integer(3)) == 2
+        @test Polymake.Integer(1) << 2 == 4
+        @test Polymake.Integer(4) >> 2 == 1
+    end
 end
