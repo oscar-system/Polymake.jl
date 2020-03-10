@@ -32,6 +32,8 @@
 
 #include "polymake_direct_calls.h"
 
+#include "polymake_array_polynomial.h"
+
 #include "polymake_type_translations.h"
 
 #include "generated/type_declarations.h"
@@ -54,7 +56,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_sparsevector(polymake);;
 
-    polymake_module_add_array(polymake);
+    auto array_type = polymake_module_add_array(polymake);
 
     polymake_module_add_incidencematrix(polymake);
 
@@ -65,6 +67,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     polymake_module_add_polynomial(polymake);
 
     polymake_module_add_direct_calls(polymake);
+
+    polymake_module_add_array_polynomial(polymake, array_type);
 
     polymake.method("initialize_polymake", &initialize_polymake);
     polymake.method("application", [](const std::string x) {
