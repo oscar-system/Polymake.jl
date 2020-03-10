@@ -29,7 +29,7 @@ void polymake_module_add_polynomial(jlcxx::Module& polymake)
                 wrapped.method("monomials_as_matrix", [](polyT& a) { return a.monomials_as_matrix(); });
                 wrapped.method("set_var_names", [](polyT& a, Array<std::string>& names) { a.set_var_names(names); });
                 wrapped.method("get_var_names", [](polyT& a) { return a.get_var_names(); });
-                wrapped.method("nvars", &polyT::n_vars);
+                wrapped.method("nvars", [] (polyT& a) -> pm::Int { return a.n_vars(); });
 
                 wrapped.method("show_small_obj", [](polyT& P) {
                     return show_small_object<polyT>(P);
