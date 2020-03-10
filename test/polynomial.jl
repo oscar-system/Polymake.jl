@@ -25,6 +25,7 @@ using SparseArrays
         for (C,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double")]
             p = Polymake.Polynomial(C.(jl_v),jl_m)
             @test Polymake.nvars(p) == size(jl_m)[2]
+            @test Polymake.nvars(p) isa Int
             # the following line is only necessary if the tests are run with an active session of Polymake
             # because variable names are global for the specific typing; ["x"] is its default value
             Polymake.set_var_names(p,["x"])
