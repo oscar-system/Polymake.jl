@@ -8,6 +8,7 @@
         (Polymake.Matrix{Polymake.Integer}, Polymake.Matrix{Polymake.Integer}([1 0; 2 1])),
         (Polymake.Array{Polymake.to_cxx_type(Int)}, Polymake.Array{Int64}(Int64[1, 2, 3])),
         (Polymake.Array{Polymake.Integer}, Polymake.Array{Polymake.Integer}(Polymake.Integer[1, 2, 3])),
+        (Polymake.Array{Polymake.Rational}, Polymake.Array{Polymake.Integer}(Polymake.Rational[1, 2, 3])),
         ]
         @test Polymake.Array{T} <: AbstractVector
         @test Polymake.Array{T}(undef, 3) isa AbstractVector

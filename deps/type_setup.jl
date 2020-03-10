@@ -20,6 +20,7 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "Array_Set_Int",               "pm::Array<pm::Set<long>>",                 "Array{Set{CxxWrap.CxxLong}}",            "to_array_set_int" ),
 ( "Array_Array_Int",             "pm::Array<pm::Array<long>>",               "Array{Array{CxxWrap.CxxLong}}",          "to_array_array_int" ),
 ( "Array_Array_Integer",         "pm::Array<pm::Array<pm::Integer>>",        "Array{Array{Integer}}",        "to_array_array_integer" ),
+( "Array_Array_Rational",        "pm::Array<pm::Array<pm::Rational>>",       "Array{Array{Rational}}",       "to_array_array_rational" ),
 ( "Array_Matrix_Integer",        "pm::Array<pm::Matrix<pm::Integer>>",       "Array{Matrix{Integer}}",       "to_array_matrix_integer" ),
 ( "Array_BigObject",             "pm::Array<pm::perl::BigObject>",           "Array{BigObject}",             "to_array_bigobject" ),
 ( "SparseMatrix_Integer",        "pm::SparseMatrix<pm::Integer>",            "SparseMatrix{Integer}",        "to_sparsematrix_integer"),

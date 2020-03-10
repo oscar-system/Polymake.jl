@@ -18,6 +18,7 @@ void polymake_module_add_array(jlcxx::Module& polymake)
                pm::Array<std::string>, pm::Array<pm::Set<pm::Int>>,
                pm::Array<pm::Array<pm::Int>>,
                pm::Array<pm::Array<pm::Integer>>,
+               pm::Array<pm::Array<pm::Rational>>,
                pm::Array<pm::Matrix<pm::Integer>>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type             WrappedT;
             typedef typename decltype(wrapped)::type::value_type elemType;
@@ -90,6 +91,10 @@ void polymake_module_add_array(jlcxx::Module& polymake)
     polymake.method(
         "to_array_array_integer", [](const pm::perl::PropertyValue& pv) {
             return to_SmallObject<pm::Array<pm::Array<pm::Integer>>>(pv);
+        });
+    polymake.method(
+        "to_array_array_rational", [](const pm::perl::PropertyValue& pv) {
+            return to_SmallObject<pm::Array<pm::Array<pm::Rational>>>(pv);
         });
     polymake.method(
         "to_array_set_int", [](const pm::perl::PropertyValue& pv) {
