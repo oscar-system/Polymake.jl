@@ -45,6 +45,5 @@ For more advanced use see section on [`@pm`](@ref) macro.
 
 ## User Guide
 - [Getting Started](@ref)
-- Executing Polymake methods
-- Supported types
-- Examples
+- [Using Polymake.jl](@ref)
+- [Examples](@ref)

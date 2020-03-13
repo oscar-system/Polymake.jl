@@ -128,12 +128,58 @@ The following tables explain by example how to quickly translate `polymake` synt
 
 ### Variables
 
-| Polymake                              | Julia                                                        |
-| ------------------------------------- | ------------------------------------------------------------ |
-| `$p` (reference to 'scalar' variable) | `p` (reference to any variable)                              |
-| `print $p;`                           | `print(p)` or `println(p)` or `@show p`, or just `p` in REPL |
-| `$i=5; $j=6;`                         | `i,j = 5,6` or `i=5; j=6`<br> (`;` is needed for separation, can be used to suppress return value in REPL) |
-| `$s = $i + $j; print $s;`             | `s = i + j`                                                  |
+```@raw html
+<style>
+  table, tr, th, td {
+    border: 1px solid black;
+  }
+</style>
+<table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      `$p` (reference to 'scalar' variable)
+    </td>
+    <td>
+      `p` (reference to any variable)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      `print $p;`
+    </td>
+    <td>
+      `print(p)` or `println(p)` or `@show p`, or just `p` in REPL
+    </td>
+  </tr>
+  <tr>
+    <td>
+      `$i=5; $j=6;`
+    </td>
+    <td>
+      `i,j = 5,6` or `i=5; j=6`<br>
+      (`;` is needed for separation, can be used to suppress return value in REPL)
+    </td>
+  </tr>
+  <tr>
+    <td>
+```
+      $s = $i + $j; print $s;
+```@raw html
+    </td>
+    <td>
+      `s = i + j`
+    </td>
+  </tr>
+</table>
+```
 
 ### Arrays
 

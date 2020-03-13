@@ -61,8 +61,6 @@ Just remember that You need to `activate Polymake.jl` to use `Polymake`.
 
 ## Getting Help
 
-For basic information on the usage of `Polymake.jl` we refer to the other big sections of this documentation:
-- a
-- b
+For basic information on the usage of `Polymake.jl` we refer to the other sections of this documentation.
 
 For further details on `polymake` and its abilities see the [Polymake User Guide](https://polymake.org/doku.php/user_guide/start).
