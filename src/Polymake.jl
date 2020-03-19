@@ -17,12 +17,10 @@ import SparseArrays
 using CxxWrap
 import Libdl.dlext
 
-# !!!: Nemo is never used in Polymake.jl.
-# However, polymake uses flint and Nemo as well.
-# And Nemo changes the malloc function of flint, so we get
-# a crash if we first load Polymke.jl and then Nemo.
+# LoadFlint is needed to initialize the flint malloc functions
+# to the corresponding julia functions.
 # See also https://github.com/Nemocas/Nemo.jl/issues/788
-import Nemo
+import LoadFlint
 
 struct PolymakeError <: Exception
     msg
