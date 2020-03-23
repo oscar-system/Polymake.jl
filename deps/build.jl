@@ -23,7 +23,7 @@ dependencies = [
     "https://github.com/benlorenz/ninjaBuilder/releases/download/v1.9.0/build_ninja.v1.9.0.jl",
     "https://github.com/thofma/Flint2Builder/releases/download/dd1021/build_libflint.v0.0.0-dd1021a6cbaca75d94e6e066c26a3a5622884a7c.jl",
     "https://github.com/thofma/NTLBuilder2/releases/download/v10.5.0-1/build_libntl.v10.5.0.jl",
-    "https://github.com/wbhart/SingularBuilder/releases/download/0.0.2/build_libsingular.v0.0.1-2.jl",
+    "https://github.com/oscar-system/SingularBuilder/releases/download/v0.0.6/build_libsingular.v0.0.6.jl",
 ]
 
 
