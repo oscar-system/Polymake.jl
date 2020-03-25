@@ -56,8 +56,11 @@ function __init__()
     end
 
     try
-        initialize_polymake(isinteractive())
-        if !isinteractive()
+        show_banner = isinteractive() &&
+                       !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+
+        initialize_polymake(show_banner)
+        if !show_banner
             shell_execute(raw"$Verbose::credits=\"0\";")
         end
     catch ex # initialize_polymake throws jl_error
