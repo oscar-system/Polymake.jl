@@ -46,3 +46,8 @@ Base.float(int::Integer) = Float64(int)
 # no-copy converts
 convert(::Type{<:Integer}, int::T) where T <: Integer = int
 convert(::Type{Base.Integer}, int::Integer) = int
+
+Base.trailing_zeros(int::Integer) = trailing_zeros(BigInt(int))
+Base.trailing_ones(int::Integer) = trailing_ones(BigInt(int))
+Base.:(>>)(int::Polymake.Integer, n::UInt64) = >>(BigInt(int), n)
+Base.:(<<)(int::Polymake.Integer, n::UInt64) = <<(BigInt(int), n)

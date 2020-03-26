@@ -1,7 +1,7 @@
 name = "Polymake"
 uuid = "d720cf60-89b5-51f5-aff5-213f193123e7"
 repo = "https://github.com/oscar-system/Polymake.jl.git"
-version = "0.3.0"
+version = "0.3.2"
 
 [deps]
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
@@ -9,6 +9,7 @@ CMake = "631607c0-34d2-5d66-819e-eb0f9aa2061a"
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+LoadFlint = "472f376f-f1cf-461b-9ac1-d103423be9b7"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
@@ -20,6 +21,7 @@ CMake = "^1.1.1"
 CxxWrap = "^0.9.0"
 JSON = "^0.20, ^0.21"
 julia = "^1.0"
+LoadFlint = "^0.1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

@@ -12,11 +12,15 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
 
 using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
+import SparseArrays
 
 using CxxWrap
 import Libdl.dlext
 
-import SparseArrays
+# LoadFlint is needed to initialize the flint malloc functions
+# to the corresponding julia functions.
+# See also https://github.com/Nemocas/Nemo.jl/issues/788
+import LoadFlint
 
 struct PolymakeError <: Exception
     msg
@@ -52,8 +56,11 @@ function __init__()
     end
 
     try
-        initialize_polymake(isinteractive())
-        if !isinteractive()
+        show_banner = isinteractive() &&
+                       !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+
+        initialize_polymake(show_banner)
+        if !show_banner
             shell_execute(raw"$Verbose::credits=\"0\";")
         end
     catch ex # initialize_polymake throws jl_error

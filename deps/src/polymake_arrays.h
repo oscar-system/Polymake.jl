@@ -3,6 +3,7 @@
 
 #include "jlcxx/jlcxx.hpp"
 
-void polymake_module_add_array(jlcxx::Module& polymake);
+using tparametric1 = jlcxx::TypeWrapper<jlcxx::Parametric<jlcxx::TypeVar<1>>>;
+tparametric1 polymake_module_add_array(jlcxx::Module& polymake);
 
 #endif

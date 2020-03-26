@@ -3,7 +3,7 @@ const Array_suppT = Union{Int64, CxxWrap.CxxLong,
                         String, CxxWrap.StdString,
                         Set{Int64}, Set{CxxWrap.CxxLong},
                         Array{Int64}, Array{CxxWrap.CxxLong},
-                        Array{Integer}, Matrix{Integer}}
+                        Array{Integer}, Array{Rational}, Matrix{Integer}}
 
 function Array{T}(::UndefInitializer, n::Base.Integer) where
     T <: Array_suppT
