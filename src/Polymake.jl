@@ -1,3 +1,8 @@
+@doc Markdown.doc"""
+  Polymake.jl is a Julia package for using polymake, a software for research in polyhedral geometry from Julia. 
+
+  For more information about polymake, see https://polymake.org/doku.php    
+"""
 module Polymake
 
 export @pm, @convert_to, visual
