@@ -128,65 +128,367 @@ The following tables explain by example how to quickly translate `polymake` synt
 
 ### Variables
 
-
-| Polymake                              | Julia                                                        |
-| ------------------------------------- | ------------------------------------------------------------ |
-| `$p` (reference to 'scalar' variable) | `p` (reference to any variable)                              |
-| `print $p;`                           | `print(p)` or `println(p)` or `@show p`, or just `p` in REPL |
-| `$i=5; $j=6;`                         | `i,j = 5,6` or `i=5; j=6`<br> (`;` is needed for separation, can be used to suppress return value in REPL) |
-| `$s = $i + $j; print $s;`             | `s = i + j`                                                  |
+```@raw html
+<table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>$p</code> (reference to 'scalar' variable)
+    </td>
+    <td>
+      <code>p</code> (reference to any variable)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print $p;</code>
+    </td>
+    <td>
+      <code>print(p)</code> or <code>println(p)</code> or <code>@show p</code>, or just <code>p</code> in REPL
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$i=5; $j=6;</code>
+    </td>
+    <td>
+      <code>i,j = 5,6</code> or <code>i=5; j=6</code><br>
+      (<code>;</code> is needed for separation, can be used to suppress return value in REPL)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$s = $i + $j; print $s;</code>
+    </td>
+    <td>
+      <code>s = i + j</code>
+    </td>
+  </tr>
+</table>
+```
 
 ### Arrays
 
-| Polymake                                                 | Julia                                                        |
-| -------------------------------------------------------- | ------------------------------------------------------------ |
-| Linear containers with random access                     | Linear containers with random access + all the algebra attached      |
-| `@A = ("a", "b", "c");`                                  | `A = ["a", "b", "c"]`                                        |
-| `$first = $A[0];`<br>(`first` is equal to `a`)         | `first = A[1]`<br>(note the `1`-based indexing!)           |
-| `@A2 = (3,1,4,2);`                                       | `A2 = [3,1,4,2]`                                             |
-| `print sort(@A2);`<br>(a copy of `A2` is sorted)       | `println(sort(A2))`<br>(to sort in place use `sort!(A2))`  |
-| `$arr = new Array<Int>([3,2,5]);` <br>(a `C++` object) | `arr = [3,2,5]`<br>(the `Int` type is inferred)            |
-| `$arr->[0] = 100;`<br>(assignment)                     | `arr[1] = 100`<br>(assignment; returns `100`)              |
+```@raw html
+<table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Linear containers with random access
+    </td>
+    <td>
+      Linear containers with random access + all the algebra attached
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>@A = ("a", "b", "c");</code>
+    </td>
+    <td>
+      <code>A = ["a", "b", "c"]</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$first = $A[0];</code>
+      <br>(<code>first</code> is equal to <code>a</code>)
+    </td>
+    <td>
+      <code>first = A[1]</code><br>(note the <code>1</code>-based indexing!)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>@A2 = (3,1,4,2);</code>
+    </td>
+    <td>
+      <code>A2 = [3,1,4,2]</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print sort(@A2);</code><br>(a copy of <code>A2</code> is sorted)
+    </td>
+    <td>
+      <code>println(sort(A2))</code><br>(to sort in place use <code>sort!(A2))</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$arr = new Array<Int>([3,2,5]);</code><br>(a <code>C++</code> object)
+    </td>
+    <td>
+      <code>arr = [3,2,5]</code><br>(the <code>Int</code> type is inferred)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$arr->[0] = 100;</code><br>(assignment)
+    </td>
+    <td>
+      <code>arr[1] = 100</code><br>(assignment; returns <code>100</code>)
+    </td>
+  </tr>
+</table>
+```
 
 ### Dictionaries/Hash Tables
 
-| Polymake                       | Julia                                                         |
-| ------------------------------ | ------------------------------------------------------------ |
-| `%h = ();`                     | `h = Dict()`<br>it is **MUCH** better to provide types e.g.<br>`h = Dict{String, Int}()` |
-|`$h{"zero"}=0; $h{"four"}=4;`   | `h["zero"] = 0; h["four"] = 4`<br>(call returns the value)|
-|`print keys %h;`                | `@show keys(h)` (NOTE: order is not specified)              |
-|`print join(", ",keys %hash);`  | `join(keys(h), ", ")`<br>(returns `String`)               |
-|`%hash=("one",1,"two",2);`      | `Dict([("one",1), ("two",2)])`<br>(will infer types)      |
-|`%hash=("one"=>1,"two"=>2);`    | `Dict("one"=>1,"two"=>2)`                                     |
+```@raw html
+<table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>%h = ();</code>
+    </td>
+    <td>
+      <code>h = Dict()</code><br>it is <b>MUCH</b> better to provide types e.g.<br><code>h = Dict{String, Int}()</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$h{"zero"}=0; $h{"four"}=4;</code>
+    </td>
+    <td>
+      <code>h["zero"] = 0; h["four"] = 4</code><br>(call returns the value)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print keys %h;</code>
+    </td>
+    <td>
+      <code>@show keys(h)</code> (NOTE: order is not specified)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print join(", ",keys %hash);</code>
+    </td>
+    <td>
+      <code>join(keys(h), ", ")</code><br>(returns <code>String</code>)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>%hash=("one",1,"two",2);</code>
+    </td>
+    <td>
+      <code>Dict([("one",1), ("two",2)])</code><br>(will infer types)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>%hash=("one"=>1,"two"=>2);</code>
+    </td>
+    <td>
+      <code>Dict("one"=>1,"two"=>2)</code>
+    </td>
+  </tr>
+</table>
+```
 
 ### Sets
 
-| Polymake                      | Julia                                                        |
-| ----------------------------- | ------------------------------------------------------------ |
-| Balanced binary search trees  | Hash table with no content                                   |
-| `$set=new Set<Int>(3,2,5,3);` | `set = Set{Int}([3,2,5,3])`                                  |
-| `print $set->size;`           | `length(set)`                                                |
-| `@array_from_set=@$set`       | `collect(set)`<br>(NOTE: this creates a `Vector`, but order is NOT specified) |
+```@raw html
+<table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Balanced binary search trees
+    </td>
+    <td>
+      Hash table with no content
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$set=new Set<Int>(3,2,5,3);</code>
+    </td>
+    <td>
+      <code>set = Set{Int}([3,2,5,3])</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print $set->size;</code>
+    </td>
+    <td>
+      <code>length(set)</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>@array_from_set=@$set</code>
+    </td>
+    <td>
+      <code>collect(set)</code><br>(NOTE: this creates a <code>Vector</code>, but order is NOT specified)
+    </td>
+  </tr>
+</table>
+```
 
 ### Matrices
 
-| Polymake                                                     | Julia                                                        |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| `new Matrix<T>` <br>Container with algebraic operations  | `Matrix{T} = Array{T, 2}`<br>**Linear** container with available indexing by `2`-ples; all algebra attached  |
-| `$mat=new Matrix<Rational>([[2,1,4,0,0],[3,1,5,2,1],[1,0,4,0,6]]);`<br>`$row1=new Vector<Rational>([2,1,4,0,0]);`<br>`$row2=new Vector<Rational>([3,1,5,2,1]);`<br>`$row3=new Vector<Rational>([1,0,4,0,6]);`<br>`@matrix_rows=($row1,$row2,$row3);`(`Perl` object)<br>`$matrix_from_array=new Matrix<Rational>(\@matrix_rows);`(`C++` object) | `mat = Rational{Int}[2 1 4 0 0; 3 1 5 2 1; 1 0 4 0 6];`<br>`row1 = Rational{Int}[2, 1, 4, 0, 0];`<br>`row2 = Rational{Int}[3, 1, 5, 2, 1];`<br>`row3 = Rational{Int}[1, 0, 4, 0, 6];`<br>`matrix_rows = hcat(row1', row2', row3')`<br>(Julia stores matrices in **column major** format, so `'` i.e. transposition is needed) |
-| `$mat->row(1)->[1]=7; $mat->elem(1,2)=8;`                    | `mat[2,2] = 7; mat[2,3] = 8`                                 |
-| `$unit_mat=4*unit_matrix<Rational>(3);` | `unit_mat = Diagonal([4//1 for i in 1:3])` or `UniformScaling(4//1)`<br>depending on application; both require `using LinearAlgebra` |
-| `$dense=new Matrix<Rational>($unit_mat);`<br>`$m_rat=new Matrix<Rational>(3/5*unit_matrix<Rational>(5));`<br>`$m2=$mat/$m_rat;`<br>`$m_int=new Matrix<Int>(unit_matrix<Rational>(5));`<br>`$m3=$m_rat/$m_int;`<br>(results in an error due to incompatible types)| `Array(unit_mat)`<br>`m_rat = Diagonal([3//5 for i in 1:5])`<br>`m2 = mat/m_rat`<br>`m_int = Diagonal([1 for i in 1:5])`<br>`m_rat/m_int`<br>(succeeds due to `promote` happening in `/`) |
-| `convert_to<Rational>($m_int)`<br>`$z_vec=zero_vector<Int>($m_int->rows)`<br>`$extended_matrix=($z_vec\|$m_int);`<br>(adds `z_vec` as the first column, result is dense) | `convert(Diagonal{Rational{Int}}, m_int)`<br>`z_vec = zeros(Int, size(m_int, 1))`<br>`extended_matrix = hcat(z_vec, m_int)`<br>(result is sparse) |
-| `$set=new Set<Int>(3,2,5);`<br>`$template_Ex=new Array<Set<Int>>((new Set<Int>(5,2,6)),$set)` | `set = Set([3,2,5]);`<br> `template_Ex = [Set([5,2,6]), set]` |
+```@raw html
+<table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>new Matrix<T></code><br>Container with algebraic operations
+    </td>
+    <td>
+      <code>Matrix{T} = Array{T, 2}</code><br>**Linear** container with available indexing by <code>2</code>-ples; all algebra attached
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$mat=new Matrix<Rational>([[2,1,4,0,0],[3,1,5,2,1],[1,0,4,0,6]]);</code><br><code>$row1=new Vector<Rational>([2,1,4,0,0]);</code><br><code>$row2=new Vector<Rational>([3,1,5,2,1]);</code><br><code>$row3=new Vector<Rational>([1,0,4,0,6]);</code><br><code>@matrix_rows=($row1,$row2,$row3);</code> (<code>Perl</code> object)<br><code>$matrix_from_array=new Matrix<Rational>(\@matrix_rows);</code> (<code>C++</code> object)
+    </td>
+    <td>
+      <code>mat = Rational{Int}[2 1 4 0 0; 3 1 5 2 1; 1 0 4 0 6];</code><br><code>row1 = Rational{Int}[2, 1, 4, 0, 0];</code><br><code>row2 = Rational{Int}[3, 1, 5, 2, 1];</code><br><code>row3 = Rational{Int}[1, 0, 4, 0, 6];</code><br><code>matrix_rows = hcat(row1', row2', row3')</code><br>(Julia stores matrices in <b>column major</b> format, so <code>'</code> i.e. transposition is needed)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$mat->row(1)->[1]=7; $mat->elem(1,2)=8;</code>
+    </td>
+    <td>
+      <code>mat[2,2] = 7; mat[2,3] = 8</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$unit_mat=4*unit_matrix<Rational>(3);</code>
+    </td>
+    <td>
+      <code>unit_mat = Diagonal([4//1 for i in 1:3])</code> or <code>UniformScaling(4//1)</code><br>depending on application; both require <code>using LinearAlgebra</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$dense=new Matrix<Rational>($unit_mat);</code><br><code>$m_rat=new Matrix<Rational>(3/5*unit_matrix<Rational>(5));</code><br><code>$m2=$mat/$m_rat;</code><br><code>$m_int=new Matrix<Int>(unit_matrix<Rational>(5));</code><br><code>$m3=$m_rat/$m_int;</code><br>(results in an error due to incompatible types)
+    </td>
+    <td>
+      <code>Array(unit_mat)</code><br><code>m_rat = Diagonal([3//5 for i in 1:5])</code><br><code>m2 = mat/m_rat</code><br><code>m_int = Diagonal([1 for i in 1:5])</code><br><code>m_rat/m_int</code><br>(succeeds due to <code>promote</code> happening in <code>/</code>)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>convert_to<Rational>($m_int)</code><br><code>$z_vec=zero_vector<Int>($m_int->rows)</code><br><code>$extended_matrix=($z_vec\|$m_int);</code><br>(adds <code>z_vec</code> as the first column, result is dense)
+    </td>
+    <td>
+      <code>convert(Diagonal{Rational{Int}}, m_int)</code><br><code>z_vec = zeros(Int, size(m_int, 1))</code><br><code>extended_matrix = hcat(z_vec, m_int)</code><br>(result is sparse)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$set=new Set<Int>(3,2,5);</code><br><code>$template_Ex=new Array<Set<Int>>((new Set<Int>(5,2,6)),$set)</code>
+    </td>
+    <td>
+      <code>set = Set([3,2,5]);</code><br> <code>template_Ex = [Set([5,2,6]), set]</code>
+    </td>
+  </tr>
+</table>
+```
 
 ### Big objects & properties:
 
-| Polymake                                                     | Julia                                                         |
-| ------------------------------------------------------------ | ------------------------------------------------------------- |
-| `$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);`      | `p = polytope.Polytope(POINTS=polytope.cube(4).VERTICES)` |
-| `$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);` | `lp = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,1,1,1])` |
-| `$p->LP=$lp;`<br>`$p->LP->MAXIMAL_VALUE;`                  | `p.LP = lp`<br>`p.LP.MAXIMAL_VALUE`                        |
-| `$i = ($p->N_FACETS * $p->N_FACETS) * 15;`                   | `i = (p.N_FACETS * p.N_FACETS) * 15`                         |
-| `$print p->DIM;`                                             | `polytope.dim(p)`<br> `DIM` is actually a faux property, which hides a function beneath |
-| `application "topaz";`<br>`$p = new Polytope<Max, QuadraticExtension>(POINTS=>[[1,0,0], [1,1,0], [1,1,1]]);` | `p = @pm tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])`<br> more information on the @pm macro can be found below |
+```@raw html
+<table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);</code>
+    </td>
+    <td>
+      <code>p = polytope.Polytope(POINTS=polytope.cube(4).VERTICES)</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);</code>
+    </td>
+    <td>
+      <code>lp = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,1,1,1])</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$p->LP=$lp;</code><br><code>$p->LP->MAXIMAL_VALUE;</code>
+    </td>
+    <td>
+      <code>p.LP = lp</code><br><code>p.LP.MAXIMAL_VALUE</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$i = ($p->N_FACETS * $p->N_FACETS) * 15;</code>
+    </td>
+    <td>
+      <code>i = (p.N_FACETS * p.N_FACETS) * 15</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$print p->DIM;</code>
+    </td>
+    <td>
+      <code>polytope.dim(p)</code><br><code>DIM</code> is actually a faux property, which hides a function beneath
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>application "topaz";</code><br><code>$p = new Polytope<Max, QuadraticExtension>(POINTS=>[[1,0,0], [1,1,0], [1,1,1]]);</code>
+    </td>
+    <td>
+      <code>p = @pm tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])</code><br>more information on the @pm macro can be found
+```
+here: [`@pm`](@ref)
+```@raw html
+    </td>
+  </tr>
+</table>
+```
