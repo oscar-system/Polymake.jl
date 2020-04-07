@@ -115,5 +115,8 @@ include("polynomial.jl")
 
 include("polymake_direct_calls.jl")
 
-include("generate_applications.jl")
+Base.CoreLogging.with_logger(Base.CoreLogging.NullLogger()) do
+  include("generate_applications.jl")
+end
+
 end # of module Polymake
