@@ -20,7 +20,7 @@ pm::Integer new_integer_from_bigint(jl_value_t*);
 template <typename T>
 std::string show_small_object(const T& obj, bool print_typename = true)
 {
-    std::ostringstream buffer;
+    std::ostringstream buffer("");
     auto               wrapped_buffer = wrap(buffer);
     if (print_typename) {
         wrapped_buffer << polymake::legible_typename(typeid(obj)) << pm::endl;
