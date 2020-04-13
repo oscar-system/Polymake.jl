@@ -1,3 +1,11 @@
+"""
+`Polymake.jl` is the Julia interface to `polymake`, an open source software for research in polyhedral geometry.
+
+For more information see:
+ > https://polymake.org/doku.php
+ >
+ > https://github.com/oscar-system/Polymake.jl
+"""
 module Polymake
 
 export @pm, @convert_to, visual
@@ -56,8 +64,11 @@ function __init__()
     end
 
     try
-        initialize_polymake(isinteractive())
-        if !isinteractive()
+        show_banner = isinteractive() &&
+                       !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+
+        initialize_polymake(show_banner)
+        if !show_banner
             shell_execute(raw"$Verbose::credits=\"0\";")
         end
     catch ex # initialize_polymake throws jl_error
