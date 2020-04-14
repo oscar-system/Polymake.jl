@@ -13,8 +13,14 @@ matrix:
   include:
   - julia: 1.3
     os: osx
+  - julia: 1.4
+    os: osx
+    osx_image: xcode11.4
   allow_failures:
   - julia: nightly
+  - julia: 1.4
+    os: osx
+    osx_image: xcode11.4
 notifications:
   email: false
 codecov: true
