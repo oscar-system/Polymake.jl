@@ -177,3 +177,9 @@ open(joinpath(@__DIR__,"deps.jl"), "a") do f
    println(f, "const using_binary = $use_binary")
    println(f, depsjl)
 end
+
+println("storing libcxxwrap version")
+jlcxxversion = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
+open(joinpath(@__DIR__,"jlcxx_version.jl"), "w") do f
+   println(f, """const jlcxx_version = v"$jlcxxversion";""")
+end

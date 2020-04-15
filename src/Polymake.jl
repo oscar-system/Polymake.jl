@@ -38,6 +38,13 @@ function Base.showerror(io::IO, ex::PolymakeError)
     print(io, "Exception occured at Polymake side:\n$(ex.msg)")
 end
 
+function check_jlcxx_version(version)
+    current_jlcxx = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
+    if (version != current_jlcxx)
+        error("""JlCxx version changed, please run Pkg.build("Polymake");""")
+    end
+end
+
 ###########################
 # Load Cxx stuff and init
 ##########################
@@ -45,6 +52,14 @@ end
 Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
 deps_dir = joinpath(@__DIR__, "..", "deps")
+
+isfile(joinpath(deps_dir,"jlcxx_version.jl")) &&
+    isfile(joinpath(deps_dir,"deps.jl")) ||
+    error("""Please run Pkg.build("Polymake");""")
+
+include(joinpath(deps_dir,"jlcxx_version.jl"))
+
+check_jlcxx_version(jlcxx_version)
 
 @wrapmodule(joinpath(deps_dir, "src", "libpolymake.$dlext"), :define_module_polymake)
 
@@ -56,6 +71,7 @@ include("ijulia.jl")
 include(joinpath(deps_dir,"deps.jl"))
 
 function __init__()
+    check_jlcxx_version(jlcxx_version)
     @initcxx
 
     if using_binary

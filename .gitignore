@@ -10,6 +10,7 @@ deps/src/generated/*
 deps/build.log
 deps/build_*.jl
 deps/deps.jl
+deps/jlcxx_version.jl
 deps/usr
 deps/json
 local
