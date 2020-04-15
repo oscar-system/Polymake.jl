@@ -34,6 +34,8 @@ end
 # Load Cxx stuff and init
 ##########################
 
+__is_root_module(m=@__MODULE__) = haskey(Base.package_locks, Base.PkgId(m))
+
 Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
 deps_dir = joinpath(@__DIR__, "..", "deps")
@@ -56,8 +58,7 @@ function __init__()
     end
 
     try
-        show_banner = isinteractive() &&
-                       !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+        show_banner = isinteractive() && __is_root_module()
 
         initialize_polymake(show_banner)
         if !show_banner
@@ -115,8 +116,5 @@ include("polynomial.jl")
 
 include("polymake_direct_calls.jl")
 
-Base.CoreLogging.with_logger(Base.CoreLogging.NullLogger()) do
-  include("generate_applications.jl")
-end
-
+include("generate_applications.jl")
 end # of module Polymake
