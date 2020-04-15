@@ -41,7 +41,7 @@ end
 function check_jlcxx_version(version)
     current_jlcxx = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
     if (version != current_jlcxx)
-        error("""JlCxx version changed, please run Pkg.build("Polymake");""")
+        error("""JlCxx version changed, please run `using Pkg; Pkg.build("Polymake");`""")
     end
 end
 
@@ -55,7 +55,7 @@ deps_dir = joinpath(@__DIR__, "..", "deps")
 
 isfile(joinpath(deps_dir,"jlcxx_version.jl")) &&
     isfile(joinpath(deps_dir,"deps.jl")) ||
-    error("""Please run Pkg.build("Polymake");""")
+    error("""Please run `using Pkg; Pkg.build("Polymake");`""")
 
 include(joinpath(deps_dir,"jlcxx_version.jl"))
 
