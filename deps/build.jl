@@ -142,7 +142,11 @@ pm_ldflags = chomp(read(`$perl $pm_config --ldflags`, String))
 pm_libraries = chomp(read(`$perl $pm_config --libs`, String))
 pm_cxx = chomp(read(`$perl $pm_config --cc`, String))
 
-jlcxx_cmake_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
+jlcxx_cmake_dir = joinpath(dirname(
+                     isdefined(CxxWrap, :jlcxx_path) && !isempty(CxxWrap.jlcxx_path) ?
+                     CxxWrap.jlcxx_path :
+                     CxxWrap.CxxWrapCore.libcxxwrap_julia_jll.libcxxwrap_julia_path
+                  ),"cmake","JlCxx")
 
 julia_exec = joinpath(Sys.BINDIR , "julia")
 
@@ -172,4 +176,10 @@ println("appending to deps.jl file")
 open(joinpath(@__DIR__,"deps.jl"), "a") do f
    println(f, "const using_binary = $use_binary")
    println(f, depsjl)
+end
+
+println("storing libcxxwrap version")
+jlcxxversion = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
+open(joinpath(@__DIR__,"jlcxx_version.jl"), "w") do f
+   println(f, """const jlcxx_version = v"$jlcxxversion";""")
 end
