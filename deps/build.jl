@@ -142,12 +142,7 @@ pm_ldflags = chomp(read(`$perl $pm_config --ldflags`, String))
 pm_libraries = chomp(read(`$perl $pm_config --libs`, String))
 pm_cxx = chomp(read(`$perl $pm_config --cc`, String))
 
-jlcxx_cmake_dir = joinpath(dirname(
-                     isdefined(CxxWrap, :jlcxx_path) && !isempty(CxxWrap.jlcxx_path) ?
-                     CxxWrap.jlcxx_path :
-                     CxxWrap.CxxWrapCore.libcxxwrap_julia_jll.libcxxwrap_julia_path
-                  ),"cmake","JlCxx")
-
+jlcxx_cmake_dir = joinpath(CxxWrap.prefix_path(), "lib", "cmake", "JlCxx")
 julia_exec = joinpath(Sys.BINDIR , "julia")
 
 cd(joinpath(@__DIR__, "src"))
