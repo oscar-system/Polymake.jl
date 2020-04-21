@@ -116,6 +116,10 @@ If you already have a polymake installation you need to set the environment vari
     eval(depsjl)
     prepare_env()
     run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
+
+    # adjust signal used for initalization purposes to avoid problems
+    run(`$perl -pi -e "s/SIG{INT}/SIG{USR1}/g" $pm_bin_prefix/share/polymake/perllib/Polymake/Main.pm`)
+
     run(`sh -c "$perl -pi -e 's{/workspace/destdir}{$pm_bin_prefix}g' $pm_bin_prefix/lib/perl5/*/*/Config_heavy.pl"`)
 
 else
