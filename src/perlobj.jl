@@ -41,6 +41,11 @@ function give(obj::BigObject, prop::String)
         internal_give(obj, prop)
     catch ex
         ex isa ErrorException && throw(PolymakeError(ex.msg))
+        if (ex isa InterruptException)
+            @warn("""Interrupting polymake is not safe.
+                   You are entering the dark forest of memory corruption in the valley of segfaults, bring your 🏹, ⚔︎ and 🛡︎.
+                   Please restart your julia session if you encounter any weird stuff.""")
+        end
         rethrow(ex)
     end
     return convert_from_property_value(return_obj)
