@@ -185,9 +185,19 @@ function PolymakeApp(jl_module::Symbol, app_json::Dict{String, Any})
             end
         end
 
-        callables = [PolymakeCallable(app_name,f) for f in app_json["functions"] if haskey(f, "name")]
+        all_callables = [PolymakeCallable(app_name,f) for f in app_json["functions"] if haskey(f, "name")]
+        aggregate = Dict{String, Vector{Int}}()
+        for (i,c) in enumerate(all_callables)
+            if !haskey(aggregate, pm_name(c))
+                aggregate[pm_name(c)] = Int[]
+            end
+            push!(aggregate[pm_name(c)], i)
+        end
 
-        callables = unique(pc -> pm_name(pc), callables)
+        callables = unique(pc -> pm_name(pc), all_callables)
+        for c in callables
+            c.json["doc"] = [docstring(all_callables[i]) for i in aggregate[pm_name(c)]]
+        end
     else
         callables = PolymakeCallable[]
     end
@@ -226,6 +236,8 @@ jl_module_name(pa::PolymakeApp) = pa.jl_module
 callable(::PolymakeFunction) = :call_function
 callable(::PolymakeMethod) = :call_method
 
+docstring(pc::PolymakeCallable) = get(pc.json, "doc", "")
+
 docstring(obj::PolymakeObject) = get(obj.json, "help", "")
 istemplated(obj::PolymakeObject) = haskey(obj.json, "params")
 templates(obj::PolymakeObject) = Symbol.(get(obj.json, "params", String[]))
@@ -253,7 +265,7 @@ end
 
 ########## code generation
 
-function jl_code(pf::PolymakeFunction)
+function jl_code(pf::PolymakeFunction, doc_string=docstring(pf))
     jlfunc_name = jl_symbol(pf)
     func_name = pm_name(pf)
     app = pm_app(pf)
@@ -274,25 +286,29 @@ function jl_code(pf::PolymakeFunction)
                 template_parameters=template_parameters, kwargs...)
         end;
         function $(Base.Docs).getdoc(::typeof($(jlfunc_name)))
-            docstrs = get_docs($(pm_name_qualified(app, func_name)), full=true)
-            return PolymakeDocstring(join(docstrs, "\n\n---\n\n"))
+            return PolymakeDocstring($(doc_string))
         end;
         export $(jlfunc_name);
     end
 end
 
-function jl_code(pm::PolymakeMethod)
+function jl_code(pm::PolymakeMethod, doc_string = docstring(pm))
+    jlfunc_name = jl_symbol(pm)
     func_name = pm_name(pm)
     return quote
-        function $(jl_symbol(pm))(::Type{PropertyValue}, object::BigObject,
+        function $(jlfunc_name)(::Type{PropertyValue}, object::BigObject,
             args...; kwargs...)
             return $(callable(pm))(PropertyValue, object, Symbol($func_name), args...;
                 kwargs...)
         end;
-        function $(jl_symbol(pm))(object::BigObject, args...;
+        function $(jlfunc_name)(object::BigObject, args...;
                 kwargs...)
             return $(callable(pm))(object, Symbol($func_name), args...; kwargs...)
         end;
+
+        function $(Base.Docs).getdoc(::typeof($(jlfunc_name)))
+            return PolymakeDocstring($(doc_string))
+        end
         export $(jl_symbol(pm));
     end
 end
@@ -360,6 +376,9 @@ end
 struct PolymakeDocstring
     s::String
 end
+
+PolymakeDocstring(docs::Vector) = PolymakeDocstring(join(docs, "\n ---- \n"))
+
 # if someone wants to implement something prettier, overload this
 Base.show(io::IO, doc::PolymakeDocstring) = print(io, doc.s)
 
