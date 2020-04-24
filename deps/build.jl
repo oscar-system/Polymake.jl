@@ -3,6 +3,7 @@ using BinaryProvider
 using Base.Filesystem
 import Pkg
 import CMake
+using Libdl
 
 # Parse some basic command-line arguments
 const verbose = "--verbose" in ARGS
@@ -149,9 +150,40 @@ pm_cxx = chomp(read(`$perl $pm_config --cc`, String))
 jlcxx_cmake_dir = joinpath(CxxWrap.prefix_path(), "lib", "cmake", "JlCxx")
 julia_exec = joinpath(Sys.BINDIR , "julia")
 
+xcode_typeinfo_bug = false
+
+if (Sys.isapple())
+   # Lets have some fun for xcode 11.4 until
+   # https://github.com/llvm/llvm-project/commit/2464d8135e
+   # arrives.
+   #
+   # We build a jlcxx library that uses std::string which will should
+   # abort with a failed assertion has_julia_type<T> if we are building
+   # with xcode 11.4 but libcxxwrap-julia was built with an older libc++.
+   #
+   # Read the above commit message some details; the effect of merged
+   # vs non-merged type_info is that for the former memory addresses are
+   # used as hash_code(), for the latter the type_info.name() string is
+   # hashed.
+
+   cd(joinpath(@__DIR__, "xcodetypeinfo"))
+   run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir .`)
+   run(`make -j1`)
+   libpath = joinpath(@__DIR__, "xcodetypeinfo", "libhello.$dlext")
+   res = run(pipeline(Cmd(`$julia_exec --project -e "using CxxWrap; @wrapmodule(\"$libpath\", :define_module_hello); @initcxx;"`,ignorestatus=true),stdout=devnull,stderr=devnull))
+   if res.termsignal == 6
+      global xcode_typeinfo_bug = true
+      println("Applying XCode type_info.hash_code() workaround")
+   end
+end
+
 cd(joinpath(@__DIR__, "src"))
 
 include("type_setup.jl")
+
+if xcode_typeinfo_bug
+   global pm_cflags *= " -DFORCE_XCODE_TYPEINFO_MERGED"
+end
 
 run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
 cpus = max(div(Sys.CPU_THREADS,2), 1)
