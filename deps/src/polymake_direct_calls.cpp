@@ -1,6 +1,6 @@
 #include "polymake_includes.h"
 
-#include "polymake_direct_calls.h"
+#include "polymake_type_modules.h"
 
 template<typename Scalar>
 pm::Vector<Scalar> direct_call_solve_LP(

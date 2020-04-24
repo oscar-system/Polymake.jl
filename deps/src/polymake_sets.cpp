@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_sets.h"
+#include "polymake_type_modules.h"
 
 template<> struct jlcxx::IsMirroredType<pm::operations::cmp> : std::false_type { };
 

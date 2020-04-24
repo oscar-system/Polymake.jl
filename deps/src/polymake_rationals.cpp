@@ -4,9 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_integers.h"
-
-#include "polymake_rationals.h"
+#include "polymake_type_modules.h"
 
 void polymake_module_add_rational(jlcxx::Module& polymake)
 {

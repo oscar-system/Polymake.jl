@@ -1,10 +1,10 @@
 #ifndef POLYMAKE_WRAP_INCLUDES
 #define POLYMAKE_WRAP_INCLUDES
 
+#include "polymake_jlcxx.h"
+
 #include <string>
 #include <iostream>
-
-#include "jlcxx/jlcxx.hpp"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wlogical-op-parentheses"
