@@ -152,16 +152,16 @@ julia_exec = joinpath(Sys.BINDIR , "julia")
 
 xcode_typeinfo_bug = false
 
-if (Sys.isapple())
+if Sys.isapple()
    # Lets have some fun for xcode 11.4 until
    # https://github.com/llvm/llvm-project/commit/2464d8135e
    # arrives.
    #
-   # We build a jlcxx library that uses std::string which will should
+   # We build a jlcxx library that uses std::string which will
    # abort with a failed assertion has_julia_type<T> if we are building
    # with xcode 11.4 but libcxxwrap-julia was built with an older libc++.
    #
-   # Read the above commit message some details; the effect of merged
+   # Read the above LLVM commit message for some details; the effect of merged
    # vs non-merged type_info is that for the former memory addresses are
    # used as hash_code(), for the latter the type_info.name() string is
    # hashed.
@@ -173,7 +173,7 @@ if (Sys.isapple())
    res = run(pipeline(Cmd(`$julia_exec --project -e "using CxxWrap; @wrapmodule(\"$libpath\", :define_module_hello); @initcxx;"`,ignorestatus=true),stdout=devnull,stderr=devnull))
    if res.termsignal == 6
       global xcode_typeinfo_bug = true
-      println("Applying XCode type_info.hash_code() workaround")
+      println("Applying Xcode type_info.hash_code() workaround")
    end
 end
 
