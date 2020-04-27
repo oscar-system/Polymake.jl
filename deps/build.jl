@@ -148,12 +148,12 @@ pm_libraries = chomp(read(`$perl $pm_config --libs`, String))
 pm_cxx = chomp(read(`$perl $pm_config --cc`, String))
 
 jlcxx_cmake_dir = joinpath(CxxWrap.prefix_path(), "lib", "cmake", "JlCxx")
-julia_exec = joinpath(Sys.BINDIR , "julia")
+julia_exec = joinpath(Sys.BINDIR, Base.julia_exename())
 
 xcode_typeinfo_bug = false
 
 if Sys.isapple()
-   # Lets have some fun for xcode 11.4 until
+   # Work around a bug in Xcode 11.4 that causes SIGABRT, at least until
    # https://github.com/llvm/llvm-project/commit/2464d8135e
    # arrives.
    #
@@ -170,7 +170,7 @@ if Sys.isapple()
    run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir .`)
    run(`make -j1`)
    libpath = joinpath(@__DIR__, "xcodetypeinfo", "libhello.$dlext")
-   res = run(pipeline(Cmd(`$julia_exec --project -e "using CxxWrap; @wrapmodule(\"$libpath\", :define_module_hello); @initcxx;"`,ignorestatus=true),stdout=devnull,stderr=devnull))
+   res = run(pipeline(Cmd(`$(Base.julia_cmd()) --project -e "using CxxWrap; @wrapmodule(\"$libpath\", :define_module_hello); @initcxx;"`,ignorestatus=true),stdout=devnull,stderr=devnull))
    if res.termsignal == 6
       global xcode_typeinfo_bug = true
       println("Applying Xcode type_info.hash_code() workaround")
