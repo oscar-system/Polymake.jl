@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_bigobjects.h"
+#include "polymake_type_modules.h"
 
 #include "polymake_caller.h"
 

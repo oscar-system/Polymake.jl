@@ -7,6 +7,9 @@ deps/src/Makefile
 deps/src/cmake_install.cmake
 deps/src/libpolymake.*
 deps/src/generated/*
+deps/xcodetypeinfo/*
+!deps/xcodetypeinfo/hello.cpp
+!deps/xcodetypeinfo/CMakeLists.txt
 deps/build.log
 deps/build_*.jl
 deps/deps.jl

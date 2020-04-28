@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_sparsevector.h"
+#include "polymake_type_modules.h"
 
 void polymake_module_add_sparsevector(jlcxx::Module& polymake)
 {
