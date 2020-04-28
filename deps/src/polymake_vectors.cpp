@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_vectors.h"
+#include "polymake_type_modules.h"
 
 void polymake_module_add_vector(jlcxx::Module& polymake)
 {

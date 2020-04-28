@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_integers.h"
+#include "polymake_type_modules.h"
 
 pm::Integer new_integer_from_bigint(jl_value_t* integer)
 {

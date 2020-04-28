@@ -1,3 +1,11 @@
+"""
+`Polymake.jl` is the Julia interface to `polymake`, an open source software for research in polyhedral geometry.
+
+For more information see:
+ > https://polymake.org/doku.php
+ >
+ > https://github.com/oscar-system/Polymake.jl
+"""
 module Polymake
 
 export @pm, @convert_to, visual
@@ -17,12 +25,10 @@ import SparseArrays
 using CxxWrap
 import Libdl.dlext
 
-# !!!: Nemo is never used in Polymake.jl.
-# However, polymake uses flint and Nemo as well.
-# And Nemo changes the malloc function of flint, so we get
-# a crash if we first load Polymke.jl and then Nemo.
+# LoadFlint is needed to initialize the flint malloc functions
+# to the corresponding julia functions.
 # See also https://github.com/Nemocas/Nemo.jl/issues/788
-import Nemo
+import LoadFlint
 
 struct PolymakeError <: Exception
     msg
@@ -32,6 +38,13 @@ function Base.showerror(io::IO, ex::PolymakeError)
     print(io, "Exception occured at Polymake side:\n$(ex.msg)")
 end
 
+function check_jlcxx_version(version)
+    current_jlcxx = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
+    if (version != current_jlcxx)
+        error("""JlCxx version changed, please run `using Pkg; Pkg.build("Polymake");`""")
+    end
+end
+
 ###########################
 # Load Cxx stuff and init
 ##########################
@@ -39,6 +52,14 @@ end
 Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
 deps_dir = joinpath(@__DIR__, "..", "deps")
+
+isfile(joinpath(deps_dir,"jlcxx_version.jl")) &&
+    isfile(joinpath(deps_dir,"deps.jl")) ||
+    error("""Please run `using Pkg; Pkg.build("Polymake");`""")
+
+include(joinpath(deps_dir,"jlcxx_version.jl"))
+
+check_jlcxx_version(jlcxx_version)
 
 @wrapmodule(joinpath(deps_dir, "src", "libpolymake.$dlext"), :define_module_polymake)
 
@@ -50,6 +71,7 @@ include("ijulia.jl")
 include(joinpath(deps_dir,"deps.jl"))
 
 function __init__()
+    check_jlcxx_version(jlcxx_version)
     @initcxx
 
     if using_binary
@@ -58,8 +80,11 @@ function __init__()
     end
 
     try
-        initialize_polymake(isinteractive())
-        if !isinteractive()
+        show_banner = isinteractive() &&
+                       !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+
+        initialize_polymake(show_banner)
+        if !show_banner
             shell_execute(raw"$Verbose::credits=\"0\";")
         end
     catch ex # initialize_polymake throws jl_error
