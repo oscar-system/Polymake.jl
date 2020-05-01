@@ -156,8 +156,8 @@ sub app_to_json($$) {
                                    };
       }
 
-      $objhash->{mandatory_params} = $ann->{mandatory_tparam}
-         if defined($ann) && defined($ann->{mandatory_tparam});
+      $objhash->{mandatory_params} = $ann->{mandatory_tparams}
+         if defined($ann) && defined($ann->{mandatory_tparams});
 
       $objhash->{linear_isa} = [
                                   map { $_->qualified_name }
