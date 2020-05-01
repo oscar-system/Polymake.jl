@@ -138,14 +138,40 @@ sub app_to_json($$) {
          }
       }
    }
-
-   my @types = grep {!defined($_->generic) } @{User::application($appname)->object_types};
-   foreach my $type (@types) {
+   foreach my $type (@gen_types) {
+      my $ann = $type->help->annex;
       my $objhash = {
                        name => $type->full_name,
                        help => $type->help->display_text
                     };
-      $objhash->{params} = [ map { $_->name } @{$type->params} ] if defined $type->params;
+      my $c = 0;
+      foreach my $p (@{$type->params // [] }) {
+         push @{$objhash->{params}}, {
+                                      name => $p->name,
+                                      description =>
+                                          defined($ann->{tparam})
+                                             && @{$ann->{tparam}} >= $c
+                                          ? $ann->{tparam}[$c++]->text
+                                          : ""
+                                   };
+      }
+
+      $objhash->{mandatory_params} = $ann->{mandatory_tparam}
+         if defined($ann) && defined($ann->{mandatory_tparam});
+
+      $objhash->{linear_isa} = [
+                                  map { $_->qualified_name }
+                                  grep { !defined($_->generic) }
+                                  @{$type->linear_isa}
+                               ];
+
+      $objhash->{description} = $type->help->text
+         if defined($type->help->text);
+
+      $objhash->{examples} = [ map {$_->body} @{$ann->{examples}} ]
+         if defined $ann && defined $ann->{examples};
+
+
       push @{$data{objects}}, $objhash;
    }
 
