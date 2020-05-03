@@ -8,6 +8,10 @@ using Mongoc
 
 #Polymake.Polydb's types store information via
 # a corresponding Mongoc type variable
+struct Database
+   mdb::Mongoc.Database
+end
+
 struct Collection
    mcol::Mongoc.Collection
 end
@@ -16,8 +20,13 @@ struct Cursor
    mcursor::Mongoc.Cursor{Mongoc.Collection}
 end
 
-struct Database
-   mdb::Mongoc.Database
+# alternative iterators returning `BSON` objects
+struct BSONCollection
+   mcol::Mongoc.Collection
+end
+
+struct BSONCursor
+   mcursor::Mongoc.Cursor{Mongoc.Collection}
 end
 
 # connects to the Polydb and
@@ -43,6 +52,24 @@ function find(c::Collection, d::Pair...)
    return Cursor(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
 end
 
+# querying a `BSONCollection` returns a `BSONCursor`
+function find(c::BSONCollection, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing)
+   return BSONCursor(Mongoc.find(c.mcol, Mongoc.BSON(d); options=opts))
+end
+
+function find(c::BSONCollection, d::Pair...)
+   return BSONCursor(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
+end
+
+# creating `BSON` iterators from the respective `Polymake.BigObject` iterator
+function BSONCollection(c::Collection)
+   return BSONCollection(c.mcol)
+end
+
+function BSONCursor(cursor::Cursor)
+   return BSONCursor(cursor.mcursor)
+end
+
 # returns a Polymake.BigObject from a Mongoc.BSON document
 function parse_document(bson::Mongoc.BSON)
    str = Mongoc.as_json(bson)
@@ -51,25 +78,24 @@ end
 
 #Iterator
 
+# help functions to reduce runtime and keep code clean
+function _evaluateIteration(nothing::Nothing)
+   return nothing
+end
+
+function _evaluateIteration(a::Tuple{Mongoc.BSON, Any})
+   return (parse_document(a[1]), a[2])
+end
+
+# default iteration functions returning `Polymake.BigObject`s
 function Base.iterate(cursor::Cursor)
-   a = iterate(cursor.mcursor)
-   if a == nothing
-      return nothing
-   else
-      return (parse_document(a[1]), a[2])
-   end
+   return _evaluateIteration(iterate(cursor.mcursor))
 end
 
 function Base.iterate(cursor::Cursor, state::Nothing)
-   a = iterate(cursor.mcursor, state)
-   if a == nothing
-      return nothing
-   else
-      return (parse_document(a[1]), a[2])
-   end
+   return _evaluateIteration(iterate(cursor.mcursor, state))
 end
 
-#
 function Base.collect(cursor::Cursor)
    result = Vector{Polymake.BigObject}()
     for doc in cursor
@@ -79,17 +105,32 @@ function Base.collect(cursor::Cursor)
 end
 
 function Base.iterate(coll::Collection)
-   a =  iterate(coll.mcol)
-   return (parse_document(a[1]), a[2])
+   return _evaluateIteration(iterate(coll.mcol))
 end
 
 function Base.iterate(coll::Collection, state::Mongoc.Cursor)
-   a = iterate(coll.mcol,state)
-   if a == nothing
-      return nothing
-   else
-      return (parse_document(a[1]), a[2])
-   end
+   return _evaluateIteration(iterate(coll.mcol, state))
+end
+
+# functions for `BSON` iteration
+function Base.iterate(cursor::BSONCursor)
+   return iterate(cursor.mcursor)
+end
+
+function Base.iterate(cursor::BSONCursor, state::Nothing)
+   return iterate(cursor.mcursor, state)
+end
+
+function Base.collect(cursor::BSONCursor)
+   return collect(cursor.mcursor)
+end
+
+function Base.iterate(coll::BSONCollection)
+   return iterate(coll.mcol)
+end
+
+function Base.iterate(coll::BSONCollection, state::Mongoc.Cursor)
+   return iterate(coll.mcol, state)
 end
 
 #Info
@@ -170,19 +211,18 @@ end
 # prints information about a specific section and
 # continues to print information about its content
 function _print_section(db::Database, info::Mongoc.BSON, sections::Array{String,1}, collections::Array{String,1})
-   println(string("SECTION: ", join(info["section"], ".")))
+   @info string("SECTION: ", join(info["section"], "."))
    println(info["description"])
    if haskey(info, "maintainer")
-      println(string("Maintained by ", info["maintainer"]["name"], ", ", info["maintainer"]["email"], ", ", info["maintainer"]["affiliation"], "\n"))
-   else
-      println()
+      println(string("Maintained by ", info["maintainer"]["name"], ", ", info["maintainer"]["email"], ", ", info["maintainer"]["affiliation"]))
    end
+   println()
    _print_sections(db, info["section"], sections, collections)
 end
 
 # prints information about a specific collection
 function _print_collection(info::Mongoc.BSON)
-   println(string("\tCOLLECTION: ", join(info["section"], "."), ".", info["collection"]))
+   @info string("\tCOLLECTION: ", join(info["section"], "."), ".", info["collection"])
    if haskey(info, "description")
       println(string("\t", info["description"]))
    end
