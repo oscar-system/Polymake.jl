@@ -29,8 +29,8 @@ function shell_execute(str::AbstractString)
     end
 end
 
-const version = VersionNumber(shell_execute("print \$Version;").stdout)
-const installTop = shell_execute("print \$InstallTop;").stdout
+version() = VersionNumber(shell_execute("print \$Version;").stdout)
+installTop() = shell_execute("print \$InstallTop;").stdout
 
 function cite(;format=:bibtex)
     cite_str = match(r"(?<bibtex>@incollection.*\n (\s*\w*\s?= .*\n)+\s*\})", shell_execute("""help "core/citation";""").stdout)
