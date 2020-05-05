@@ -240,7 +240,8 @@ docstring(pc::PolymakeCallable) = get(pc.json, "doc", "")
 
 docstring(obj::PolymakeObject) = get(obj.json, "help", "")
 istemplated(obj::PolymakeObject) = haskey(obj.json, "params")
-templates(obj::PolymakeObject) = Symbol.(get(obj.json, "params", String[]))
+mandatorytemplates(obj::PolymakeObject) = get(obj.json, "mandatory_params", 0)
+templates(obj::PolymakeObject) = get(obj.json, "params", Dict[])
 
 function Base.show(io::IO, pc::PolymakeCallable)
     println(io, typeof(pc), ":")
@@ -345,9 +346,10 @@ function jl_code(obj::PolymakeObject)
     pm_object_name = pm_name_qualified(pm_app(obj), pm_name(obj))
 
     if istemplated(obj)
-        Ts = templates(obj)
+        Ts = Symbol.(map(x->get(x,"name",String),templates(obj)))
+        mand = mandatorytemplates(obj)
         templated_constructors = [
-            jl_constructor(obj, Ts[1:i]) for i in 1:length(Ts)
+            jl_constructor(obj, Ts[1:i]) for i in max(mand,1):length(Ts)
         ]
 
         struct_def = quote
@@ -355,7 +357,9 @@ function jl_code(obj::PolymakeObject)
                 # inner templated constructors:
                 $(templated_constructors...)
                 # inner template-less constructor
-                $(jl_constructor(obj))
+                $(if mand == 0
+                   jl_constructor(obj)
+                  end)
             end;
         end # of quote
     else
