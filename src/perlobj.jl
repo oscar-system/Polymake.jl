@@ -38,7 +38,9 @@ Base.setproperty!(obj::BigObject, prop::String, val) = setproperty!(obj, Symbol(
 
 function give(obj::BigObject, prop::String)
     return_obj = try
-        internal_give(obj, prop)
+        disable_sigint() do
+            internal_give(obj, prop)
+        end
     catch ex
         ex isa ErrorException && throw(PolymakeError(ex.msg))
         if (ex isa InterruptException)
