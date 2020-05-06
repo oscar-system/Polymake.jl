@@ -55,7 +55,7 @@ deps_dir = joinpath(@__DIR__, "..", "deps")
 
 isfile(joinpath(deps_dir,"jlcxx_version.jl")) &&
     isfile(joinpath(deps_dir,"deps.jl")) ||
-    error("""Please run `using Pkg; Pkg.build("Polymake");`""")
+    error("""Please run `using Pkg; Pkg.add("Polymake"); Pkg.build("Polymake");`""")
 
 include(joinpath(deps_dir,"jlcxx_version.jl"))
 
