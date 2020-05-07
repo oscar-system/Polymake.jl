@@ -44,9 +44,8 @@ function give(obj::BigObject, prop::String)
     catch ex
         ex isa ErrorException && throw(PolymakeError(ex.msg))
         if (ex isa InterruptException)
-            @warn("""Interrupting polymake is not safe.
-                   You are entering the dark forest of memory corruption in the valley of segfaults, bring your 🏹, ⚔︎ and 🛡︎.
-                   Please restart your julia session if you encounter any weird stuff.""")
+            @warn """Interrupting polymake is not safe.
+            SIGINT is disabled while waiting for polymake to finish its computations."""
         end
         rethrow(ex)
     end
