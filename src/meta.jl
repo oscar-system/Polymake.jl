@@ -238,10 +238,9 @@ callable(::PolymakeMethod) = :call_method
 
 docstring(pc::PolymakeCallable) = get(pc.json, "doc", "")
 
-docstring(obj::PolymakeObject) = get(obj.json, "help", "")
-istemplated(obj::PolymakeObject) = haskey(obj.json, "params")
-mandatorytemplates(obj::PolymakeObject) = get(obj.json, "mandatory_params", 0)
-templates(obj::PolymakeObject) = get(obj.json, "params", Dict[])
+istemplated(obj::PolymakeCallable) = haskey(obj.json, "type_params")
+templates(obj::PolymakeCallable) = get(obj.json, "type_params", Dict[])
+mandatorytemplates(obj::PolymakeCallable) = get(obj.json, "mandatory_type_params", 0)
 
 function Base.show(io::IO, pc::PolymakeCallable)
     println(io, typeof(pc), ":")
