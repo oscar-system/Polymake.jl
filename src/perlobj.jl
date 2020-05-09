@@ -38,13 +38,14 @@ Base.setproperty!(obj::BigObject, prop::String, val) = setproperty!(obj, Symbol(
 
 function give(obj::BigObject, prop::String)
     return_obj = try
-        internal_give(obj, prop)
+        disable_sigint() do
+            internal_give(obj, prop)
+        end
     catch ex
         ex isa ErrorException && throw(PolymakeError(ex.msg))
         if (ex isa InterruptException)
-            @warn("""Interrupting polymake is not safe.
-                   You are entering the dark forest of memory corruption in the valley of segfaults, bring your 🏹, ⚔︎ and 🛡︎.
-                   Please restart your julia session if you encounter any weird stuff.""")
+            @warn """Interrupting polymake is not safe.
+            SIGINT is disabled while waiting for polymake to finish its computations."""
         end
         rethrow(ex)
     end

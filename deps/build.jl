@@ -185,7 +185,16 @@ if xcode_typeinfo_bug
    global pm_cflags *= " -DFORCE_XCODE_TYPEINFO_MERGED"
 end
 
-run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
+run(`$(CMake.cmake)
+    -DJulia_EXECUTABLE=$julia_exec
+    -DJlCxx_DIR=$jlcxx_cmake_dir
+    -Dpolymake_includes=$pm_includes
+    -Dpolymake_ldflags=$pm_ldflags
+    -Dpolymake_libs=$pm_libraries
+    -Dpolymake_cflags=$pm_cflags
+    -DCMAKE_CXX_COMPILER=$pm_cxx
+    -DCMAKE_INSTALL_LIBDIR=lib
+    .`)
 cpus = max(div(Sys.CPU_THREADS,2), 1)
 run(`make -j$cpus`)
 
