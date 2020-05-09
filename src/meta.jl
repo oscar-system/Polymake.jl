@@ -265,6 +265,15 @@ end
 
 ########## code generation
 
+function jl_missing_type(jl_name::Symbol,type_names::Array{Symbol})
+    sig = QuoteNode("$jl_name{$(join(type_names,","))}")
+    return quote
+        $(jl_name)(args...; kwargs...) =
+            throw(ArgumentError("Missing type parameter(s) for `$($sig)(...)` ."))
+    end
+end
+
+
 function jl_function(callable::Symbol,
                      jl_name::Symbol,
                      pm_name::String,
@@ -330,6 +339,8 @@ function jl_code(pf::PolymakeFunction, doc_string=docstring(pf))
                $(templated_functions...)
                $(if min_tparam == 0
                   jl_function(pf)
+                 else
+                  jl_missing_type(jlfunc_name,tparams[1:min_tparam])
                  end)
             end;
         end # of quote
@@ -415,6 +426,8 @@ function jl_code(obj::PolymakeObject)
                 # inner template-less constructor
                 $(if mand == 0
                    jl_constructor(obj)
+                  else
+                   jl_missing_type(jl_object_name,Ts[1:mand])
                   end)
             end;
         end # of quote
