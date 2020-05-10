@@ -12,20 +12,11 @@ struct Database
    mdb::Mongoc.Database
 end
 
-struct Collection
+struct Collection{T}
    mcol::Mongoc.Collection
 end
 
-struct Cursor
-   mcursor::Mongoc.Cursor{Mongoc.Collection}
-end
-
-# alternative iterators returning `BSON` objects
-struct BSONCollection
-   mcol::Mongoc.Collection
-end
-
-struct BSONCursor
+struct Cursor{T}
    mcursor::Mongoc.Cursor{Mongoc.Collection}
 end
 
@@ -40,34 +31,29 @@ end
 # sections and collections in the name are connected with the '.' sign,
 # i.e. names = "Polytopes.Lattice.SmoothReflexive"
 function get_collection(db::Database, name::String)
-   return Collection(db.mdb[name])
+   return Collection{Polymake.BigObject}(db.mdb[name])
+end
+
+function get_collection(db::Database, name::String, ::Type{T}) where T <: Union{Polymake.BigObject, Mongoc.BSON}
+   return Collection{T}(db.mdb[name])
 end
 
 # search a collection for documents matching the criteria given by d
-function find(c::Collection, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing)
-   return Cursor(Mongoc.find(c.mcol, Mongoc.BSON(d); options=opts))
+function find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
+   return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d); options=opts))
 end
 
-function find(c::Collection, d::Pair...)
-   return Cursor(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
-end
-
-# querying a `BSONCollection` returns a `BSONCursor`
-function find(c::BSONCollection, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing)
-   return BSONCursor(Mongoc.find(c.mcol, Mongoc.BSON(d); options=opts))
-end
-
-function find(c::BSONCollection, d::Pair...)
-   return BSONCursor(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
+function find(c::Collection{T}, d::Pair...) where T
+   return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
 end
 
 # creating `BSON` iterators from the respective `Polymake.BigObject` iterator
-function BSONCollection(c::Collection)
-   return BSONCollection(c.mcol)
+function Collection{Mongoc.BSON}(c::Collection{Polymake.BigObject})
+   return Collection{Mongoc.BSON}(c.mcol)
 end
 
-function BSONCursor(cursor::Cursor)
-   return BSONCursor(cursor.mcursor)
+function Cursor{Mongoc.BSON}(cursor::Cursor{Polymake.BigObject})
+   return Cursor{Mongoc.BSON}(cursor.mcursor)
 end
 
 # returns a Polymake.BigObject from a Mongoc.BSON document
@@ -77,6 +63,9 @@ function parse_document(bson::Mongoc.BSON)
 end
 
 #Iterator
+
+Base.IteratorSize(::Type{<:Cursor}) = Base.SizeUnknown()
+Base.eltype(::Cursor{T}) where T = T
 
 # help functions to reduce runtime and keep code clean
 function _evaluateIteration(nothing::Nothing)
@@ -88,48 +77,40 @@ function _evaluateIteration(a::Tuple{Mongoc.BSON, Any})
 end
 
 # default iteration functions returning `Polymake.BigObject`s
-function Base.iterate(cursor::Cursor)
+function Base.iterate(cursor::Cursor{Polymake.BigObject})
    return _evaluateIteration(iterate(cursor.mcursor))
 end
 
-function Base.iterate(cursor::Cursor, state::Nothing)
+function Base.iterate(cursor::Cursor{Polymake.BigObject}, state::Nothing)
    return _evaluateIteration(iterate(cursor.mcursor, state))
 end
 
-function Base.collect(cursor::Cursor)
-   result = Vector{Polymake.BigObject}()
-    for doc in cursor
-        push!(result, doc)
-    end
-    return result
-end
-
-function Base.iterate(coll::Collection)
+function Base.iterate(coll::Collection{Polymake.BigObject})
    return _evaluateIteration(iterate(coll.mcol))
 end
 
-function Base.iterate(coll::Collection, state::Mongoc.Cursor)
+function Base.iterate(coll::Collection{Polymake.BigObject}, state::Mongoc.Cursor)
    return _evaluateIteration(iterate(coll.mcol, state))
 end
 
 # functions for `BSON` iteration
-function Base.iterate(cursor::BSONCursor)
+function Base.iterate(cursor::Cursor{Mongoc.BSON})
    return iterate(cursor.mcursor)
 end
 
-function Base.iterate(cursor::BSONCursor, state::Nothing)
+function Base.iterate(cursor::Cursor{Mongoc.BSON}, state::Nothing)
    return iterate(cursor.mcursor, state)
 end
 
-function Base.collect(cursor::BSONCursor)
+function Base.collect(cursor::Cursor{Mongoc.BSON})
    return collect(cursor.mcursor)
 end
 
-function Base.iterate(coll::BSONCollection)
+function Base.iterate(coll::Collection{Mongoc.BSON})
    return iterate(coll.mcol)
 end
 
-function Base.iterate(coll::BSONCollection, state::Mongoc.Cursor)
+function Base.iterate(coll::Collection{Mongoc.BSON}, state::Mongoc.Cursor)
    return iterate(coll.mcol, state)
 end
 
@@ -141,25 +122,27 @@ function fields(coll::Collection)
    db = coll.mcol.database
    coll_c = db[string("_collectionInfo.", coll.mcol.name)]
    info = collect(coll_c)[2]
-   try
-      _print_fields(info["fields"])
-   catch
-      println("no information on fields available")
+   if haskey(info, "fields")
+      return _get_fields(info["fields"])
+   else
+      return "no information on fields available"
    end
 end
 
-function _print_fields(d::Dict)
+function _get_fields(d::Dict)
+   res = ""
    for (key, value) in d
       if value == 1
-         println(key)
+         res = string(res, key, "\n")
       else
-         println(string(key, ": ", value))
+         res = string(res, key, ": ", value, "\n")
       end
    end
+   return res
 end
 
-function _print_fields(a::Array)
-   println(join(a, "\n"))
+function _get_fields(a::Array)
+   return join(a, "\n")
 end
 
 # prints information about a specific Collection
@@ -168,7 +151,7 @@ function info(coll::Collection)
    db = coll.mcol.database
    coll_c = db[string("_collectionInfo.", coll.mcol.name)]
    info = iterate(coll_c)[1]
-   _print_collection(info)
+   println(_get_collection(info))
 end
 
 # returns an array containing the names of all collections in the Polydb
@@ -182,8 +165,8 @@ end
 # first one for sections, second one for collections
 function _get_meta_names(names::Array{String, 1})
    n = length(names)
-   sec_bool = Array{Bool, 1}(undef, n)
-   coll_bool = Array{Bool, 1}(undef, n)
+   sec_bool = BitArray{1}(undef, n)
+   coll_bool = BitArray{1}(undef, n)
    n_secs = 0
    n_colls = 0
    i = 1
@@ -202,8 +185,8 @@ function _get_meta_names(names::Array{String, 1})
       end
       i += 1
    end
-   secs = Array{String,1}(undef, n_secs)
-   colls = Array{String,1}(undef, n_colls)
+   secs = Base.Array{String,1}(undef, n_secs)
+   colls = Base.Array{String,1}(undef, n_colls)
    i_s = 1
    i_c = 1
    for j = 1:n
@@ -219,72 +202,73 @@ function _get_meta_names(names::Array{String, 1})
 end
 
 # functions helping printing metadata for sections or collections
-function _print_contact(s::String)
-   println(s)
+function _get_contact(s::String)
+   return s
 end
 
-function _print_contact(a::Array)
+function _get_contact(a::Array)
+   res = ""
    for dict in a
       str = dict["name"]
       for key in ["email", "www", "affiliation"]
-         if haskey(dict, key) && dict[key] != ""
+         if !isempty(get(dict, key, ""))
             str = string(str, ", ", dict[key])
          end
       end
-      println(string("\t\t", str))
+      res = string(res, "\t\t", str, "\n")
    end
+   return res
 end
 
 # prints information about a specific section and
 # continues to print information about its content
-function _print_section(db::Database, info::Mongoc.BSON, sections::Array{String,1}, collections::Array{String,1})
-   @info string("SECTION: ", join(info["section"], "."))
-   println(info["description"])
+function _get_section(db::Database, info::Mongoc.BSON, sections::Array{String,1}, collections::Array{String,1})
+   res = string("SECTION: ", join(info["section"], "."), "\n", info["description"], "\n")
    if haskey(info, "maintainer")
-      println(string("Maintained by ", info["maintainer"]["name"], ", ", info["maintainer"]["email"], ", ", info["maintainer"]["affiliation"]))
+      res = string(res, "Maintained by ", info["maintainer"]["name"], ", ", info["maintainer"]["email"], ", ", info["maintainer"]["affiliation"], "\n")
    end
-   println()
-   _print_sections(db, info["section"], sections, collections)
+   return string(res, "\n", _get_sections(db, info["section"], sections, collections))
 end
 
 # prints information about a specific collection
-function _print_collection(info::Mongoc.BSON)
-   @info string("\tCOLLECTION: ", join(info["section"], "."), ".", info["collection"])
+function _get_collection(info::Mongoc.BSON)
+   res = string("\tCOLLECTION: ", join(info["section"], "."), ".", info["collection"], "\n")
    if haskey(info, "description")
-      println(string("\t", info["description"]))
+      res = string(res, "\t", info["description"], "\n")
    end
    if haskey(info, "author")
-      println("\tAuthored by ")
-      _print_contact(info["author"])
+      res = string(res, "\tAuthored by ", "\n", _get_contact(info["author"]))
    end
    if haskey(info, "maintainer")
-      println("\tMaintained by")
-      _print_contact(info["maintainer"])
+      res = string(res, "\tMaintained by", "\n", _get_contact(info["maintainer"]))
    end
-   println()
+   return res
 end
 
 # initializes printing complete section/collection tree
-function _print_sections(db::Database, sections::Array{String,1}, collections::Array{String,1})
+function _get_sections(db::Database, sections::Array{String,1}, collections::Array{String,1})
+   res = ""
    for sec in sections
       sec_c = db.mdb[sec]
       info = iterate(sec_c)[1]
       if length(info["section"]) == 1
-         _print_section(db, info, sections, collections)
+         res = string(res, _get_section(db, info, sections, collections))
       end
    end
+   return res
 end
 
 # prints subsections/collection tree of a section given by the array s
 # i.e. for the section "Polytopes.Lattice", s = ["Polytopes", "Lattice"]
-function _print_sections(db::Database, s::Array{Any,1}, sections::Array{String,1}, collections::Array{String,1})
+function _get_sections(db::Database, s::Array{Any,1}, sections::Array{String,1}, collections::Array{String,1})
+   res = ""
    coll_bool = true
    for sec in sections
       sec_c = db.mdb[sec]
       info = iterate(sec_c)[1]
       if length(info["section"]) == length(s) + 1 && info["section"][1:length(s)] == s
          coll_bool = false
-         _print_section(db, info, sections, collections)
+         res = string(res, _get_section(db, info, sections, collections))
       end
    end
    # as of now, each section either contains subsections or collections
@@ -293,10 +277,11 @@ function _print_sections(db::Database, s::Array{Any,1}, sections::Array{String,1
          coll_c = db.mdb[coll]
          info = iterate(coll_c)[1]
          if info["section"] == s
-            _print_collection(info)
+            res = string(res, _get_collection(info), "\n")
          end
       end
    end
+   return res
 end
 
 # prints a sorted list of the sections and collections of the Polydb
@@ -305,7 +290,7 @@ end
 function info(db::Database)
    names = _get_collection_names(db)
    sections, collections = _get_meta_names(names)
-   _print_sections(db, sections, collections)
+   println(_get_sections(db, sections, collections))
 end
 
 end
