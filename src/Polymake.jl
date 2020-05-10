@@ -87,8 +87,9 @@ function __init__()
         if !show_banner
             shell_execute(raw"$Verbose::credits=\"0\";")
         end
-    catch ex # initialize_polymake throws jl_error
-        throw(PolymakeError(ex.msg))
+    catch ex # initialize_polymake may throw jl_error
+        ex isa ErrorException && throw(PolymakeError(ex.msg))
+        rethrow(ex)
     end
 
     application("common")
