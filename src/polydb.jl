@@ -135,6 +135,33 @@ end
 
 #Info
 
+# prints a list of the fields of a collection
+
+function fields(coll::Collection)
+   db = coll.mcol.database
+   coll_c = db[string("_collectionInfo.", coll.mcol.name)]
+   info = collect(coll_c)[2]
+   try
+      _print_fields(info["fields"])
+   catch
+      println("no information on fields available")
+   end
+end
+
+function _print_fields(d::Dict)
+   for (key, value) in d
+      if value == 1
+         println(key)
+      else
+         println(string(key, ": ", value))
+      end
+   end
+end
+
+function _print_fields(a::Array)
+   println(join(a, "\n"))
+end
+
 # prints information about a specific Collection
 # also used for the info(::Database) function
 function info(coll::Collection)
