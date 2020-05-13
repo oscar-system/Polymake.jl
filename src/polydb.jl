@@ -4,6 +4,10 @@ import Polymake: call_function
 
 using Polymake
 
+# julia itself also has a cert.pem but this one should be more recent
+# and provides a variable for the path
+using MozillaCACerts_jll
+
 using Mongoc
 
 #Polymake.Polydb's types store information via
@@ -23,7 +27,8 @@ end
 # connects to the Polydb and
 # returns a Polymake.Polydb.Database instance
 function get_db()
-   client = Mongoc.Client("mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true")
+   # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
+   client = Mongoc.Client("mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)")
    return Database(client["polydb"])
 end
 
