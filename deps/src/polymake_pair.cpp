@@ -11,7 +11,7 @@ tparametric1 polymake_module_add_pair(jlcxx::Module& polymake)
 {
 
     auto type = polymake
-        .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>(
+        .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
             "Pair", jlcxx::julia_type("Tuple", "Base"));
 
         type.apply<std::pair<pm::Integer,pm::Integer>>[](auto wrapped) {
@@ -34,8 +34,8 @@ tparametric1 polymake_module_add_pair(jlcxx::Module& polymake)
             });
         })
 
-    polymake.method("to_array_int", [](const pm::perl::PropertyValue& pv) {
-        return to_SmallObject<pm::Array<pm::Int>>(pv);
+    polymake.method("to_pair_int", [](const pm::perl::PropertyValue& pv) {
+        return to_SmallObject<std::pair<pm::Int>>(pv);
     });
 
     return type;
