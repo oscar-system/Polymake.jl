@@ -13,6 +13,7 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
 ( "Vector_Integer",              "pm::Vector<pm::Integer>",                  "Vector{Integer}",              "to_vector_integer" ),
 ( "Vector_Rational",             "pm::Vector<pm::Rational>",                 "Vector{Rational}",             "to_vector_rational" ),
 ( "Vector_double",               "pm::Vector<double>",                       "Vector{Float64}",              "to_vector_double" ),
+( "Pair_Int",                    "std::pair<pm::Int>",                       "Pair{CxxWrap.CxxLong,CxxWrap.CxxLong}",                   "to_pair_int" ),
 ( "Set_Int",                     "pm::Set<long>",                            "Set{CxxWrap.CxxLong}",                   "to_set_int" ),
 ( "Array_Int",                   "pm::Array<long>",                          "Array{CxxWrap.CxxLong}",                 "to_array_int" ),
 ( "Array_Integer",               "pm::Array<pm::Integer>",                   "Array{Integer}",               "to_array_integer" ),
