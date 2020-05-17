@@ -35,13 +35,7 @@ end
 # returns a Polymake.Polydb.Collection instance with the given name
 # sections and collections in the name are connected with the '.' sign,
 # i.e. names = "Polytopes.Lattice.SmoothReflexive"
-function get_collection(db::Database, name::String)
-   return Collection{Polymake.BigObject}(db.mdb[name])
-end
-
-function get_collection(db::Database, name::String, ::Type{T}) where T <: Union{Polymake.BigObject, Mongoc.BSON}
-   return Collection{T}(db.mdb[name])
-end
+Base.getindex(db::Database, name::AbstractString) = Collection{Polymake.BigObject}(db.mdb[name])
 
 # search a collection for documents matching the criteria given by d
 function find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
@@ -64,7 +58,7 @@ end
 # returns a Polymake.BigObject from a Mongoc.BSON document
 function parse_document(bson::Mongoc.BSON)
    str = Mongoc.as_json(bson)
-   return call_function(:common, :deserialize_json_string, str)
+   return @pm common.deserialize_json_string(str)
 end
 
 #Iterator
@@ -123,21 +117,36 @@ end
 
 # prints a list of the fields of a collection
 
-function fields(coll::Collection)
+function get_fields(coll::Collection)
    db = coll.mcol.database
    coll_c = db[string("_collectionInfo.", coll.mcol.name)]
    info = collect(coll_c)[2]
    if haskey(info, "fields")
-      return _get_fields(info["fields"])
+      return _convert_fields(info["fields"])
    else
-      return "no information on fields available"
+      return Array{String, 1}()
    end
 end
 
-function _get_fields(d::Dict)
+function _convert_fields(d::Dict)
+   return [key=>(value == 1 ? "" : value)
+      for (key, value) in d]
+end
+
+function _convert_fields(a::Array{String, 1})
+   return map(p -> p=>"", a)
+end
+
+function print_fields(coll::Collection)
+   println(_print_fields(get_fields(coll)))
+end
+
+# function _print_fields
+
+function _print_fields(a::Array{Pair{String, String}})
    res = ""
-   for (key, value) in d
-      if value == 1
+   for (key, value) in a
+      if value == ""
          res = string(res, key, "\n")
       else
          res = string(res, key, ": ", value, "\n")
@@ -146,18 +155,18 @@ function _get_fields(d::Dict)
    return res
 end
 
-function _get_fields(a::Array)
-   return join(a, "\n")
-end
-
 # prints information about a specific Collection
 # also used for the info(::Database) function
-function info(coll::Collection)
+function _info(io::IO, coll::Collection)
    db = coll.mcol.database
    coll_c = db[string("_collectionInfo.", coll.mcol.name)]
    info = iterate(coll_c)[1]
-   println(_get_collection(info))
+   print(io, typeof(coll), "\n", _get_collection(info))
 end
+
+Base.show(io::IO, coll::Collection) = _info(io, coll)
+
+Base.show(io::IO, ::MIME"text/plain", coll::Collection) = print(io, typeof(coll), ": ", coll.mcol.name)
 
 # returns an array containing the names of all collections in the Polydb
 function _get_collection_names(db::Database)
