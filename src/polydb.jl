@@ -95,7 +95,7 @@ Base.iterate(coll::Collection{Mongoc.BSON}, state::Mongoc.Cursor) =
 
 #Info
 
-# prints a list of the fields of a collection
+# returns a list of the fields of a collection
 
 function get_fields(coll::Collection)
    db = coll.mcol.database
@@ -107,12 +107,6 @@ function get_fields(coll::Collection)
       return Array{String, 1}(schema["required"])
    else
       return _read_fields(schema)
-      # temp = schema["allOf"]
-      # res = Array{String, 1}()
-      # for entry in temp
-      #    append!(res, _read_fields(entry))
-      # end
-      # return res
    end
 end
 
@@ -133,21 +127,6 @@ function _read_fields(d::Dict)
       return _read_fields(d["allOf"])
    end
 end
-
-# function _convert_fields(d::Dict)
-#    return [key=>(value == 1 ? "" : value)
-#       for (key, value) in d]
-# end
-#
-# function _convert_fields(a::Array{String, 1})
-#    return map(p -> p=>"", a)
-# end
-#
-# function print_fields(coll::Collection)
-#    println(_print_fields(get_fields(coll)))
-# end
-
-# function _print_fields
 
 function _print_fields(a::Array{Pair{String, String}})
    res = ""
