@@ -66,52 +66,32 @@ end
 Base.IteratorSize(::Type{<:Cursor}) = Base.SizeUnknown()
 Base.eltype(::Cursor{T}) where T = T
 
-# help functions to reduce runtime and keep code clean
-function _evaluateIteration(nothing::Nothing)
-   return nothing
-end
-
-function _evaluateIteration(a::Tuple{Mongoc.BSON, Any})
-   return (parse_document(a[1]), a[2])
-end
-
 # default iteration functions returning `Polymake.BigObject`s
-function Base.iterate(cursor::Cursor{Polymake.BigObject})
-   return _evaluateIteration(iterate(cursor.mcursor))
+function Base.iterate(cursor::Polymake.Polydb.Cursor{Polymake.BigObject}, state::Nothing=nothing)
+    next = iterate(cursor.mcursor, state)
+    isnothing(next) && return nothing
+    return Polymake.Polydb.parse_document(first(next)), nothing
 end
 
-function Base.iterate(cursor::Cursor{Polymake.BigObject}, state::Nothing)
-   return _evaluateIteration(iterate(cursor.mcursor, state))
-end
+Base.iterate(coll::Polymake.Polydb.Collection{T}) where T =
+    return iterate(coll, Cursor{T}(find(coll)))
 
-function Base.iterate(coll::Collection{Polymake.BigObject})
-   return _evaluateIteration(iterate(coll.mcol))
-end
-
-function Base.iterate(coll::Collection{Polymake.BigObject}, state::Mongoc.Cursor)
-   return _evaluateIteration(iterate(coll.mcol, state))
+function Base.iterate(coll::Polymake.Polydb.Collection, state::Polymake.Polydb.Cursor)
+    next = iterate(state, nothing)
+    isnothing(next) && return nothing
+    doc, _ = next
+    return doc, state
 end
 
 # functions for `BSON` iteration
-function Base.iterate(cursor::Cursor{Mongoc.BSON})
-   return iterate(cursor.mcursor)
-end
+Base.iterate(cursor::Cursor{Mongoc.BSON}, state::Nothing=nothing) =
+    iterate(cursor.mcursor, state)
 
-function Base.iterate(cursor::Cursor{Mongoc.BSON}, state::Nothing)
-   return iterate(cursor.mcursor, state)
-end
+Base.iterate(coll::Collection{Mongoc.BSON}) =
+   iterate(coll.mcol)
 
-function Base.collect(cursor::Cursor{Mongoc.BSON})
-   return collect(cursor.mcursor)
-end
-
-function Base.iterate(coll::Collection{Mongoc.BSON})
-   return iterate(coll.mcol)
-end
-
-function Base.iterate(coll::Collection{Mongoc.BSON}, state::Mongoc.Cursor)
-   return iterate(coll.mcol, state)
-end
+Base.iterate(coll::Collection{Mongoc.BSON}, state::Mongoc.Cursor) =
+   iterate(coll.mcol, state)
 
 #Info
 
@@ -120,26 +100,52 @@ end
 function get_fields(coll::Collection)
    db = coll.mcol.database
    coll_c = db[string("_collectionInfo.", coll.mcol.name)]
-   info = collect(coll_c)[2]
-   if haskey(info, "fields")
-      return _convert_fields(info["fields"])
+   info1 = Mongoc.find_one(coll_c, Mongoc.BSON("_id" => "info.2.1"))
+   info2 = Mongoc.find_one(coll_c, Mongoc.BSON("_id" => info1["schema"]))
+   schema = info2["schema"]
+   if haskey(schema, "required")
+      return Array{String, 1}(schema["required"])
    else
-      return Array{String, 1}()
+      return _read_fields(schema)
+      # temp = schema["allOf"]
+      # res = Array{String, 1}()
+      # for entry in temp
+      #    append!(res, _read_fields(entry))
+      # end
+      # return res
    end
 end
 
-function _convert_fields(d::Dict)
-   return [key=>(value == 1 ? "" : value)
-      for (key, value) in d]
+function _read_fields(a::Array)
+   res = Array{String, 1}()
+   for entry in a
+      append!(res, _read_fields(entry))
+   end
+   return res
 end
 
-function _convert_fields(a::Array{String, 1})
-   return map(p -> p=>"", a)
+function _read_fields(d::Dict)
+   if haskey(d, "required")
+      return d["required"]
+   elseif haskey(d, "then")
+      return _read_fields(d["then"])
+   else
+      return _read_fields(d["allOf"])
+   end
 end
 
-function print_fields(coll::Collection)
-   println(_print_fields(get_fields(coll)))
-end
+# function _convert_fields(d::Dict)
+#    return [key=>(value == 1 ? "" : value)
+#       for (key, value) in d]
+# end
+#
+# function _convert_fields(a::Array{String, 1})
+#    return map(p -> p=>"", a)
+# end
+#
+# function print_fields(coll::Collection)
+#    println(_print_fields(get_fields(coll)))
+# end
 
 # function _print_fields
 
@@ -168,10 +174,23 @@ Base.show(io::IO, coll::Collection) = _info(io, coll)
 
 Base.show(io::IO, ::MIME"text/plain", coll::Collection) = print(io, typeof(coll), ": ", coll.mcol.name)
 
-# returns an array containing the names of all collections in the Polydb
+# returns an array containing the names of all collections in the Polydb, also including meta collections
 function _get_collection_names(db::Database)
    opts = Mongoc.BSON("authorizedCollections" => true, "nameOnly" => true)
    return Mongoc.get_collection_names(db.mdb;options=opts)
+end
+
+# returns an array cotaining the names of all collections in the Polydb, excluding meta collections
+function get_collection_names(db::Database)
+   names = _get_collection_names(db)
+   res = Array{String, 1}()
+   sizehint!(res, Int64(floor(length(names)/2)))
+   for name in names
+      if SubString(name, 1, 1) != "_"
+         push!(res, name)
+      end
+   end
+   return res
 end
 
 # for the set of names obtained by the _get_collection_names(::Database) function
