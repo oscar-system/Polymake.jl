@@ -202,7 +202,7 @@ json_script = joinpath(@__DIR__,"rules","apptojson.pl")
 json_folder = joinpath(@__DIR__,"json")
 mkpath(json_folder)
 
-run(`$perl $polymake --iscript $json_script $json_folder`)
+run(`$perl $polymake --no-config --iscript $json_script $json_folder`)
 
 # remove old deps.jl first to avoid problems when switching from binary installation
 rm(joinpath(@__DIR__,"deps.jl"), force=true)
