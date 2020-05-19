@@ -101,21 +101,24 @@ If you already have a polymake installation you need to set the environment vari
     pm_bin_prefix = joinpath(@__DIR__,"usr")
     perllib = replace(chomp(read(`$perl -e 'print join(":",@INC);'`,String)),"/workspace/destdir/"=>prefix.path)
     depsjl = :(
-        ENV["PERL5LIB"]=$perllib;
-        ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"));
-        ENV["PATH"] = ENV["PATH"]*":"*joinpath($pm_bin_prefix,"bin");
+        function prepare_env()
+            ENV["PERL5LIB"]=$perllib;
+            ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"));
+            ENV["PATH"] = ENV["PATH"]*":"*joinpath($pm_bin_prefix,"bin");
+        end
         )
     eval(depsjl)
+    prepare_env()
 
     rex = Regex("\\s+'$(@__DIR__).*'\\s?=>\\s?'(?<wrappers_dir>wrappers\\.\\d+)'\\s?,?")
     customize_file = joinpath(ENV["POLYMAKE_USER_DIR"], "customize.pl")
     if isfile(customize_file)
-        for l in readlines()
+        for l in readlines(customize_file)
             m = match(rex, l)
             if m !== nothing && m[:wrappers_dir] !== nothing
                 wrappers = joinpath(ENV["POLYMAKE_USER_DIR"], m[:wrappers_dir])
                 @info "Removing $(wrappers)"
-                # rm(wrappers, force=true, recursive=true)
+                rm(wrappers, force=true, recursive=true)
             end
         end
     end
