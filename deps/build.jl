@@ -100,22 +100,26 @@ If you already have a polymake installation you need to set the environment vari
     pm_config_ninja = joinpath(libdir(prefix),"polymake","config.ninja")
     pm_bin_prefix = joinpath(@__DIR__,"usr")
     perllib = replace(chomp(read(`$perl -e 'print join(":",@INC);'`,String)),"/workspace/destdir/"=>prefix.path)
-    global depsjl = quote
-        using Pkg: depots1
-        function prepare_env()
-            ENV["PERL5LIB"]=$perllib
-            user_dir = ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
-            if Base.Filesystem.isdir(user_dir)
-                del = filter(i -> Base.Filesystem.isdir(i) && startswith(i, "wrappers."), readdir(user_dir))
-                for i in del
-                    Base.Filesystem.rm(user_dir * "/" * i, recursive = true)
-                end
+    depsjl = :(
+        ENV["PERL5LIB"]=$perllib;
+        ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"));
+        ENV["PATH"] = ENV["PATH"]*":"*joinpath($pm_bin_prefix,"bin");
+        )
+    eval(depsjl)
+
+    rex = Regex("\\s+'$(@__DIR__).*'\\s?=>\\s?'(?<wrappers_dir>wrappers\\.\\d+)'\\s?,?")
+    customize_file = joinpath(ENV["POLYMAKE_USER_DIR"], "customize.pl")
+    if isfile(customize_file)
+        for l in readlines()
+            m = match(rex, l)
+            if m !== nothing && m[:wrappers_dir] !== nothing
+                wrappers = joinpath(ENV["POLYMAKE_USER_DIR"], m[:wrappers_dir])
+                @info "Removing $(wrappers)"
+                # rm(wrappers, force=true, recursive=true)
             end
-            ENV["PATH"] = ENV["PATH"]*":"*$pm_bin_prefix*"/bin"
         end
     end
-    eval(depsjl)
-    prepare_env()
+
     run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
 
     # adjust signal used for initalization purposes to avoid problems
