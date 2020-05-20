@@ -170,7 +170,7 @@ end
 function get_collection_names(db::Database)
    names = _get_collection_names(db)
    res = Array{String, 1}()
-   sizehint!(res, Int64(floor(length(names)/2)))
+   sizehint!(res, floor(Int, length(names)/2))
    for name in names
       if SubString(name, 1, 1) != "_"
          push!(res, name)
