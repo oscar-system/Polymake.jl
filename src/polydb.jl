@@ -194,7 +194,7 @@ function _get_meta_names(names::Array{String, 1})
          sec_bool[i] = true
          coll_bool[i] = false
          n_secs += 1
-      elseif SubString(name, 1, 2) == "_c"
+      elseif startswith(name, "_c")
          sec_bool[i] = false
          coll_bool[i] = true
          n_colls += 1
