@@ -10,6 +10,8 @@ using MozillaCACerts_jll
 
 using Mongoc
 
+import Mongoc: find
+
 #Polymake.Polydb's types store information via
 # a corresponding Mongoc type variable
 struct Database
@@ -38,11 +40,11 @@ end
 Base.getindex(db::Database, name::AbstractString) = Collection{Polymake.BigObject}(db.mdb[name])
 
 # search a collection for documents matching the criteria given by d
-function find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
+function Mongoc.find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
    return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d); options=opts))
 end
 
-function find(c::Collection{T}, d::Pair...) where T
+function Mongoc.find(c::Collection{T}, d::Pair...) where T
    return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
 end
 
@@ -142,14 +144,19 @@ end
 
 # prints information about a specific Collection
 # also used for the info(::Database) function
-function _info(io::IO, coll::Collection)
+function Base.show(io::IO, coll::Collection)
    db = coll.mcol.database
    coll_c = db[string("_collectionInfo.", coll.mcol.name)]
    info = iterate(coll_c)[1]
    print(io, typeof(coll), "\n", _get_collection(info))
 end
 
-Base.show(io::IO, coll::Collection) = _info(io, coll)
+function testc(coll::Collection)
+   db = coll.mcol.database
+   return collect(db[string("_collectionInfo.", coll.mcol.name)])
+end
+
+# Base.show(io::IO, coll::Collection) = _info(io, coll)
 
 Base.show(io::IO, ::MIME"text/plain", coll::Collection) = print(io, typeof(coll), ": ", coll.mcol.name)
 
