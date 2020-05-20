@@ -23,6 +23,6 @@ for (pm_solve_LP, scalarT, concreteT) in [
     end
 end
 
-solve_LP(inequalities::AbstractMatrix{T}, objective::AbstractVector; sense=max) where T = solve_LP(inequalities, Matrix{T}(undef, 0, 0), objective, sense)
+solve_LP(inequalities::AbstractMatrix{T}, objective::AbstractVector; sense=max) where T = solve_LP(inequalities, Base.Matrix{T}(undef, 0, 0), objective, sense)
 
 solve_LP(inequalities::AbstractMatrix, equalities::AbstractMatrix, objective::AbstractVector; sense=max) = solve_LP(inequalities, equalities, objective, sense)

@@ -423,3 +423,9 @@ POINTS
 1 5/4 3/2
 
 ```
+
+## Funding
+
+The development of this Julia package is supported by the Deutsche
+Forschungsgemeinschaft DFG within the
+[Collaborative Research Center TRR 195](https://www.computeralgebra.de/sfb/).

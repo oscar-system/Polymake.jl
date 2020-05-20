@@ -29,10 +29,13 @@ function shell_execute(str::AbstractString)
     end
 end
 
+version() = VersionNumber(shell_execute("print \$Version;").stdout)
+installTop() = shell_execute("print \$InstallTop;").stdout
+
 function cite(;format=:bibtex)
-    cite_str = split(shell_execute("""help "core/citation";""")[2], "\n\n")[2]
+    cite_str = match(r"(?<bibtex>@incollection.*\n (\s*\w*\s?= .*\n)+\s*\})", shell_execute("""help "core/citation";""").stdout)
     if format == :bibtex
-        return cite_str
+        return print(cite_str[:bibtex])
     else
         throw("The only supported citation format is :bibtex")
     end

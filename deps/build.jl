@@ -3,6 +3,7 @@ using BinaryProvider
 using Base.Filesystem
 import Pkg
 import CMake
+using Libdl
 
 # Parse some basic command-line arguments
 const verbose = "--verbose" in ARGS
@@ -99,23 +100,34 @@ If you already have a polymake installation you need to set the environment vari
     pm_config_ninja = joinpath(libdir(prefix),"polymake","config.ninja")
     pm_bin_prefix = joinpath(@__DIR__,"usr")
     perllib = replace(chomp(read(`$perl -e 'print join(":",@INC);'`,String)),"/workspace/destdir/"=>prefix.path)
-    global depsjl = quote
-        using Pkg: depots1
+    depsjl = :(
         function prepare_env()
-            ENV["PERL5LIB"]=$perllib
-            user_dir = ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(depots1(),"polymake_user"))
-            if Base.Filesystem.isdir(user_dir)
-                del = filter(i -> Base.Filesystem.isdir(i) && startswith(i, "wrappers."), readdir(user_dir))
-                for i in del
-                    Base.Filesystem.rm(user_dir * "/" * i, recursive = true)
-                end
-            end
-            ENV["PATH"] = ENV["PATH"]*":"*$pm_bin_prefix*"/bin"
+            ENV["PERL5LIB"]=$perllib;
+            ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"));
+            ENV["PATH"] = ENV["PATH"]*":"*joinpath($pm_bin_prefix,"bin");
         end
-    end
+        )
     eval(depsjl)
     prepare_env()
+
+    rex = Regex("\\s+'$(@__DIR__).*'\\s?=>\\s?'(?<wrappers_dir>wrappers\\.\\d+)'\\s?,?")
+    customize_file = joinpath(ENV["POLYMAKE_USER_DIR"], "customize.pl")
+    if isfile(customize_file)
+        for l in readlines(customize_file)
+            m = match(rex, l)
+            if m !== nothing && m[:wrappers_dir] !== nothing
+                wrappers = joinpath(ENV["POLYMAKE_USER_DIR"], m[:wrappers_dir])
+                @info "Removing $(wrappers)"
+                rm(wrappers, force=true, recursive=true)
+            end
+        end
+    end
+
     run(`$perl -pi -e "s{REPLACEPREFIX}{$pm_bin_prefix}g" $pm_config $pm_config_ninja $polymake`)
+
+    # adjust signal used for initalization purposes to avoid problems
+    run(`$perl -pi -e "s/SIG{INT}/SIG{USR1}/g" $pm_bin_prefix/share/polymake/perllib/Polymake/Main.pm`)
+
     run(`sh -c "$perl -pi -e 's{/workspace/destdir}{$pm_bin_prefix}g' $pm_bin_prefix/lib/perl5/*/*/Config_heavy.pl"`)
 
 else
@@ -142,15 +154,54 @@ pm_ldflags = chomp(read(`$perl $pm_config --ldflags`, String))
 pm_libraries = chomp(read(`$perl $pm_config --libs`, String))
 pm_cxx = chomp(read(`$perl $pm_config --cc`, String))
 
-jlcxx_cmake_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
+jlcxx_cmake_dir = joinpath(CxxWrap.prefix_path(), "lib", "cmake", "JlCxx")
+julia_exec = joinpath(Sys.BINDIR, Base.julia_exename())
 
-julia_exec = joinpath(Sys.BINDIR , "julia")
+xcode_typeinfo_bug = false
+
+if Sys.isapple()
+   # Work around a bug in Xcode 11.4 that causes SIGABRT, at least until
+   # https://github.com/llvm/llvm-project/commit/2464d8135e
+   # arrives.
+   #
+   # We build a jlcxx library that uses std::string which will
+   # abort with a failed assertion has_julia_type<T> if we are building
+   # with xcode 11.4 but libcxxwrap-julia was built with an older libc++.
+   #
+   # Read the above LLVM commit message for some details; the effect of merged
+   # vs non-merged type_info is that for the former memory addresses are
+   # used as hash_code(), for the latter the type_info.name() string is
+   # hashed.
+
+   cd(joinpath(@__DIR__, "xcodetypeinfo"))
+   run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir .`)
+   run(`make -j1`)
+   libpath = joinpath(@__DIR__, "xcodetypeinfo", "libhello.$dlext")
+   res = run(pipeline(Cmd(`$(Base.julia_cmd()) --project -e "using CxxWrap; @wrapmodule(\"$libpath\", :define_module_hello); @initcxx;"`,ignorestatus=true),stdout=devnull,stderr=devnull))
+   if res.termsignal == 6
+      global xcode_typeinfo_bug = true
+      println("Applying Xcode type_info.hash_code() workaround")
+   end
+end
 
 cd(joinpath(@__DIR__, "src"))
 
 include("type_setup.jl")
 
-run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -Dpolymake_includes=$pm_includes -Dpolymake_ldflags=$pm_ldflags -Dpolymake_libs=$pm_libraries -Dpolymake_cflags=$pm_cflags -DCMAKE_CXX_COMPILER=$pm_cxx  -DCMAKE_INSTALL_LIBDIR=lib .`)
+if xcode_typeinfo_bug
+   global pm_cflags *= " -DFORCE_XCODE_TYPEINFO_MERGED"
+end
+
+run(`$(CMake.cmake)
+    -DJulia_EXECUTABLE=$julia_exec
+    -DJlCxx_DIR=$jlcxx_cmake_dir
+    -Dpolymake_includes=$pm_includes
+    -Dpolymake_ldflags=$pm_ldflags
+    -Dpolymake_libs=$pm_libraries
+    -Dpolymake_cflags=$pm_cflags
+    -DCMAKE_CXX_COMPILER=$pm_cxx
+    -DCMAKE_INSTALL_LIBDIR=lib
+    .`)
 cpus = max(div(Sys.CPU_THREADS,2), 1)
 run(`make -j$cpus`)
 
@@ -158,7 +209,7 @@ json_script = joinpath(@__DIR__,"rules","apptojson.pl")
 json_folder = joinpath(@__DIR__,"json")
 mkpath(json_folder)
 
-run(`$perl $polymake --iscript $json_script $json_folder`)
+run(`$perl $polymake --no-config --iscript $json_script $json_folder`)
 
 # remove old deps.jl first to avoid problems when switching from binary installation
 rm(joinpath(@__DIR__,"deps.jl"), force=true)
@@ -172,4 +223,10 @@ println("appending to deps.jl file")
 open(joinpath(@__DIR__,"deps.jl"), "a") do f
    println(f, "const using_binary = $use_binary")
    println(f, depsjl)
+end
+
+println("storing libcxxwrap version")
+jlcxxversion = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
+open(joinpath(@__DIR__,"jlcxx_version.jl"), "w") do f
+   println(f, """const jlcxx_version = v"$jlcxxversion";""")
 end

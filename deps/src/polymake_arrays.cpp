@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_arrays.h"
+#include "polymake_type_modules.h"
 
 
 tparametric1 polymake_module_add_array(jlcxx::Module& polymake)

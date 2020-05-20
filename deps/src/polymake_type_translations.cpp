@@ -1,6 +1,6 @@
 #include "polymake_includes.h"
 
-#include "polymake_type_translations.h"
+#include "polymake_type_modules.h"
 
 #include "generated/get_type_names.h"
 

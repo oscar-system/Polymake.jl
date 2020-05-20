@@ -16,7 +16,9 @@ function call_function(::Type{PropertyValue}, app::Symbol, func::Symbol, args...
     fname = Meta.pm_name_qualified(app, func)
     cargs = Meta.polymake_arguments(args...; kwargs...)
     templ = CxxWrap.StdVector{CxxWrap.StdString}(template_parameters)
-    return internal_call_function(fname, templ, cargs)
+    return disable_sigint() do
+        internal_call_function(fname, templ, cargs)
+    end
 end
 
 function call_function(app::Symbol, func::Symbol, args...;
@@ -40,7 +42,9 @@ function call_method(::Type{PropertyValue}, obj::BigObject, func::Symbol, args..
     kwargs...)
     fname = string(func)
     cargs = Meta.polymake_arguments(args...; kwargs...)
-    return internal_call_method(fname, obj, cargs)
+    return disable_sigint() do
+        internal_call_method(fname, obj, cargs)
+    end
 end
 
 function call_method(obj::BigObject, func::Symbol, args...; kwargs...)

@@ -40,15 +40,60 @@ sub help_to_hash($$$) {
    # return \%fun if $ov->text eq "UNDOCUMENTED\n";
    my $ann = $ov->annex;
    $fun{name} = $help->name;
+   $fun{description} = $ov->text;
+   my $textdoc = true;
    my $numparam = $ann->{param} ? scalar(@{$ann->{param}}) : 0;
-   $fun{args} = [map { type_for_julia($appname,$_->[0]) } @{$ann->{param}}];
-   $fun{mandatory} = defined $ann->{mandatory} ? $ann->{mandatory} + 1 : $numparam;
-   push @{$fun{args}}, ("Anything") x ($fun{mandatory} - $numparam)
-      if $fun{mandatory} > $numparam;
-   $fun{type_params} = defined $ann->{tparam} ? scalar(@{$ann->{tparam}}) : 0;
+   foreach my $arg (@{$ann->{param}}) {
+      push @{$fun{args}}, {
+                             name => $arg->name,
+                             type => type_for_julia($appname,$arg->type,$ann->{tparam}),
+                             description => $arg->text
+                           };
+   }
+   $fun{mandatory_args} = defined $ann->{mandatory} ? $ann->{mandatory} + 1 : $numparam;
+
+   if ($fun{mandatory_args} > $numparam) {
+      push @{$fun{args}}, ({name => "",type=>"Anything",description=>""})
+                           x ($fun{mandatory_args} - $numparam);
+      $textdoc = false;
+   }
+
+   $fun{type_params} = [ map { {name=>$_->name, type=>"", description=>$_->text} } @{$ann->{tparam}}]
+      if defined $ann->{tparam};
+
+   $fun{mandatory_type_params} = $ann->{mandatory_tparams}
+      if defined($ann->{mandatory_tparams});
+
    # not needed $fun{include} = ;
-   push @{$fun{args}}, "OptionSet" if defined $ann->{options};
-   $fun{return} = $help->return_type if defined($help->return_type);
+   if (defined ($ann->{options}) && scalar($ann->{options}) > 0) {
+      push @{$fun{args}}, {name => "options", type => "OptionSet", description=>""};
+      push @{$fun{opts}},
+         map {
+            {
+               name => $_->name,
+               type => type_for_julia($appname,$_->type,$ann->{tparam}),
+               description=> $_->text
+            }
+         }
+         @{$ann->{options}[0]->annex->{keys}};
+   }
+
+   $fun{examples} = [ map {$_->body} @{$ann->{examples}} ]
+      if defined $ann->{examples};
+
+   $fun{return} = {type => type_for_julia($appname,$ann->{return}->type,$ann->{tparam}), description=>$ann->{return}->text}
+      if defined($ann->{return});
+
+   if ($textdoc) {
+      my $text_writer = new Core::Help::PlainText(0);
+      $ov->write_function_text($help, $text_writer, true);
+      $fun{doc} = $text_writer->text;
+   } else {
+      # this is necessary due to a bug in polymake
+      $fun{doc} = "";
+      print STDERR "WARNING: skipping text docs for ",$help->name,"\n";
+   }
+
    return \%fun;
 }
 
@@ -96,14 +141,40 @@ sub app_to_json($$) {
          }
       }
    }
-
-   my @types = grep {!defined($_->generic) } @{User::application($appname)->object_types};
-   foreach my $type (@types) {
+   foreach my $type (@gen_types) {
+      my $ann = $type->help->annex;
       my $objhash = {
                        name => $type->full_name,
-                       help => $type->help->display_text
+                       doc => $type->help->display_text
                     };
-      $objhash->{params} = [ map { $_->name } @{$type->params} ] if defined $type->params;
+      my $c = 0;
+      foreach my $p (@{$type->params // [] }) {
+         push @{$objhash->{type_params}}, {
+                                      name => $p->name,
+                                      description =>
+                                          defined($ann->{tparam})
+                                             && @{$ann->{tparam}} >= $c
+                                          ? $ann->{tparam}[$c++]->text
+                                          : ""
+                                   };
+      }
+
+      $objhash->{mandatory_type_params} = $ann->{mandatory_tparams}
+         if defined($ann) && defined($ann->{mandatory_tparams});
+
+      $objhash->{linear_isa} = [
+                                  map { $_->qualified_name }
+                                  grep { !defined($_->generic) }
+                                  @{$type->linear_isa}
+                               ];
+
+      $objhash->{description} = $type->help->text
+         if defined($type->help->text);
+
+      $objhash->{examples} = [ map {$_->body} @{$ann->{examples}} ]
+         if defined $ann && defined $ann->{examples};
+
+
       push @{$data{objects}}, $objhash;
    }
 

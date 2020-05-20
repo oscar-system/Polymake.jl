@@ -4,7 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_tropicalnumber.h"
+#include "polymake_type_modules.h"
 
 template<> struct jlcxx::IsMirroredType<pm::Max> : std::false_type { };
 template<> struct jlcxx::IsMirroredType<pm::Min> : std::false_type { };
