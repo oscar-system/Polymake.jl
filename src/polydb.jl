@@ -134,7 +134,7 @@ function _read_fields(d::Dict)
    end
 end
 
-# prints information about a specific Collection
+# shows information about a specific Collection
 function Base.show(io::IO, coll::Collection)
    db = Database(coll.mcol.database)
    print(io, typeof(coll), "\n", _get_collection_string(db, coll.mcol.name))
@@ -161,47 +161,6 @@ function get_collection_names(db::Database)
    return res
 end
 
-# for the set of names obtained by the _get_collection_names(::Database) function
-# returns two arrays containing the names of the meta data collections
-# first one for sections, second one for collections
-# function _get_meta_names(names::Array{String, 1})
-#    n = length(names)
-#    sec_bool = BitArray{1}(undef, n)
-#    coll_bool = BitArray{1}(undef, n)
-#    n_secs = 0
-#    n_colls = 0
-#    i = 1
-#    for name in names
-#       if startswith(name, "_s")
-#          sec_bool[i] = true
-#          coll_bool[i] = false
-#          n_secs += 1
-#       elseif startswith(name, "_c")
-#          sec_bool[i] = false
-#          coll_bool[i] = true
-#          n_colls += 1
-#       else
-#          sec_bool[i] = false
-#          coll_bool[i] = false
-#       end
-#       i += 1
-#    end
-#    secs = Base.Array{String,1}(undef, n_secs)
-#    colls = Base.Array{String,1}(undef, n_colls)
-#    i_s = 1
-#    i_c = 1
-#    for j = 1:n
-#       if sec_bool[j]
-#          secs[i_s] = names[j]
-#          i_s += 1
-#       elseif coll_bool[j]
-#          colls[i_c] = names[j]
-#          i_c += 1
-#       end
-#    end
-#    return secs, colls
-# end
-
 # functions helping printing metadata for sections or collections
 function _get_contact(s::String)
    return s
@@ -221,8 +180,7 @@ function _get_contact(a::Array)
    return string("\t\t", join(res, "\n\t\t"))
 end
 
-# prints information about a specific section and
-# continues to print information about its content
+# returns information String about a specific section
 function _get_section_string(db::Database, name::String)
    info = _get_info_document(db, string("_sectionInfo.", name))
    res = [string("SECTION: ", join(info["section"], "."), "\n", info["description"])]
@@ -232,7 +190,7 @@ function _get_section_string(db::Database, name::String)
    return join(res, "\n")
 end
 
-# prints information about a specific collection
+# returns information String about a specific collection
 function _get_collection_string(db::Database, name::String)
    info = _get_info_document(db, string("_collectionInfo.", name))
    res = [string("\tCOLLECTION: ", name)]
@@ -256,6 +214,8 @@ function info(db::Database)
    println(join(_get_info_strings(db, dbtree), "\n\n"))
 end
 
+# returns a tree-like nesting of Dicts and Array{String}s
+# representing polyDB's structure
 function _get_db_tree(db)
    root = Dict{String, Union{Dict, Array{String, 1}}}()
    cnames =  get_collection_names(db)
@@ -277,6 +237,7 @@ function _get_db_tree(db)
    return root
 end
 
+# recursively generates the info Strings from the tree received by `_get_db_tree`
 function _get_info_strings(db::Database, tree::Dict, path::String="")
    res = Array{String, 1}()
    for (key, value) in tree
@@ -287,6 +248,7 @@ function _get_info_strings(db::Database, tree::Dict, path::String="")
    return res
 end
 
+# leaves of the tree are the collections, whose names are stored in an Array{String}
 function _get_info_strings(db:: Database, colls::Array{String, 1}, path::String="")
    res = Array{String, 1}()
    for coll in colls
@@ -295,6 +257,8 @@ function _get_info_strings(db:: Database, colls::Array{String, 1}, path::String=
    return res
 end
 
+# for a given collection or section name,
+# returns the `BSON` document we read the meta information from
 function _get_info_document(db::Database, name::String)
    i = startswith(name, "_c") ? 17 : 14
    return Mongoc.find_one(db.mdb[name], Mongoc.BSON("_id" => string(SubString(name, i), ".2.1")))
