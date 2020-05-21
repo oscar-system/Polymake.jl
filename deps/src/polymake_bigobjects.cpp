@@ -10,6 +10,8 @@
 
 #include "generated/option_set_take.h"
 
+#include "generated/polymake_call_function_feed_argument.h"
+
 void polymake_module_add_bigobject(jlcxx::Module& polymake)
 {
 
@@ -48,7 +50,19 @@ void polymake_module_add_bigobject(jlcxx::Module& polymake)
         .method("properties", [](pm::perl::BigObject p) {
             std::string x = p.call_method("properties");
             return x;
-        });
+        })
+        .method("_get_attachment", [](pm::perl::BigObject p, const std::string& s) {
+            return p.get_attachment(s);
+        })
+        .method("remove_attachment", [](pm::perl::BigObject p, const std::string& s) {
+            return p.remove_attachment(s);
+        })
+        .method("attach", [](pm::perl::BigObject p, const std::string& s,
+                              jl_value_t* v) {
+            auto pv_helper = p.attach(s);
+            polymake_call_function_feed_argument(pv_helper, v);
+        })
+        ;
 
     polymake.method("to_bool", [](pm::perl::PropertyValue p) {
         return static_cast<bool>(p);
