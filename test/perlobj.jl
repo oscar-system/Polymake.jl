@@ -120,6 +120,16 @@
         @test c.VERTICES[1,2] == -1//4
     end
 
+    @testset "attachments" begin
+        test_polytope = polytope.Polytope(POINTS=points_int)
+        att = Polymake.Matrix{Polymake.Rational}(3,3)
+        @test Polymake.attach(test_polytope,"ATT",att) === nothing
+        @test Polymake.get_attachment(test_polytope,"ATT") isa Polymake.Matrix
+        @test Polymake.get_attachment(Polymake.PropertyValue,test_polytope,"ATT") isa Polymake.PropertyValue
+        @test Polymake.remove_attachment(test_polytope,"ATT") === nothing
+        @test Polymake.get_attachment(test_polytope,"ATT") === nothing
+    end
+
     @testset "tab-completion" begin
         test_polytope = @pm polytope.Polytope(POINTS=points_int)
 

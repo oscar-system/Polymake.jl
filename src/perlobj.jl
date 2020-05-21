@@ -77,6 +77,14 @@ function convert_from_property_value(obj::PropertyValue)
     end
 end
 
+function get_attachment(obj::BigObject, name::String)
+   return convert_from_property_value(_get_attachment(obj,name))
+end
+
+function get_attachment(::Type{PropertyValue}, obj::BigObject, name::String)
+   return _get_attachment(obj,name)
+end
+
 function OptionSet(iter)
     opt_set = OptionSet()
     for (key, value) in iter
