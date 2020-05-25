@@ -114,6 +114,10 @@ function get_fields(coll::Collection)
    return temp[(!startswith).(temp, "_")]
 end
 
+function _get_field_string(coll::Collection)
+   return join(get_fields(coll), ", ")
+end
+
 # recursive helpers to read more complex metadata
 # currently only neccessary for `Polytopes.Lattice.SmoothReflexive`
 function _read_fields(a::Array)
@@ -137,7 +141,7 @@ end
 # shows information about a specific Collection
 function Base.show(io::IO, coll::Collection)
    db = Database(coll.mcol.database)
-   print(io, typeof(coll), "\n", _get_collection_string(db, coll.mcol.name))
+   print(io, typeof(coll), "\n", _get_collection_string(db, coll.mcol.name, 5))
 end
 
 Base.show(io::IO, ::MIME"text/plain", coll::Collection) = print(io, typeof(coll), ": ", coll.mcol.name)
@@ -181,27 +185,39 @@ function _get_contact(a::Array)
 end
 
 # returns information String about a specific section
-function _get_section_string(db::Database, name::String)
+function _get_section_string(db::Database, name::String, level::Int64)
    info = _get_info_document(db, string("_sectionInfo.", name))
-   res = [string("SECTION: ", join(info["section"], "."), "\n", info["description"])]
-   if haskey(info, "maintainer")
+   res = [string("SECTION: ", join(info["section"], "."))]
+   if level == 1 && haskey(info, "short_description")
+      push!(res, string("\t", info["short_description"]))
+   end
+   if level >= 2 && haskey(info, "description")
+      push!(res, info["description"])
+   end
+   if level >= 3 && haskey(info, "maintainer")
       push!(res, string("Maintained by ", info["maintainer"]["name"], ", ", info["maintainer"]["email"], ", ", info["maintainer"]["affiliation"]))
    end
    return join(res, "\n")
 end
 
 # returns information String about a specific collection
-function _get_collection_string(db::Database, name::String)
+function _get_collection_string(db::Database, name::String, level::Int64)
    info = _get_info_document(db, string("_collectionInfo.", name))
    res = [string("\tCOLLECTION: ", name)]
-   if haskey(info, "description")
+   if level == 1 && haskey(info, "short_description")
+      push!(res, string("\t", info["short_description"]))
+   end
+   if level >= 2 && haskey(info, "description")
       push!(res, string("\t", info["description"]))
    end
-   if haskey(info, "author")
+   if level >= 3 && haskey(info, "author")
       push!(res, string("\tAuthored by ", "\n", _get_contact(info["author"])))
    end
-   if haskey(info, "maintainer")
+   if level >= 3 && haskey(info, "maintainer")
       push!(res, string("\tMaintained by", "\n", _get_contact(info["maintainer"])))
+   end
+   if level >= 5
+      push!(res, string("\tFields: ", _get_field_string(db[name])))
    end
    return join(res, "\n")
 end
@@ -209,10 +225,12 @@ end
 # prints a sorted list of the sections and collections of the Polydb
 # together with information about each of these, if existent
 # relying on the structure of Polydb
-function info(db::Database)
+function info(db::Database, level::Int64)
    dbtree = _get_db_tree(db)
-   println(join(_get_info_strings(db, dbtree), "\n\n"))
+   println(join(_get_info_strings(db, dbtree, level), "\n\n"))
 end
+
+info(db::Database) =  info(db, 1)
 
 # returns a tree-like nesting of Dicts and Array{String}s
 # representing polyDB's structure
@@ -238,21 +256,21 @@ function _get_db_tree(db)
 end
 
 # recursively generates the info Strings from the tree received by `_get_db_tree`
-function _get_info_strings(db::Database, tree::Dict, path::String="")
+function _get_info_strings(db::Database, tree::Dict, level::Int64, path::String="")
    res = Array{String, 1}()
    for (key, value) in tree
       new_path = path == "" ? key : string(path, ".", key)
-      push!(res, _get_section_string(db, new_path))
-      append!(res, _get_info_strings(db, value, new_path))
+      push!(res, _get_section_string(db, new_path, level))
+      append!(res, _get_info_strings(db, value, level, new_path))
    end
    return res
 end
 
 # leaves of the tree are the collections, whose names are stored in an Array{String}
-function _get_info_strings(db:: Database, colls::Array{String, 1}, path::String="")
+function _get_info_strings(db:: Database, colls::Array{String, 1}, level::Int64, path::String="")
    res = Array{String, 1}()
    for coll in colls
-      push!(res, _get_collection_string(db, string(path, ".", coll)))
+      push!(res, _get_collection_string(db, string(path, ".", coll), level))
    end
    return res
 end
