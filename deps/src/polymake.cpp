@@ -24,6 +24,8 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_pairs(polymake);
 
+    polymake_module_add_lists(polymake);
+
     polymake_module_add_vector(polymake);
 
     polymake_module_add_set(polymake);

@@ -16,6 +16,7 @@ void polymake_module_add_matrix(jlcxx::Module& polymake);
 void polymake_module_add_polynomial(jlcxx::Module& polymake);
 void polymake_module_add_rational(jlcxx::Module& polymake);
 void polymake_module_add_pairs(jlcxx::Module& polymake);
+void polymake_module_add_lists(jlcxx::Module& polymake);
 void polymake_module_add_set(jlcxx::Module& polymake);
 void polymake_module_add_sparsematrix(jlcxx::Module& polymake);
 void polymake_module_add_sparsevector(jlcxx::Module& polymake);

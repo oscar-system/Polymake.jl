@@ -20,8 +20,8 @@ tparametric1 polymake_module_add_array(jlcxx::Module& polymake)
                pm::Array<pm::Array<pm::Int>>,
                pm::Array<pm::Array<pm::Integer>>,
                pm::Array<pm::Array<pm::Rational>>,
-               //pm::Array<std::pair<pm::Integer, pm::Integer>>,
-               //pm::Array<std::list<std::pair<pm::Integer, pm::Integer>>>,
+               pm::Array<std::pair<pm::Int, pm::Int>>,
+               //pm::Array<std::list<std::pair<pm::Int, pm::Int>>>,
                pm::Array<pm::Matrix<pm::Integer>>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type             WrappedT;
             typedef typename decltype(wrapped)::type::value_type elemType;
@@ -103,13 +103,13 @@ tparametric1 polymake_module_add_array(jlcxx::Module& polymake)
         "to_array_set_int", [](const pm::perl::PropertyValue& pv) {
             return to_SmallObject<pm::Array<pm::Set<pm::Int>>>(pv);
         });
-    /*polymake.method(
-        "to_array_pair_int_int", [](const pm::perl::PropertyValue& pv){
-                return to_SmallObject<pm::Array<std::pair<pm::Integer, pm::Integer>>>()
-        });
     polymake.method(
+        "to_array_pair_int_int", [](const pm::perl::PropertyValue& pv){
+                return to_SmallObject<pm::Array<std::pair<pm::Int, pm::Int>>>(pv);
+        });
+    /*polymake.method(
             "to_array_list_pair_int_int", [](const pm::perl::PropertyValue& pv){
-                return to_SmallObject<pm::Array<std::list<std::pair<pm::Integer, pm::Integer>>>>()
+                return to_SmallObject<pm::Array<std::list<std::pair<pm::Int, pm::Int>>>>(pv);
             });*/
     polymake.method(
         "to_array_matrix_integer", [](const pm::perl::PropertyValue& pv) {

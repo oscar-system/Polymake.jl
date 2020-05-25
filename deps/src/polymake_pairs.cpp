@@ -12,26 +12,27 @@ void polymake_module_add_pairs(jlcxx::Module& polymake)
 
     auto type = polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
-            "Pair", jlcxx::julia_type("Tuple", "Base"));
+            "StdPair", jlcxx::julia_type("Any", "Base" ));
 
         type.apply<std::pair<pm::Int,pm::Int>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type WrappedT;
 
+            wrapped.template constructor();
             wrapped.template constructor<int64_t, int64_t>();
-            wrapped.template constructor<int64_t, int64_t>(int64_t, int64_t);
 
             /*
-          wrapped.method("_getindex", [](const WrappedT& P, int64_t n) {
-              return elemType(P.getIndex(static_cast<pm::Int>(n) - 1));
-          });
+            wrapped.method("_getindex", [](const WrappedT& P, int64_t n) {
+                return std::get<static_cast<pm::Int>(n) - 1>>(P);
+            });*/
 
-          wrapped.method("first", [](WrappedT& P) {
-              return P.first();
-          });
 
-          wrapped.method("last", [](WrappedT& P) {
-              return P.last();
-          });*/
+            wrapped.method("first", [](WrappedT& P) {
+                return P.first;
+            });
+
+            wrapped.method("second", [](WrappedT& P) {
+                return P.second;
+            });
         });
 
     polymake.method("to_pair_int", [](const pm::perl::PropertyValue& pv) {

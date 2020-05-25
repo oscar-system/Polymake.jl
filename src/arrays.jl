@@ -1,7 +1,8 @@
 const Array_suppT = Union{Int64, CxxWrap.CxxLong,
                         Integer, Rational,
                         String, CxxWrap.StdString,
-			#CxxWrap.StdList, CxxWrap.StdPair,
+		        Pair{CxxWrap.CxxLong,CxxWrap.CxxLong},
+			Array{Pair{CxxWrap.CxxLong,CxxWrap.CxxLong}},
                         Set{Int64}, Set{CxxWrap.CxxLong},
                         Array{Int64}, Array{CxxWrap.CxxLong},
                         Array{Integer}, Array{Rational}, Matrix{Integer}}
@@ -27,6 +28,8 @@ Array(n::Base.Integer, elt::T) where T =
 
 Array(vec::AbstractVector) =
     Array{convert_to_pm_type(eltype(vec))}(vec)
+
+
 
 Base.size(a::Array) = (length(a),)
 Base.eltype(v::Array{T}) where T = to_jl_type(T)
