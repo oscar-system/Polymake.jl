@@ -185,7 +185,7 @@ function _get_contact(a::Array)
 end
 
 # returns information String about a specific section
-function _get_section_string(db::Database, name::String, level::Int64)
+function _get_section_string(db::Database, name::String, level::Base.Integer)
    info = _get_info_document(db, string("_sectionInfo.", name))
    res = [string("SECTION: ", join(info["section"], "."))]
    if level == 1 && haskey(info, "short_description")
@@ -201,7 +201,7 @@ function _get_section_string(db::Database, name::String, level::Int64)
 end
 
 # returns information String about a specific collection
-function _get_collection_string(db::Database, name::String, level::Int64)
+function _get_collection_string(db::Database, name::String, level::Base.Integer)
    info = _get_info_document(db, string("_collectionInfo.", name))
    res = [string("\tCOLLECTION: ", name)]
    if level == 1 && haskey(info, "short_description")
@@ -225,12 +225,10 @@ end
 # prints a sorted list of the sections and collections of the Polydb
 # together with information about each of these, if existent
 # relying on the structure of Polydb
-function info(db::Database, level::Int64)
+function info(db::Database, level::Base.Integer=1)
    dbtree = _get_db_tree(db)
    println(join(_get_info_strings(db, dbtree, level), "\n\n"))
 end
-
-info(db::Database) =  info(db, 1)
 
 # returns a tree-like nesting of Dicts and Array{String}s
 # representing polyDB's structure
@@ -256,7 +254,7 @@ function _get_db_tree(db)
 end
 
 # recursively generates the info Strings from the tree received by `_get_db_tree`
-function _get_info_strings(db::Database, tree::Dict, level::Int64, path::String="")
+function _get_info_strings(db::Database, tree::Dict, level::Base.Integer, path::String="")
    res = Array{String, 1}()
    for (key, value) in tree
       new_path = path == "" ? key : string(path, ".", key)
@@ -267,7 +265,7 @@ function _get_info_strings(db::Database, tree::Dict, level::Int64, path::String=
 end
 
 # leaves of the tree are the collections, whose names are stored in an Array{String}
-function _get_info_strings(db:: Database, colls::Array{String, 1}, level::Int64, path::String="")
+function _get_info_strings(db:: Database, colls::Array{String, 1}, level::Base.Integer, path::String="")
    res = Array{String, 1}()
    for coll in colls
       push!(res, _get_collection_string(db, string(path, ".", coll), level))
@@ -280,6 +278,18 @@ end
 function _get_info_document(db::Database, name::String)
    i = startswith(name, "_c") ? 17 : 14
    return Mongoc.find_one(db.mdb[name], Mongoc.BSON("_id" => string(SubString(name, i), ".2.1")))
+end
+
+function info(coll::Collection, level::Base.Integer=5)
+   db = Database(coll.mcol.database)
+   name = coll.mcol.name
+   parts = split(name, ".")
+   res = Array{String, 1}()
+   for (i, section) in enumerate(parts[1:length(parts) - 1])
+      push!(res, _get_section_string(db, join(parts[1:i], "."), level))
+   end
+   push!(res, _get_collection_string(db, coll.mcol.name, level))
+   println(join(res, "\n\n"))
 end
 
 end
