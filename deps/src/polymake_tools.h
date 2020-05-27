@@ -58,4 +58,13 @@ template <typename T> struct WrappedSetIterator {
     }
 };
 
+template <typename T> struct WrappedStdListIterator {
+    typename std::list<T>::const_iterator iterator;
+    using value_type = T;
+    WrappedStdListIterator<T>(std::list<T>& L)
+    {
+        iterator = L.iterator;
+    }
+};
+
 #endif
