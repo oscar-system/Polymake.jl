@@ -35,59 +35,59 @@ void polymake_module_add_set(jlcxx::Module& polymake)
                 S.clear();
                 return S;
             });
-            wrapped.method("_isequal", [](WrappedT& S, WrappedT& T) { return S == T; });
+            wrapped.method("_isequal", [](const WrappedT& S, const WrappedT& T) { return S == T; });
             wrapped.method(
-                "in", [](elemType i, WrappedT& S) { return S.contains(i); });
+                "in", [](const elemType& i, const WrappedT& S) { return S.contains(i); });
 
-            wrapped.method("push!", [](WrappedT& S, elemType i) {
+            wrapped.method("push!", [](WrappedT& S, const elemType& i) {
                 S += i;
                 return S;
             });
 
-            wrapped.method("delete!", [](WrappedT& S, elemType i) {
+            wrapped.method("delete!", [](WrappedT& S, const elemType& i) {
                 S -= i;
                 return S;
             });
 
             wrapped.method("union!",
-                           [](WrappedT& S, WrappedT& T) { return S += T; });
+                           [](WrappedT& S, const WrappedT& T) { return S += T; });
             wrapped.method("intersect!",
-                           [](WrappedT& S, WrappedT& T) { return S *= T; });
+                           [](WrappedT& S, const WrappedT& T) { return S *= T; });
             wrapped.method("setdiff!",
-                           [](WrappedT& S, WrappedT& T) { return S -= T; });
+                           [](WrappedT& S, const WrappedT& T) { return S -= T; });
             wrapped.method("symdiff!",
-                           [](WrappedT& S, WrappedT& T) { return S ^= T; });
+                           [](WrappedT& S, const WrappedT& T) { return S ^= T; });
 
             wrapped.method(
-                "union", [](WrappedT& S, WrappedT& T) { return WrappedT{S + T}; });
-            wrapped.method("intersect", [](WrappedT& S, WrappedT& T) {
+                "union", [](const WrappedT& S, const WrappedT& T) { return WrappedT{S + T}; });
+            wrapped.method("intersect", [](const WrappedT& S, const WrappedT& T) {
                 return WrappedT{S * T};
             });
-            wrapped.method("setdiff", [](WrappedT& S, WrappedT& T) {
+            wrapped.method("setdiff", [](const WrappedT& S, const WrappedT& T) {
                 return WrappedT{S - T};
             });
-            wrapped.method("symdiff", [](WrappedT& S, WrappedT& T) {
+            wrapped.method("symdiff", [](const WrappedT& S, const WrappedT& T) {
                 return WrappedT{S ^ T};
             });
 
-            wrapped.method("_getindex", [](WrappedT& S, WrappedT& T) {
+            wrapped.method("_getindex", [](const WrappedT& S, const WrappedT& T) {
                 return WrappedT{pm::select(pm::wary(S), T)};
             });
-            wrapped.method("range", [](elemType a, elemType b) {
+            wrapped.method("range", [](const elemType& a, const elemType& b) {
                 return WrappedT{pm::range(a, b)};
             });
-            wrapped.method("sequence", [](elemType a, elemType c) {
+            wrapped.method("sequence", [](const elemType& a, const elemType& c) {
                 return WrappedT{pm::sequence(a, c)};
             });
-            wrapped.method("scalar2set", [](elemType s) {
+            wrapped.method("scalar2set", [](const elemType& s) {
                 return WrappedT{pm::scalar2set(s)};
             });
-            wrapped.method("show_small_obj", [](WrappedT& S) {
+            wrapped.method("show_small_obj", [](const WrappedT& S) {
                 return show_small_object<WrappedT>(S);
             });
             wrapped.method("take",
                 [](pm::perl::BigObject p, const std::string& s,
-                    WrappedT& S){ p.take(s) << S; });
+                    const WrappedT& S){ p.take(s) << S; });
         });
 
     polymake.method("to_set_int", [](pm::perl::PropertyValue v) {
@@ -99,9 +99,8 @@ void polymake_module_add_set(jlcxx::Module& polymake)
             [](auto wrapped) {
                 typedef typename decltype(wrapped)::type WrappedSetIter;
                 typedef typename decltype(wrapped)::type::value_type elemType;
-                wrapped.method("beginiterator", [](pm::Set<elemType>& S) {
-                    auto result = WrappedSetIterator<elemType>{S};
-                    return result;
+                wrapped.method("beginiterator", [](const pm::Set<elemType>& S) {
+                    return WrappedSetIterator<elemType>{S};
                 });
 
                 wrapped.method("increment", [](WrappedSetIter& state) {
@@ -111,13 +110,13 @@ void polymake_module_add_set(jlcxx::Module& polymake)
                     auto elt = *(state.iterator);
                     return elt;
                 });
-                wrapped.method("isdone", [](pm::Set<elemType>& S,
+                wrapped.method("isdone", [](const pm::Set<elemType>& S,
                                             WrappedSetIter&    state) {
                     return S.end() == state.iterator;
                 });
             });
 
-    polymake.method("incl", [](pm::Set<pm::Int> s1, pm::Set<pm::Int> s2) {
+    polymake.method("incl", [](const pm::Set<pm::Int>& s1, const pm::Set<pm::Int>& s2) {
         return pm::incl(s1, s2);
     });
 }

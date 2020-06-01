@@ -20,25 +20,25 @@ void polymake_module_add_sparsematrix(jlcxx::Module& polymake)
                     typedef typename decltype(wrapped)::type::value_type elemType;
                     wrapped.template constructor<int64_t, int64_t>();
                     wrapped.method("_getindex",
-                        [](matType& M, int64_t i, int64_t j) {
+                        [](const matType& M, int64_t i, int64_t j) {
                             return elemType(M(i - 1, j - 1));
                     });
                     wrapped.method("_setindex!",
-                        [](matType& M, elemType r, int64_t i,
+                        [](matType& M, const elemType& r, int64_t i,
                         int64_t j) {
                             M(i - 1, j - 1) = r;
                     });
                     wrapped.method("nrows", &matType::rows);
                     wrapped.method("ncols", &matType::cols);
-                    wrapped.method("nzindices", [](matType& S) {
+                    wrapped.method("nzindices", [](const matType& S) {
                         return Array<Set<pm::Int>>(pm::rows(pm::index_matrix(S)));
                     });
                     wrapped.method("resize!", [](matType& M, int64_t i,
                                                 int64_t j) { M.resize(i, j); });
                     wrapped.method("take",
                                    [](pm::perl::BigObject p, const std::string& s,
-                                      matType& M) { p.take(s) << M; });
-                    wrapped.method("show_small_obj", [](matType& S) {
+                                      const matType& M) { p.take(s) << M; });
+                    wrapped.method("show_small_obj", [](const matType& S) {
                         return show_small_object<matType>(S);
                     });
             });

@@ -43,15 +43,15 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     polymake_module_add_array_polynomial(polymake, array_type);
 
     polymake.method("initialize_polymake", &initialize_polymake);
-    polymake.method("application", [](const std::string x) {
+    polymake.method("application", [](const std::string& x) {
         data.main_polymake_session->set_application(x);
     });
 
-    polymake.method("_shell_execute", [](const std::string x) {
+    polymake.method("_shell_execute", [](const std::string& x) {
         return data.main_polymake_session->shell_execute(x);
     });
 
-    polymake.method("shell_complete", [](const std::string x) {
+    polymake.method("shell_complete", [](const std::string& x) {
         auto res = data.main_polymake_session->shell_complete(x);
         return std::tuple<int64_t, std::vector<std::string>>{
             std::get<0>(res),
@@ -69,7 +69,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
         return ctx_help;
     });
 
-    polymake.method("set_preference", [](const std::string x) {
+    polymake.method("set_preference", [](const std::string& x) {
         return data.main_polymake_session->set_preference(x);
     });
 
@@ -79,8 +79,4 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
 
     polymake_module_add_type_translations(polymake);
 
-    //   polymake.method("cube",[](pm::perl::Value a1, pm::perl::Value a2,
-    //   pm::perl::Value a3, pm::perl::OptionSet opt){ return
-    //   polymake::polytope::cube<pm::QuadraticExtension<pm::Rational>
-    //   >(a1,a2,a3,opt); });
 }

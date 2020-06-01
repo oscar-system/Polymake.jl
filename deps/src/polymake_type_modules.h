@@ -6,7 +6,7 @@
 using tparametric1 = jlcxx::TypeWrapper<jlcxx::Parametric<jlcxx::TypeVar<1>>>;
 
 tparametric1 polymake_module_add_array(jlcxx::Module& polymake);
-void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1 arrayt);
+void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1& arrayt);
 
 void polymake_module_add_bigobject(jlcxx::Module& polymake);
 void polymake_module_add_direct_calls(jlcxx::Module&);

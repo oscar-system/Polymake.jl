@@ -21,7 +21,7 @@ void polymake_module_add_incidencematrix(jlcxx::Module& polymake)
         typedef typename decltype(wrapped)::type WrappedT;
         wrapped.template constructor<int64_t, int64_t>();
         wrapped.method("_getindex",
-            [](WrappedT& M, int64_t i, int64_t j) {
+            [](const WrappedT& M, int64_t i, int64_t j) {
                 return bool(M(i - 1, j - 1));
         });
         wrapped.method("_setindex!",
@@ -30,16 +30,16 @@ void polymake_module_add_incidencematrix(jlcxx::Module& polymake)
                 M(i - 1, j - 1) = r;
         });
         wrapped.method("nrows", &WrappedT::rows);
-        wrapped.method("_row", [](WrappedT& M, int64_t i) { return pm::Set<pm::Int>(M.row(i - 1)); });
+        wrapped.method("_row", [](const WrappedT& M, int64_t i) { return pm::Set<pm::Int>(M.row(i - 1)); });
         wrapped.method("ncols", &WrappedT::cols);
-        wrapped.method("_col", [](WrappedT& M, int64_t i) { return pm::Set<pm::Int>(M.col(i - 1)); });
+        wrapped.method("_col", [](const WrappedT& M, int64_t i) { return pm::Set<pm::Int>(M.col(i - 1)); });
         wrapped.method("_resize!", [](WrappedT& M, int64_t i,
                                     int64_t j) { M.resize(i, j); });
         wrapped.method("take",
                        [](pm::perl::BigObject p, const std::string& s,
-                          WrappedT& M) { p.take(s) << M; });
+                          const WrappedT& M) { p.take(s) << M; });
 
-        wrapped.method("show_small_obj", [](WrappedT& S) {
+        wrapped.method("show_small_obj", [](const WrappedT& S) {
             return show_small_object<WrappedT>(S);
         });
     });

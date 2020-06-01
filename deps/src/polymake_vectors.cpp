@@ -17,11 +17,11 @@ void polymake_module_add_vector(jlcxx::Module& polymake)
                 typedef typename decltype(wrapped)::type             WrappedT;
                 typedef typename decltype(wrapped)::type::value_type elemType;
                 wrapped.template constructor<int64_t>();
-                wrapped.method("_getindex", [](WrappedT& V, int64_t n) {
+                wrapped.method("_getindex", [](const WrappedT& V, int64_t n) {
                     return elemType(V[n - 1]);
                 });
                 wrapped.method("_setindex!",
-                               [](WrappedT& V, elemType val, int64_t n) {
+                               [](WrappedT& V, const elemType& val, int64_t n) {
                                    V[n - 1] = val;
                                });
                 wrapped.method("length", &WrappedT::size);
@@ -30,8 +30,8 @@ void polymake_module_add_vector(jlcxx::Module& polymake)
 
                 wrapped.method("take",
                                [](pm::perl::BigObject p, const std::string& s,
-                                  WrappedT& V) { p.take(s) << V; });
-                wrapped.method("show_small_obj", [](WrappedT& V) {
+                                  const WrappedT& V) { p.take(s) << V; });
+                wrapped.method("show_small_obj", [](const WrappedT& V) {
                     return show_small_object<WrappedT>(V);
                 });
             });

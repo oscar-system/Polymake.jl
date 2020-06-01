@@ -18,20 +18,20 @@ void polymake_module_add_rational(jlcxx::Module& polymake)
             const jlcxx::StrictlyTypedNumber<long> den) {
             return pm::Rational(num.value, den.value);
         })
-        .method("<", [](pm::Rational& a, pm::Rational& b) { return a < b; })
-        .method("<", [](pm::Rational& a, pm::Integer& b) { return a < b; })
-        .method("<", [](pm::Rational& a,
+        .method("<", [](const pm::Rational& a, const pm::Rational& b) { return a < b; })
+        .method("<", [](const pm::Rational& a, const pm::Integer& b) { return a < b; })
+        .method("<", [](const pm::Rational& a,
                         int64_t       b) { return a < static_cast<pm::Int>(b); })
-        .method("<", [](pm::Integer& a, pm::Rational& b) { return a < b; })
+        .method("<", [](const pm::Integer& a, const pm::Rational& b) { return a < b; })
         .method("<", [](int64_t       a,
-                        pm::Rational& b) { return static_cast<pm::Int>(a) < b; })
+                        const pm::Rational& b) { return static_cast<pm::Int>(a) < b; })
 
-        .method("<=", [](pm::Rational& a, pm::Rational& b) { return a <= b; })
-        .method("<=", [](pm::Rational& a, pm::Integer& b) { return a <= b; })
-        .method("<=", [](pm::Rational& a,
+        .method("<=", [](const pm::Rational& a, const pm::Rational& b) { return a <= b; })
+        .method("<=", [](const pm::Rational& a, const pm::Integer& b) { return a <= b; })
+        .method("<=", [](const pm::Rational& a,
                          int64_t b) { return a <= static_cast<pm::Int>(b); })
-        .method("<=", [](pm::Integer& a, pm::Rational& b) { return a <= b; })
-        .method("<=", [](int64_t a, pm::Rational& b) {
+        .method("<=", [](const pm::Integer& a, const pm::Rational& b) { return a <= b; })
+        .method("<=", [](int64_t a, const pm::Rational& b) {
                     return static_cast<pm::Int>(a) <= b;
                 })
 
@@ -45,56 +45,56 @@ void polymake_module_add_rational(jlcxx::Module& polymake)
                 [](const pm::Rational& r) {
                     return show_small_object<pm::Rational>(r, false);
                 })
-        .method("Float64", [](pm::Rational& a) { return double(a); })
-        .method("-", [](pm::Rational& a, pm::Rational& b) { return a - b; })
-        .method("-", [](pm::Rational& a, pm::Integer& b) { return a - b; })
-        .method("-", [](pm::Rational& a,
+        .method("Float64", [](const pm::Rational& a) { return double(a); })
+        .method("-", [](const pm::Rational& a, const pm::Rational& b) { return a - b; })
+        .method("-", [](const pm::Rational& a, const pm::Integer& b) { return a - b; })
+        .method("-", [](const pm::Rational& a,
                         int64_t       b) { return a - static_cast<pm::Int>(b); })
-        .method("-", [](pm::Integer& a, pm::Rational& b) { return a - b; })
+        .method("-", [](const pm::Integer& a, const pm::Rational& b) { return a - b; })
         .method("-", [](int64_t       a,
-                        pm::Rational& b) { return static_cast<pm::Int>(a) - b; })
+                        const pm::Rational& b) { return static_cast<pm::Int>(a) - b; })
         // unary minus
-        .method("-", [](pm::Rational& a) { return -a; })
+        .method("-", [](const pm::Rational& a) { return -a; })
 
-        .method("//", [](pm::Rational& a, pm::Rational& b) { return a / b; })
-        .method("//", [](pm::Rational& a, pm::Integer&  b) { return a / b; })
-        .method("//", [](pm::Rational& a, int64_t       b) {
+        .method("//", [](const pm::Rational& a, const pm::Rational& b) { return a / b; })
+        .method("//", [](const pm::Rational& a, const pm::Integer&  b) { return a / b; })
+        .method("//", [](const pm::Rational& a, int64_t       b) {
             return a / static_cast<pm::Int>(b); })
-        .method("//", [](pm::Integer&  a, pm::Rational& b) { return a / b; })
-        .method("//", [](int64_t       a, pm::Rational& b) {
+        .method("//", [](const pm::Integer&  a, const pm::Rational& b) { return a / b; })
+        .method("//", [](int64_t       a, const pm::Rational& b) {
             return static_cast<pm::Int>(a) / b; });
 
         polymake.set_override_module(polymake.julia_module());
-        polymake.method("==", [](pm::Rational& a, pm::Rational& b) {
+        polymake.method("==", [](const pm::Rational& a, const pm::Rational& b) {
             return a == b; });
-        polymake.method("==", [](pm::Rational& a, pm::Integer& b) {
+        polymake.method("==", [](const pm::Rational& a, const pm::Integer& b) {
             return a == b; });
-        polymake.method("==", [](pm::Integer& a, pm::Rational& b) {
+        polymake.method("==", [](const pm::Integer& a, const pm::Rational& b) {
             return a == b; });
-        polymake.method("==", [](pm::Rational& a, int64_t b) {
+        polymake.method("==", [](const pm::Rational& a, int64_t b) {
             return static_cast<pm::Int>(a) == b; });
-        polymake.method("==", [](int64_t a, pm::Rational& b) {
+        polymake.method("==", [](int64_t a, const pm::Rational& b) {
             return a == static_cast<pm::Int>(b); });
         // the symmetric definitions are on the julia side
-        polymake.method("+", [](pm::Rational& a, pm::Rational& b) {
+        polymake.method("+", [](const pm::Rational& a, const pm::Rational& b) {
             return a + b; });
-        polymake.method("+", [](pm::Rational& a, pm::Integer& b) {
+        polymake.method("+", [](const pm::Rational& a, const pm::Integer& b) {
             return a + b; });
-        polymake.method("+", [](pm::Integer& a, pm::Rational& b) {
+        polymake.method("+", [](const pm::Integer& a, const pm::Rational& b) {
             return a + b; });
-        polymake.method("+", [](pm::Rational& a, int64_t b) {
+        polymake.method("+", [](const pm::Rational& a, int64_t b) {
             return a + static_cast<pm::Int>(b); });
-        polymake.method("+", [](int64_t a, pm::Rational& b) {
+        polymake.method("+", [](int64_t a, const pm::Rational& b) {
             return static_cast<pm::Int>(a) + b; });
-        polymake.method("*", [](pm::Rational& a, pm::Rational& b) {
+        polymake.method("*", [](const pm::Rational& a, const pm::Rational& b) {
             return a * b; });
-        polymake.method("*", [](pm::Rational& a, pm::Integer& b) {
+        polymake.method("*", [](const pm::Rational& a, const pm::Integer& b) {
             return a * b; });
-        polymake.method("*", [](pm::Integer& a, pm::Rational& b) {
+        polymake.method("*", [](const pm::Integer& a, const pm::Rational& b) {
             return a * b; });
-        polymake.method("*", [](pm::Rational& a, int64_t b) {
+        polymake.method("*", [](const pm::Rational& a, int64_t b) {
             return a * static_cast<pm::Int>(b); });
-        polymake.method("*", [](int64_t a, pm::Rational& b) {
+        polymake.method("*", [](int64_t a, const pm::Rational& b) {
             return static_cast<pm::Int>(a) * b; });
         polymake.unset_override_module();
 

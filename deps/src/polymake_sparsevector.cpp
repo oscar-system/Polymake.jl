@@ -17,20 +17,20 @@ void polymake_module_add_sparsevector(jlcxx::Module& polymake)
                     typedef typename decltype(wrapped)::type::value_type elemType;
                     wrapped.template constructor<int64_t>();
                     wrapped.method("_getindex",
-                        [](vecType& V, int64_t i) {
+                        [](const vecType& V, int64_t i) {
                             return elemType(V[i - 1]);
                     });
                     wrapped.method("_setindex!",
-                        [](vecType& V, elemType r, int64_t i) {
+                        [](vecType& V, const elemType& r, int64_t i) {
                             V[i - 1] = r;
                     });
                     wrapped.method("length", &vecType::dim);
-                    wrapped.method("_nzindices", [](vecType& S) {
+                    wrapped.method("_nzindices", [](const vecType& S) {
                         return Set<pm::Int>(pm::indices(S));
                     });
                     wrapped.method("resize!",
                                    [](vecType& V, int64_t sz) { V.resize(sz); });
-                    wrapped.method("show_small_obj", [](vecType& S) {
+                    wrapped.method("show_small_obj", [](const vecType& S) {
                         return show_small_object<vecType>(S);
                     });
             });

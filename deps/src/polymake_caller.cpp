@@ -13,7 +13,7 @@ void insert_type_in_map(std::string&& ptr_name, jl_value_t** var_space)
     type_map_translator->emplace(std::make_pair(ptr_name, var_space));
 }
 
-void set_julia_type(std::string name, void* type_address)
+void set_julia_type(const std::string& name, void* type_address)
 {
     jl_value_t** address;
     try {

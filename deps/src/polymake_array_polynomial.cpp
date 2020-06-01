@@ -6,7 +6,7 @@
 
 #include "polymake_type_modules.h"
 
-void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1 array_type)
+void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1& array_type)
 {
     array_type
         .apply<pm::Array<pm::Polynomial<pm::Rational,long>>,
@@ -30,7 +30,7 @@ void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1 
                 return A;
             });
 
-            wrapped.method("append!", [](WrappedT& A, WrappedT& B) {
+            wrapped.method("append!", [](WrappedT& A, const WrappedT& B) {
                 A.append(B);
                 return A;
             });
@@ -43,7 +43,7 @@ void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1 
             });
             wrapped.method("take",
                            [](pm::perl::BigObject p, const std::string& s,
-                              WrappedT& A) { p.take(s) << A; });
+                              const WrappedT& A) { p.take(s) << A; });
         });
     polymake.method(
         "to_array_polynomial_integer_int", [](const pm::perl::PropertyValue& pv) {
