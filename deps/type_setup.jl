@@ -54,10 +54,10 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
             "to_vector_double",
         ),
         (
-            "Pair_Int",
+            "Pair_Int_Int",
             "std::pair<pm::Int, pm::Int>",
             "StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong}",
-            "to_pair_int",
+            "to_pair_int_int",
         ),
         (
             "List_Pair_Int",
