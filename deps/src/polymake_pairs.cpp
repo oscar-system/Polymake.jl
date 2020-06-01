@@ -38,7 +38,7 @@ void polymake_module_add_pairs(jlcxx::Module& polymake)
 						});
         });
 
-    polymake.method("to_pair_int", [](const pm::perl::PropertyValue& pv) {
+    polymake.method("to_pair_int_int", [](const pm::perl::PropertyValue& pv) {
         return to_SmallObject<std::pair<pm::Int, pm::Int>>(pv);
     });
 
