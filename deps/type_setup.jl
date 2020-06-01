@@ -115,7 +115,7 @@ type_tuples = let NT = NamedTuple{(:type_string, :ctype, :jltype, :convert_f)}
             "to_array_pair_int_int",
         ),
         (
-            "Array_List_Pair_Integer_Integer",
+            "Array_List_Pair_Int_Int",
             "pm::Array<std::list<std::pair<pm::Int, pm::Int>>>",
             "Array{StdList{StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong}}}",
             "to_array_list_pair_int_int",
