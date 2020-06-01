@@ -70,7 +70,7 @@ void polymake_module_add_lists(jlcxx::Module& polymake)
                     auto elt = *(state.iterator);
                     return elt;
                 });
-                wrapped.method("isdone", [](std::list<elemType>& L,
+                wrapped.method("isdone", [](const std::list<elemType>& L,
                                             WrappedT&    state) {
                     return L.end() == state.iterator;
                 });
