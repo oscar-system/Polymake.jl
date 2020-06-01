@@ -23,7 +23,7 @@ void polymake_module_add_pairs(jlcxx::Module& polymake)
             //Pattern to overwrite function in Base
             polymake.set_override_module(jl_base_module);
 
-	    			wrapped.method("first", [](const WrappedT& P) {
+            wrapped.method("first", [](WrappedT& P) {
                 return P.first;
             });
 
@@ -31,11 +31,11 @@ void polymake_module_add_pairs(jlcxx::Module& polymake)
                 return P.second;
             });
 
-	    			polymake.unset_override_module();
+            polymake.unset_override_module();
 
-						wrapped.method("show_small_obj", [](const WrappedT& S) {
-								return show_small_object<WrappedT>(S);
-						});
+            wrapped.method("show_small_obj", [](WrappedT& S) {
+                return show_small_object<WrappedT>(S);
+            });
         });
 
     polymake.method("to_pair_int_int", [](const pm::perl::PropertyValue& pv) {

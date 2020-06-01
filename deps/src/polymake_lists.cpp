@@ -35,12 +35,12 @@ void polymake_module_add_lists(jlcxx::Module& polymake)
                 return L;
             });
 
-						wrapped.method("pushfirst!", [](WrappedT& L, elemType i) {
-								L.push_front(i);
-								return L;
-						});
+            wrapped.method("pushfirst!", [](WrappedT& L, elemType i) {
+                L.push_front(i);
+                return L;
+            });
 
-	    			wrapped.method("length", &WrappedT::size);
+            wrapped.method("length", &WrappedT::size);
 
             polymake.unset_override_module();
 
