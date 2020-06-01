@@ -14,25 +14,28 @@ void polymake_module_add_pairs(jlcxx::Module& polymake)
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
             "StdPair", jlcxx::julia_type("Any", "Base" ));
 
-        type.apply<std::pair<pm::Int,pm::Int>>([](auto wrapped) {
+        type.apply<std::pair<pm::Int,pm::Int>>([&polymake](auto wrapped) {
             typedef typename decltype(wrapped)::type WrappedT;
 
             wrapped.template constructor();
             wrapped.template constructor<int64_t, int64_t>();
 
-            /*
-            wrapped.method("_getindex", [](const WrappedT& P, int64_t n) {
-                return std::get<static_cast<pm::Int>(n) - 1>>(P);
-            });*/
+            //Pattern to overwrite function in Base
+            polymake.set_override_module(jl_base_module);
 
-
-            wrapped.method("first", [](WrappedT& P) {
+	    			wrapped.method("first", [](WrappedT& P) {
                 return P.first;
             });
 
-            wrapped.method("second", [](WrappedT& P) {
+            wrapped.method("last", [](WrappedT& P) {
                 return P.second;
             });
+
+	    			polymake.unset_override_module();
+
+						wrapped.method("show_small_obj", [](WrappedT& S) {
+								return show_small_object<WrappedT>(S);
+						});
         });
 
     polymake.method("to_pair_int", [](const pm::perl::PropertyValue& pv) {

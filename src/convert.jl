@@ -78,7 +78,7 @@ convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = Sparse
 convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}}) = IncidenceMatrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
-convert_to_pm_type(::Type{<:Polymake.Pair}) = Polymake.Pair
+convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
 # convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
 # specific converts for container types we wrap:

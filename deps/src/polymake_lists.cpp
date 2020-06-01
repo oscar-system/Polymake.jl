@@ -18,7 +18,7 @@ void polymake_module_add_lists(jlcxx::Module& polymake)
             typedef typename decltype(wrapped)::type::value_type elemType;
 
             wrapped.template constructor();
-            wrapped.template constructor<std::list<elemType>>();
+            wrapped.template constructor<WrappedT>();
 
             //Pattern to overwrite function in Base
             polymake.set_override_module(jl_base_module);
@@ -34,10 +34,15 @@ void polymake_module_add_lists(jlcxx::Module& polymake)
                 L.push_back(i);
                 return L;
             });
+
+						wrapped.method("pushfirst!", [](WrappedT& L, elemType i) {
+								L.push_front(i);
+								return L;
+						});
+
+	    			wrapped.method("length", &WrappedT::size);
+
             polymake.unset_override_module();
-
-            wrapped.method("length", &WrappedT::size);
-
 
             wrapped.method("show_small_obj", [](WrappedT& S) {
                 return show_small_object<WrappedT>(S);
