@@ -63,7 +63,7 @@ template <typename T> struct WrappedStdListIterator {
     using value_type = T;
     WrappedStdListIterator<T>(std::list<T>& L)
     {
-        iterator = L.iterator;
+        iterator = L.begin();
     }
 };
 

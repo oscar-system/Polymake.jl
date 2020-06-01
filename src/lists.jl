@@ -1,4 +1,6 @@
-const List_suppT = Union{Std.Pair{CxxWrap.CxxLong, CxxWrap.CxxLong}}
+const List_suppT = Union{StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}
+
+Base.eltype(::Polymake.StdList{T}) where T = T
 
 function Base.iterate(L::StdList)
     isempty(L) &&  return nothing

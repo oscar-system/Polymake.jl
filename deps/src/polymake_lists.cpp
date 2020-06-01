@@ -36,42 +36,40 @@ void polymake_module_add_lists(jlcxx::Module& polymake)
             });
             polymake.unset_override_module();
 
-            //wrapped.method("length", &WrappedT::size);
+            wrapped.method("length", &WrappedT::size);
 
 
             wrapped.method("show_small_obj", [](WrappedT& S) {
                 return show_small_object<WrappedT>(S);
             });
-
-            polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ListIterator")
-                    .apply<WrappedStdListIterator<pm::Int>>(
-                            [](auto wrapped) {
-                                typedef typename decltype(wrapped)::type WrappedStdListIterator;
-                                typedef typename decltype(wrapped)::type::value_type elemType;
-                                wrapped.method("beginiterator", [](std::list<elemType>& L) {
-                                    auto result = WrappedStdListIterator<elemType>{L};
-                                    return result;
-                                });
-
-                                wrapped.method("increment", [](WrappedStdListIterator& state) {
-                                    state.iterator++;
-                                });
-                                wrapped.method("get_element", [](WrappedStdListIterator& state) {
-                                    auto elt = *(state.iterator);
-                                    return elt;
-                                });
-                                wrapped.method("isdone", [](std::list<elemType>& L,
-                                                            WrappedStdListIterator&    state) {
-                                    return L.end() == state.iterator;
-                                });
-                            });
-            
-
-
         });
 
     polymake.method("to_list_pair_int", [](const pm::perl::PropertyValue& pv) {
         return to_SmallObject<std::list<std::pair<pm::Int, pm::Int>>>(pv);
     });
+
+    polymake.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ListIterator")
+            .apply<WrappedStdListIterator<std::pair<pm::Int, pm::Int>>>(
+            [](auto wrapped) {
+                typedef typename decltype(wrapped)::type WrappedT;
+                typedef typename decltype(wrapped)::type::value_type elemType;
+
+                wrapped.method("beginiterator", [](std::list<elemType>& L) {
+                    WrappedT result(L);
+                    return result;
+                });
+
+                wrapped.method("increment", [](WrappedT& state) {
+                    state.iterator++;
+                });
+                wrapped.method("get_element", [](WrappedT& state) {
+                    auto elt = *(state.iterator);
+                    return elt;
+                });
+                wrapped.method("isdone", [](std::list<elemType>& L,
+                                            WrappedT&    state) {
+                    return L.end() == state.iterator;
+                });
+            });
 
 }
