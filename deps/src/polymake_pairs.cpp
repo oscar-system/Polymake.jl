@@ -27,7 +27,7 @@ void polymake_module_add_pairs(jlcxx::Module& polymake)
                 return P.first;
             });
 
-            wrapped.method("last", [](WrappedT& P) {
+            wrapped.method("last", [](const WrappedT& P) {
                 return P.second;
             });
 
