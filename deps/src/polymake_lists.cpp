@@ -59,9 +59,8 @@ void polymake_module_add_lists(jlcxx::Module& polymake)
                 typedef typename decltype(wrapped)::type WrappedT;
                 typedef typename decltype(wrapped)::type::value_type elemType;
 
-                wrapped.method("beginiterator", [](std::list<elemType>& L) {
-                    WrappedT result(L);
-                    return result;
+                wrapped.method("beginiterator", [](const std::list<elemType>& L) {
+                    return WrappedT(L);
                 });
 
                 wrapped.method("increment", [](WrappedT& state) {
