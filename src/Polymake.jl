@@ -18,6 +18,9 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
+# needed for deps.jl setting polymake_user
+import Pkg
+
 using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
 import SparseArrays

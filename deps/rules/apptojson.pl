@@ -50,16 +50,19 @@ sub help_to_hash($$$) {
                              description => $arg->text
                            };
    }
-   $fun{mandatory} = defined $ann->{mandatory} ? $ann->{mandatory} + 1 : $numparam;
+   $fun{mandatory_args} = defined $ann->{mandatory} ? $ann->{mandatory} + 1 : $numparam;
 
-   if ($fun{mandatory} > $numparam) {
+   if ($fun{mandatory_args} > $numparam) {
       push @{$fun{args}}, ({name => "",type=>"Anything",description=>""})
-                           x ($fun{mandatory} - $numparam);
+                           x ($fun{mandatory_args} - $numparam);
       $textdoc = false;
    }
 
    $fun{type_params} = [ map { {name=>$_->name, type=>"", description=>$_->text} } @{$ann->{tparam}}]
       if defined $ann->{tparam};
+
+   $fun{mandatory_type_params} = $ann->{mandatory_tparams}
+      if defined($ann->{mandatory_tparams});
 
    # not needed $fun{include} = ;
    if (defined ($ann->{options}) && scalar($ann->{options}) > 0) {
@@ -142,11 +145,11 @@ sub app_to_json($$) {
       my $ann = $type->help->annex;
       my $objhash = {
                        name => $type->full_name,
-                       help => $type->help->display_text
+                       doc => $type->help->display_text
                     };
       my $c = 0;
       foreach my $p (@{$type->params // [] }) {
-         push @{$objhash->{params}}, {
+         push @{$objhash->{type_params}}, {
                                       name => $p->name,
                                       description =>
                                           defined($ann->{tparam})
@@ -156,7 +159,7 @@ sub app_to_json($$) {
                                    };
       }
 
-      $objhash->{mandatory_params} = $ann->{mandatory_tparams}
+      $objhash->{mandatory_type_params} = $ann->{mandatory_tparams}
          if defined($ann) && defined($ann->{mandatory_tparams});
 
       $objhash->{linear_isa} = [
