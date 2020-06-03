@@ -23,4 +23,6 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("sparsematrix.jl")
     include("tropicalnumber.jl")
     include("polynomial.jl")
+    include("pairs.jl")
+    include("lists.jl")
 end
