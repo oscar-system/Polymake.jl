@@ -11,10 +11,10 @@
 
     @testset "List operations" begin
 	l = Polymake.StdList{Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}()
-	p = Polymake.StdPair(4,2)
+	p = Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}(4,2) 
 	push!(l,p)
 	@test Polymake.length(l) == 1;
-	q = Polymake.StdPair(1,2)
+	q = Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}(1,2) 
 	Polymake.pushfirst!(l, q)
 	a = collect(l)
 	@test a[1] == (1=>2)
