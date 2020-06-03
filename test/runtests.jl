@@ -1,5 +1,6 @@
 using Polymake
 using Test
+using CxxWrap
 
 # make wrapper compilation verbose on travis
 if (haskey(ENV, "TRAVIS"))
@@ -18,7 +19,7 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("arrays.jl")
     include("incidencematrix.jl")
     include("convert.jl")
-    include("perlobj.jl")
+    nclude("perlobj.jl")
     include("interface_functions.jl")
     include("sparsematrix.jl")
     include("tropicalnumber.jl")

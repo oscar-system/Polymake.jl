@@ -1,7 +1,7 @@
 @testset "Polymake.StdPair" begin
 
     @testset "Constructors" begin
-        @test Polymake.StdPair{Int64, Int64}() isa Polymake.StdPair
+        @test Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}() isa Polymake.StdPair
     end
     
 

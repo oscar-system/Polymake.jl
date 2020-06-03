@@ -2,15 +2,15 @@
 
     @testset "Constructors" begin
         
-	l = Polymake.StdList{Polymake.StdPair{Int64, Int64}}()
+	l = Polymake.StdList{Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}()
         @test l isa Polymake.StdList
-	k = Polymake.StdList{Polymake.StdPair{Int64, Int64}}(l)
+	k = Polymake.StdList{Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}(l)
 	@test k isa Polymake.StdList
 
     end
 
     @testset "List operations" begin
-	l = Polymake.StdList{Polymake.StdPair{Int, Int}}()
+	l = Polymake.StdList{Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}()
 	p = Polymake.StdPair(4,2)
 	push!(l,p)
 	@test Polymake.length(l) == 1;
