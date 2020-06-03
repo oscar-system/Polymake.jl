@@ -1,6 +1,8 @@
 const Array_suppT = Union{Int64, CxxWrap.CxxLong,
                         Integer, Rational,
                         String, CxxWrap.StdString,
+                        StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong},
+                        StdList{StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong}},
                         Set{Int64}, Set{CxxWrap.CxxLong},
                         Array{Int64}, Array{CxxWrap.CxxLong},
                         Array{Integer}, Array{Rational}, Matrix{Integer}}
