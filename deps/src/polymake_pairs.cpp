@@ -23,7 +23,7 @@ void polymake_module_add_pairs(jlcxx::Module& polymake)
             //Pattern to overwrite function in Base
             polymake.set_override_module(jl_base_module);
 
-            wrapped.method("first", [](WrappedT& P) {
+            wrapped.method("first", [](const WrappedT& P) {
                 return P.first;
             });
 

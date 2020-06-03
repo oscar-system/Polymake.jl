@@ -1,5 +1,3 @@
-const List_suppT = Union{StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}
-
 Base.eltype(::StdList{StdPair{T, T}}) where T = Pair{T,T}
 
 function Base.iterate(L::StdList)
