@@ -41,7 +41,7 @@ Base.getindex(db::Database, name::AbstractString) = Collection{Polymake.BigObjec
 
 # search a collection for documents matching the criteria given by d
 function Mongoc.find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
-   return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d); options=opts))
+   return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d); options=(isnothing(opts) ? nothing : Mongoc.BSON(opts))))
 end
 
 function Mongoc.find(c::Collection{T}, d::Pair...) where T
@@ -290,6 +290,58 @@ function info(coll::Collection, level::Base.Integer=5)
    end
    push!(res, _get_collection_string(db, coll.mcol.name, level))
    println(join(res, "\n\n"))
+end
+
+# Advanced Querying
+
+_operationToMongo = Dict{Symbol, String}(
+   :< => "\$lt",
+   :<= => "\$lte",
+   :> => "\$gt",
+   :>= => "\$gte",
+   :!= => "\$ne"
+)
+
+macro select(args...)
+   if length(args) > 1 || !(args[1] isa String)
+      throw(ArgumentError("`Polymake.Polydb.@select` macro needs to be called together with a String representing a collection's name, e.g. `Polymake.Polydb.@select \"Polytopes.Lattice.SmoothReflexive\"`"))
+   end
+   :(x -> (getindex(x, $args[1]), Dict{String, Any}()))
+end
+
+macro filter(args...)
+   d = Dict{String, Any}()
+   for i=1:length(args)
+      if length(args[i].args) != 3
+         throw(ArgumentError(string("no applicable condition: ", args[i])))
+      end
+      op, key, val = args[i].args
+      if (op == :(==))
+         d[key] = val
+      else
+         d[key] = Dict{String, Any}(_operationToMongo[Symbol(op)] => val)
+      end
+   end
+   :(x -> (x[1], merge(x[2], $d)))
+end
+
+macro map(args...)
+   if length(args) == 0
+      :(x -> find(x[1], x[2]))
+   else
+      d = Dict{String, Dict{String, Bool}}("projection" => Dict{String, Bool}()) #TODO: add necessary fields
+      for field in args
+         d["projection"][field] = true
+      end
+      :(x -> _find(x[1], x[2], $d))
+   end
+end
+
+function _find(c::Collection, d::Dict, opt_set::Dict{String, Dict{String, Bool}})
+   for field in get_fields(c)
+      opt_set["projection"][field] = true
+   end
+   return find(c, d; opts=opt_set)
 end
 
 end
