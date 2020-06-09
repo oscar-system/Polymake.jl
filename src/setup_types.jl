@@ -1,4 +1,18 @@
-const SmallObject = Union{Integer, Rational, Matrix, Vector, Set, Array, SparseMatrix, SparseVector, TropicalNumber, IncidenceMatrix, Polynomial}
+const SmallObject = Union{
+    StdPair,
+    StdList,
+    Integer,
+    Rational,
+    Matrix,
+    Vector,
+    Set,
+    Array,
+    SparseMatrix,
+    SparseVector,
+    TropicalNumber,
+    IncidenceMatrix,
+    Polynomial,
+}
 const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, CxxWrap.CxxLong}
 
 const TypeConversionFunctions = Dict(
