@@ -88,4 +88,22 @@
         @test Polymake.Integer(1) << 2 == 4
         @test Polymake.Integer(4) >> 2 == 1
     end
+
+    @testset "weird BigInt issue" begin
+        test_f(n) = (k = Polymake.Integer(n); BigInt(k))
+        bn = test_f(5)
+        GC.gc();
+        @test bn == 5
+
+        function test_weird_int(k)
+            i = 0
+            while i < k
+                n = Polymake.Integer(3)
+                BigInt(n) == 3 || return false
+                i +=1
+            end
+            return true
+        end
+        @test test_weird_int(10^6)
+    end
 end

@@ -30,7 +30,10 @@ Base.promote_rule(::Type{<:Integer}, ::Type{<:AbstractFloat}) = Float64
 
 # BigInt constructor from Integer
 @inline function Base.BigInt(int::pmI) where pmI<:Integer
-    return deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
+    GC.@preserve int begin
+        i = deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
+    end
+    return i
 end
 # all convert(T, x) fallbacks to T(x)
 # big(::Integer) goes through convert(BigInt, x)
