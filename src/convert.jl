@@ -78,6 +78,7 @@ convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = Sparse
 convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}}) = IncidenceMatrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
+convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
 # convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
 # specific converts for container types we wrap:
@@ -92,17 +93,23 @@ for (pmT, jlT) in [(Integer, Base.Integer),
     end
 end
 
-convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:AbstractFloat = Matrix{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:AbstractFloat =
+    Matrix{convert_to_pm_type(T)}
 
-convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractSet} = Array{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractSet} =
+    Array{convert_to_pm_type(T)}
 
 # this catches all Arrays of Arrays we have right now:
-convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T = Array{Array{convert_to_pm_type(T)}}
+convert_to_pm_type(::Type{<:AbstractVector{<:AbstractArray{T}}}) where T =
+    Array{Array{convert_to_pm_type(T)}}
 
 # 2-argument version: the first is the container type
 promote_to_pm_type(::Type, S::Type) = convert_to_pm_type(S) #catch all
 
-function promote_to_pm_type(::Type{<:Union{Vector, Matrix, SparseMatrix, SparseVector}}, S::Type{<:Union{Base.Integer,CxxWrap.CxxLong}})
+function promote_to_pm_type(
+    ::Type{<:Union{Vector,Matrix,SparseMatrix,SparseVector}},
+    S::Type{<:Union{Base.Integer,CxxWrap.CxxLong}},
+)
     (promote_type(S, Int64) == Int64 || S isa CxxWrap.CxxLong) && return Int64
     return Integer
 end
