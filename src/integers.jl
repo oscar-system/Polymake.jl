@@ -54,3 +54,14 @@ Base.trailing_zeros(int::Integer) = trailing_zeros(BigInt(int))
 Base.trailing_ones(int::Integer) = trailing_ones(BigInt(int))
 Base.:(>>)(int::Polymake.Integer, n::UInt64) = >>(BigInt(int), n)
 Base.:(<<)(int::Polymake.Integer, n::UInt64) = <<(BigInt(int), n)
+
+Base.checked_abs(x::Integer) = abs(x)
+Base.checked_neg(x::Integer) = -x
+Base.checked_add(a::Integer, b::Integer) = a + b
+Base.checked_sub(a::Integer, b::Integer) = a - b
+Base.checked_mul(a::Integer, b::Integer) = a * b
+Base.checked_div(a::Integer, b::Integer) = div(a, b)
+Base.checked_rem(a::Integer, b::Integer) = rem(a, b)
+Base.add_with_overflow(a::Integer, b::Integer) = a + b, false
+Base.sub_with_overflow(a::Integer, b::Integer) = a - b, false
+Base.mul_with_overflow(a::Integer, b::Integer) = a * b, false

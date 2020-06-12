@@ -36,7 +36,7 @@
             p = polytope.rand_sphere(3,20);
             @test polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS) isa Polymake.BigObject
             P = polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS)
-            @test occursin("my cuttie", Polymake.properties(P))
+            @test occursin("my cuttie", String(Polymake.properties(P)))
         end
 
         @testset "conversions" begin
