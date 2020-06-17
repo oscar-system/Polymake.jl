@@ -85,11 +85,13 @@
             B = Polymake.Set(T[5,6,6])
 
             A1 = deepcopy(A)
+            A11 = copy(A)
             swap(A, B)
 
             @test A == Polymake.Set([5,6])
             @test B == Polymake.Set([1,2,3])
             @test A1 == B
+            @test A11 == B
 
             A = Polymake.Set(T[1,2,3,1])
             jlA = Base.Set(T[1,2,3,1])
