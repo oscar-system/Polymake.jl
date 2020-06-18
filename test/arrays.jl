@@ -106,5 +106,4 @@
         @test fill!(A, elt) == Polymake.Array{T}(2l+2, elt)
         @test A == Polymake.Array{T}(2l+2, elt)
     end
-
 end

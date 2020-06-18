@@ -18,6 +18,9 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
+# needed for deps.jl setting polymake_user
+import Pkg
+
 using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
 import SparseArrays
@@ -128,6 +131,8 @@ include("convert.jl")
 include("integers.jl")
 include("rationals.jl")
 include("sets.jl")
+include("std/lists.jl")
+include("std/pairs.jl")
 include("vectors.jl")
 include("matrices.jl")
 include("sparsematrix.jl")

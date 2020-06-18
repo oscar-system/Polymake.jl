@@ -14,7 +14,8 @@
     @test @pm polytope.equal_polyhedra(c, cc)
     @test polytope.equal_polyhedra(c, cc)
 
-    @test tropical.cyclic(3,5,template_parameters=["Max"]) isa Polymake.BigObject
+    @test tropical.cyclic{max}(3,5) isa Polymake.BigObject
+    @test_throws ArgumentError tropical.cyclic(3,5)
 
     @test (@pm tropical.cyclic{Max}(3,5)) isa Polymake.BigObject
 
