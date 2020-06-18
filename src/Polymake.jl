@@ -42,7 +42,7 @@ function Base.showerror(io::IO, ex::PolymakeError)
 end
 
 function check_jlcxx_version(version)
-    global current_jlcxx = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
+    current_jlcxx = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
     if (version != current_jlcxx)
         error("""JlCxx version changed, please run `using Pkg; Pkg.build("Polymake");`""")
     end

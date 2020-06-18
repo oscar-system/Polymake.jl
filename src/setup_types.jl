@@ -40,7 +40,7 @@ fill_wrapped_types!(TypeConversionFunctions, get_type_names())
 # now it is mapped to Base.copy
 # we make sure both really do a C++ copy for polymake types
 # whether this is deep or not cannot be enforced anyway
-if current_jlcxx >= v"0.8.0"
+if jlcxx_version >= v"0.8.0"
     Base.deepcopy(x::T) where T<:SmallObject = Base.copy(x)
 else
     Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
