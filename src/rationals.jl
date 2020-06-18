@@ -66,7 +66,7 @@ Base.://(x::Rational, y::Base.Rational) = x//Rational(y)
 Base.://(x::Base.Rational, y::Rational) = Rational(x)//y
 Base.://(x::Bool, y::Rational) = Rational(x)//y
 
-for op in (:*, :+, :-, ://)
+for op in (:*, :+, :-)
     @eval begin
         Base.$op(x::Integer, y::Base.Rational) = $op(x, Rational(y))
         Base.$op(y::Base.Rational, x::Integer) = $op(Rational(y), x)
