@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@v2.1.0
       - name: "Set up docker for polyDB testing"
         if: matrix.os == 'ubuntu-latest'
-        run: docker run --network=something -d --rm=true --network-alias=db-test-server -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=admin mongo:4.2
+        run: docker run -d --rm=true --network-alias=db-test-server -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=admin mongo:4.2
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
