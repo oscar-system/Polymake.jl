@@ -44,6 +44,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.1.0
+      - name: "Set up docker for polyDB testing"
+        if: matrix.os == ubuntu-latest
+        run: docker run --network=something -d --rm=true --network-alias=db-test-server -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=admin mongo:4.2
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
@@ -55,6 +58,9 @@ jobs:
         if: matrix.xcode != ''
         run: echo "::set-env name=DEVELOPER_DIR::/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer"
       - uses: julia-actions/julia-buildpkg@latest
+      - name: "Fill polyDB container"
+        if: matrix.os == ubuntu-latest
+        run: mongorestore --host db-test-server -u admin -p admin --port 27017 .github/polydb_dump
       - uses: julia-actions/julia-runtest@latest
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v1

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"polydb._sectionInfo.Matroids"}],"uuid":"d290b56a222e4647bf3149173ad5f6f7"}
