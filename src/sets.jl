@@ -74,8 +74,6 @@ end
 
 Base.allunique(::Set) = true
 
-Base.copy(S::Set) = deepcopy(S)
-
 # delete! : Defined on the C++ side
 Base.delete!(s::Set{T}, x) where T = delete!(s, T(x))
 # empty!  : Defined on the C++ side
