@@ -37,7 +37,7 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
       - name: "Set variable for Database testing"
-        run: mkdir /home/runner/.julia/config && echo "PDB_TEST = true" > /home/runner/.julia/config/startup.jl
+        run: mkdir -p /home/runner/.julia/config && echo "PDB_TEST = true" > /home/runner/.julia/config/startup.jl
       - uses: julia-actions/julia-buildpkg@latest
       - name: "Fill polyDB container"
         run: mongorestore --host localhost -u admin -p admin --port 27017 .github/polydb_dump
