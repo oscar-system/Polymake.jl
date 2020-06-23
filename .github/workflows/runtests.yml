@@ -30,14 +30,14 @@ jobs:
         ports:
           # Maps tcp port 27017 on service container to the host
           - 27017:27017
+    env:
+        POLYDB_SERVER_URI: "mongodb://localhost:27017"
     steps:
       - uses: actions/checkout@v2.1.0
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
-      - name: "Set variable for Database testing"
-        run: mkdir -p /home/runner/.julia/config && echo "PDB_TEST = true" > /home/runner/.julia/config/startup.jl
       - uses: julia-actions/julia-buildpkg@latest
       - name: "Fill polyDB container"
         run: mongorestore --host localhost -u admin -p admin --port 27017 .github/polydb_dump
