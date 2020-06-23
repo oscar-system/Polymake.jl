@@ -26,4 +26,13 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("polynomial.jl")
     include("pairs.jl")
     include("lists.jl")
+    if ENV["JULIA_PDB_TEST"]
+        @testset "Polymake.Polydb" begin
+            @test 1 == 1
+        end
+    else
+        @testset "THIS IS MACOS" begin
+            @test 1 == 1
+        end
+    end
 end
