@@ -30,9 +30,5 @@ struct MyInt x::Int end # needed in test/convert.jl
         @testset "Polymake.Polydb" begin
             @test 1 == 1
         end
-    else
-        @testset "THIS IS MACOS" begin
-            @test 1 == 1
-        end
     end
 end
