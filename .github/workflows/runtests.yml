@@ -36,6 +36,7 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
+      - name: "Set variable for Database testing"
         run: echo "PDB_TEST = true" > /home/runner/.julia/config/startup.jl
       - uses: julia-actions/julia-buildpkg@latest
       - name: "Fill polyDB container"
