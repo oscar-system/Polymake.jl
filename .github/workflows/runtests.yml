@@ -30,6 +30,8 @@ jobs:
         ports:
           # Maps tcp port 27017 on service container to the host
           - 27017:27017
+    env:
+        POLYDB_SERVER_URI: "mongodb://localhost:27017"
     steps:
       - uses: actions/checkout@v2.1.0
       - name: "Set up Julia"
