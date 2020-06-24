@@ -347,3 +347,8 @@ function _find(c::Collection, d::Dict, opt_set::Dict{String, Dict{String, Bool}}
 end
 
 end
+
+# Method to overwrite POLYDB_SERVER_URI
+function _set_uri(uri::String)
+   POLYDB_SERVER_URI = uri
+end
