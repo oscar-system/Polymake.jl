@@ -27,8 +27,6 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("pairs.jl")
     include("lists.jl")
     if get(ENV, "POLYDB_SERVER_URI", "") != ""
-        @testset "Polymake.Polydb" begin
-            @test 1 == 1
-        end
+        include("polydb.jl")
     end
 end

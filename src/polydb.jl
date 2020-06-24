@@ -12,6 +12,8 @@ using Mongoc
 
 import Mongoc: find
 
+POLYDB_SERVER_URI = "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)"
+
 #Polymake.Polydb's types store information via
 # a corresponding Mongoc type variable
 struct Database
@@ -30,7 +32,7 @@ end
 # returns a Polymake.Polydb.Database instance
 function get_db()
    # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
-   client = Mongoc.Client("mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)")
+   client = Mongoc.Client(POLYDB_SERVER_URI)
    return Database(client["polydb"])
 end
 
@@ -49,12 +51,12 @@ function Mongoc.find(c::Collection{T}, d::Pair...) where T
 end
 
 # creating `BSON` iterators from the respective `Polymake.BigObject` iterator
-function Collection{Mongoc.BSON}(c::Collection{Polymake.BigObject})
-   return Collection{Mongoc.BSON}(c.mcol)
+function Collection{T}(c::Collection{T}) where T<:Union{Polymake.BigObject, Mongoc.BSON}
+   return Collection{T}(c.mcol)
 end
 
-function Cursor{Mongoc.BSON}(cursor::Cursor{Polymake.BigObject})
-   return Cursor{Mongoc.BSON}(cursor.mcursor)
+function Cursor{T}(cursor::Cursor{T}) where T<:Union{Polymake.BigObject, Mongoc.BSON}
+   return Cursor{T}(cursor.mcursor)
 end
 
 # returns a Polymake.BigObject from a Mongoc.BSON document
@@ -75,10 +77,10 @@ function Base.iterate(cursor::Polymake.Polydb.Cursor{Polymake.BigObject}, state:
     return Polymake.Polydb.parse_document(first(next)), nothing
 end
 
-Base.iterate(coll::Polymake.Polydb.Collection{T}) where T =
-    return iterate(coll, Cursor{T}(find(coll)))
+Base.iterate(coll::Polymake.Polydb.Collection{Polymake.BigObject}) =
+    return iterate(coll, find(coll))
 
-function Base.iterate(coll::Polymake.Polydb.Collection, state::Polymake.Polydb.Cursor)
+function Base.iterate(coll::Polymake.Polydb.Collection{Polymake.BigObject}, state::Polymake.Polydb.Cursor)
     next = iterate(state, nothing)
     isnothing(next) && return nothing
     doc, _ = next
