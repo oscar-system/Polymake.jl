@@ -1,6 +1,6 @@
 using Mongoc
 
-Polymake.Polydb.POLYDB_SERVER_URI = get(ENV, "POLYDB_SERVER_URI")
+Polymake.Polydb.POLYDB_SERVER_URI = get(ENV, "POLYDB_SERVER_URI", "")
 
 @testset "polyDB" begin
 
