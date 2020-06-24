@@ -51,11 +51,11 @@ function Mongoc.find(c::Collection{T}, d::Pair...) where T
 end
 
 # creating `BSON` iterators from the respective `Polymake.BigObject` iterator
-function Collection{T}(c::Collection{T}) where T<:Union{Polymake.BigObject, Mongoc.BSON}
+function Collection{T}(c::Collection) where T<:Union{Polymake.BigObject, Mongoc.BSON}
    return Collection{T}(c.mcol)
 end
 
-function Cursor{T}(cursor::Cursor{T}) where T<:Union{Polymake.BigObject, Mongoc.BSON}
+function Cursor{T}(cursor::Cursor) where T<:Union{Polymake.BigObject, Mongoc.BSON}
    return Cursor{T}(cursor.mcursor)
 end
 
@@ -69,6 +69,8 @@ end
 
 Base.IteratorSize(::Type{<:Cursor}) = Base.SizeUnknown()
 Base.eltype(::Cursor{T}) where T = T
+Base.IteratorSize(::Type{<:Collection}) = Base.SizeUnknown()
+Base.eltype(::Collection{T}) where T = T
 
 # default iteration functions returning `Polymake.BigObject`s
 function Base.iterate(cursor::Polymake.Polydb.Cursor{Polymake.BigObject}, state::Nothing=nothing)
@@ -344,6 +346,11 @@ function _find(c::Collection, d::Dict, opt_set::Dict{String, Dict{String, Bool}}
       opt_set["projection"][field] = true
    end
    return find(c, d; opts=opt_set)
+end
+
+# Method to overwrite POLYDB_SERVER_URI
+function _set_uri(uri::String)
+   POLYDB_SERVER_URI = uri
 end
 
 end

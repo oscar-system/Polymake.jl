@@ -1,6 +1,6 @@
 using Mongoc
 
-Polymake.Polydb.POLYDB_SERVER_URI = get(ENV, "POLYDB_SERVER_URI", "")
+Polymake.Polydb._set_uri(get(ENV, "POLYDB_SERVER_URI", ""))
 
 @testset "polyDB" begin
 
@@ -9,6 +9,11 @@ Polymake.Polydb.POLYDB_SERVER_URI = get(ENV, "POLYDB_SERVER_URI", "")
         db = Polymake.Polydb.get_db()
         @test db["Polytopes.Lattice.SmoothReflexive"] isa Polymake.Polydb.Collection
         @test db["Polytopes.Lattice.SmoothReflexive"] isa Polymake.Polydb.Collection{Polymake.BigObject}
+        try
+            @test Mongoc.ping(db.mdb.client)["ok"] == 1
+        catch
+            @test "not" == "connected"
+        end
         collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
         @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection
         @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection{Mongoc.BSON}
@@ -41,17 +46,56 @@ Polymake.Polydb.POLYDB_SERVER_URI = get(ENV, "POLYDB_SERVER_URI", "")
         end
         @testset "Information" begin
             @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
-            fields = Polymake.Polydb.get_fields
+            fields = Polymake.Polydb.get_fields(collection_bo)
             @test length(fields) == 44
             @test fields[1] == "AFFINE_HULL"
         end
     end
 
     @testset "Basic querying" begin
-        @test 1 == 1
+        db = Polymake.Polydb.get_db()
+        collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
+        @testset "`Polymake.BigObject`-templated types" begin
+            complete = collect(collection_bo)
+            @test length(complete) == 25
+            for (constraints, amount, op) in    [(["N_VERTICES" => 8], 7, :(==)),
+                                                (["N_VERTICES" => Dict("\$lt" => 8)], 12, :<),
+                                                (["N_VERTICES" => Dict("\$gt" => 8)], 6, :>)]
+                query = Dict(constraints...)
+                results = collect(Polymake.Polydb.find(collection, constraints...))
+                @test length(results) == amount
+                for obj in results
+                    @eval begin
+                        @test $op(obj.N_VERTICES, 8)
+                    end
+                end
+                results = collect(Polymake.Polydb.find(collection, query))
+                @test length(results) == amount
+                for obj in results
+                    @eval begin
+                        @test $op(obj.N_VERTICES, 8)
+                    end
+                end
+            end
+            let constraints = ["N_VERTICES"=>8, "N_HILBERT_BASIS"=>27]
+                query = Dict(constraints...)
+                results = collect(Polymake.Polydb.find(collection, constraints...))
+                @test length(results) == 2
+                for obj in results
+                    @test obj.N_VERTICES == 8
+                    @test obj.N_HILBERT_BASIS == 27
+                end
+                results = collect(Polymake.Polydb.find(collection, query))
+                @test length(results) == 2
+                for obj in results
+                    @test obj.N_VERTICES == 8
+                    @test obj.N_HILBERT_BASIS == 27
+                end
+            end
+        end
     end
-
-    @testset "Query macros" begin
-        @test 1 == 1
-    end
+    #
+    # @testset "Query macros" begin
+    #     @test 1 == 1
+    # end
 end
