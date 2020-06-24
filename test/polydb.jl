@@ -41,7 +41,7 @@ Polymake.Polydb._set_uri(get(ENV, "POLYDB_SERVER_URI", ""))
         end
         @testset "Information" begin
             @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
-            fields = Polymake.Polydb.get_fields
+            fields = Polymake.Polydb.get_fields(collection_bo)
             @test length(fields) == 44
             @test fields[1] == "AFFINE_HULL"
         end
