@@ -48,7 +48,15 @@ Polymake.Polydb._set_uri(get(ENV, "POLYDB_SERVER_URI", ""))
     end
 
     @testset "Basic querying" begin
-        @test 1 == 1
+        db = Polymake.Polydb.get_db()
+        collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
+        @testset "`Polymake.BigObject`-templated types" begin
+            complete = collect(collection_bo)
+            @test length(complete) == 25
+            constraints = ["N_VERTICES" => 8]
+            query = Dict(constraints...)
+            results = collect(Polymake.Polydb.find(collection, constraints...))
+        end
     end
 
     @testset "Query macros" begin
