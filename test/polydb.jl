@@ -14,20 +14,20 @@ Polymake.Polydb._set_uri(get(ENV, "POLYDB_SERVER_URI", ""))
         catch
             @test "not" == "connected"
         end
-        # collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
-        # @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection
-        # @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection{Mongoc.BSON}
-        # collection_bson = Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo)
-        # constraints = ["DIM" => 3, "N_VERTICES" => 8]
-        # query = Dict(constraints...)
-        # @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor
-        # @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor{Polymake.BigObject}
-        # @test Polymake.Polydb.find(collection_bo, constraints...) isa Polymake.Polydb.Cursor
-        # @test Polymake.Polydb.find(collection_bo, constraints...) isa Polymake.Polydb.Cursor{Polymake.BigObject}
-        # @test Polymake.Polydb.find(collection_bson, query) isa Polymake.Polydb.Cursor
-        # @test Polymake.Polydb.find(collection_bson, query) isa Polymake.Polydb.Cursor{Mongoc.BSON}
-        # @test Polymake.Polydb.find(collection_bson, constraints...) isa Polymake.Polydb.Cursor
-        # @test Polymake.Polydb.find(collection_bson, constraints...) isa Polymake.Polydb.Cursor{Mongoc.BSON}
+        collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
+        @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection
+        @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection{Mongoc.BSON}
+        collection_bson = Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo)
+        constraints = ["DIM" => 3, "N_VERTICES" => 8]
+        query = Dict(constraints...)
+        @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor
+        @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor{Polymake.BigObject}
+        @test Polymake.Polydb.find(collection_bo, constraints...) isa Polymake.Polydb.Cursor
+        @test Polymake.Polydb.find(collection_bo, constraints...) isa Polymake.Polydb.Cursor{Polymake.BigObject}
+        @test Polymake.Polydb.find(collection_bson, query) isa Polymake.Polydb.Cursor
+        @test Polymake.Polydb.find(collection_bson, query) isa Polymake.Polydb.Cursor{Mongoc.BSON}
+        @test Polymake.Polydb.find(collection_bson, constraints...) isa Polymake.Polydb.Cursor
+        @test Polymake.Polydb.find(collection_bson, constraints...) isa Polymake.Polydb.Cursor{Mongoc.BSON}
         # @testset "Iterator (Cursor)" begin
         #     results_bo = Polymake.Polydb.find(collection_bo, constraints...)
         #     results_bson = Polymake.Polydb.find(collection_bson, constraints...)
