@@ -38,40 +38,62 @@ Polymake.Polydb._set_uri(get(ENV, "POLYDB_SERVER_URI", ""))
             @test collect(results_bo) isa Array{Polymake.BigObject, 1}
             @test collect(results_bson) isa Array{Mongoc.BSON, 1}
         end
-        # @testset "Iterator (Collection)" begin
-        #     @test iterate(collection_bo) isa Tuple{Polymake.BigObject, Polymake.Polydb.Cursor{Polymake.BigObject}}
-        #     @test iterate(collection_bson) isa Tuple{Mongoc.BSON, Mongoc.Cursor}
-        #     @test collect(collection_bo) isa Array{Polymake.BigObject}
-        #     @test collect(collection_bson) isa Array{Mongoc.BSON}
-        # end
-        # @testset "Information" begin
-        #     @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
-        #     fields = Polymake.Polydb.get_fields(collection_bo)
-        #     @test length(fields) == 44
-        #     @test fields[1] == "AFFINE_HULL"
-        # end
+        @testset "Iterator (Collection)" begin
+            @test iterate(collection_bo) isa Tuple{Polymake.BigObject, Polymake.Polydb.Cursor{Polymake.BigObject}}
+            @test iterate(collection_bson) isa Tuple{Mongoc.BSON, Mongoc.Cursor}
+            @test collect(collection_bo) isa Array{Polymake.BigObject}
+            @test collect(collection_bson) isa Array{Mongoc.BSON}
+        end
+        @testset "Information" begin
+            @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
+            fields = Polymake.Polydb.get_fields(collection_bo)
+            @test length(fields) == 44
+            @test fields[1] == "AFFINE_HULL"
+        end
     end
 
-    # @testset "Basic querying" begin
-    #     db = Polymake.Polydb.get_db()
-    #     collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
-    #     @testset "`Polymake.BigObject`-templated types" begin
-    #         complete = collect(collection_bo)
-    #         @test length(complete) == 25
-    #         for (constraints, amount, op) in    [(["N_VERTICES" => 8], 7, :(==)),
-    #                                             (["N_VERTICES" => Dict("\$lt" => 8)], 12, :<),
-    #                                             (["N_VERTICES" => Dict("\$gt" => 8)], 6, :>)]
-    #             query = Dict(constraints...)
-    #             results = collect(Polymake.Polydb.find(collection, constraints...))
-    #             @test length(results) == amount
-    #             for obj in results
-    #                 @eval begin
-    #                     @test $op(obj.N_VERTICES, 8)
-    #                 end
-    #             end
-    #         end
-    #     end
-    # end
+    @testset "Basic querying" begin
+        db = Polymake.Polydb.get_db()
+        collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
+        @testset "`Polymake.BigObject`-templated types" begin
+            complete = collect(collection_bo)
+            @test length(complete) == 25
+            for (constraints, amount, op) in    [(["N_VERTICES" => 8], 7, :(==)),
+                                                (["N_VERTICES" => Dict("\$lt" => 8)], 12, :<),
+                                                (["N_VERTICES" => Dict("\$gt" => 8)], 6, :>)]
+                query = Dict(constraints...)
+                results = collect(Polymake.Polydb.find(collection, constraints...))
+                @test length(results) == amount
+                for obj in results
+                    @eval begin
+                        @test $op(obj.N_VERTICES, 8)
+                    end
+                end
+                results = collect(Polymake.Polydb.find(collection, query))
+                @test length(results) == amount
+                for obj in results
+                    @eval begin
+                        @test $op(obj.N_VERTICES, 8)
+                    end
+                end
+            end
+            let constraints = ["N_VERTICES"=>8, "N_HILBERT_BASIS"=>27]
+                query = Dict(constraints...)
+                results = collect(Polymake.Polydb.find(collection, constraints...))
+                @test length(results) == 2
+                for obj in results
+                    @test obj.N_VERTICES == 8
+                    @test obj.N_HILBERT_BASIS == 27
+                end
+                results = collect(Polymake.Polydb.find(collection, query))
+                @test length(results) == 2
+                for obj in results
+                    @test obj.N_VERTICES == 8
+                    @test obj.N_HILBERT_BASIS == 27
+                end
+            end
+        end
+    end
     #
     # @testset "Query macros" begin
     #     @test 1 == 1
