@@ -31,7 +31,7 @@ jobs:
           # Maps tcp port 27017 on service container to the host
           - 27017:27017
     env:
-        POLYDB_SERVER_URI: "mongodb://localhost:27017/polydb_dump?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)"
+        POLYDB_SERVER_URI: "mongodb://localhost:27017/polydb_dump?username=admin&password=admin"
     steps:
       - uses: actions/checkout@v2.1.0
       - name: "Set up Julia"
