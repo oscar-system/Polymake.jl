@@ -12,8 +12,6 @@ using Mongoc
 
 import Mongoc: find
 
-POLYDB_SERVER_URI = "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)"
-
 #Polymake.Polydb's types store information via
 # a corresponding Mongoc type variable
 struct Database
@@ -32,7 +30,7 @@ end
 # returns a Polymake.Polydb.Database instance
 function get_db()
    # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
-   client = Mongoc.Client(POLYDB_SERVER_URI)
+   client = Mongoc.Client(get(ENV, "POLYDB_SERVER_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)"))
    return Database(client["polydb"])
 end
 
@@ -118,9 +116,9 @@ function get_fields(coll::Collection)
    return temp[(!startswith).(temp, "_")]
 end
 
-function _get_field_string(coll::Collection)
-   return join(get_fields(coll), ", ")
-end
+# function _get_field_string(coll::Collection)
+#    return join(get_fields(coll), ", ")
+# end
 
 # recursive helpers to read more complex metadata
 # currently only neccessary for `Polytopes.Lattice.SmoothReflexive`
@@ -299,6 +297,7 @@ end
 # Advanced Querying
 
 _operationToMongo = Dict{Symbol, String}(
+   :(==) => "\$eq",
    :< => "\$lt",
    :<= => "\$lte",
    :> => "\$gt",
@@ -310,7 +309,7 @@ macro select(args...)
    if length(args) > 1 || !(args[1] isa String)
       throw(ArgumentError("`Polymake.Polydb.@select` macro needs to be called together with a String representing a collection's name, e.g. `Polymake.Polydb.@select \"Polytopes.Lattice.SmoothReflexive\"`"))
    end
-   :(x -> (getindex(x, $args[1]), Dict{String, Any}()))
+   :(x -> getindex(x, $args[1]))
 end
 
 macro filter(args...)
@@ -320,13 +319,13 @@ macro filter(args...)
          throw(ArgumentError(string("no applicable condition: ", args[i])))
       end
       op, key, val = args[i].args
-      if (op == :(==))
-         d[key] = val
+      if haskey(d, key)
+         d[key][_operationToMongo[Symbol(op)]] = val
       else
          d[key] = Dict{String, Any}(_operationToMongo[Symbol(op)] => val)
       end
    end
-   :(x -> (x[1], merge(x[2], $d)))
+   :(x -> x isa Polymake.Polydb.Collection ? (x, $d) : (x[1], merge(x[2], $d)))
 end
 
 macro map(args...)
@@ -346,11 +345,6 @@ function _find(c::Collection, d::Dict, opt_set::Dict{String, Dict{String, Bool}}
       opt_set["projection"][field] = true
    end
    return find(c, d; opts=opt_set)
-end
-
-# Method to overwrite POLYDB_SERVER_URI
-function _set_uri(uri::String)
-   POLYDB_SERVER_URI = uri
 end
 
 end
