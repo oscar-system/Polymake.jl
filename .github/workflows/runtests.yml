@@ -79,6 +79,8 @@ jobs:
 
       fail-fast: false
 
+    env:
+      POLYDB_TEST: "off"
     steps:
       - uses: actions/checkout@v2.1.0
       - name: "Set up Julia"
