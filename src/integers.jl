@@ -30,7 +30,10 @@ Base.promote_rule(::Type{<:Integer}, ::Type{<:AbstractFloat}) = Float64
 
 # BigInt constructor from Integer
 @inline function Base.BigInt(int::pmI) where pmI<:Integer
-    return deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
+    GC.@preserve int begin
+        i = deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
+    end
+    return i
 end
 # all convert(T, x) fallbacks to T(x)
 # big(::Integer) goes through convert(BigInt, x)
@@ -51,3 +54,14 @@ Base.trailing_zeros(int::Integer) = trailing_zeros(BigInt(int))
 Base.trailing_ones(int::Integer) = trailing_ones(BigInt(int))
 Base.:(>>)(int::Polymake.Integer, n::UInt64) = >>(BigInt(int), n)
 Base.:(<<)(int::Polymake.Integer, n::UInt64) = <<(BigInt(int), n)
+
+Base.checked_abs(x::Integer) = abs(x)
+Base.checked_neg(x::Integer) = -x
+Base.checked_add(a::Integer, b::Integer) = a + b
+Base.checked_sub(a::Integer, b::Integer) = a - b
+Base.checked_mul(a::Integer, b::Integer) = a * b
+Base.checked_div(a::Integer, b::Integer) = div(a, b)
+Base.checked_rem(a::Integer, b::Integer) = rem(a, b)
+Base.add_with_overflow(a::Integer, b::Integer) = a + b, false
+Base.sub_with_overflow(a::Integer, b::Integer) = a - b, false
+Base.mul_with_overflow(a::Integer, b::Integer) = a * b, false
