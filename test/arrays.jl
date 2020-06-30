@@ -62,6 +62,10 @@
         @test length(A) == 2l
         @test A[1] == A[l+1] && A[l] == A[2l]
 
+        A = append!(copy(arr), arr)
+        @test A != arr
+        @test length(A) == 2l
+
         append!(A, [[1 2 3], [1 2]])
         @test A[end] == [1 2]
         @test A[end-1] == [1 2 3]

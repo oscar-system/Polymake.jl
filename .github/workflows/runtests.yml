@@ -24,12 +24,15 @@ jobs:
             julia-version: '1.3'
           - os: macos-latest
             julia-version: 'nightly'
-        # add a few extra tests: xcode 11.4 bug and legacy cxxwrap 0.9
+        # add a few extra tests: xcode 11.4 bug and legacy cxxwrap
         include:
           - xcode: '11.4'
             os: macos-latest
             julia-version: 1.4
           - cxxwrap: '0.9'
+            os: ubuntu-latest
+            julia-version: 1.4
+          - cxxwrap: '0.10'
             os: ubuntu-latest
             julia-version: 1.4
 
