@@ -24,8 +24,8 @@ using Mongoc
         @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection
         @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection{Mongoc.BSON}
         collection_bson = Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo)
-        @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection
-        @test Polymake.Polydb.Collection{Mongoc.BSON}(collection_bo) isa Polymake.Polydb.Collection{Mongoc.BSON}
+        @test Polymake.Polydb.Collection{Polymake.BigObject}(collection_bson) isa Polymake.Polydb.Collection
+        @test Polymake.Polydb.Collection{Polymake.BigObject}(collection_bson) isa Polymake.Polydb.Collection{Polymake.BigObject}
         constraints = _acp(["DIM" => 3, "N_VERTICES" => 8])
         query = Dict(constraints...)
         @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor
@@ -63,6 +63,10 @@ using Mongoc
             fields = Polymake.Polydb.get_fields(collection_bo)
             @test length(fields) == (get(ENV, "POLYDB_SERVER_URI", "") == "" ? 43 : 44)
             @test fields[1] == "AFFINE_HULL"
+            @test repr(collection_bo) isa String
+            @test Polymake.Polydb.get_collection_names(db) isa Array{String}
+            collections = Polymake.Polydb.get_collection_names(db)
+            @test_throws MethodError Polymake.Polydb.info(db)
         end
     end
 

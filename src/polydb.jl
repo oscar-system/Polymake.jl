@@ -116,10 +116,6 @@ function get_fields(coll::Collection)
    return temp[(!startswith).(temp, "_")]
 end
 
-# function _get_field_string(coll::Collection)
-#    return join(get_fields(coll), ", ")
-# end
-
 # recursive helpers to read more complex metadata
 # currently only neccessary for `Polytopes.Lattice.SmoothReflexive`
 function _read_fields(a::Array)
