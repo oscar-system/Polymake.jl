@@ -1,0 +1,5 @@
+[deps]
+CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
+Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Polymake = "d720cf60-89b5-51f5-aff5-213f193123e7"
