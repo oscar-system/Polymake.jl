@@ -136,6 +136,10 @@ function _read_fields(d::Dict)
    end
 end
 
+function _get_field_string(coll::Collection)
+   return join(get_fields(coll), ", ")
+end
+
 # shows information about a specific Collection
 function Base.show(io::IO, coll::Collection)
    db = Database(coll.mcol.database)
