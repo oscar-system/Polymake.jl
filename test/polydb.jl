@@ -1,11 +1,11 @@
 using Mongoc
 
 @testset "polyDB" begin
-    add_constraints_poly = get(ENV, "POLYDB_SERVER_URI", "") == "" ? ["DIM" => Dict("\$lte" => 3)] : []
+    add_constraints_poly = get(ENV, "POLYDB_TEST_URI", "") == "" ? ["DIM" => Dict("\$lte" => 3)] : []
     function _acp(a::Array)
         return append!(Array{Pair{String,Any}}(a), add_constraints_poly)
     end
-    add_constraints_mat = get(ENV, "POLYDB_SERVER_URI", "") == "" ? [:("N_ELEMENTS" <= 4)] : []
+    add_constraints_mat = get(ENV, "POLYDB_TEST_URI", "") == "" ? [:("N_ELEMENTS" <= 4)] : []
     function _acm(a::Array)
         return append!(Array{Expr}(a), add_constraints_mat)
     end
