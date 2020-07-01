@@ -1,4 +1,18 @@
-const SmallObject = Union{Integer, Rational, Matrix, Vector, Set, Array, SparseMatrix, SparseVector, TropicalNumber, IncidenceMatrix, Polynomial}
+const SmallObject = Union{
+    StdPair,
+    StdList,
+    Integer,
+    Rational,
+    Matrix,
+    Vector,
+    Set,
+    Array,
+    SparseMatrix,
+    SparseVector,
+    TropicalNumber,
+    IncidenceMatrix,
+    Polynomial,
+}
 const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, CxxWrap.CxxLong}
 
 const TypeConversionFunctions = Dict(
@@ -21,3 +35,13 @@ function fill_wrapped_types!(wrapped_types_dict, function_type_list)
 end
 
 fill_wrapped_types!(TypeConversionFunctions, get_type_names())
+
+# libcxxwrap-julia prior to 0.8 mapped C++ copy to Base.deepcopy
+# now it is mapped to Base.copy
+# we make sure both really do a C++ copy for polymake types
+# whether this is deep or not cannot be enforced anyway
+if jlcxx_version >= v"0.8.0"
+    Base.deepcopy(x::T) where T<:SmallObject = Base.copy(x)
+else
+    Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
+end

@@ -54,8 +54,8 @@ end
 
 ### Promotion rules
 
-Base.promote_rule(::Type{<:Set{S}}, ::Type{Base.Set{T}}) where {S,T} = Base.Set{promote_type(to_jl_type(S),T)}
-
+Base.promote_rule(::Type{<:Set{S}}, ::Type{Base.Set{T}}) where {S,T} =
+    Base.Set{promote_type(to_jl_type(S),T)}
 Base.emptymutable(s::Set{T}, ::Type{U}=to_jl_type(T)) where {T,U} =
     Base.emptymutable(Base.Set{to_jl_type(T)}(), U)
 Base.copymutable(s::Set{T}) where T = Base.Set{to_jl_type(T)}(s)
@@ -73,8 +73,6 @@ end
 ==(T::AbstractSet, S::Set) = S == T
 
 Base.allunique(::Set) = true
-
-Base.copy(S::Set) = deepcopy(S)
 
 # delete! : Defined on the C++ side
 Base.delete!(s::Set{T}, x) where T = delete!(s, T(x))
