@@ -53,10 +53,6 @@ using Mongoc
         @testset "Iterator (Collection)" begin
             @test iterate(collection_bo) isa Tuple{Polymake.BigObject, Polymake.Polydb.Cursor{Polymake.BigObject}}
             @test iterate(collection_bson) isa Tuple{Mongoc.BSON, Mongoc.Cursor}
-            if (get(ENV, "POLYDB_SERVER_URI", "") != "")
-                @test collect(collection_bo) isa Array{Polymake.BigObject}
-                @test collect(collection_bson) isa Array{Mongoc.BSON}
-            end
         end
         @testset "Information" begin
             @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
