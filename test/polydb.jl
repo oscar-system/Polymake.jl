@@ -53,16 +53,12 @@ using Mongoc
         @testset "Iterator (Collection)" begin
             @test iterate(collection_bo) isa Tuple{Polymake.BigObject, Polymake.Polydb.Cursor{Polymake.BigObject}}
             @test iterate(collection_bson) isa Tuple{Mongoc.BSON, Mongoc.Cursor}
-            if (get(ENV, "POLYDB_SERVER_URI", "") != "")
-                @test collect(collection_bo) isa Array{Polymake.BigObject}
-                @test collect(collection_bson) isa Array{Mongoc.BSON}
-            end
         end
         @testset "Information" begin
             @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
             fields = Polymake.Polydb.get_fields(collection_bo)
-            @test length(fields) == (get(ENV, "POLYDB_SERVER_URI", "") == "" ? 43 : 44)
-            @test fields[1] == "AFFINE_HULL"
+            @test length(fields) > 10
+            @test "FACETS" in fields
             @test repr(collection_bo) isa String
             @test Polymake.Polydb.get_collection_names(db) isa Array{String}
             collections = Polymake.Polydb.get_collection_names(db)
@@ -77,10 +73,6 @@ using Mongoc
                                     (Mongoc.BSON, :((x,y) -> x[y]))]
             collection = Polymake.Polydb.Collection{template}(collection_bo)
             @testset "`$template`-templated types" begin
-                if (get(ENV, "POLYDB_SERVER_URI", "") != "")
-                    complete = collect(collection)
-                    @test length(complete) == 25
-                end
                 for (constraints, amount, op) in    [(_acp(["N_VERTICES" => 8]), 7, :(==)),
                                                     (_acp(["N_VERTICES" => Dict("\$lt" => 8)]), 12, :<),
                                                     (_acp(["N_VERTICES" => Dict("\$gt" => 8)]), 6, :>)]
