@@ -58,7 +58,7 @@ using Mongoc
             @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
             fields = Polymake.Polydb.get_fields(collection_bo)
             @test length(fields) > 10
-            @test fields[1] == "AFFINE_HULL"
+            @test "FACETS" in fields
             @test repr(collection_bo) isa String
             @test Polymake.Polydb.get_collection_names(db) isa Array{String}
             collections = Polymake.Polydb.get_collection_names(db)
