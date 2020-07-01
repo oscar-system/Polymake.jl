@@ -73,10 +73,6 @@ using Mongoc
                                     (Mongoc.BSON, :((x,y) -> x[y]))]
             collection = Polymake.Polydb.Collection{template}(collection_bo)
             @testset "`$template`-templated types" begin
-                if (get(ENV, "POLYDB_SERVER_URI", "") != "")
-                    complete = collect(collection)
-                    @test length(complete) == 25
-                end
                 for (constraints, amount, op) in    [(_acp(["N_VERTICES" => 8]), 7, :(==)),
                                                     (_acp(["N_VERTICES" => Dict("\$lt" => 8)]), 12, :<),
                                                     (_acp(["N_VERTICES" => Dict("\$gt" => 8)]), 6, :>)]
