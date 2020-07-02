@@ -40,8 +40,12 @@ fill_wrapped_types!(TypeConversionFunctions, get_type_names())
 # now it is mapped to Base.copy
 # we make sure both really do a C++ copy for polymake types
 # whether this is deep or not cannot be enforced anyway
-if CxxWrap.libcxxwrapversion() >= v"0.8.0"
+#
+# relevant is the libcxxwrap version that is used at build-time
+# which is fixed to 0.8.0 at the moment so we dont need the else case
+# and cxxwrap 0.10 with libcxxwrap 0.7 might still work
+#if CxxWrap.libcxxwrapversion() >= v"0.8.0"
     Base.deepcopy(x::T) where T<:SmallObject = Base.copy(x)
-else
-    Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
-end
+#else
+#    Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
+#end
