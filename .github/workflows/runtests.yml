@@ -35,6 +35,8 @@ jobs:
           - cxxwrap: '0.10'
             os: ubuntu-latest
             julia-version: 1.4
+          - os: ubuntu-20.04
+            julia-version: 1.4
 
       fail-fast: false
 
