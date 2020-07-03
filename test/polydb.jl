@@ -1,16 +1,18 @@
 using Mongoc
 
 @testset "polyDB" begin
-    add_constraints_poly = get(ENV, "POLYDB_TEST_URI", "") == "" ? ["DIM" => Dict("\$lte" => 3)] : []
+    # conditions from which the test database dump was generated.
+    add_constraints_poly = ["DIM" => Dict("\$lte" => 3)]
     function _acp(a::Array)
         return append!(Array{Pair{String,Any}}(a), add_constraints_poly)
     end
-    add_constraints_mat = get(ENV, "POLYDB_TEST_URI", "") == "" ? [:("N_ELEMENTS" <= 4)] : []
+    add_constraints_mat = [:("N_ELEMENTS" <= 4)]
     function _acm(a::Array)
         return append!(Array{Expr}(a), add_constraints_mat)
     end
 
     @testset "Basic functionality" begin
+        # Types
         @test Polymake.Polydb.get_db() isa Polymake.Polydb.Database
         db = Polymake.Polydb.get_db()
         @test db["Polytopes.Lattice.SmoothReflexive"] isa Polymake.Polydb.Collection
@@ -28,6 +30,7 @@ using Mongoc
         @test Polymake.Polydb.Collection{Polymake.BigObject}(collection_bson) isa Polymake.Polydb.Collection{Polymake.BigObject}
         constraints = _acp(["DIM" => 3, "N_VERTICES" => 8])
         query = Dict(constraints...)
+        # Queries
         @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor
         @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor{Polymake.BigObject}
         @test Polymake.Polydb.find(collection_bo, constraints...) isa Polymake.Polydb.Cursor

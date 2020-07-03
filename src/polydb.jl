@@ -28,6 +28,10 @@ end
 
 # connects to the Polydb and
 # returns a Polymake.Polydb.Database instance
+#
+# the uri of the server can be set in advance by writing its `String` representation
+# into ENV["POLYDB_TEST_URI"]
+# (used to connect to the github services container for testing)
 function get_db()
    # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
    client = Mongoc.Client(get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)"))
@@ -49,6 +53,7 @@ function Mongoc.find(c::Collection{T}, d::Pair...) where T
 end
 
 # creating `BSON` iterators from the respective `Polymake.BigObject` iterator
+# and vice versa
 function Collection{T}(c::Collection) where T<:Union{Polymake.BigObject, Mongoc.BSON}
    return Collection{T}(c.mcol)
 end
@@ -63,7 +68,7 @@ function parse_document(bson::Mongoc.BSON)
    return @pm common.deserialize_json_string(str)
 end
 
-#Iterator
+# Iterator
 
 Base.IteratorSize(::Type{<:Cursor}) = Base.SizeUnknown()
 Base.eltype(::Cursor{T}) where T = T
@@ -136,10 +141,6 @@ function _read_fields(d::Dict)
    end
 end
 
-function _get_field_string(coll::Collection)
-   return join(get_fields(coll), ", ")
-end
-
 # shows information about a specific Collection
 function Base.show(io::IO, coll::Collection)
    db = Database(coll.mcol.database)
@@ -186,7 +187,7 @@ function _get_contact(a::Array)
    return string("\t\t", join(res, "\n\t\t"))
 end
 
-# returns information String about a specific section
+# returns information `String` about a specific section
 function _get_section_string(db::Database, name::String, level::Base.Integer)
    info = _get_info_document(db, string("_sectionInfo.", name))
    res = [string("SECTION: ", join(info["section"], "."))]
@@ -202,7 +203,7 @@ function _get_section_string(db::Database, name::String, level::Base.Integer)
    return join(res, "\n")
 end
 
-# returns information String about a specific collection
+# returns information `String` about a specific collection
 function _get_collection_string(db::Database, name::String, level::Base.Integer)
    info = _get_info_document(db, string("_collectionInfo.", name))
    res = [string("\tCOLLECTION: ", name)]
@@ -219,20 +220,21 @@ function _get_collection_string(db::Database, name::String, level::Base.Integer)
       push!(res, string("\tMaintained by", "\n", _get_contact(info["maintainer"])))
    end
    if level >= 5
-      push!(res, string("\tFields: ", _get_field_string(db[name])))
+      push!(res, string("\tFields: ", join(get_fields(db[name]), ", ")))
    end
    return join(res, "\n")
 end
 
 # prints a sorted list of the sections and collections of the Polydb
 # together with information about each of these, if existent
+#
 # relying on the structure of Polydb
 function info(db::Database, level::Base.Integer=1)
    dbtree = _get_db_tree(db)
    println(join(_get_info_strings(db, dbtree, level), "\n\n"))
 end
 
-# returns a tree-like nesting of Dicts and Array{String}s
+# returns a tree-like nesting of `Dict`s and `Array{String}`s
 # representing polyDB's structure
 function _get_db_tree(db)
    root = Dict{String, Union{Dict, Array{String, 1}}}()
@@ -255,7 +257,7 @@ function _get_db_tree(db)
    return root
 end
 
-# recursively generates the info Strings from the tree received by `_get_db_tree`
+# recursively generates the info `String`s from the tree received by `_get_db_tree`
 function _get_info_strings(db::Database, tree::Dict, level::Base.Integer, path::String="")
    res = Array{String, 1}()
    for (key, value) in tree
@@ -266,7 +268,7 @@ function _get_info_strings(db::Database, tree::Dict, level::Base.Integer, path::
    return res
 end
 
-# leaves of the tree are the collections, whose names are stored in an Array{String}
+# leaves of the tree are the collections, whose names are stored in an `Array{String}`
 function _get_info_strings(db:: Database, colls::Array{String, 1}, level::Base.Integer, path::String="")
    res = Array{String, 1}()
    for coll in colls
@@ -276,12 +278,13 @@ function _get_info_strings(db:: Database, colls::Array{String, 1}, level::Base.I
 end
 
 # for a given collection or section name,
-# returns the `BSON` document we read the meta information from
+# returns the `Mongoc.BSON` document we read the meta information from
 function _get_info_document(db::Database, name::String)
    i = startswith(name, "_c") ? 17 : 14
    return Mongoc.find_one(db.mdb[name], Mongoc.BSON("_id" => string(SubString(name, i), ".2.1")))
 end
 
+# prints customized information about a collection
 function info(coll::Collection, level::Base.Integer=5)
    db = Database(coll.mcol.database)
    name = coll.mcol.name
@@ -296,6 +299,9 @@ end
 
 # Advanced Querying
 
+# this table contains operations in julia syntax and the corresponding
+# `String` for the mongo query
+# used by `@filter` macro. expanding this table can increase the supported operations
 _operationToMongo = Dict{Symbol, String}(
    :(==) => "\$eq",
    :< => "\$lt",
@@ -305,6 +311,11 @@ _operationToMongo = Dict{Symbol, String}(
    :!= => "\$ne"
 )
 
+"""
+   Polymake.Polydb.@select collectionName
+
+TODO: doctext
+"""
 macro select(args...)
    if length(args) > 1 || !(args[1] isa String)
       throw(ArgumentError("`Polymake.Polydb.@select` macro needs to be called together with a String representing a collection's name, e.g. `Polymake.Polydb.@select \"Polytopes.Lattice.SmoothReflexive\"`"))
@@ -312,6 +323,11 @@ macro select(args...)
    :(x -> getindex(x, $args[1]))
 end
 
+"""
+   Polymake.Polydb.@filter conditions...
+
+TODO:  doctext
+"""
 macro filter(args...)
    d = Dict{String, Any}()
    for i=1:length(args)
@@ -328,6 +344,11 @@ macro filter(args...)
    :(x -> x isa Polymake.Polydb.Collection ? (x, $d) : (x[1], merge(x[2], $d)))
 end
 
+"""
+   Polymake.Polydb.@map
+
+TODO: doctext
+"""
 macro map(args...)
    if length(args) == 0
       :(x -> find(x[1], x[2]))
@@ -340,6 +361,9 @@ macro map(args...)
    end
 end
 
+# this method is generated by the `@map` macro
+# only opt_set is different depending on input of the macro. this will be used for
+# projecting to the union of the minimum neccessary fields and the user given fields
 function _find(c::Collection, d::Dict, opt_set::Dict{String, Dict{String, Bool}})
    for field in get_fields(c)
       opt_set["projection"][field] = true
