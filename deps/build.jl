@@ -15,7 +15,7 @@ dependencies = [
     "build_cddlib.v0.94.10.jl",
     "build_FLINT.v0.0.2.jl",
     "build_GMP.v6.1.2.jl",
-    "build_libpolymake_julia.v0.0.1.jl",
+    "build_libpolymake_julia.v0.0.2.jl",
     "build_lrslib.v0.1.0.jl",
     "build_MPFR.v4.0.2.jl",
     "build_Ncurses.v6.1.0.jl",
@@ -23,7 +23,7 @@ dependencies = [
     "build_normaliz.v3.8.4.jl",
     "build_PPL.v1.2.0.jl",
     "build_Perl.v5.30.3.jl",
-    "build_polymake.v4.1.0.jl",
+    "build_polymake.v4.1.1.jl",
     "build_Readline.v8.0.4.jl",
 ]
 

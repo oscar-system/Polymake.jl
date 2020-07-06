@@ -60,7 +60,7 @@ json_script = joinpath(deps_dir,"rules","apptojson.pl")
 json_folder = joinpath(deps_dir,"json")
 mkpath(json_folder)
 
-run(`$perl $polymake --no-config --iscript $json_script $json_folder`)
+run(`$polymake_run_script $json_script $json_folder`)
 
 include(type_translator)
 

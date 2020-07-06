@@ -2,6 +2,9 @@
 
 require JSON;
 
+# needed for help text gathering
+require Polymake::Core::Shell;
+
 die "usage: $0 <pathname>" unless @ARGV >= 1;
 
 
@@ -91,7 +94,6 @@ sub help_to_hash($$$) {
    } else {
       # this is necessary due to a bug in polymake
       $fun{doc} = "";
-      print STDERR "WARNING: skipping text docs for ",$help->name,"\n";
    }
 
    return \%fun;
