@@ -42,8 +42,11 @@ fill_wrapped_types!(TypeConversionFunctions, get_type_names())
 # whether this is deep or not cannot be enforced anyway
 #
 # relevant is the libcxxwrap version that is used at build-time
-# which is fixed to 0.8.0 at the moment so we dont need the else case
+# which is fixed to 0.8.0 for binarybuilder
 # and cxxwrap 0.10 with libcxxwrap 0.7 might still work
+# FIXME: we might need to add this with the build-time 
+# libcxxwrapversion for custom installations ....
+
 #if CxxWrap.libcxxwrapversion() >= v"0.8.0"
     Base.deepcopy(x::T) where T<:SmallObject = Base.copy(x)
 #else
