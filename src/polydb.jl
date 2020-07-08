@@ -161,8 +161,8 @@ function get_collection_names(db::Database)
    res = Array{String, 1}()
    sizehint!(res, floor(Int, length(names)/2))
    for name in names
-      if !startswith(name, "_")
-         push!(res, name)
+      if startswith(name, "_c")
+         push!(res, SubString(name, 17))
       end
    end
    return res
@@ -229,9 +229,9 @@ end
 # together with information about each of these, if existent
 #
 # relying on the structure of Polydb
-function info(db::Database, level::Base.Integer=1)
+function info(db::Database, level::Base.Integer=1, io::IO=stdout)
    dbtree = _get_db_tree(db)
-   println(join(_get_info_strings(db, dbtree, level), "\n\n"))
+   println(io, join(_get_info_strings(db, dbtree, level), "\n\n"))
 end
 
 # returns a tree-like nesting of `Dict`s and `Array{String}`s

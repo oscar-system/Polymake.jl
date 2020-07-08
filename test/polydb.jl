@@ -58,14 +58,20 @@ using Mongoc
             @test iterate(collection_bson) isa Tuple{Mongoc.BSON, Mongoc.Cursor}
         end
         @testset "Information" begin
-            @test Polymake.Polydb.get_fields(collection_bo) isa Array{String, 1}
-            fields = Polymake.Polydb.get_fields(collection_bo)
-            @test length(fields) > 10
-            @test "FACETS" in fields
-            @test repr(collection_bo) isa String
+            for (col, f_name) in [(collection_bo, "FACETS"), (db["Matroids.Small"], "N_ELEMENTS")]
+                @test Polymake.Polydb.get_fields(col) isa Array{String, 1}
+                fields = Polymake.Polydb.get_fields(col)
+                @test length(fields) > 10
+                @test f_name in fields
+                @test repr(col) isa String
+            end
             @test Polymake.Polydb.get_collection_names(db) isa Array{String}
             collections = Polymake.Polydb.get_collection_names(db)
-            @test_throws MethodError Polymake.Polydb.info(db)
+            # this only checks if print is non-empty
+            io = IOBuffer()
+            Polymake.Polydb.info(db, 1, io)
+            infostring = String(take!(io))
+            @test length(infostring) > 50
         end
     end
 
