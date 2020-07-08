@@ -225,7 +225,7 @@ function _get_collection_string(db::Database, name::String, level::Base.Integer)
    return join(res, "\n")
 end
 
-# prints a sorted list of the sections and collections of the Polydb
+# prints a structured list of the sections and collections of the Polydb
 # together with information about each of these, if existent
 #
 # relying on the structure of Polydb
