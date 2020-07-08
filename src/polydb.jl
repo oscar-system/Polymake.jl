@@ -160,8 +160,8 @@ function get_collection_names(db::Database)
    res = Array{String, 1}()
    sizehint!(res, floor(Int, length(names)/2))
    for name in names
-      if !startswith(name, "_")
-         push!(res, name)
+      if startswith(name, "_collectionInfo")
+         push!(res, name[17:end])
       end
    end
    return res
