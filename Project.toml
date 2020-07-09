@@ -18,9 +18,9 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 [compat]
 BinaryProvider = "^0.5.3"
 CMake = "^1.1.1"
-CxxWrap = "0.9.1, 0.10.1, 0.11"
+CxxWrap = "0.10.1, 0.11"
 JSON = "^0.20, ^0.21"
-LoadFlint = "^0.2.1"
+LoadFlint = "^0.3.0"
 julia = "^1.3"
 
 [extras]

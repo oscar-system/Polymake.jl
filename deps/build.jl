@@ -13,7 +13,7 @@ dependencies = [
     "build_bliss.v0.73.0.jl",
     "build_boost.v1.71.0.jl",
     "build_cddlib.v0.94.10.jl",
-    "build_FLINT.v0.0.2.jl",
+    "build_FLINT.v2.6.0.jl",
     "build_GMP.v6.1.2.jl",
     "build_libpolymake_julia.v0.0.2.jl",
     "build_lrslib.v0.1.0.jl",

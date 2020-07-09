@@ -29,9 +29,6 @@ jobs:
           - xcode: '11.4'
             os: macos-latest
             julia-version: 1.4
-          - cxxwrap: '0.9'
-            os: ubuntu-latest
-            julia-version: 1.4
           - cxxwrap: '0.10'
             os: ubuntu-latest
             julia-version: 1.4
