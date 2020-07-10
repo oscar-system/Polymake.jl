@@ -20,7 +20,7 @@ dependencies = [
     "build_MPFR.v4.0.2.jl",
     "build_Ncurses.v6.1.0.jl",
     "build_Ninja.v1.10.0.jl",
-    "build_normaliz.v3.8.4.jl",
+    "build_normaliz.v3.8.5.jl",
     "build_PPL.v1.2.0.jl",
     "build_Perl.v5.30.3.jl",
     "build_polymake.v4.1.1.jl",

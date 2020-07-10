@@ -2,11 +2,7 @@
 
 require JSON;
 
-# needed for help text gathering
-require Polymake::Core::Shell;
-
 die "usage: $0 <pathname>" unless @ARGV >= 1;
-
 
 my $jsonpath = shift @ARGV;
 
