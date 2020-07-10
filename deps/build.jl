@@ -86,7 +86,12 @@ Your platform $(triplet(platform)) is not supported by this package!
 If you already have a polymake installation you need to set the environment variable `POLYMAKE_CONFIG`.
 """)
     end
+    pm_bin_prefix = joinpath(@__DIR__,"usr")
     if unsatisfied || !isinstalled(dl_info...; prefix=prefix)
+        if isdir(pm_bin_prefix)
+            # make sure we can overwrite all the directories (e.g. ncurses)
+            run(`chmod -R u+w $(pm_bin_prefix)`)
+        end
         # Download and install binaries
         for dependency in dependencies          # We do not check for already installed dependencies
             build_file = joinpath(@__DIR__, dependency)
@@ -95,8 +100,6 @@ If you already have a polymake installation you need to set the environment vari
         end
         install(dl_info...; prefix=prefix, force=true, verbose=verbose)
     end
-    pm_config_ninja = joinpath(libdir(prefix),"polymake","config.ninja")
-    pm_bin_prefix = joinpath(@__DIR__,"usr")
     depsjl = :(
         function prepare_env()
             ENV["POLYMAKE_USER_DIR"] = abspath(joinpath(Pkg.depots1(),"polymake_user"));
@@ -119,6 +122,7 @@ If you already have a polymake installation you need to set the environment vari
         end
     end
 
+    pm_config_ninja = joinpath(libdir(prefix),"polymake","config.ninja")
     run(`$perl -pi -e "s{/workspace/destdir}{$pm_bin_prefix}g" $pm_config_ninja`)
 
     # adjust signal used for initalization purposes to avoid problems
