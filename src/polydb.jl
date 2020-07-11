@@ -139,7 +139,7 @@ function _read_fields(d::Dict)
    elseif haskey(d, "allOf")
       return _read_fields(d["allOf"])
    else
-      throw(KeyError(string("could not read required fields due to invalid entry: ", d)))
+      throw(ArgumentError(string("could not read required fields due to invalid entry: ", d)))
    end
 end
 
