@@ -12,6 +12,7 @@ const SmallObject = Union{
     TropicalNumber,
     IncidenceMatrix,
     Polynomial,
+    Map,
 }
 const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, CxxWrap.CxxLong}
 
