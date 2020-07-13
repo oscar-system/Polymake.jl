@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"polydb._collectionInfo.Manifolds.DIM2_3"}],"uuid":"8038f2ecd2ce44aba77b0eb9f4b7c413"}

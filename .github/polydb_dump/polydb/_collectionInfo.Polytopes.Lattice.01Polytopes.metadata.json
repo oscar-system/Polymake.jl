@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"polydb._collectionInfo.Polytopes.Lattice.01Polytopes"}],"uuid":"848f02d6a6de4cb68e080227dea1e476"}
