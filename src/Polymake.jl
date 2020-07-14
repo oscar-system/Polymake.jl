@@ -33,6 +33,10 @@ import Libdl.dlext
 # See also https://github.com/Nemocas/Nemo.jl/issues/788
 import LoadFlint
 
+using Perl_jll
+using Ninja_jll
+using libpolymake_julia_jll
+
 struct PolymakeError <: Exception
     msg
 end
@@ -52,7 +56,7 @@ deps_dir = joinpath(@__DIR__, "..", "deps")
 include("repl.jl")
 include("ijulia.jl")
 
-include(joinpath(deps_dir,"deps.jl"))
+#include(joinpath(deps_dir,"deps.jl"))
 
 @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
 
@@ -60,17 +64,27 @@ json_script = joinpath(deps_dir,"rules","apptojson.pl")
 json_folder = joinpath(deps_dir,"json")
 mkpath(json_folder)
 
-run(`$polymake_run_script $json_script $json_folder`)
+polymake_run_script() do runner
+   run(`$runner $json_script $json_folder`)
+end
 
 include(type_translator)
 
 function __init__()
     @initcxx
 
-    if using_binary
-        check_deps()
-        prepare_env()
-    end
+    #if using_binary
+    #    check_deps()
+    #    prepare_env()
+    #end
+
+    global user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
+    
+    # prepare environment variables
+    ENV["PATH"] *= ":" * Ninja_jll.PATH
+    ENV["PATH"] *= ":" * Perl_jll.PATH
+    ENV["POLYMAKE_USER_DIR"] = user_dir
+    mkpath(user_dir)
 
     try
         show_banner = isinteractive() &&
