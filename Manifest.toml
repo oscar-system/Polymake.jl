@@ -1,0 +1,267 @@
+# This file is machine-generated - editing it directly is not advised
+
+[[Base64]]
+uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+
+[[BinDeps]]
+deps = ["Libdl", "Pkg", "SHA", "URIParser", "Unicode"]
+git-tree-sha1 = "46cf2c1668ad07aba5a9d331bdeea994a1f13856"
+uuid = "9e28174c-4ba2-5203-b857-d8d62c4213ee"
+version = "1.0.1"
+
+[[BinaryProvider]]
+deps = ["Libdl", "Logging", "SHA"]
+git-tree-sha1 = "ecdec412a9abc8db54c0efc5548c64dfce072058"
+uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
+version = "0.5.10"
+
+[[CMake]]
+deps = ["BinDeps"]
+git-tree-sha1 = "50a8b41d2c562fccd9ab841085fc7d1e2706da82"
+uuid = "631607c0-34d2-5d66-819e-eb0f9aa2061a"
+version = "1.2.0"
+
+[[CompilerSupportLibraries_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "7c4f882c41faa72118841185afc58a2eb00ef612"
+uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "0.3.3+0"
+
+[[CxxWrap]]
+deps = ["Libdl", "MacroTools", "libcxxwrap_julia_jll"]
+git-tree-sha1 = "762359626941f45b21238eb373a0bcedf6b61dd7"
+uuid = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
+version = "0.11.0"
+
+[[Dates]]
+deps = ["Printf"]
+uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+
+[[Distributed]]
+deps = ["Random", "Serialization", "Sockets"]
+uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+
+[[FLINT_jll]]
+deps = ["GMP_jll", "Libdl", "MPFR_jll", "Pkg"]
+git-tree-sha1 = "6f02df09ba3f03606780738fc25f4fda18f9b468"
+uuid = "e134572f-a0d5-539d-bddf-3cad8db41a82"
+version = "2.6.0+0"
+
+[[GMP_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "4dd9301d3a027c05ec403e756ee7a60e3c367e5d"
+uuid = "781609d7-10c4-51f6-84f2-b8444358ff6d"
+version = "6.1.2+5"
+
+[[Gettext_jll]]
+deps = ["Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
+git-tree-sha1 = "731622006369631e1d0c180a61d2dd5fe9e4dfd4"
+uuid = "78b55507-aeef-58d4-861c-77aaff3498b1"
+version = "0.20.1+4"
+
+[[InteractiveUtils]]
+deps = ["Markdown"]
+uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+
+[[JSON]]
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "0.21.0"
+
+[[LibGit2]]
+deps = ["Printf"]
+uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+
+[[Libdl]]
+uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+
+[[Libiconv_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "c9d4035d7481bcdff2babf5a55525a818ef8ed8f"
+uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
+version = "1.16.0+5"
+
+[[LinearAlgebra]]
+deps = ["Libdl"]
+uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[[LoadFlint]]
+deps = ["BinaryProvider", "FLINT_jll", "GMP_jll", "Libdl", "MPFR_jll"]
+git-tree-sha1 = "c8c1c6287849e1199caa6d92fc3579708c22b88c"
+uuid = "472f376f-f1cf-461b-9ac1-d103423be9b7"
+version = "0.3.0"
+
+[[Logging]]
+uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+
+[[MPFR_jll]]
+deps = ["GMP_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "584d55157951b8e029a1dafa70ee639d24e25644"
+uuid = "3a97d323-0669-5f0c-9066-3539efd106a3"
+version = "4.0.2+2"
+
+[[MacroTools]]
+deps = ["Markdown", "Random"]
+git-tree-sha1 = "f7d2e3f654af75f01ec49be82c231c382214223a"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.5"
+
+[[Markdown]]
+deps = ["Base64"]
+uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
+[[Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+
+[[Ncurses_jll]]
+deps = ["Gettext_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "8abe113efbf13dae7069194902f54aeb3c202e62"
+uuid = "68e3532b-a499-55ff-9963-d1c0c0748b3a"
+version = "6.1.0+4"
+
+[[Ninja_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "be987b7d4265f3297c8c5740bbc95fdeb6b5358e"
+uuid = "76642167-d241-5cee-8c94-7a494e8cb7b7"
+version = "1.10.0+0"
+
+[[PPL_jll]]
+deps = ["GMP_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "4cb5b7f7b6ad18d8ff955bea75fca1ca650bf3e0"
+uuid = "80dd9cbb-8b87-5171-a280-372cc418f402"
+version = "1.2.0+0"
+
+[[Parsers]]
+deps = ["Dates", "Test"]
+git-tree-sha1 = "10134f2ee0b1978ae7752c41306e131a684e1f06"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "1.0.7"
+
+[[Perl_jll]]
+deps = ["Libdl", "Pkg", "Readline_jll"]
+git-tree-sha1 = "52e12608bfaae678cb93f7e879d8a0828ca905da"
+uuid = "83958c19-0796-5285-893e-a1267f8ec499"
+version = "5.30.3+0"
+
+[[Pkg]]
+deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
+uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+
+[[Printf]]
+deps = ["Unicode"]
+uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[[REPL]]
+deps = ["InteractiveUtils", "Markdown", "Sockets"]
+uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+
+[[Random]]
+deps = ["Serialization"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[[Readline_jll]]
+deps = ["Libdl", "Ncurses_jll", "Pkg"]
+git-tree-sha1 = "1efb93f0083416648dd8ab7702f52a0451a27c87"
+uuid = "05236dd9-4125-5232-aa7c-9ec0c9b2c25a"
+version = "8.0.4+0"
+
+[[SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+
+[[Serialization]]
+uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+
+[[Sockets]]
+uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+
+[[SparseArrays]]
+deps = ["LinearAlgebra", "Random"]
+uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
+[[Test]]
+deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
+uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[[URIParser]]
+deps = ["Unicode"]
+git-tree-sha1 = "53a9f49546b8d2dd2e688d216421d050c9a31d0d"
+uuid = "30578b45-9adc-5946-b283-645ec420af67"
+version = "0.4.1"
+
+[[UUIDs]]
+deps = ["Random", "SHA"]
+uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+
+[[Unicode]]
+uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+
+[[XML2_jll]]
+deps = ["Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
+git-tree-sha1 = "432d91f45e950f2f2bda5c0f4e2b938c14493af9"
+uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
+version = "2.9.10+1"
+
+[[Zlib_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "622d8b6dc0c7e8029f17127703de9819134d1b71"
+uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.11+14"
+
+[[bliss_jll]]
+deps = ["GMP_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "2dd3966c5084f35af863e3cd5a98ee955f764d9f"
+uuid = "508c9074-7a14-5c94-9582-3d4bc1871065"
+version = "0.73.0+0"
+
+[[boost_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "4135c43c414bc32041148999f707f88544d810f2"
+uuid = "28df3c45-c428-5900-9ff8-a3135698ca75"
+version = "1.71.0+2"
+
+[[cddlib_jll]]
+deps = ["GMP_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "877efde5e9e2416840b784a864671aebaaad481e"
+uuid = "f07e07eb-5685-515a-97c8-3014f6152feb"
+version = "0.94.10+0"
+
+[[libcxxwrap_julia_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "1b2520ea0c1d5cbc12e8a97c15427133d726f743"
+uuid = "3eaa8342-bff7-56a5-9981-c04077f7cee7"
+version = "0.8.0+0"
+
+[[libpolymake_julia_jll]]
+deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg", "libcxxwrap_julia_jll", "polymake_jll"]
+git-tree-sha1 = "bc9f8eb99fcddc359a8ad878746a9e6eac203928"
+repo-rev = "master"
+repo-url = "https://github.com/benlorenz/libpolymake_julia_jll.jl"
+uuid = "4d8266f6-2b3b-57e3-ad7a-d431eaaac945"
+version = "0.0.4+0"
+
+[[lrslib_jll]]
+deps = ["GMP_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "6952c85611d3064f2743bcc5b88563b64098509d"
+uuid = "3873f7d0-7b7c-52c3-bdf4-8ab39b8f337a"
+version = "0.1.0+1"
+
+[[nauty_jll]]
+deps = ["GMP_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "2f41f884c7021fab26c718ca7eeea78122304d3a"
+uuid = "55c6dc9b-343a-50ca-8ff2-b71adb3733d5"
+version = "2.6.12+0"
+
+[[normaliz_jll]]
+deps = ["CompilerSupportLibraries_jll", "FLINT_jll", "GMP_jll", "Libdl", "Pkg", "nauty_jll"]
+git-tree-sha1 = "4f5482ed648d73fe8cfd9f92524fb61fd0e156b7"
+uuid = "6690c6e9-4e12-53b8-b8fd-4bffaef8839f"
+version = "3.8.5+0"
+
+[[polymake_jll]]
+deps = ["CompilerSupportLibraries_jll", "FLINT_jll", "GMP_jll", "Libdl", "MPFR_jll", "PPL_jll", "Perl_jll", "Pkg", "bliss_jll", "boost_jll", "cddlib_jll", "lrslib_jll", "normaliz_jll"]
+git-tree-sha1 = "c1fb0a0b8b0e4d5427786599687705a7bb7b64bf"
+repo-rev = "master"
+repo-url = "https://github.com/benlorenz/polymake_jll.jl"
+uuid = "7c209550-9012-526c-9264-55ba7a78ba2c"
+version = "4.1.3+0"
