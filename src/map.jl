@@ -25,7 +25,7 @@ function Base.iterate(M::Map{S,T}) where {S,T}
     state = beginiterator(M)
     elt = get_element(state)
     increment(state)
-    return Pair{to_jl_type(S), to_jl_type(T)}(elt), state
+    return Pair{to_jl_type(S), to_jl_type(T)}(elt[1], elt[2]), state
 end
 
 
@@ -35,6 +35,6 @@ function Base.iterate(M::Map{S,T}, state) where {S,T}
     else
         elt = get_element(state)
         increment(state)
-        return Pair{to_jl_type(S), to_jl_type(T)}(elt), state
+        return Pair{to_jl_type(S), to_jl_type(T)}(elt[1], elt[2]), state
     end
 end
