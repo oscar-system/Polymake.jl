@@ -167,5 +167,7 @@ include("polymake_direct_calls.jl")
 
 include("generate_applications.jl")
 
+include("get_attachment.jl")
+
 include("polydb.jl")
 end # of module Polymake
