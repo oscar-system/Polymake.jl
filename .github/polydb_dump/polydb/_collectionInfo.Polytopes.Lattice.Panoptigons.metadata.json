@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"polydb._collectionInfo.Polytopes.Lattice.Panoptigons"}],"uuid":"b562344ed06148e28f9d9bb1f92ef854"}

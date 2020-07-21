@@ -185,9 +185,19 @@ function PolymakeApp(jl_module::Symbol, app_json::Dict{String, Any})
             end
         end
 
-        callables = [PolymakeCallable(app_name,f) for f in app_json["functions"] if haskey(f, "name")]
+        all_callables = [PolymakeCallable(app_name,f) for f in app_json["functions"] if haskey(f, "name")]
+        aggregate = Dict{String, Vector{Int}}()
+        for (i,c) in enumerate(all_callables)
+            if !haskey(aggregate, pm_name(c))
+                aggregate[pm_name(c)] = Int[]
+            end
+            push!(aggregate[pm_name(c)], i)
+        end
 
-        callables = unique(pc -> pm_name(pc), callables)
+        callables = unique(pc -> pm_name(pc), all_callables)
+        for c in callables
+            c.json["doc"] = [docstring(all_callables[i]) for i in aggregate[pm_name(c)]]
+        end
     else
         callables = PolymakeCallable[]
     end
@@ -226,9 +236,11 @@ jl_module_name(pa::PolymakeApp) = pa.jl_module
 callable(::PolymakeFunction) = :call_function
 callable(::PolymakeMethod) = :call_method
 
-docstring(obj::PolymakeObject) = get(obj.json, "help", "")
-istemplated(obj::PolymakeObject) = haskey(obj.json, "params")
-templates(obj::PolymakeObject) = Symbol.(get(obj.json, "params", String[]))
+docstring(pc::PolymakeCallable) = get(pc.json, "doc", "")
+
+istemplated(obj::PolymakeCallable) = haskey(obj.json, "type_params")
+templates(obj::PolymakeCallable) = get(obj.json, "type_params", Dict[])
+mandatorytemplates(obj::PolymakeCallable) = get(obj.json, "mandatory_type_params", 0)
 
 function Base.show(io::IO, pc::PolymakeCallable)
     println(io, typeof(pc), ":")
@@ -253,46 +265,118 @@ end
 
 ########## code generation
 
-function jl_code(pf::PolymakeFunction)
+function jl_missing_type(jl_name::Symbol,type_names::Array{Symbol})
+    sig = QuoteNode("$jl_name{$(join(type_names,","))}")
+    return quote
+        $(jl_name)(args...; kwargs...) =
+            throw(ArgumentError("Missing type parameter(s) for `$($sig)(...)` ."))
+    end
+end
+
+
+function jl_function(callable::Symbol,
+                     jl_name::Symbol,
+                     pm_name::String,
+                     app_name::String)
+    return quote
+        function $(jl_name)(::Type{PropertyValue}, args...;
+            template_parameters::Base.AbstractVector{<:AbstractString}=String[],
+            kwargs...)
+            return $(callable)(PropertyValue, Symbol($app_name), Symbol($pm_name), args...;
+                template_parameters=template_parameters, kwargs...)
+        end;
+        function $(jl_name)(args...;
+            template_parameters::Base.AbstractVector{<:AbstractString}=String[],
+            kwargs...)
+            return $(callable)(Symbol($app_name), Symbol($pm_name), args...;
+                template_parameters=template_parameters, kwargs...)
+        end;
+    end
+end
+
+function jl_function(callable::Symbol,
+                     jl_name::Symbol,
+                     pm_name::String,
+                     app_name::String,
+                     templates)
+    return quote
+        function $(jl_name){$(templates...)}(::Type{PropertyValue},
+            args...;
+            kwargs...) where {$(templates...)}
+            template_parameters = translate_type_to_pm_string.([$(templates...)])
+            return $(callable)(PropertyValue, Symbol($app_name), Symbol($pm_name), args...;
+                template_parameters=template_parameters, kwargs...)
+        end
+        function $(jl_name){$(templates...)}(args...; kwargs...) where {$(templates...)}
+            template_parameters = translate_type_to_pm_string.([$(templates...)])
+            return $(callable)(Symbol($app_name), Symbol($pm_name), args...;
+                template_parameters=template_parameters, kwargs...)
+        end
+    end
+end
+
+jl_function(pf::PolymakeFunction, templates) =
+    jl_function(callable(pf), jl_symbol(pf), pm_name(pf), pm_app(pf), templates)
+
+jl_function(pf::PolymakeFunction) =
+    jl_function(callable(pf), jl_symbol(pf), pm_name(pf), pm_app(pf))
+
+function jl_code(pf::PolymakeFunction, doc_string=docstring(pf))
     jlfunc_name = jl_symbol(pf)
     func_name = pm_name(pf)
     app = pm_app(pf)
+    min_tparam = mandatorytemplates(pf)
+
+    if istemplated(pf)
+        tparams = Symbol.(map(x->get(x,"name",String),templates(pf)))
+        templated_functions= [
+            jl_function(pf, tparams[1:i])
+               for i in max(min_tparam,1):length(tparams)
+        ]
+
+        functiondef = quote
+            struct $(jlfunc_name){$(tparams...)}
+               $(templated_functions...)
+               $(if min_tparam == 0
+                  jl_function(pf)
+                 else
+                  jl_missing_type(jlfunc_name,tparams[1:min_tparam])
+                 end)
+            end;
+        end # of quote
+    else
+        functiondef = quote
+            struct $(jlfunc_name)
+                $(jl_function(pf))
+            end;
+        end # of quote
+    end
 
     return quote
-        function $(jlfunc_name)(::Type{PropertyValue}, args...;
-            template_parameters::Base.AbstractVector{<:AbstractString}=String[],
-            kwargs...)
-
-            return $(callable(pf))(PropertyValue, Symbol($app), Symbol($func_name), args...;
-                template_parameters=template_parameters, kwargs...)
-        end;
-        function $(jlfunc_name)(args...;
-            template_parameters::Base.AbstractVector{<:AbstractString}=String[],
-            kwargs...)
-
-            return $(callable(pf))(Symbol($app), Symbol($func_name), args...;
-                template_parameters=template_parameters, kwargs...)
-        end;
-        function $(Base.Docs).getdoc(::typeof($(jlfunc_name)))
-            docstrs = get_docs($(pm_name_qualified(app, func_name)), full=true)
-            return PolymakeDocstring(join(docstrs, "\n\n---\n\n"))
-        end;
+        $functiondef
+        Base.Docs.getdoc(::Type{$(jlfunc_name)}) = PolymakeDocstring($(doc_string))
         export $(jlfunc_name);
     end
 end
 
-function jl_code(pm::PolymakeMethod)
+function jl_code(pm::PolymakeMethod, doc_string = docstring(pm))
+    jlfunc_name = jl_symbol(pm)
     func_name = pm_name(pm)
+    # note that polymake methods cannot have explicit template parameters, so no need to deal with that here
     return quote
-        function $(jl_symbol(pm))(::Type{PropertyValue}, object::BigObject,
+        function $(jlfunc_name)(::Type{PropertyValue}, object::BigObject,
             args...; kwargs...)
             return $(callable(pm))(PropertyValue, object, Symbol($func_name), args...;
                 kwargs...)
         end;
-        function $(jl_symbol(pm))(object::BigObject, args...;
+        function $(jlfunc_name)(object::BigObject, args...;
                 kwargs...)
             return $(callable(pm))(object, Symbol($func_name), args...; kwargs...)
         end;
+
+        function $(Base.Docs).getdoc(::typeof($(jlfunc_name)))
+            return PolymakeDocstring($(doc_string))
+        end
         export $(jl_symbol(pm));
     end
 end
@@ -329,9 +413,10 @@ function jl_code(obj::PolymakeObject)
     pm_object_name = pm_name_qualified(pm_app(obj), pm_name(obj))
 
     if istemplated(obj)
-        Ts = templates(obj)
+        Ts = Symbol.(map(x->get(x,"name",String),templates(obj)))
+        mand = mandatorytemplates(obj)
         templated_constructors = [
-            jl_constructor(obj, Ts[1:i]) for i in 1:length(Ts)
+            jl_constructor(obj, Ts[1:i]) for i in max(mand,1):length(Ts)
         ]
 
         struct_def = quote
@@ -339,7 +424,11 @@ function jl_code(obj::PolymakeObject)
                 # inner templated constructors:
                 $(templated_constructors...)
                 # inner template-less constructor
-                $(jl_constructor(obj))
+                $(if mand == 0
+                   jl_constructor(obj)
+                  else
+                   jl_missing_type(jl_object_name,Ts[1:mand])
+                  end)
             end;
         end # of quote
     else
@@ -360,6 +449,9 @@ end
 struct PolymakeDocstring
     s::String
 end
+
+PolymakeDocstring(docs::Vector) = PolymakeDocstring(join(docs, "\n ---- \n"))
+
 # if someone wants to implement something prettier, overload this
 Base.show(io::IO, doc::PolymakeDocstring) = print(io, doc.s)
 

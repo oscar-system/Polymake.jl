@@ -36,7 +36,7 @@
             p = polytope.rand_sphere(3,20);
             @test polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS) isa Polymake.BigObject
             P = polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS)
-            @test occursin("my cuttie", Polymake.properties(P))
+            @test occursin("my cuttie", String(Polymake.properties(P)))
         end
 
         @testset "conversions" begin
@@ -118,6 +118,16 @@
 
         c = polytope.cube(3, 1//4, -1//4)
         @test c.VERTICES[1,2] == -1//4
+    end
+
+    @testset "attachments" begin
+        test_polytope = polytope.Polytope(POINTS=points_int)
+        att = Polymake.Matrix{Polymake.Rational}(3,3)
+        @test Polymake.attach(test_polytope,"ATT",att) === nothing
+        @test Polymake.get_attachment(test_polytope,"ATT") isa Polymake.Matrix
+        @test Polymake.get_attachment(Polymake.PropertyValue,test_polytope,"ATT") isa Polymake.PropertyValue
+        @test Polymake.remove_attachment(test_polytope,"ATT") === nothing
+        @test Polymake.get_attachment(test_polytope,"ATT") === nothing
     end
 
     @testset "tab-completion" begin

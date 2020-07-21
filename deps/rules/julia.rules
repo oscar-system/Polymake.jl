@@ -66,3 +66,9 @@ function jupyter_visual_svg(Visual::Object+) {
    close $handle;
    return $string;
 }
+
+function deserialize_json_string($) {
+   my ($str) = @_;
+   my $hash = decode_json($str);
+   return Core::Serializer::deserialize($hash);
+}

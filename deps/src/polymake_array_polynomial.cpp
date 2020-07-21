@@ -4,10 +4,7 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_arrays.h"
-
-#include "polymake_polynomial.h"
-
+#include "polymake_type_modules.h"
 
 void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1 array_type)
 {

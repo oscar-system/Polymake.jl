@@ -62,6 +62,13 @@ Base.://(x::Integer, y::Base.Rational) = Rational(x*numerator(y), denominator(y)
 # division by Int64, Integer defined on the Cxx side
 Base.://(x::Rational, y::Union{Int8, Int16, Int32, BigInt, Unsigned}) = x//Integer(y)
 Base.://(x::Union{Int8, Int16, Int32, BigInt, Unsigned}, y::Rational) = Integer(x)//y
-Base.://(x::Rational, y::Base.Rational{<:Base.Integer}) = x//Rational(y)
-Base.://(x::Base.Rational{<:Base.Integer}, y::Rational) = Rational(x)//y
+Base.://(x::Rational, y::Base.Rational) = x//Rational(y)
+Base.://(x::Base.Rational, y::Rational) = Rational(x)//y
 Base.://(x::Bool, y::Rational) = Rational(x)//y
+
+for op in (:*, :+, :-)
+    @eval begin
+        Base.$op(x::Integer, y::Base.Rational) = $op(x, Rational(y))
+        Base.$op(y::Base.Rational, x::Integer) = $op(Rational(y), x)
+    end
+end

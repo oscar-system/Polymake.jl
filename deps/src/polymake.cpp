@@ -4,37 +4,9 @@
 
 #include "polymake_functions.h"
 
-#include "polymake_bigobjects.h"
-
-#include "polymake_integers.h"
-
-#include "polymake_rationals.h"
-
-#include "polymake_sets.h"
-
-#include "polymake_matrices.h"
-
-#include "polymake_vectors.h"
-
-#include "polymake_arrays.h"
-
-#include "polymake_incidencematrix.h"
-
-#include "polymake_sparsematrix.h"
-
-#include "polymake_sparsevector.h"
-
-#include "polymake_tropicalnumber.h"
-
-#include "polymake_polynomial.h"
-
 #include "polymake_caller.h"
 
-#include "polymake_direct_calls.h"
-
-#include "polymake_array_polynomial.h"
-
-#include "polymake_type_translations.h"
+#include "polymake_type_modules.h"
 
 #include "generated/type_declarations.h"
 
@@ -49,6 +21,10 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     polymake_module_add_rational(polymake);
 
     polymake_module_add_matrix(polymake);
+
+    polymake_module_add_pairs(polymake);
+
+    polymake_module_add_lists(polymake);
 
     polymake_module_add_vector(polymake);
 

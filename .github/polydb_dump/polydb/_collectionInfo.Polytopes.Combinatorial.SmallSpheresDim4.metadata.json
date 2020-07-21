@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"polydb._collectionInfo.Polytopes.Combinatorial.SmallSpheresDim4"}],"uuid":"58cc060886d8460ba4a39d831da8afe5"}

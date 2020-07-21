@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"polydb._collectionInfo.Polytopes.Lattice.ExceptionalMaximalHollow"}],"uuid":"5f49e779e4874104b4c984e2b8449e9c"}

@@ -1,13 +1,6 @@
-if VERSION < v"1.3.0-rc3.0"
-    # tosimplex segfaults when called from different thread, see
-    # https://github.com/oscar-system/Polymake.jl/issues/144
-    # this has been fixed in julia-1.3:
-    # https://github.com/JuliaLang/julia/pull/33284
-    ENV["OMP_NUM_THREADS"] = 1
-end
-
 using Polymake
 using Test
+using CxxWrap
 
 # make wrapper compilation verbose on travis
 if (haskey(ENV, "TRAVIS"))
@@ -31,4 +24,9 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("sparsematrix.jl")
     include("tropicalnumber.jl")
     include("polynomial.jl")
+    include("pairs.jl")
+    include("lists.jl")
+    if get(ENV, "POLYDB_TEST_URI", "") != ""
+        include("polydb.jl")
+    end
 end
