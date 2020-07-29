@@ -1,0 +1,20 @@
+name: Create documentation
+
+on:
+  push:
+    branches:
+      - documentation/new
+
+jobs:
+  create-documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.4'
+      - uses: julia-actions/julia-buildpkg@latest
+      - name: "Run `make` file"
+        run: julia docs/make.jl
