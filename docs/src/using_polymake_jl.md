@@ -167,3 +167,66 @@ POINTS
 1 5/4 3/2
 
 ```
+
+## Accessing the polyDB
+
+```@meta
+CurrentModule = Polymake.Polydb
+```
+
+`Polymake.jl` allows the user to access the objects stored within the `polyDB` via the `Mongoc.jl` package; this functionality can be found in another sub-module, `Polymake.Polydb`, which requires no additional interaction to be loaded. It offers two different ways for querying, as well as some methods for information.
+For demonstration purposes, there also is a `Jupyter notebook` in the `examples/` folder.
+
+### General tools
+
+There are three types one needs to know when working with `Polymake.Polydb`:
+
+```@docs
+Database
+Collection
+Cursor
+```
+
+To receive the `Database` object referencing to the `polyDB`, there is the `get_db()` method:
+
+```@docs
+get_db()
+```
+
+A specific `Collection` object can then be obtained with the brackets operator:
+
+```@docs
+getindex(::Database, ::String)
+```
+
+By default, the results are parsed to `Polymake.BigObject`s when accessed, but one may choose to change this behaviour by adjusting the typing template of `Collection` or `Cursor` using the following method:
+
+```@docs
+Collection(::Collection)
+```
+
+### Information
+
+```@docs
+info
+get_collection_names
+get_fields
+```
+
+### Querying
+
+There are two ways for querying within `Polymake.jl`.
+
+#### Methods
+
+```@docs
+find
+```
+
+#### Macros
+
+```@docs
+@select
+@filter
+@map
+```

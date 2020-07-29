@@ -49,7 +49,7 @@ end
 """
       get_db()
 
-Connect to the `polyDB` and return a Polymake.Polydb.Database instance.
+Connect to the `polyDB` and return `Database` instance.
 
 The uri of the server can be set in advance by writing its `String` representation
 into ENV["POLYDB_TEST_URI"].
