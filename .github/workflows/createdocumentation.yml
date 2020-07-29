@@ -16,5 +16,7 @@ jobs:
         with:
           version: '1.4'
       - uses: julia-actions/julia-buildpkg@latest
+      - name: "Add Documenter package"
+        run: julia --project -e 'using Pkg; pkg"add Documenter";'
       - name: "Run `make` file"
         run: julia docs/make.jl
