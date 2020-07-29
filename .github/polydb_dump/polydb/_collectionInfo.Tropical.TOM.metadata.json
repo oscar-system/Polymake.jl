@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"polydb._collectionInfo.Tropical.TOM"}],"uuid":"6556a640d9334bc1b4d86bf43a92f49e"}
