@@ -125,6 +125,7 @@ void beneath_beyond_algo_for_ml<E>::initialize(const Matrix<E>& rays, const Matr
 template <typename E>
 void beneath_beyond_algo_for_ml<E>::process_point(Int p){
     if ( !points_added.contains(p) ){
+        state = compute_state::zero;
         Base::process_point(p);
         points_added += p;
 #if POLYMAKE_DEBUG
@@ -139,12 +140,10 @@ void beneath_beyond_algo_for_ml<E>::compute(const Matrix<E>& rays, const Matrix<
     
     initialize(rays, lins, perm);
 
-    try{
-        for (state = compute_state::zero; !perm.at_end(); ++perm)
+    try
+    {
+        for (; !perm.at_end(); ++perm)
             process_point(*perm);
-
-        if (state == compute_state::low_dim && !facet_normals_valid)
-            facet_normals_low_dim();
     }
     catch (const stop_calculation&){
 #if POLYMAKE_DEBUG
@@ -197,6 +196,18 @@ void beneath_beyond_algo_for_ml<E>::clear(){
         }
         break;
     case compute_state::low_dim:
+        if ( !facet_normals_valid )
+        {
+            try
+            {
+                facet_normals_low_dim();
+            }
+            catch(const stop_calculation& )
+            {
+                stop_cleanup();
+            }
+        }
+        break;
     case compute_state::full_dim:
         dual_graph.squeeze();
         break;
