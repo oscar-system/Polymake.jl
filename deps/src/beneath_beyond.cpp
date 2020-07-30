@@ -138,7 +138,7 @@ template <typename E>
 template <typename Iterator>
 void beneath_beyond_algo_for_ml<E>::compute(const Matrix<E>& rays, const Matrix<E>& lins, Iterator perm){
     
-    initialize(rays, lins, perm);
+    initialize(rays, lins);
 
     try
     {
