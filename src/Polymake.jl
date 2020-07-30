@@ -145,6 +145,12 @@ include("polynomial.jl")
 
 include("polymake_direct_calls.jl")
 
+using Base.Docs
+using Markdown
+include("meta.jl")
+
+using Polymake.Meta
+
 include("generate_applications.jl")
 
 include("polydb.jl")
