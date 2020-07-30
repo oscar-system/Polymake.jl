@@ -15,28 +15,31 @@ class beneath_beyond_algo_for_ml: public beneath_beyond_algo<E>{
             initialized = false;
         };
 
-        void initialize(const Matrix<E>& rays, const Matrix<E>& lins){
+        template <typename Iterator>
+        void initialize(const Matrix<E>& rays, const Matrix<E>& lins, Iterator perm);
+        void initialize(const Matrix<E>& rays, const Matrix<E>& lins)
+        {
+        #if POLYMAKE_DEBUG
+            enable_debug_output();
+        #endif
             initialize(rays, lins, entire(sequence(0, rays.rows())));
         };
 
-        template <typename Iterator>
-        void initialize(const Matrix<E>& rays, const Matrix<E>& lins, Iterator perm);
-
         void process_point(Int p);
 
-        void finalize();
+        void clear();
 
+
+        // TODO: bundle all results in a structure, move all numbers into it
+        template <typename Iterator>
+        void compute(const Matrix<E>& rays, const Matrix<E>& lins, Iterator perm);
         void compute(const Matrix<E>& rays, const Matrix<E>& lins)
         {
         #if POLYMAKE_DEBUG
             enable_debug_output();
         #endif
             compute(rays, lins, entire(sequence(0, rays.rows())));
-        }
-
-        // TODO: bundle all results in a structure, move all numbers into it
-        template <typename Iterator>
-        void compute(const Matrix<E>& rays, const Matrix<E>& lins, Iterator perm);
+        };
 
     protected:
         void stop_cleanup();
@@ -147,7 +150,7 @@ void beneath_beyond_algo_for_ml<E>::compute(const Matrix<E>& rays, const Matrix<
         stop_cleanup();
     }
 
-    finalize();
+    clear();
 
 #if POLYMAKE_DEBUG
     if (debug >= do_dump) {
@@ -172,7 +175,8 @@ void beneath_beyond_algo_for_ml<E>::stop_cleanup(){
 }
 
 template <typename E>
-void beneath_beyond_algo_for_ml<E>::finalize(){
+void beneath_beyond_algo_for_ml<E>::clear(){
+
     switch (state) {
     case compute_state::zero:
         if (!is_cone) {
