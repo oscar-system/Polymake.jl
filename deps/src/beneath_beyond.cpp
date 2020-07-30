@@ -74,15 +74,14 @@ class beneath_beyond_algo_for_ml: public beneath_beyond_algo<E>{
 
     private:
         bool initialized;
-        std::vector<bool> points_added;
+        Bitset points_added;
 };
+
 
 template <typename E>
 template <typename Iterator>
 void beneath_beyond_algo_for_ml<E>::initialize(const Matrix<E>& rays, const Matrix<E>& lins, Iterator perm)
 {
-    assert(initialized == false);
-
     source_points = &rays;
     source_linealities = &lins;
 
@@ -112,7 +111,7 @@ void beneath_beyond_algo_for_ml<E>::initialize(const Matrix<E>& rays, const Matr
             interior_points_this_step.resize(points->rows());
         }
 
-        points_added = std::vector<bool>(perm.size(), false);
+        points_added = Bitset();
         initialized = true;
     }
     catch (const stop_calculation&) { 
@@ -125,9 +124,13 @@ void beneath_beyond_algo_for_ml<E>::initialize(const Matrix<E>& rays, const Matr
 
 template <typename E>
 void beneath_beyond_algo_for_ml<E>::process_point(Int p){
-    if ( !points_added[p] )
+    if ( !points_added.contains(p) ){
         Base::process_point(p);
-    points_added[p] = true;
+        points_added += p;
+#if POLYMAKE_DEBUG
+        std::cout << "processed point p = " << p << std::endl;
+#endif
+    };
 };
 
 template <typename E>
