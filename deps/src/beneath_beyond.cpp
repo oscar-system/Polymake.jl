@@ -217,8 +217,16 @@ void beneath_beyond_algo_for_ml<E>::clear(){
 }
 }
 
+
+template<> struct jlcxx::IsMirroredType<
+    polymake::polytope::beneath_beyond_algo<pm::Rational>> : std::false_type { };
+
 void polymake_module_add_beneath_beyond(jlcxx::Module& polymake)
 {
+    polymake
+        .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("_BeneathBeyondAlgo")
+        .apply<polymake::polytope::beneath_beyond_algo<pm::Rational>>([](auto wrapped) {});
+    
     polymake
         .add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("BeneathBeyondAlgo")
         .apply<polymake::polytope::beneath_beyond_algo_for_ml<pm::Rational>>([](auto wrapped) {
@@ -226,19 +234,22 @@ void polymake_module_add_beneath_beyond(jlcxx::Module& polymake)
             typedef typename decltype(wrapped)::type::value_type E;
             wrapped.template constructor();
 
-            wrapped.method("expecting_redundant", &WrappedT::expecting_redundant);
-            wrapped.method("for_cone", &WrappedT::for_cone);
-            wrapped.method("making_triangulation", &WrappedT::making_triangulation);
-            wrapped.method("computing_vertices", &WrappedT::computing_vertices);
+            wrapped.method("bb_expecting_redundant", &WrappedT::expecting_redundant);
+            wrapped.method("bb_for_cone", &WrappedT::for_cone);
+            wrapped.method("bb_making_triangulation", &WrappedT::making_triangulation);
+            wrapped.method("bb_computing_vertices", &WrappedT::computing_vertices);
 
-            wrapped.method("compute", [](
-                    WrappedT& bb, 
-                    const pm::Matrix<E>& rays,
-                    const pm::Matrix<E>& lins
-                    ) {
-                bb.compute(rays, lins);
-                return bb;
-            });
+            wrapped.method("bb_compute!", static_cast<
+                void (polymake::polytope::beneath_beyond_algo_for_ml<E>::*)(const pm::Matrix<E>&, const pm::Matrix<E>&)
+            >(&WrappedT::compute));
+
+            wrapped.method("bb_initialize!", static_cast<
+                void (polymake::polytope::beneath_beyond_algo_for_ml<E>::*)(const pm::Matrix<E>&, const pm::Matrix<E>&)
+            >(&WrappedT::initialize));
+
+            // wrapped.method("initialize", &WrappedT::initialize);
+            wrapped.method("bb_add_point!", &WrappedT::process_point);
+            wrapped.method("bb_clear!", &WrappedT::clear);
 
             wrapped.method("getFacets", &WrappedT::getFacets);
             wrapped.method("getVertexFacetIncidence", &WrappedT::getVertexFacetIncidence);
@@ -249,8 +260,5 @@ void polymake_module_add_beneath_beyond(jlcxx::Module& polymake)
             wrapped.method("getLinealities", &WrappedT::getLinealities);
             // wrapped.method("getDualGraph", &WrappedT::getDualGraph);
             wrapped.method("getTriangulation", &WrappedT::getTriangulation);
-            // wrapped.method("get", &WrappedT::get);
-            // wrapped.method("get", &WrappedT::get);
-            // wrapped.method("get", &WrappedT::get);
         });
 }
