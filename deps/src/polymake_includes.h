@@ -21,7 +21,6 @@
 #include <polymake/TropicalNumber.h>
 #include <polymake/IncidenceMatrix.h>
 #include <polymake/Polynomial.h>
-#include <polymake/polytope/solve_LP.h>
 #include <polymake/SparseVector.h>
 
 #include <polymake/perl/calls.h>

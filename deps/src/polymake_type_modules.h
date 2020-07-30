@@ -9,7 +9,8 @@ tparametric1 polymake_module_add_array(jlcxx::Module& polymake);
 void polymake_module_add_array_polynomial(jlcxx::Module& polymake, tparametric1 arrayt);
 
 void polymake_module_add_bigobject(jlcxx::Module& polymake);
-void polymake_module_add_direct_calls(jlcxx::Module&);
+void polymake_module_add_direct_calls(jlcxx::Module& polymake);
+void polymake_module_add_beneath_beyond(jlcxx::Module& polymake);
 void polymake_module_add_incidencematrix(jlcxx::Module& polymake);
 void polymake_module_add_integer(jlcxx::Module& polymake);
 void polymake_module_add_matrix(jlcxx::Module& polymake);
