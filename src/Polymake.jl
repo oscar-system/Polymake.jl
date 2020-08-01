@@ -144,6 +144,7 @@ include("tropicalnumber.jl")
 include("polynomial.jl")
 
 include("polymake_direct_calls.jl")
+include("beneath_beyond.jl")
 
 using Base.Docs
 using Markdown
