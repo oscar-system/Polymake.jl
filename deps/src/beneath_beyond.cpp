@@ -111,6 +111,8 @@ void beneath_beyond_algo_for_ml<E>::initialize(const Matrix<E>& rays, const Matr
             interior_points_this_step.resize(points->rows());
         }
 
+        state = compute_state::zero; // moved from the main compute loop
+
         points_added = Bitset();
         initialized = true;
     }
@@ -125,7 +127,6 @@ void beneath_beyond_algo_for_ml<E>::initialize(const Matrix<E>& rays, const Matr
 template <typename E>
 void beneath_beyond_algo_for_ml<E>::process_point(Int p){
     if ( !points_added.contains(p) ){
-        state = compute_state::zero;
         Base::process_point(p);
         points_added += p;
 #if POLYMAKE_DEBUG
