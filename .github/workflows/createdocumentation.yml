@@ -3,7 +3,9 @@ name: Create documentation
 on:
   push:
     branches:
-      - documentation/new
+      - documentation/new #change to master when working
+    tags: '*'
+  pull request:
 
 jobs:
   create-documentation:
@@ -17,6 +19,9 @@ jobs:
           version: '1.4'
       - uses: julia-actions/julia-buildpkg@latest
       - name: "Add Documenter package"
-        run: julia --project -e 'using Pkg; pkg"add Documenter";'
-      - name: "Run `make` file"
-        run: julia --project docs/make.jl
+        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
+                                                  Pkg.instantiate()'
+      - name: "Build and deploy documentation"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: julia --project=docs/ docs/make.jl
