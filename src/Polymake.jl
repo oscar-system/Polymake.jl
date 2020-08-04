@@ -37,6 +37,8 @@ using Perl_jll
 using Ninja_jll
 using libpolymake_julia_jll
 
+const jlpolymake_version_range = (v"0.1.0",  v"0.2")
+
 struct PolymakeError <: Exception
     msg
 end
@@ -52,6 +54,18 @@ end
 Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
 libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
+
+jlpolymake_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_version,libpolymake_julia), Cstring, ())))
+
+function checkversion()
+  jlpolymakeversion = jlpolymake_version()
+  if !(jlpolymake_version_range[1] <= jlpolymakeversion < jlpolymake_version_range[2])
+    error("This version of Polymake.jl requires libpolymake-julia in the range $(libpolymake_version_range), but version $jlpolymakeversion was found")
+  end
+end
+
+# Must also be called during precompile
+checkversion()
 
 generated_dir = joinpath(@__DIR__, "generated")
 
@@ -71,6 +85,8 @@ end
 include(type_translator)
 
 function __init__()
+    checkversion()
+
     @initcxx
 
     global user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))

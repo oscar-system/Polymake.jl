@@ -88,9 +88,9 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[LoadFlint]]
 deps = ["BinaryProvider", "FLINT_jll", "GMP_jll", "Libdl", "MPFR_jll"]
-git-tree-sha1 = "c8c1c6287849e1199caa6d92fc3579708c22b88c"
+git-tree-sha1 = "31909d56f9e104e2e39bd97c7a33d6da21e26948"
 uuid = "472f376f-f1cf-461b-9ac1-d103423be9b7"
-version = "0.3.0"
+version = "0.3.1"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -204,9 +204,9 @@ version = "2.9.10+1"
 
 [[Zlib_jll]]
 deps = ["Libdl", "Pkg"]
-git-tree-sha1 = "622d8b6dc0c7e8029f17127703de9819134d1b71"
+git-tree-sha1 = "d5bba6485811931e4b8958e2d7ca3738273ac468"
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
-version = "1.2.11+14"
+version = "1.2.11+15"
 
 [[bliss_jll]]
 deps = ["GMP_jll", "Libdl", "Pkg"]
@@ -234,11 +234,11 @@ version = "0.8.0+0"
 
 [[libpolymake_julia_jll]]
 deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg", "libcxxwrap_julia_jll", "polymake_jll"]
-git-tree-sha1 = "bc9f8eb99fcddc359a8ad878746a9e6eac203928"
+git-tree-sha1 = "a9beb661e24bb75bc9b80ec17b60d2091ce101f3"
 repo-rev = "master"
 repo-url = "https://github.com/benlorenz/libpolymake_julia_jll.jl"
 uuid = "4d8266f6-2b3b-57e3-ad7a-d431eaaac945"
-version = "0.0.4+0"
+version = "0.1.0+0"
 
 [[lrslib_jll]]
 deps = ["GMP_jll", "Libdl", "Pkg"]
