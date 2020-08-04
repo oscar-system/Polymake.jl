@@ -4,8 +4,8 @@ include("meta.jl")
 
 using Polymake.Meta
 
-json_dir = joinpath(@__DIR__, "..", "deps", "json")
 generated_dir = joinpath(@__DIR__, "generated")
+json_dir = joinpath(generated_dir, "json")
 isdir(generated_dir) || mkpath(generated_dir)
 
 for (app, mod) in appname_module_dict

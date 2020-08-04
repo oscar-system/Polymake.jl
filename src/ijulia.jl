@@ -1,7 +1,7 @@
 import JSON
 
 function copy_javascript_files(target_dir)
-    jupyter_resources = joinpath(@__DIR__, "..", "deps", "jupyter_resources")
+    jupyter_resources = joinpath(@__DIR__, "..", "resources","jupyter")
     for file in readdir(jupyter_resources)
         cp(joinpath(jupyter_resources, file),
            joinpath(target_dir, file); force=true)

@@ -18,7 +18,7 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
-# needed for deps.jl setting polymake_user
+# needed for setting polymake_user
 import Pkg
 
 using SparseArrays
@@ -53,17 +53,15 @@ Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
 libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
 
-deps_dir = joinpath(@__DIR__, "..", "deps")
+generated_dir = joinpath(@__DIR__, "generated")
 
 include("repl.jl")
 include("ijulia.jl")
 
-#include(joinpath(deps_dir,"deps.jl"))
-
 @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
 
-json_script = joinpath(deps_dir,"rules","apptojson.pl")
-json_folder = joinpath(deps_dir,"json")
+json_script = joinpath(@__DIR__,"polymake","apptojson.pl")
+json_folder = joinpath(generated_dir,"json")
 mkpath(json_folder)
 
 polymake_run_script() do runner
@@ -74,11 +72,6 @@ include(type_translator)
 
 function __init__()
     @initcxx
-
-    #if using_binary
-    #    check_deps()
-    #    prepare_env()
-    #end
 
     global user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
     
@@ -102,7 +95,7 @@ function __init__()
     end
 
     application("common")
-    shell_execute("include(\"$(joinpath(deps_dir, "rules", "julia.rules"))\");")
+    shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
 
     for app in call_function(:common, :startup_applications)
         application(app)
