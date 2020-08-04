@@ -1,5 +1,7 @@
 mutable struct BeneathBeyond{T}
     algo::Polymake.BeneathBeyondAlgoAllocated{T}
+    rays::Matrix{T}
+    lineality::Matrix{T}
     perm::Vector{Int}
 
     function BeneathBeyond(
@@ -14,19 +16,18 @@ mutable struct BeneathBeyond{T}
 
         @assert !isempty(perm)
 
-        algo = Polymake.BeneathBeyondAlgo{T}()
-        Polymake.bb_expecting_redundant(algo, redundant)
-        Polymake.bb_making_triangulation(algo, triangulation)
-        Polymake.bb_for_cone(algo, iscone)
-        Polymake.bb_computing_vertices(algo, vertices)
+        algo = BeneathBeyondAlgo{T}()
+        R = convert(Matrix{T}, rays)
+        L = convert(Matrix{T}, lineality)
+        p = convert(Vector{T}, perm)
+        bb = new{T}(algo, R, L, p)
 
-        Polymake.bb_initialize!(
-            algo,
-            convert(Polymake.Matrix{Polymake.Rational}, rays),
-            convert(Polymake.Matrix{Polymake.Rational}, lineality),
-        )
+        bb_expecting_redundant(bb.algo, redundant)
+        bb_making_triangulation(bb.algo, triangulation)
+        bb_for_cone(bb.algo, iscone)
+        bb_computing_vertices(bb.algo, vertices)
 
-        bb = new{T}(algo, perm)
+        bb_initialize!(bb.algo, R, L)
 
         # finalizer(x->bb_clear!(x.algo), bb)
 
