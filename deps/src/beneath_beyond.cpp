@@ -66,11 +66,10 @@ class beneath_beyond_algo_for_ml: public beneath_beyond_algo<E>{
         using Base::triangulation;
         using Base::is_cone;
         using Base::facets;
+        using compute_state = typename Base::compute_state;
+        using Base::state;
         
         class stop_calculation {};
-
-        enum class compute_state { zero, one, low_dim, full_dim };
-        compute_state state;
 
     private:
         bool initialized;
