@@ -44,11 +44,9 @@ fill_wrapped_types!(TypeConversionFunctions, get_type_names())
 # relevant is the libcxxwrap version that is used at build-time
 # which is fixed to 0.8.0 for binarybuilder
 # and cxxwrap 0.10 with libcxxwrap 0.7 might still work
-# FIXME: we might need to add this with the build-time 
-# libcxxwrapversion for custom installations ....
 
-#if CxxWrap.libcxxwrapversion() >= v"0.8.0"
+if libcxxwrap_build_version() >= v"0.8.0"
     Base.deepcopy(x::T) where T<:SmallObject = Base.copy(x)
-#else
-#    Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
-#end
+else
+    Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
+end

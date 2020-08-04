@@ -51,6 +51,8 @@ end
 
 Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
+libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
+
 deps_dir = joinpath(@__DIR__, "..", "deps")
 
 include("repl.jl")
