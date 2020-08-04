@@ -1,6 +1,6 @@
 # Polymake.jl
 
-`Polymake.jl` is a Julia package for using [`polymake`](https://polymake.org/doku.php), a software for research in polyhedral geometry from Julia.
+[`Polymake.jl`](https://github.com/oscar-system/Polymake.jl) is a Julia package for using [`polymake`](https://polymake.org/doku.php), a software for research in polyhedral geometry from Julia.
 This package is developed as part of the [OSCAR](https://oscar.computeralgebra.de) project.
 
 The current version of `Polymake.jl` relies on `polymake` version `4.0` or later.
