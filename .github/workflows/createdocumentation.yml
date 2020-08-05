@@ -3,7 +3,7 @@ name: Create documentation
 on:
   push:
     branches:
-      - documentation/new #change to master when working
+      - master
     tags: '*'
   pull_request:
 
