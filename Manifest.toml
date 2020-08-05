@@ -69,6 +69,12 @@ git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
 
+[[LZO_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "71119990371c93f027bee80547ee908ddfe7c5ca"
+uuid = "dd4b983a-f0e5-5f8d-a1b7-129d4a5fb1ac"
+version = "2.10.0+1"
+
 [[LibGit2]]
 deps = ["Printf"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -114,6 +120,24 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
+[[MongoC_jll]]
+deps = ["Libdl", "OpenSSL_jll", "Pkg", "Zlib_jll", "Zstd_jll", "snappy_jll"]
+git-tree-sha1 = "714054676cf3ca277d5f0d28d79cc7795d9adbf8"
+uuid = "90100e71-7732-535a-9be7-2e9affd1cfc1"
+version = "1.16.2+0"
+
+[[Mongoc]]
+deps = ["Dates", "MongoC_jll", "Serialization"]
+git-tree-sha1 = "10bb3bb5794315cf385555de1c3e8e669e373647"
+uuid = "4fe8b98c-fc19-5c23-8ec2-168ff83495f2"
+version = "0.6.0"
+
+[[MozillaCACerts_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "27c9ccaa98d650a40ef11def5963253f6dab2152"
+uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2020.0.0-01-01+0"
+
 [[Ncurses_jll]]
 deps = ["Gettext_jll", "Libdl", "Pkg"]
 git-tree-sha1 = "8abe113efbf13dae7069194902f54aeb3c202e62"
@@ -125,6 +149,12 @@ deps = ["Libdl", "Pkg"]
 git-tree-sha1 = "be987b7d4265f3297c8c5740bbc95fdeb6b5358e"
 uuid = "76642167-d241-5cee-8c94-7a494e8cb7b7"
 version = "1.10.0+0"
+
+[[OpenSSL_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "997359379418d233767f926ea0c43f0e731735c0"
+uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
+version = "1.1.1+5"
 
 [[PPL_jll]]
 deps = ["GMP_jll", "Libdl", "Pkg"]
@@ -208,6 +238,12 @@ git-tree-sha1 = "d5bba6485811931e4b8958e2d7ca3738273ac468"
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
 version = "1.2.11+15"
 
+[[Zstd_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "b25b0fb10176c42e9a5a20e1f40d570ac0288d4e"
+uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
+version = "1.4.5+0"
+
 [[bliss_jll]]
 deps = ["GMP_jll", "Libdl", "Pkg"]
 git-tree-sha1 = "2dd3966c5084f35af863e3cd5a98ee955f764d9f"
@@ -265,3 +301,9 @@ repo-rev = "master"
 repo-url = "https://github.com/benlorenz/polymake_jll.jl"
 uuid = "7c209550-9012-526c-9264-55ba7a78ba2c"
 version = "4.1.3+0"
+
+[[snappy_jll]]
+deps = ["LZO_jll", "Libdl", "Pkg", "Zlib_jll"]
+git-tree-sha1 = "c1195c341330c685d68aa2519fd3935c5bdefc5d"
+uuid = "fe1e1685-f7be-5f59-ac9f-4ca204017dfd"
+version = "1.1.8+0"
