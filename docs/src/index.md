@@ -47,3 +47,9 @@ For more advanced use see section on [`@pm`](@ref) macro.
 - [Getting Started](@ref)
 - [Using Polymake.jl](@ref)
 - [Examples](@ref)
+
+## Funding
+
+The development of this Julia package is supported by the Deutsche
+Forschungsgemeinschaft DFG within the
+[Collaborative Research Center TRR 195](https://www.computeralgebra.de/sfb/).
