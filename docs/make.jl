@@ -4,4 +4,5 @@ makedocs(sitename = "Polymake.jl - Documentation", pages = ["index.md", "getting
 
 deploydocs(
     repo = "github.com/oscar-system/Polymake.jl.git",
+    push_preview    = true,
 )
