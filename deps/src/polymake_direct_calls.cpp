@@ -1,5 +1,5 @@
 #include "polymake_includes.h"
-
+#include <polymake/polytope/solve_LP.h>
 #include "polymake_type_modules.h"
 
 template<typename Scalar>

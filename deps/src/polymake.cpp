@@ -43,6 +43,7 @@ JLCXX_MODULE define_module_polymake(jlcxx::Module& polymake)
     polymake_module_add_polynomial(polymake);
 
     polymake_module_add_direct_calls(polymake);
+    polymake_module_add_beneath_beyond(polymake);
 
     polymake_module_add_array_polynomial(polymake, array_type);
 

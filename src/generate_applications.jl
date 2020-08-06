@@ -1,9 +1,3 @@
-using Base.Docs
-using Markdown
-include("meta.jl")
-
-using Polymake.Meta
-
 json_dir = joinpath(@__DIR__, "..", "deps", "json")
 generated_dir = joinpath(@__DIR__, "generated")
 isdir(generated_dir) || mkpath(generated_dir)
