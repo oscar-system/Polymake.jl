@@ -19,3 +19,4 @@ local
 Manifest.toml
 src/generated/*.jl
 .vscode
+docs/build/*

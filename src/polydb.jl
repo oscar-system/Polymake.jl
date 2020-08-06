@@ -14,55 +14,194 @@ import Mongoc: find
 
 #Polymake.Polydb's types store information via
 # a corresponding Mongoc type variable
+
+"""
+      Database
+
+Type for referencing a specific database (usually the `polyDB`)
+"""
 struct Database
    mdb::Mongoc.Database
 end
 
+"""
+      Collection{T}
+
+Type for referencing a specific collection.
+`T<:Union{Polymake.BigObject, Mongoc.BSON}` defines the template and/or element types
+returned by operations applied on objects of this type.
+"""
 struct Collection{T}
    mcol::Mongoc.Collection
 end
 
+"""
+      Cursor{T}
+
+Type containing the results of a query.
+Can be iterated, but the iterator can not be reset. For this cause, one has to query again.
+`T<:Union{Polymake.BigObject, Mongoc.BSON}` defines the element types.
+"""
 struct Cursor{T}
    mcursor::Mongoc.Cursor{Mongoc.Collection}
 end
 
-# connects to the Polydb and
-# returns a Polymake.Polydb.Database instance
-#
-# the uri of the server can be set in advance by writing its `String` representation
-# into ENV["POLYDB_TEST_URI"]
-# (used to connect to the github services container for testing)
+"""
+      get_db()
+
+Connect to the `polyDB` and return `Database` instance.
+
+The uri of the server can be set in advance by writing its `String` representation
+into ENV["POLYDB_TEST_URI"].
+(used to connect to the github services container for testing)
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> typeof(db)
+Polymake.Polydb.Database
+```
+"""
 function get_db()
    # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
    client = Mongoc.Client(get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)"))
    return Database(client["polydb"])
 end
 
-# returns a Polymake.Polydb.Collection instance with the given name
-# sections and collections in the name are connected with the '.' sign,
-# i.e. names = "Polytopes.Lattice.SmoothReflexive"
+"""
+      getindex(db::Database, name::AbstractString)
+
+Return a `Polymake.Polydb.Collection{Polymake.BigObject}` instance
+from `db` with the given `name`.
+Sections and collections in the name are connected with the '.' sign.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = getindex(db, "Polytopes.Lattice.SmoothReflexive")
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive
+
+julia> collection = db["Matroids.Small"]
+Polymake.Polydb.Collection{Polymake.BigObject}: Matroids.Small
+```
+"""
 Base.getindex(db::Database, name::AbstractString) = Collection{Polymake.BigObject}(db.mdb[name])
 
-# search a collection for documents matching the criteria given by d
+"""
+      find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict})
+
+Search a collection `c` for documents matching the criteria given by `d`.
+Apply search options `opts`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"];
+
+julia> query = Dict("DIM"=>3, "N_FACETS"=>5);
+
+julia> results = Polymake.Polydb.find(collection, query);
+
+julia> typeof(results)
+Polymake.Polydb.Cursor{Polymake.BigObject}
+```
+"""
 function Mongoc.find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
    return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d); options=(isnothing(opts) ? nothing : Mongoc.BSON(opts))))
 end
 
+"""
+      find(c::Collection{T}, d::Pair...)
+
+Search a collection `c` for documents matching the criteria given by `d`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"];
+
+julia> results = Polymake.Polydb.find(collection, "DIM"=>3, "N_FACETS"=>5);
+
+julia> typeof(results)
+Polymake.Polydb.Cursor{Polymake.BigObject}
+```
+"""
 function Mongoc.find(c::Collection{T}, d::Pair...) where T
    return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
 end
 
-# creating `BSON` iterators from the respective `Polymake.BigObject` iterator
-# and vice versa
+"""
+      Collection{T}(c::Collection)
+
+Create another `Collection` object with a specific template parameter
+referencing the same collection as `c`.
+`T` can be chosen from `Polymake.BigObject` and `Mongoc.BSON`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"]
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive
+
+julia> collection_bson = Polymake.Polydb.Collection{Mongoc.BSON}(collection)
+Polymake.Polydb.Collection{Mongoc.BSON}: Polytopes.Lattice.SmoothReflexive
+
+julia> collection_bo = Polymake.Polydb.Collection{Polymake.BigObject}(collection_bson)
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive
+```
+"""
 function Collection{T}(c::Collection) where T<:Union{Polymake.BigObject, Mongoc.BSON}
    return Collection{T}(c.mcol)
 end
 
+"""
+      Cursor{T}(cur::Cursor)
+
+Create another `Cursor` object with a specific template parameter
+referencing the same data set as `cur`.
+`T` can be chosen from `Polymake.BigObject` and `Mongoc.BSON`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"]
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive
+
+julia> results = Polymake.Polydb.find(collection, "DIM"=>3, "N_FACETS"=>5);
+
+julia> results_bson = Polymake.Polydb.Cursor{Mongoc.BSON}(results);
+
+julia> typeof(results_bson)
+Polymake.Polydb.Cursor{Mongoc.BSON}
+
+julia> results_bo = Polymake.Polydb.Cursor{Polymake.BigObject}(results_bson);
+
+julia> typeof(results_bo)
+Polymake.Polydb.Cursor{Polymake.BigObject}
+```
+"""
 function Cursor{T}(cursor::Cursor) where T<:Union{Polymake.BigObject, Mongoc.BSON}
    return Cursor{T}(cursor.mcursor)
 end
 
-# returns a Polymake.BigObject from a Mongoc.BSON document
+"""
+      parse_document(bson::Mongoc.BSON)
+Create a `Polymake.BigObject` from the data given by `bson`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = Polymake.Polydb.Collection{Mongoc.BSON}(db["Polytopes.Lattice.SmoothReflexive"])
+Polymake.Polydb.Collection{Mongoc.BSON}: Polytopes.Lattice.SmoothReflexive
+
+julia> bson = collect(Polymake.Polydb.find(collection, "DIM"=>3, "N_FACETS"=>5))[1];
+
+julia> bo = Polymake.Polydb.parse_document(bson);
+
+julia> typeof(bo)
+Polymake.BigObjectAllocated
+```
+"""
 function parse_document(bson::Mongoc.BSON)
    str = Mongoc.as_json(bson)
    return @pm common.deserialize_json_string(str)
@@ -104,8 +243,32 @@ Base.iterate(coll::Collection{Mongoc.BSON}, state::Mongoc.Cursor) =
 
 #Info
 
-# returns an `Array{String, 1}` of the fields of a collection
+"""
+      get_fields(c::Collection)
+Return an `Array{String, 1}` containing the names of the fields of `c`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
 
+julia> collection = db["Matroids.Small"]
+Polymake.Polydb.Collection{Polymake.BigObject}: Matroids.Small
+
+julia> Polymake.Polydb.get_fields(collection)
+27-element Array{String,1}:
+ "DUAL"
+ "N_BASES"
+ "TUTTE_POLYNOMIAL"
+ "SERIES_PARALLEL"
+ "N_FLATS"
+ "SPLIT_FLACETS"
+ ⋮
+ "TERNARY"
+ "REGULAR"
+ "TRANSVERSAL"
+ "IDENTICALLY_SELF_DUAL"
+ "BETA_INVARIANT"
+```
+"""
 function get_fields(coll::Collection)
    db = coll.mcol.database
    coll_c = db[string("_collectionInfo.", coll.mcol.name)]
@@ -157,7 +320,31 @@ function _get_collection_names(db::Database)
    return Mongoc.get_collection_names(db.mdb;options=opts)
 end
 
-# returns an array cotaining the names of all collections in the Polydb, excluding meta collections
+"""
+      get_collection_names(db::Database)
+
+Return an `Array{String, 1}` containing the names of all collections in the
+Polydb, excluding meta collections.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> Polymake.Polydb.get_collection_names(db)
+16-element Array{String,1}:
+ "Polytopes.Combinatorial.FacesBirkhoffPolytope"
+ "Polytopes.Combinatorial.SmallSpheresDim4"
+ "Polytopes.Geometric.01Polytopes"
+ "Polytopes.Lattice.SmoothReflexive"
+ "Polytopes.Lattice.ExceptionalMaximalHollow"
+ "Tropical.TOM"
+ ⋮
+ "Polytopes.Lattice.Panoptigons"
+ "Tropical.Cubics"
+ "Tropical.SchlaefliFan"
+ "Polytopes.Lattice.Reflexive"
+ "Polytopes.Combinatorial.CombinatorialTypes"
+```
+"""
 function get_collection_names(db::Database)
    names = _get_collection_names(db)
    res = Array{String, 1}()
@@ -227,10 +414,18 @@ function _get_collection_string(db::Database, name::String, level::Base.Integer)
    return join(res, "\n")
 end
 
-# prints a structured list of the sections and collections of the Polydb
-# together with information about each of these, if existent
-#
-# relying on the structure of Polydb
+"""
+      info(db::Database, level::Base.Integer=1)
+Print a structured list of the sections and collections of the Polydb
+together with information about each of these (if existent).
+
+Detail of the output determined by value of `level`:
+ * 1: short description,
+ * 2: description,
+ * 3: description, authors, maintainers,
+ * 4: full info,
+ * 5: full info and list of recommended search fields.
+"""
 function info(db::Database, level::Base.Integer=1, io::IO=stdout)
    dbtree = _get_db_tree(db)
    println(io, join(_get_info_strings(db, dbtree, level), "\n\n"))
@@ -286,7 +481,17 @@ function _get_info_document(db::Database, name::String)
    return Mongoc.find_one(db.mdb[name], Mongoc.BSON("_id" => string(SubString(name, i), ".2.1")))
 end
 
-# prints customized information about a collection
+"""
+      info(c::Collection, level::Base.Integer=1)
+Print information about collection `c` (if existent).
+
+Detail of the output determined by value of `level`:
+ * 1: short description,
+ * 2: description,
+ * 3: description, authors, maintainers,
+ * 4: full info,
+ * 5: full info and list of recommended search fields.
+"""
 function info(coll::Collection, level::Base.Integer=5)
    db = Database(coll.mcol.database)
    name = coll.mcol.name
@@ -316,7 +521,20 @@ _operationToMongo = Dict{Symbol, String}(
 """
    Polymake.Polydb.@select collectionName
 
-TODO: doctext
+This macro can be used as part of a chain for easy (i.e. human readable)
+querying.
+Generate a method asking a container for the entry with key `collectionName`.
+
+See also: [`@filter`](@ref), [`@map`](@ref)
+
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db |>
+       Polymake.Polydb.@select("Polytopes.Lattice.SmoothReflexive")
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive
+```
 """
 macro select(args...)
    if length(args) > 1 || !(args[1] isa String)
@@ -328,7 +546,43 @@ end
 """
    Polymake.Polydb.@filter conditions...
 
-TODO:  doctext
+This macro can be used as part of a chain for easy (i.e. human readable)
+querying.
+Convert `conditions` into the corresponding `Dict` and
+generate a method expanding its input by this `Dict`.
+Multiple conditions can be passed in the same line and/or in different lines.
+
+See also: [`@select`](@ref), [`@map`](@ref)
+
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> query_tuple = db |>
+       Polymake.Polydb.@select("Polytopes.Lattice.SmoothReflexive") |>
+       Polymake.Polydb.@filter("DIM" <= 3) |>
+       Polymake.Polydb.@filter("N_VERTICES" == 8)
+(Polymake.Polydb.Collection{Polymake.BigObject}
+    COLLECTION: Polytopes.Lattice.SmoothReflexive
+    Smooth reflexive lattice polytopes in dimensions up to 9, up to lattice equivalence. The lists were computed with the algorithm of Mikkel Oebro (see [[http://arxiv.org/abs/0704.0049|arxiv: 0704.0049]]) and are taken from the [[http://polymake.org/polytopes/paffenholz/www/fano.html|website of Andreas Paffenholz]]. They also contain splitting data according to [[https://arxiv.org/abs/1711.02936| arxiv: 1711.02936]].
+    Authored by
+        Andreas Paffenholz, paffenholz@opt.tu-darmstadt.de, TU Darmstadt
+        Benjamin Lorenz, paffenholz@opt.tu-darmstadt.de, TU Berlin
+        Mikkel Oebro
+    Fields: AFFINE_HULL, CONE_DIM, DIM, EHRHART_POLYNOMIAL, F_VECTOR, FACET_SIZES, FACET_WIDTHS, FACETS, H_STAR_VECTOR, LATTICE_DEGREE, LATTICE_VOLUME, LINEALITY_SPACE, N_BOUNDARY_LATTICE_POINTS, N_EDGES, N_FACETS, N_INTERIOR_LATTICE_POINTS, N_LATTICE_POINTS, N_RIDGES, N_VERTICES, REFLEXIVE, SMOOTH, SELF_DUAL, SIMPLE, TERMINAL, VERTEX_SIZES, VERTICES, VERTICES_IN_FACETS, VERY_AMPLE, ALTSHULER_DET, BALANCED, CENTROID, DIAMETER, NORMAL, N_HILBERT_BASIS, IS_PRISM, IS_PRODUCT, IS_SKEW_PRISM, IS_SIMPLEX_SUM, PRISM_BASE, PRODUCT_FACTORS, SIMPLEX_SUM_BASES, SKEW_PRISM_BASES, Dict{String,Any}("DIM" => Dict{String,Any}("\$lte" => 3),"N_VERTICES" => Dict{String,Any}("\$eq" => 8)))
+
+julia> query_tuple = db |>
+       Polymake.Polydb.@select("Polytopes.Lattice.SmoothReflexive") |>
+       Polymake.Polydb.@filter("DIM" <= 3, "N_VERTICES" == 8)
+(Polymake.Polydb.Collection{Polymake.BigObject}
+    COLLECTION: Polytopes.Lattice.SmoothReflexive
+    Smooth reflexive lattice polytopes in dimensions up to 9, up to lattice equivalence. The lists were computed with the algorithm of Mikkel Oebro (see [[http://arxiv.org/abs/0704.0049|arxiv: 0704.0049]]) and are taken from the [[http://polymake.org/polytopes/paffenholz/www/fano.html|website of Andreas Paffenholz]]. They also contain splitting data according to [[https://arxiv.org/abs/1711.02936| arxiv: 1711.02936]].
+    Authored by
+        Andreas Paffenholz, paffenholz@opt.tu-darmstadt.de, TU Darmstadt
+        Benjamin Lorenz, paffenholz@opt.tu-darmstadt.de, TU Berlin
+        Mikkel Oebro
+    Fields: AFFINE_HULL, CONE_DIM, DIM, EHRHART_POLYNOMIAL, F_VECTOR, FACET_SIZES, FACET_WIDTHS, FACETS, H_STAR_VECTOR, LATTICE_DEGREE, LATTICE_VOLUME, LINEALITY_SPACE, N_BOUNDARY_LATTICE_POINTS, N_EDGES, N_FACETS, N_INTERIOR_LATTICE_POINTS, N_LATTICE_POINTS, N_RIDGES, N_VERTICES, REFLEXIVE, SMOOTH, SELF_DUAL, SIMPLE, TERMINAL, VERTEX_SIZES, VERTICES, VERTICES_IN_FACETS, VERY_AMPLE, ALTSHULER_DET, BALANCED, CENTROID, DIAMETER, NORMAL, N_HILBERT_BASIS, IS_PRISM, IS_PRODUCT, IS_SKEW_PRISM, IS_SIMPLEX_SUM, PRISM_BASE, PRODUCT_FACTORS, SIMPLEX_SUM_BASES, SKEW_PRISM_BASES, Dict{String,Any}("DIM" => Dict{String,Any}("\$lte" => 3),"N_VERTICES" => Dict{String,Any}("\$eq" => 8)))
+```
 """
 macro filter(args...)
    d = Dict{String, Any}()
@@ -349,7 +603,32 @@ end
 """
    Polymake.Polydb.@map
 
-TODO: doctext
+This macro can be used as part of a chain for easy (i.e. human readable)
+querying.
+Convert `conditions` into the corresponding `Dict` and
+generate a method expanding its input by this `Dict`.
+Multiple conditions can be passed in the same line and/or in different lines.
+
+See also: [`@select`](@ref), [`@filter`](@ref)
+
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> results = db |>
+       Polymake.Polydb.@select("Polytopes.Lattice.SmoothReflexive") |>
+       Polymake.Polydb.@filter("DIM" == 3, "N_VERTICES" == 8) |>
+       Polymake.Polydb.@map() |>
+       collect
+7-element Array{Polymake.BigObject,1}:
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x00000000028c5320)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000abd7b40)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000a6d7bf0)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000a431470)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000bcaf290)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x00000000098fb670)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000a1ba460)
+```
 """
 macro map(args...)
    if length(args) == 0
