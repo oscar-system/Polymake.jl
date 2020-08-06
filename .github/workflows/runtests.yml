@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        julia-version: ['1.3', '1.4', '1.5.0-beta1', 'nightly']
+        julia-version: ['1.3', '1.4', '1.5', 'nightly']
         os: [ubuntu-latest]
       fail-fast: false
     # Service containers to run
@@ -54,7 +54,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        julia-version: ['1.3', '1.4', '1.5.0-beta1', 'nightly']
+        julia-version: ['1.3', '1.4', '1.5', 'nightly']
         os: [ubuntu-latest, macOS-latest]
         # empty entry for defaults
         xcode: [ '' ]
