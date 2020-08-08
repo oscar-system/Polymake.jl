@@ -601,13 +601,14 @@ macro filter(args...)
 end
 
 """
-   Polymake.Polydb.@map
+   Polymake.Polydb.@map [optFields...]
 
 This macro can be used as part of a chain for easy (i.e. human readable)
 querying.
-Convert `conditions` into the corresponding `Dict` and
-generate a method expanding its input by this `Dict`.
-Multiple conditions can be passed in the same line and/or in different lines.
+Generate a method running a query given a `Tuple{Collection, Dict}`.
+If `optFields` are given (as `String`s), the results only contain the stated
+fields and the objects metadata.
+
 
 See also: [`@select`](@ref), [`@filter`](@ref)
 
