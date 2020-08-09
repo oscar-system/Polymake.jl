@@ -85,6 +85,10 @@ end
 include(type_translator)
 
 function __init__()
+    if length(get(ENV,"POLYMAKE_CONFIG","")) > 0
+         @warn "Setting `POLYMAKE_CONFIG` to use a custom polymake installation is no longer supported. Please use `Overrides.toml` to override `polymake_jll` and `libpolymake_julia_jll`."
+    end
+
     checkversion()
 
     @initcxx
