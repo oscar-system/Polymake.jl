@@ -121,6 +121,12 @@ using Mongoc
         @test Polymake.Polydb.@map() isa Function
         filter_tuple = Polymake.Polydb.@filter("N_LOOPS" > 1)(Polymake.Polydb.@filter("N_ELEMENTS" == 3)(collection))
         @test Polymake.Polydb.@map()(filter_tuple) isa Polymake.Polydb.Cursor
+        tobj = iterate(Polymake.Polydb.@map()(filter_tuple))[1]
+        @test Polymake.call_method(tobj,:list_properties) > 20
+        @test Polymake.Polydb.@map("TUTTE_POLYNOMIAL", "N_LOOPS")(filter_tuple) isa Polymake.Polydb.Cursor
+        tobj = iterate(Polymake.Polydb.@map("TUTTE_POLYNOMIAL", "N_LOOPS")(filter_tuple))[1]
+        @test Polymake.call_method(tobj, :list_properties) == 2
+        @test Polymake.exists(tobj, "TUTTE_POLYNOMIAL") && Polymake.exists(tobj, "N_LOOPS")
         selection = Polymake.Polydb.@select("Matroids.Small")
         for (constraints, amount, op) in    [([:("N_ELEMENTS" == 3)], 4, :(==)),
                                             ([:("N_ELEMENTS" < 3)], 4, :<),

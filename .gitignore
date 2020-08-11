@@ -6,3 +6,4 @@ Manifest.toml
 src/generated/json/*.json
 src/generated/*.jl
 .vscode
+docs/build/*
