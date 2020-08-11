@@ -28,10 +28,10 @@ import SparseArrays
 using CxxWrap
 import Libdl.dlext
 
-# LoadFlint is needed to initialize the flint malloc functions
+# FLINT_jll now initializes the flint malloc functions
 # to the corresponding julia functions.
 # See also https://github.com/Nemocas/Nemo.jl/issues/788
-import LoadFlint
+using FLINT_jll
 
 using Perl_jll
 using Ninja_jll
