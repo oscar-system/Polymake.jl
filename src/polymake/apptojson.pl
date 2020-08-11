@@ -4,7 +4,6 @@ require JSON;
 
 die "usage: $0 <pathname>" unless @ARGV >= 1;
 
-
 my $jsonpath = shift @ARGV;
 
 my @apps = @ARGV > 0 ? @ARGV : @User::start_applications;
@@ -91,7 +90,6 @@ sub help_to_hash($$$) {
    } else {
       # this is necessary due to a bug in polymake
       $fun{doc} = "";
-      print STDERR "WARNING: skipping text docs for ",$help->name,"\n";
    }
 
    return \%fun;

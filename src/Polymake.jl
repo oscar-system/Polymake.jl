@@ -18,7 +18,7 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
-# needed for deps.jl setting polymake_user
+# needed for setting polymake_user
 import Pkg
 
 using SparseArrays
@@ -28,10 +28,16 @@ import SparseArrays
 using CxxWrap
 import Libdl.dlext
 
-# LoadFlint is needed to initialize the flint malloc functions
+# FLINT_jll now initializes the flint malloc functions
 # to the corresponding julia functions.
 # See also https://github.com/Nemocas/Nemo.jl/issues/788
-import LoadFlint
+using FLINT_jll
+
+using Perl_jll
+using Ninja_jll
+using libpolymake_julia_jll
+
+const jlpolymake_version_range = (v"0.1.0",  v"0.2")
 
 struct PolymakeError <: Exception
     msg
@@ -41,46 +47,59 @@ function Base.showerror(io::IO, ex::PolymakeError)
     print(io, "Exception occured at Polymake side:\n$(ex.msg)")
 end
 
-function check_jlcxx_version(version)
-    current_jlcxx = VersionNumber(unsafe_string(ccall(:cxxwrap_version_string, Cstring, ())))
-    if (version != current_jlcxx)
-        error("""JlCxx version changed, please run `using Pkg; Pkg.build("Polymake");`""")
-    end
-end
-
 ###########################
 # Load Cxx stuff and init
 ##########################
 
 Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
-deps_dir = joinpath(@__DIR__, "..", "deps")
+libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
 
-isfile(joinpath(deps_dir,"jlcxx_version.jl")) &&
-    isfile(joinpath(deps_dir,"deps.jl")) ||
-    error("""Please run `using Pkg; Pkg.build("Polymake");`""")
+jlpolymake_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_version,libpolymake_julia), Cstring, ())))
 
-include(joinpath(deps_dir,"jlcxx_version.jl"))
+function checkversion()
+  jlpolymakeversion = jlpolymake_version()
+  if !(jlpolymake_version_range[1] <= jlpolymakeversion < jlpolymake_version_range[2])
+    error("This version of Polymake.jl requires libpolymake-julia in the range $(libpolymake_version_range), but version $jlpolymakeversion was found")
+  end
+end
 
-check_jlcxx_version(jlcxx_version)
+# Must also be called during precompile
+checkversion()
 
-@wrapmodule(joinpath(deps_dir, "src", "libpolymake.$dlext"), :define_module_polymake)
-
-include("generated/type_translator.jl")
+generated_dir = joinpath(@__DIR__, "generated")
 
 include("repl.jl")
 include("ijulia.jl")
 
-include(joinpath(deps_dir,"deps.jl"))
+@wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
+
+json_script = joinpath(@__DIR__,"polymake","apptojson.pl")
+json_folder = joinpath(generated_dir,"json")
+mkpath(json_folder)
+
+polymake_run_script() do runner
+   run(`$runner $json_script $json_folder`)
+end
+
+include(type_translator)
 
 function __init__()
-    check_jlcxx_version(jlcxx_version)
+    if length(get(ENV,"POLYMAKE_CONFIG","")) > 0
+         @warn "Setting `POLYMAKE_CONFIG` to use a custom polymake installation is no longer supported. Please use `Overrides.toml` to override `polymake_jll` and `libpolymake_julia_jll`."
+    end
+
+    checkversion()
+
     @initcxx
 
-    if using_binary
-        check_deps()
-        prepare_env()
-    end
+    global user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
+    
+    # prepare environment variables
+    ENV["PATH"] *= ":" * Ninja_jll.PATH
+    ENV["PATH"] *= ":" * Perl_jll.PATH
+    ENV["POLYMAKE_USER_DIR"] = user_dir
+    mkpath(user_dir)
 
     try
         show_banner = isinteractive() &&
@@ -96,7 +115,7 @@ function __init__()
     end
 
     application("common")
-    shell_execute("include(\"$(joinpath(deps_dir, "rules", "julia.rules"))\");")
+    shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
 
     for app in call_function(:common, :startup_applications)
         application(app)
