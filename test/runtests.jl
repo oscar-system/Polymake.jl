@@ -26,6 +26,7 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("polynomial.jl")
     include("pairs.jl")
     include("lists.jl")
+    include("map.jl")
     if get(ENV, "POLYDB_TEST_URI", "") != ""
         include("polydb.jl")
     end
