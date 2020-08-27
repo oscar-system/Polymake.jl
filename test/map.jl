@@ -1,5 +1,5 @@
 @testset "Polymake.Map" begin
-    @test Map{String,String} <: Dict{Polymake.to_cxx_type(String),Polymake.to_cxx_type(String)}
+    @test Polymake.Map{String,String} <: AbstractDict{String,String}
     @testset "Constructors" begin
         @test Polymake.Map{String,String}() isa Polymake.Map{Polymake.to_cxx_type(String),Polymake.to_cxx_type(String)}
     end
@@ -8,7 +8,7 @@
         M["one"] = "Eins"
         @test M["one"] isa String
         @test M["one"] == "Eins"
-        @test_throws KeyError M["two"] #might need implementation
+        @test_throws ErrorException M["two"]
         @testset "Iterator" begin
             M["zero"] = "Null"
             M["infinity"] = "Unendlich"
