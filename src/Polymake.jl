@@ -37,7 +37,7 @@ using Perl_jll
 using Ninja_jll
 using libpolymake_julia_jll
 
-const jlpolymake_version_range = (v"0.1.0",  v"0.2")
+const jlpolymake_version_range = (v"0.1.2",  v"0.2")
 
 struct PolymakeError <: Exception
     msg
@@ -60,7 +60,7 @@ jlpolymake_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_version,li
 function checkversion()
   jlpolymakeversion = jlpolymake_version()
   if !(jlpolymake_version_range[1] <= jlpolymakeversion < jlpolymake_version_range[2])
-    error("This version of Polymake.jl requires libpolymake-julia in the range $(libpolymake_version_range), but version $jlpolymakeversion was found")
+    error("This version of Polymake.jl requires libpolymake-julia in the range $(jlpolymake_version_range), but version $jlpolymakeversion was found")
   end
 end
 
@@ -161,10 +161,13 @@ include("arrays.jl")
 include("incidencematrix.jl")
 include("tropicalnumber.jl")
 include("polynomial.jl")
+include("map.jl")
 
 include("polymake_direct_calls.jl")
 
 include("generate_applications.jl")
+
+include("get_attachment.jl")
 
 include("polydb.jl")
 end # of module Polymake
