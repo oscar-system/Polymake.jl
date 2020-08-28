@@ -37,7 +37,7 @@ using Perl_jll
 using Ninja_jll
 using libpolymake_julia_jll
 
-const jlpolymake_version_range = (v"0.1.0",  v"0.2")
+const jlpolymake_version_range = (v"0.1.1",  v"0.2")
 
 struct PolymakeError <: Exception
     msg
