@@ -164,6 +164,7 @@ include("polynomial.jl")
 include("map.jl")
 
 include("polymake_direct_calls.jl")
+include("beneath_beyond.jl")
 
 include("generate_applications.jl")
 
