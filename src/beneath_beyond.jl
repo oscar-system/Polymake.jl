@@ -26,7 +26,7 @@ mutable struct BeneathBeyond{T}
 
         _bb_initialize!(bb.algo, bb.rays, bb.lineality)
 
-        finalizer(_clear!, bb)
+        finalizer(_bb_clear!, bb)
         return bb
     end
     function BeneathBeyond{T}(
@@ -35,13 +35,15 @@ mutable struct BeneathBeyond{T}
         lineality::AbstractMatrix,
         perm::AbstractVector,
     ) where {T}
-        return new{T}(a, rays, lineality, perm)
+        bb = new{T}(a, rays, lineality, perm)
+        finalizer(_bb_clear!, bb)
+        return bb
     end
 end
 
 Base.length(bb::BeneathBeyond) = length(bb.perm)
 
-function add_point!(bb::BeneathBeyond, i::Integer)
+function add_point!(bb::BeneathBeyond, i::Base.Integer)
     @boundscheck 0 < i <= length(bb) || throw(BoundsError(bb, i))
     GC.@preserve bb begin
         _bb_add_point!(bb.algo, i - 1)
@@ -53,24 +55,12 @@ function Base.iterate(bb::BeneathBeyond, s = 1)
     if s > length(bb)
         return nothing
     end
-    GC.@preserve bb begin
-        add_point!(bb.algo, bb.perm[s])
-        # _, time, _ = @timed _bb_add_point!(bb.algo, bb.perm[s])
-        # @debug "" Iteration=s adding_point=bb.perm[s]+1 triangulation_size(bb.algo) time
-        # @debug time, triangulation_size(bb.algo)
-    end
+    add_point!(bb, bb.perm[s])
     return nothing, s + 1
 end
 
-function _clear!(bb::BeneathBeyond)
-    GC.@preserve bb begin
-        _bb_clear!(bb.algo)
-    end
-end
-
-
 for f in (
-    :_clear!,
+    :_bb_clear!,
     :facets,
     :vertex_facet_incidence,
     :affine_hull,
