@@ -96,8 +96,7 @@ function __init__()
     global user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
     
     # prepare environment variables
-    ENV["PATH"] *= ":" * (isa(Ninja_jll.PATH,Ref) ? Ninja_jll.PATH[] : Ninja_jll.PATH)
-    ENV["PATH"] *= ":" * (isa(Perl_jll.PATH,Ref) ? Perl_jll.PATH[] : Perl_jll.PATH)
+    ENV["PATH"] = string(Ninja_jll.PATH[], ":", Perl_jll.PATH[], ":", ENV["PATH"])
     ENV["POLYMAKE_USER_DIR"] = user_dir
     mkpath(user_dir)
 
