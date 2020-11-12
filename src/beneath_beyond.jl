@@ -26,9 +26,9 @@ mutable struct BeneathBeyond{T}
 
         _bb_initialize!(bb.algo, bb.rays, bb.lineality)
 
-        finalizer(_bb_clear!, bb)
         return bb
     end
+
     function BeneathBeyond{T}(
         a::BeneathBeyondAlgo,
         rays::AbstractMatrix,
@@ -36,7 +36,6 @@ mutable struct BeneathBeyond{T}
         perm::AbstractVector,
     ) where {T}
         bb = new{T}(a, rays, lineality, perm)
-        finalizer(_bb_clear!, bb)
         return bb
     end
 end
@@ -53,6 +52,7 @@ end
 
 function Base.iterate(bb::BeneathBeyond, s = 1)
     if s > length(bb)
+        GC.@preserve bb _bb_finish!(bb)
         return nothing
     end
     add_point!(bb, bb.perm[s])
@@ -60,7 +60,7 @@ function Base.iterate(bb::BeneathBeyond, s = 1)
 end
 
 for f in (
-    :_bb_clear!,
+    :_bb_finish!,
     :facets,
     :vertex_facet_incidence,
     :affine_hull,
