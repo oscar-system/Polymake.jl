@@ -44,9 +44,7 @@ Base.length(bb::BeneathBeyond) = length(bb.perm)
 
 function add_point!(bb::BeneathBeyond, i::Base.Integer)
     @boundscheck 0 < i <= length(bb) || throw(BoundsError(bb, i))
-    GC.@preserve bb begin
-        _bb_add_point!(bb.algo, i - 1)
-    end
+    _bb_add_point!(bb.algo, i - 1)
     return bb
 end
 
@@ -55,7 +53,7 @@ function Base.iterate(bb::BeneathBeyond, s = 1)
         GC.@preserve bb _bb_finish!(bb)
         return nothing
     end
-    add_point!(bb, bb.perm[s])
+    GC.@preserve bb add_point!(bb, bb.perm[s])
     return nothing, s + 1
 end
 
@@ -69,11 +67,10 @@ for f in (
     :linealities,
     :triangulation,
     :triangulation_size,
+    :state,
 )
     @eval begin
-        $f(bb::BeneathBeyond) = GC.@preserve bb begin
-            $f(bb.algo)
-        end
+        $f(bb::BeneathBeyond) = GC.@preserve bb $f(bb.algo)
     end
 end
 
