@@ -84,3 +84,8 @@ function Base.deepcopy_internal(bb::BeneathBeyond{T}, dict::IdDict) where {T}
         )
     return res
 end
+
+Base.:(==)(bb1::BeneathBeyond, bb2::BeneathBeyond) =
+    bb1.rays == bb2.rays && bb1.lineality == bb2.lineality && bb1.perm == bb2.perm
+
+Base.hash(::BeneathBeyond, h::UInt) = h
