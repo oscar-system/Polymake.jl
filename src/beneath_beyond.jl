@@ -76,13 +76,11 @@ end
 
 function Base.deepcopy_internal(bb::BeneathBeyond{T}, dict::IdDict) where {T}
 
-    GC.@preserve bb begin
-        res = BeneathBeyond{T}(
+    GC.@preserve bb res = BeneathBeyond{T}(
             copy(bb.algo),
-            copy(bb.rays),
-            copy(bb.lineality),
+            bb.rays, # stored as pointer in bb.algo
+            bb.lineality, # stored as pointer in bb.algo
             copy(bb.perm),
         )
-    end
     return res
 end
