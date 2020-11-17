@@ -18,7 +18,6 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
 
-# needed for setting polymake_user
 import Pkg
 
 using SparseArrays
@@ -35,9 +34,10 @@ using FLINT_jll
 
 using Perl_jll
 using Ninja_jll
+using polymake_jll
 using libpolymake_julia_jll
 
-const jlpolymake_version_range = (v"0.2.0",  v"0.3")
+const jlpolymake_version_range = (v"0.2.0",  v"0.4")
 
 struct PolymakeError <: Exception
     msg
@@ -84,6 +84,10 @@ end
 
 include(type_translator)
 
+include(polymake_jll.generate_deps_tree)
+
+const polymake_deps_tree = prepare_deps_tree()
+
 function __init__()
     if length(get(ENV,"POLYMAKE_CONFIG","")) > 0
          @warn "Setting `POLYMAKE_CONFIG` to use a custom polymake installation is no longer supported. Please use `Overrides.toml` to override `polymake_jll` and `libpolymake_julia_jll`."
@@ -99,6 +103,8 @@ function __init__()
     ENV["PATH"] = string(Ninja_jll.PATH[], ":", Perl_jll.PATH[], ":", ENV["PATH"])
     ENV["POLYMAKE_USER_DIR"] = user_dir
     mkpath(user_dir)
+
+    ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
 
     try
         show_banner = isinteractive() &&
