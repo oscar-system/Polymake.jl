@@ -3,6 +3,7 @@ mutable struct BeneathBeyond{T}
     rays::Matrix{T}
     lineality::Matrix{T}
     perm::Base.Vector{Int}
+    lock::ReentrantLock
 
     function BeneathBeyond(
         rays::AbstractMatrix{T},
@@ -17,7 +18,7 @@ mutable struct BeneathBeyond{T}
         @assert !isempty(perm)
         @assert all(>(0), perm)
 
-        bb = new{T}(BeneathBeyondAlgo{T}(), rays, lineality, perm)
+        bb = new{T}(BeneathBeyondAlgo{T}(), rays, lineality, perm, ReentrantLock())
 
         _bb_expecting_redundant(bb.algo, redundant)
         _bb_making_triangulation(bb.algo, triangulation)
@@ -35,7 +36,7 @@ mutable struct BeneathBeyond{T}
         lineality::AbstractMatrix,
         perm::AbstractVector,
     ) where {T}
-        bb = new{T}(a, rays, lineality, perm)
+        bb = new{T}(a, rays, lineality, perm, ReentrantLock())
         return bb
     end
 end
@@ -75,13 +76,17 @@ for f in (
 end
 
 function Base.deepcopy_internal(bb::BeneathBeyond{T}, dict::IdDict) where {T}
-
-    GC.@preserve bb res = BeneathBeyond{T}(
-            copy(bb.algo),
-            bb.rays, # stored as pointer in bb.algo
-            bb.lineality, # stored as pointer in bb.algo
-            copy(bb.perm),
-        )
+    lock(bb.lock)
+    res = try
+        GC.@preserve bb BeneathBeyond{T}(
+                copy(bb.algo),
+                bb.rays, # stored as pointer in bb.algo
+                bb.lineality, # stored as pointer in bb.algo
+                copy(bb.perm),
+            )
+    finally
+        unlock(bb.lock)
+    end
     return res
 end
 
