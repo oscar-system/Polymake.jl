@@ -64,7 +64,7 @@ Polymake.Polydb.Database
 """
 function get_db()
    # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
-   client = Mongoc.Client(get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(cacert)"))
+   client = Mongoc.Client(get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(MozillaCACerts_jll.cacert)"))
    return Database(client["polydb"])
 end
 
