@@ -9,3 +9,6 @@
 This package is developed as part of the [OSCAR](https://oscar.computeralgebra.de) project.
 
 The current version of `Polymake.jl` relies on `polymake` version `4.0` or later.
+
+## How to cite
+If you use `Polymake.jl` in your research, please cite our [ICMS article](https://link.springer.com/chapter/10.1007/978-3-030-52200-1_37).
