@@ -37,7 +37,7 @@ using Ninja_jll
 using polymake_jll
 using libpolymake_julia_jll
 
-const jlpolymake_version_range = (v"0.2.0",  v"0.4")
+const jlpolymake_version_range = (v"0.4.0",  v"0.5")
 
 struct PolymakeError <: Exception
     msg
