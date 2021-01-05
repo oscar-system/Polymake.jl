@@ -95,7 +95,7 @@ function _get_visual_string(x::Visual,function_symbol::Symbol)
     html_string=call_function(:common, function_symbol, x.obj)
     # we guess that the julia kernel is named this way...
     kernel = "julia-$(VERSION.major).$(VERSION.minor)"
-    html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/")
+    html_string = replace(html_string,"kernelspecs/polymake/"=>"kernelspecs/$(kernel)/polymake/")
     return html_string
 end
 
