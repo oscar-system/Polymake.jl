@@ -1,7 +1,7 @@
 name = "Polymake"
 uuid = "d720cf60-89b5-51f5-aff5-213f193123e7"
 repo = "https://github.com/oscar-system/Polymake.jl.git"
-version = "0.5.4"
+version = "0.5.5"
 
 [deps]
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
