@@ -3,7 +3,7 @@ using Test
 using CxxWrap
 
 # make wrapper compilation verbose on travis
-if (haskey(ENV, "TRAVIS"))
+if (haskey(ENV, "GITHUB_ACTIONS"))
     Polymake.shell_execute(raw"$Verbose::cpp=3;")
 end
 
