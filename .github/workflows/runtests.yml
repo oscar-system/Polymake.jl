@@ -71,14 +71,18 @@ jobs:
         include:
           - xcode: '11.4'
             os: macos-latest
-            julia-version: 1.4
+            julia-version: 1.5
+          - os: macos-11.0
+            julia-version: 1.5
           - cxxwrap: '0.10'
             os: ubuntu-latest
-            julia-version: 1.4
+            julia-version: 1.5
           - os: ubuntu-20.04
-            julia-version: 1.4
+            julia-version: 1.5
+          - os: ubuntu-18.04
+            julia-version: 1.5
           - os: ubuntu-16.04
-            julia-version: 1.4
+            julia-version: 1.5
 
       fail-fast: false
 
