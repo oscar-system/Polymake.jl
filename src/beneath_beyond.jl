@@ -45,7 +45,9 @@ Base.length(bb::BeneathBeyond) = length(bb.perm)
 
 function add_point!(bb::BeneathBeyond, i::Base.Integer)
     @boundscheck 0 < i <= length(bb) || throw(BoundsError(bb, i))
-    _bb_add_point!(bb.algo, i - 1)
+    lock(bb.lock) do
+        _bb_add_point!(bb.algo, i - 1)
+    end
     return bb
 end
 
@@ -71,21 +73,23 @@ for f in (
     :state,
 )
     @eval begin
-        $f(bb::BeneathBeyond) = GC.@preserve bb $f(bb.algo)
+        function $f(bb::BeneathBeyond)
+            res = lock(bb.lock) do
+                GC.@preserve bb $f(bb.algo)
+            end
+            return res
+        end
     end
 end
 
 function Base.deepcopy_internal(bb::BeneathBeyond{T}, dict::IdDict) where {T}
-    lock(bb.lock)
-    res = try
+    res = lock(bb.lock) do
         GC.@preserve bb BeneathBeyond{T}(
                 copy(bb.algo),
                 bb.rays, # stored as pointer in bb.algo
                 bb.lineality, # stored as pointer in bb.algo
                 copy(bb.perm),
             )
-    finally
-        unlock(bb.lock)
     end
     return res
 end
