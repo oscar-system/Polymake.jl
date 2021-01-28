@@ -49,7 +49,12 @@ function Base.show(io::IO, ::MIME"text/html", obj::BigObject)
             key, val = a, ""
         end
 
-        props[i] = "<details><summary>$key</summary><pre>$val</pre></details>"
+        props[i] = """
+            <details>
+                <summary style='display:list-item;'>$key</summary>
+                <pre>$val</pre>
+            </details>
+         """
     end
 
     preamble = ("<dt>$t</dt><dd>$d</dd>" for (t,d) in split.(summary, ":"; limit=2))
