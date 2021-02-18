@@ -127,10 +127,17 @@ sub app_to_json($$) {
    my %data;
    $data{version} = "dev";
    $data{app} = $appname;
+   my $app = User::application($appname);
+
+   # imports
+   my @use = grep {not exists $app->imported->{$_}} keys %{$app->used};
+   my @import = keys %{$app->imported};
+   $data{use} = \@use;
+   $data{import} = \@import;
 
    # call funcs and meths
    push @{$data{functions}}, @{functions_to_hash($appname)};
-   my @gen_types = grep {!defined($_->generic) } @{User::application($appname)->object_types};
+   my @gen_types = grep {!defined($_->generic) } @{$app->object_types};
    foreach my $gt (@gen_types) {
       push @{$data{functions}}, @{methods_to_hash($appname,$gt)};
       if ($gt->full_spez) {
