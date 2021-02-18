@@ -149,6 +149,8 @@ end
 struct PolymakeApp
     jl_module::Symbol
     pm_name::String
+    imports::Vector{Symbol}
+    uses::Vector{Symbol}
     callables::Vector{PolymakeCallable}
     objects::Vector{PolymakeObject}
 end
@@ -173,6 +175,9 @@ end
 
 function PolymakeApp(jl_module::Symbol, app_json::Dict{String, Any})
     app_name = app_json["app"]
+
+    imports = Symbol.(get(app_json, "import", []))
+    uses = Symbol.(get(app_json, "use", []))
 
     if haskey(app_json, "functions")
         for f in app_json["functions"]
@@ -206,7 +211,7 @@ function PolymakeApp(jl_module::Symbol, app_json::Dict{String, Any})
         objects = PolymakeObject[]
     end
 
-    return PolymakeApp(jl_module, app_name, callables, objects)
+    return PolymakeApp(jl_module, app_name, imports, uses, callables, objects)
 end
 
 function PolymakeApp(module_name::Symbol, json_file::String)
@@ -459,12 +464,21 @@ module_imports() = quote
         translate_type_to_pm_string, get_docs, polymake_arguments
 end
 
+jl_import(app::Symbol) = quote import Polymake.$(app) end
+jl_using(app::Symbol) = quote using Polymake.$(app) end
+
 function jl_code(pa::PolymakeApp)
     fn_code = jl_code.(pa.callables)
     obj_code = jl_code.(pa.objects)
+    # polymake import corresponds to julia using
+    usings = jl_using.(pa.imports)
+    # polymake use corresponds to julia import
+    imports = jl_import.(pa.uses)
     return :(
         module $(jl_module_name(pa))
         $(module_imports())
+        $(imports...)
+        $(usings...)
         $(fn_code...)
         $(obj_code...)
         end
