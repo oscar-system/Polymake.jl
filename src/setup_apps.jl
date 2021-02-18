@@ -1,17 +1,16 @@
-const appname_module_dict = Dict(
-  :common     => :common,
-  :fan        => :fan,
-  :fulton     => :fulton,
-  :graph      => :graph,
-  :group      => :group,
-  :ideal      => :ideal,
-  :matroid    => :matroid,
-  :polytope   => :polytope,
-  :topaz      => :topaz,
-  :tropical   => :tropical
-)
-
-const module_appname_dict = Dict( (j,i) for (i,j) in appname_module_dict )
+# these must be sorted by dependency order !
+const ordered_pm_apps = Symbol[
+  :common
+  :graph
+  :group
+  :ideal
+  :topaz
+  :polytope
+  :fan
+  :matroid
+  :fulton
+  :tropical
+]
 
 list_applications() = call_function(:common, :list_applications)
 

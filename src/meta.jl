@@ -1,6 +1,6 @@
 module Meta
 import JSON
-import Polymake: appname_module_dict, module_appname_dict, shell_context_help
+import Polymake: shell_context_help
 import Polymake: Rational, PolymakeType, PropertyValue, OptionSet
 
 struct UnparsablePolymakeFunction <: Exception
@@ -37,11 +37,7 @@ translate_type_to_pm_string(::typeof(max)) = "Max"
 translate_type_to_pm_string(T) = throw(DomainError(T, "$T has been passed as a type parameter but no translation to a C++ template was defined. You may define such translation by appropriately extending
     `Polymake.Meta.translate_type_to_pm_string`."))
 
-function get_polymake_app_name(mod::Symbol)
-    haskey(module_appname_dict, mod) || throw("Module '$mod' not registered in Polymake.jl. If polmake application is present add the name to Polymake.module_appname_dict.")
-    polymake_app = module_appname_dict[mod]
-    return polymake_app
-end
+get_polymake_app_name(mod::Symbol) = mod
 
 ############### macro helpers
 
