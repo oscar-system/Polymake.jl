@@ -1,0 +1,63 @@
+name: OscarCI
+
+on:
+   pull_request:
+     branches:
+       - master
+
+jobs:
+  generatematrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    env:
+      PR_NUMBER: ${{github.event.number}}
+    steps:
+    - uses: actions/checkout@v2.1.0
+    - name: "Set up Julia"
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: '~1.6.0-0'
+    - id: set-matrix
+      run: |
+        julia --project=oscar-dev -e "using Pkg;
+                 Pkg.add(url=\"https://github.com/oscar-system/OscarDevTools.jl\");
+                 using OscarDevTools;
+                 ciprefs = OscarDevTools.parse_meta(\"OscarCI.toml\");
+                 cimat = OscarDevTools.ci_matrix(ciprefs;
+                                                 pr=${PR_NUMBER},
+                                                 active_repo=\"${GITHUB_REPOSITORY}\");
+                 @show cimat;
+                 println(OscarDevTools.github_json(cimat));"
+
+  test-oscar:
+    needs: generatematrix
+    name: ${{ join(matrix.*.name) }} - ${{ matrix.os }}, julia ${{ matrix.julia-version}}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.julia-version == 'nightly' }}
+    env:
+      PR_NUMBER: ${{github.event.number}}
+    strategy:
+      matrix: ${{fromJSON(needs.generatematrix.outputs.matrix)}}
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+      - name: "Set up Oscar-dev configuration"
+        env:
+          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+        run: |
+          echo "$MATRIX_CONTEXT"
+          julia --project=oscar-dev -e "using Pkg;
+                   Pkg.add(url=\"https://github.com/oscar-system/OscarDevTools.jl\");
+                   using OscarDevTools;
+                   pkgs = OscarDevTools.parse_job(ENV[\"MATRIX_CONTEXT\"]);
+                   oscar_develop(pkgs; dir=\"oscar-dev\",
+                                 active_repo=\"${GITHUB_REPOSITORY}\");"
+      - name: "Run Oscar tests"
+        run: |
+          julia --project=oscar-dev/project/ -e 'using Pkg; Pkg.test("Oscar");'
