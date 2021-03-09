@@ -7,7 +7,9 @@ julia-version = [ "~1.6.0-0" ]
 
 # packages not listed here will use the latest release
 [pkgs]
-Oscar = [ "master", "release" ]
+  [pkgs.Oscar]
+  branches = [ "master", "release" ]
+  test = true
 
 [include]
   [include.macos]
