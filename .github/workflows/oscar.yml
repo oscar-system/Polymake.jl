@@ -28,7 +28,7 @@ jobs:
       if: github.repository != 'oscar-system/OscarDevTools.jl'
       run: |
         julia --project=oscar-dev -e "using Pkg;
-                                      Pkg.add(url=\"https://github.com/oscar-system/OscarDevTools.jl\");
+                                      Pkg.add(\"OscarDevTools\");
                                       Pkg.instantiate();"
     - id: set-matrix
       run: |
