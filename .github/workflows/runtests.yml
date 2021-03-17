@@ -65,16 +65,10 @@ jobs:
           - '1.5'
           - '~1.6.0-0'
           - 'nightly'
-        os: ['ubuntu-latest', 'macOS-latest', 'macos-11.0']
+        os: ['ubuntu-latest', 'macOS-latest']
         # empty entry for defaults
         xcode: [ '' ]
         cxxwrap: [ '' ]
-        exclude:
-        # remove some macOS tests to keep the total number small
-          - os: macos-11.0
-            julia-version: '1.4'
-          - os: macos-11.0
-            julia-version: '1.5'
         # add a few extra tests: xcode 11.4, julia 1.3 with cxxwrap 0.11.0, legacy cxxwrap, several ubuntu lts versions
         include:
           - xcode: '11.4'
@@ -89,6 +83,8 @@ jobs:
           - cxxwrap: '0.10'
             os: ubuntu-latest
             julia-version: 1.5
+          - os: macos-11.0
+            julia-version: '~1.6.0-0'
           - os: ubuntu-20.04
             julia-version: 1.5
           - os: ubuntu-18.04
