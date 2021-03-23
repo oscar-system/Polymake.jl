@@ -1,22 +1,15 @@
 title = "metadata for oscar CI run"
 
-# keep it small to prevent job-explosion
 [env]
-os = [ "ubuntu-latest" ]
-julia-version = [ "~1.6.0-0" ]
+os = [ "ubuntu-latest", "macos-latest" ]
+# julia-version = [ "~1.6.0-0" ]
+# branches = [ "release", "<matching>" ]
 
-# packages not listed here will use the latest release
 [pkgs]
   [pkgs.Oscar]
-  branches = [ "master", "release" ]
   test = true
 
 [include]
-  [include.macos]
-  Oscar = "master"
-  os = "macos-latest"
-  julia-version = "~1.6.0-0"
-
   [include.julia]
   Oscar = "master"
   julia-version = "1.5"
