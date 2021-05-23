@@ -14,4 +14,4 @@ The current version of `Polymake.jl` relies on `polymake` version `4.0` or later
 The documentation can be found at [juliahub](https://juliahub.com/docs/Polymake/).
 
 ## How to cite
-If you use `Polymake.jl` in your research, please cite our [ICMS article](https://link.springer.com/chapter/10.1007/978-3-030-52200-1_37).
+If you use `Polymake.jl` in your research, please cite our [ICMS article](https://link.springer.com/chapter/10.1007/978-3-030-52200-1_37) and the [original polymake article](https://link.springer.com/chapter/10.1007/978-3-0348-8438-9_2).
