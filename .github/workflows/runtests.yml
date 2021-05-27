@@ -37,7 +37,8 @@ jobs:
           # Maps tcp port 27017 on service container to the host
           - 27017:27017
     env:
-        POLYDB_TEST_URI: "mongodb://admin:admin@localhost:27017/?authSource=admin"
+      JULIA_PKG_SERVER: ""
+      POLYDB_TEST_URI: "mongodb://admin:admin@localhost:27017/?authSource=admin"
     steps:
       - uses: actions/checkout@v2.1.0
       - name: "Set up Julia"
@@ -58,6 +59,8 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
+    env:
+      JULIA_PKG_SERVER: ""
     strategy:
       matrix:
         julia-version:
