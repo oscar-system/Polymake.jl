@@ -86,13 +86,11 @@ jobs:
           - cxxwrap: '0.10'
             os: ubuntu-latest
             julia-version: 1.5
-          - os: macos-11.0
+          - os: macos-11
             julia-version: '~1.6.0-0'
           - os: ubuntu-20.04
             julia-version: 1.5
           - os: ubuntu-18.04
-            julia-version: 1.5
-          - os: ubuntu-16.04
             julia-version: 1.5
 
       fail-fast: false
