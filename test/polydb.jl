@@ -50,8 +50,8 @@ using Mongoc
             @test iterate(results_bson) isa Tuple{Mongoc.BSON, Nothing}
             results_bo = Polymake.Polydb.find(collection_bo, constraints...)
             results_bson = Polymake.Polydb.find(collection_bson, constraints...)
-            @test collect(results_bo) isa Array{Polymake.BigObject, 1}
-            @test collect(results_bson) isa Array{Mongoc.BSON, 1}
+            @test collect(results_bo) isa Vector{Polymake.BigObject}
+            @test collect(results_bson) isa Vector{Mongoc.BSON}
         end
         @testset "Iterator (Collection)" begin
             @test iterate(collection_bo) isa Tuple{Polymake.BigObject, Polymake.Polydb.Cursor{Polymake.BigObject}}
@@ -59,7 +59,7 @@ using Mongoc
         end
         @testset "Information" begin
             for (col, f_name) in [(collection_bo, "FACETS"), (db["Matroids.Small"], "N_ELEMENTS")]
-                @test Polymake.Polydb.get_fields(col) isa Array{String, 1}
+                @test Polymake.Polydb.get_fields(col) isa Vector{String}
                 fields = Polymake.Polydb.get_fields(col)
                 @test length(fields) > 10
                 @test f_name in fields

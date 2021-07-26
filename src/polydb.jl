@@ -245,7 +245,7 @@ Base.iterate(coll::Collection{Mongoc.BSON}, state::Mongoc.Cursor) =
 
 """
       get_fields(c::Collection)
-Return an `Array{String, 1}` containing the names of the fields of `c`.
+Return an `Vector{String}` containing the names of the fields of `c`.
 # Examples
 ```julia-repl
 julia> db = Polymake.Polydb.get_db();
@@ -254,7 +254,7 @@ julia> collection = db["Matroids.Small"]
 Polymake.Polydb.Collection{Polymake.BigObject}: Matroids.Small
 
 julia> Polymake.Polydb.get_fields(collection)
-27-element Array{String,1}:
+27-element Vector{String}:
  "DUAL"
  "N_BASES"
  "TUTTE_POLYNOMIAL"
@@ -275,9 +275,9 @@ function get_fields(coll::Collection)
    info1 = Mongoc.find_one(coll_c, Mongoc.BSON("_id" => "info.2.1"))
    info2 = Mongoc.find_one(coll_c, Mongoc.BSON("_id" => info1["schema"]))
    schema = info2["schema"]
-   temp = Array{String, 1}()
+   temp = Vector{String}()
    if haskey(schema, "required")
-      temp = Array{String, 1}(schema["required"])
+      temp = Vector{String}(schema["required"])
    else
       temp = _read_fields(schema)
    end
@@ -287,7 +287,7 @@ end
 # recursive helpers to read more complex metadata
 # currently only neccessary for `Polytopes.Lattice.SmoothReflexive`
 function _read_fields(a::Array)
-   res = Array{String, 1}()
+   res = Vector{String}()
    for entry in a
       append!(res, _read_fields(entry))
    end
@@ -323,14 +323,14 @@ end
 """
       get_collection_names(db::Database)
 
-Return an `Array{String, 1}` containing the names of all collections in the
+Return an `Vector{String}` containing the names of all collections in the
 Polydb, excluding meta collections.
 # Examples
 ```julia-repl
 julia> db = Polymake.Polydb.get_db();
 
 julia> Polymake.Polydb.get_collection_names(db)
-16-element Array{String,1}:
+16-element Vector{String}:
  "Polytopes.Combinatorial.FacesBirkhoffPolytope"
  "Polytopes.Combinatorial.SmallSpheresDim4"
  "Polytopes.Geometric.01Polytopes"
@@ -347,7 +347,7 @@ julia> Polymake.Polydb.get_collection_names(db)
 """
 function get_collection_names(db::Database)
    names = _get_collection_names(db)
-   res = Array{String, 1}()
+   res = Vector{String}()
    sizehint!(res, floor(Int, length(names)/2))
    for name in names
       if startswith(name, "_c")
@@ -363,9 +363,9 @@ function _get_contact(s::String)
 end
 
 function _get_contact(a::Array)
-   res = Array{String, 1}()
+   res = Vector{String}()
    for dict in a
-      str = Array{String, 1}()
+      str = Vector{String}()
       for key in ["name", "email", "www", "affiliation"]
          if !isempty(get(dict, key, ""))
             push!(str, dict[key])
@@ -434,19 +434,19 @@ end
 # returns a tree-like nesting of `Dict`s and `Array{String}`s
 # representing polyDB's structure
 function _get_db_tree(db)
-   root = Dict{String, Union{Dict, Array{String, 1}}}()
+   root = Dict{String, Union{Dict, Vector{String}}}()
    cnames =  get_collection_names(db)
    for name in cnames
       path = split(name, ".")
       temp = root
       for i=1:length(path)-2
          if !haskey(temp, path[i])
-            temp[path[i]] = Dict{String, Union{Dict, Array{String, 1}}}()
+            temp[path[i]] = Dict{String, Union{Dict, Vector{String}}}()
          end
          temp = temp[path[i]]
       end
       if !haskey(temp, path[length(path)-1])
-         temp[path[length(path)-1]] = Array{String, 1}()
+         temp[path[length(path)-1]] = Vector{String}()
       end
       temp = temp[path[length(path)-1]]
       push!(temp, path[end])
@@ -456,7 +456,7 @@ end
 
 # recursively generates the info `String`s from the tree received by `_get_db_tree`
 function _get_info_strings(db::Database, tree::Dict, level::Base.Integer, path::String="")
-   res = Array{String, 1}()
+   res = Vector{String}()
    for (key, value) in tree
       new_path = path == "" ? key : string(path, ".", key)
       push!(res, _get_section_string(db, new_path, level))
@@ -466,8 +466,8 @@ function _get_info_strings(db::Database, tree::Dict, level::Base.Integer, path::
 end
 
 # leaves of the tree are the collections, whose names are stored in an `Array{String}`
-function _get_info_strings(db:: Database, colls::Array{String, 1}, level::Base.Integer, path::String="")
-   res = Array{String, 1}()
+function _get_info_strings(db:: Database, colls::Vector{String}, level::Base.Integer, path::String="")
+   res = Vector{String}()
    for coll in colls
       push!(res, _get_collection_string(db, string(path, ".", coll), level))
    end
@@ -496,7 +496,7 @@ function info(coll::Collection, level::Base.Integer=5)
    db = Database(coll.mcol.database)
    name = coll.mcol.name
    parts = split(name, ".")
-   res = Array{String, 1}()
+   res = Vector{String}()
    for (i, section) in enumerate(parts[1:length(parts) - 1])
       push!(res, _get_section_string(db, join(parts[1:i], "."), level))
    end
@@ -621,7 +621,7 @@ julia> results = db |>
        Polymake.Polydb.@filter("DIM" == 3, "N_VERTICES" == 8) |>
        Polymake.Polydb.@map() |>
        collect
-7-element Array{Polymake.BigObject,1}:
+7-element Vector{Polymake.BigObject}:
  Polymake.BigObjectAllocated(Ptr{Nothing} @0x00000000028c5320)
  Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000abd7b40)
  Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000a6d7bf0)

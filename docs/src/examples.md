@@ -373,7 +373,7 @@ The following tables explain by example how to quickly translate `polymake` synt
       <code>new Matrix<T></code><br>Container with algebraic operations
     </td>
     <td>
-      <code>Matrix{T} = Array{T, 2}</code><br>**Linear** container with available indexing by <code>2</code>-ples; all algebra attached
+      <code>Matrix{T} = Matrix{T}</code><br>**Linear** container with available indexing by <code>2</code>-ples; all algebra attached
     </td>
   </tr>
   <tr>

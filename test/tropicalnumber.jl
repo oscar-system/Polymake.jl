@@ -28,7 +28,7 @@
             end
 
             # julia arrays
-            @test Array{Any,1}([a,1])[1] isa Polymake.TropicalNumberAllocated
+            @test Vector{Any}([a,1])[1] isa Polymake.TropicalNumberAllocated
             @test [a,a] isa Vector{Polymake.TropicalNumberAllocated{A,Polymake.Rational}}
         end
     end
