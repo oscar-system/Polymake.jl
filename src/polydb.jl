@@ -245,7 +245,7 @@ Base.iterate(coll::Collection{Mongoc.BSON}, state::Mongoc.Cursor) =
 
 """
       get_fields(c::Collection)
-Return an `Vector{String}` containing the names of the fields of `c`.
+Return a `Vector{String}` containing the names of the fields of `c`.
 # Examples
 ```julia-repl
 julia> db = Polymake.Polydb.get_db();
@@ -323,7 +323,7 @@ end
 """
       get_collection_names(db::Database)
 
-Return an `Vector{String}` containing the names of all collections in the
+Return a `Vector{String}` containing the names of all collections in the
 Polydb, excluding meta collections.
 # Examples
 ```julia-repl
