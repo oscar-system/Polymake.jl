@@ -31,7 +31,7 @@
         @test float(a) == convert(BigFloat, a)
 
         # julia arrays
-        @test Base.Array{Any,1}([a,1])[1] isa Polymake.IntegerAllocated
+        @test Base.Vector{Any}([a,1])[1] isa Polymake.IntegerAllocated
         @test [a,1] isa Base.Vector{Polymake.Integer}
         @test [a,a] isa Base.Vector{Polymake.IntegerAllocated}
     end
