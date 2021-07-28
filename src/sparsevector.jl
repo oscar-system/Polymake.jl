@@ -47,3 +47,38 @@ function findnz(vec::SparseVector{T}) where T
     V = to_jl_type(T)[vec[idx] for idx in I]
     return (I, V)
 end
+
+# implementation of SparseVector{Bool} as Set{Integer} with Integer length
+struct SparseVectorBool <: SparseVector{Bool}
+    l::Int64
+    s::Set{Int64}
+end
+
+spzeros(::Type{Bool}, n::Base.Integer) = SparseVectorBool(n, Polymake.Set{Int64}())
+
+Base.size(v::SparseVector{Bool}) = (v.l,)
+Base.eltype(::SparseVector{Bool}) = Bool
+
+Base.@propagate_inbounds function Base.getindex(V::SparseVector{Bool}, n::Base.Integer)
+    (V.l >= n && n >= 1) || throw(BoundsError(V, n))
+    return in(V, n)
+end
+
+Base.@propagate_inbounds function Base.setindex!(V::SparseVector{Bool}, val, n::Base.Integer)
+    (V.l >= n && n >= 1) || throw(BoundsError(V, n))
+    if val
+        push!(V.s, n)
+    else
+        delete!(V.s, n)
+    end
+    return val
+end
+
+function Base.show(io::IO, ::MIME"text/plain", V::SparseVectorBool)
+    l = V.l
+    print(io, "Incidence vector with $l entries. `true` for:\n")
+    join(io, [i for i in V.s][1:min(20, length(V.s))], ", ")
+    if (length(V.s) > 20)
+        print(io, ", …")
+    end
+end

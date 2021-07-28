@@ -47,7 +47,7 @@ end
 
 function Base.similar(X::IncidenceMatrix,
     ::Type{<:Union{Bool, CxxWrap.CxxBool}}, dims::Dims{1})
-    return BitArray{1}(undef, dims...)
+    return spzeros(Bool, dims...)
 end
 
 function Base.similar(X::IncidenceMatrix,

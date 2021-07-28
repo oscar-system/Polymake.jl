@@ -50,6 +50,20 @@ function IncidenceMatrix{Symmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
+function IncidenceMatrix{NonSymmetric}(TrueIndices::Base.Array{Base.Array{Int64,1},1}) where T
+    m = length(TrueIndices)
+    n = maximum([maximum(set) for set in TrueIndices])
+    res = IncidenceMatrix(m, n)
+    i = 1
+    for set in TrueIndices
+        for j in set
+            res[i,j] = 1
+        end
+        i = i+1
+    end
+   return res
+end
+
 # set default parameter to NonSymmetric
 IncidenceMatrix(x...) = IncidenceMatrix{NonSymmetric}(x...)
 
@@ -87,4 +101,20 @@ end
 function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
     n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
     _resize!(M,Int64(n),Int64(n))
+end
+
+function Base.show(io::IO, ::MIME"text/plain", M::IncidenceMatrix)
+    m,n = size(M)
+    print(io, "$m×$n IncidenceMatrix\n")
+    for i in 1:min(20, size(M, 1))
+        print(io, "($i) - ")
+        join(io, [i for i in M[i,:].s][1:min(20,length(M[i,:].s))], ", ")
+        if (length(M[i,:]) > 20)
+            print(io, ", …")
+        end
+        print(io, "\n")
+    end
+    if (size(M, 1) > 20)
+        print(io, "⁝")
+    end
 end
