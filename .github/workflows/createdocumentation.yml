@@ -17,7 +17,7 @@ jobs:
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.4'
+          version: '1.6'
       - uses: julia-actions/julia-buildpkg@latest
       - name: "Add Documenter package"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
