@@ -92,6 +92,27 @@ Base.@propagate_inbounds function col(M::IncidenceMatrix, j::Base.Integer)
     return to_one_based_indexing(_col(M, convert(Int64, j)))
 end
 
+function _findnz(M::IncidenceMatrix)
+    len = sum(([length(row(M, i)) for i in 1:size(M, 1)]))
+    ri = Base.Vector{Int64}(undef, len)
+    ci = Base.Vector{Int64}(undef, len)
+    k = 1
+    for i in 1:size(M, 1)
+        for j in row(M, i)
+            ri[k] = i
+            ci[k] = j
+            k += 1
+        end
+    end
+    return (ri, ci)
+end
+
+function SparseArrays.findnz(M::IncidenceMatrix)
+    ri, ci = _findnz(M)
+    len = length(ri)
+    return (ri, ci, trues(len))
+end
+
 function Base.resize!(M::IncidenceMatrix{NonSymmetric}, m::Base.Integer, n::Base.Integer)
     m >= 0 || throw(DomainError(m, "can not resize to a negative length"))
     n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
@@ -104,6 +125,22 @@ function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", M::IncidenceMatrix)
+    m,n = size(M)
+    print(io, "$m×$n IncidenceMatrix\n")
+    for i in 1:min(20, size(M, 1))
+        print(io, "($i) - ")
+        join(io, [i for i in M[i,:].s][1:min(20,length(M[i,:].s))], ", ")
+        if (length(M[i,:]) > 20)
+            print(io, ", …")
+        end
+        print(io, "\n")
+    end
+    if (size(M, 1) > 20)
+        print(io, "⁝")
+    end
+end
+
+function Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, M::IncidenceMatrix)
     m,n = size(M)
     print(io, "$m×$n IncidenceMatrix\n")
     for i in 1:min(20, size(M, 1))
