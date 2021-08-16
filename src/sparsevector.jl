@@ -59,6 +59,8 @@ spzeros(::Type{Bool}, n::Base.Integer) = SparseVectorBool(n, Polymake.Set{Int64}
 Base.size(v::SparseVector{Bool}) = (v.l,)
 Base.eltype(::SparseVector{Bool}) = Bool
 
+Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, v::Polymake.SparseVectorBool) = print(io, length(v), "-element SparseVectorBool. `true` for indices:\n", v.s...)
+
 Base.@propagate_inbounds function Base.getindex(V::SparseVector{Bool}, n::Base.Integer)
     (V.l >= n && n >= 1) || throw(BoundsError(V, n))
     return in(V, n)
