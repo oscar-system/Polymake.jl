@@ -51,7 +51,7 @@ end
 # implementation of SparseVector{Bool} as Set{Integer} with Integer length
 struct SparseVectorBool <: SparseVector{Bool}
     l::Int64
-    s::Set{Int64}
+    s::Set{to_cxx_type(Int64)}
 end
 
 spzeros(::Type{Bool}, n::Base.Integer) = SparseVectorBool(n, Polymake.Set{to_cxx_type(Int64)}())
