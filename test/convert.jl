@@ -8,9 +8,9 @@
 
     @test Polymake.convert_to_pm_type(Base.Vector{String}) == Polymake.Array{String}
 
-    @test Polymake.convert_to_pm_type(Base.Array{Base.Set{Int64},1}) == Polymake.Array{Polymake.Set{Int64}}
-    @test Polymake.convert_to_pm_type(Base.Array{Base.Set{Polymake.Integer},1}) == Polymake.Array{Polymake.Set{Int64}}
-    @test Polymake.convert_to_pm_type(Base.Array{Base.Set{Int64},1}) == Polymake.Array{Polymake.Set{Int64}}
+    @test Polymake.convert_to_pm_type(Base.Vector{Base.Set{Int64}}) == Polymake.Array{Polymake.Set{Int64}}
+    @test Polymake.convert_to_pm_type(Base.Vector{Base.Set{Polymake.Integer}}) == Polymake.Array{Polymake.Set{Int64}}
+    @test Polymake.convert_to_pm_type(Base.Vector{Base.Set{Int64}}) == Polymake.Array{Polymake.Set{Int64}}
 
     @test Polymake.convert_to_pm_type(Base.Vector{Base.Vector{Int64}}) == Polymake.Array{Polymake.Array{Int64}}
 
