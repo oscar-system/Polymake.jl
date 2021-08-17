@@ -78,7 +78,7 @@ end
 
 function Base.show(io::IO, ::MIME"text/plain", V::SparseVectorBool)
     l = V.l
-    print(io, "Incidence vector with $l entries. `true` for:\n")
+    print(io, "$l-element SparseVectorBool\n")
     join(io, [i for i in V.s][1:min(20, length(V.s))], ", ")
     if (length(V.s) > 20)
         print(io, ", …")
