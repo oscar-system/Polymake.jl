@@ -121,6 +121,8 @@ function __init__()
 
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
+    application("polytope")
+    Polymake.shell_execute("require LPparser;")
 
     for app in call_function(:common, :startup_applications)
         application(app)
