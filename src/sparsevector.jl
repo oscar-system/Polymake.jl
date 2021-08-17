@@ -48,7 +48,7 @@ function findnz(vec::SparseVector{T}) where T
     return (I, V)
 end
 
-# implementation of SparseVector{Bool} as Set{Integer} with Integer length
+# implementation of SparseVector{Bool} with Int64 length using a polymake Set
 struct SparseVectorBool <: SparseVector{Bool}
     l::Int64
     s::Set{to_cxx_type(Int64)}
