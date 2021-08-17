@@ -217,6 +217,18 @@
         @test p.MILP.MINIMAL_VALUE == -7
     end
 
+    @testset "poly2lp2poly" begin
+        p = polytope.Polytope( INEQUALITIES=[1 1 -1; -1 0 1; 7 -1 -1] )
+        lp = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,1])
+        p.LP = lp
+        x = mktemp() do path, _
+           @test Polymake.polytope.poly2lp(p,lp, false, path) == 1
+           return Polymake.polytope.lp2poly(path)
+        end
+        @test x isa Polymake.BigObject
+        @test p.LP.LINEAR_OBJECTIVE == x.LP.LINEAR_OBJECTIVE
+    end
+
     @testset "toplevel visual" begin
         @test visual(polytope.cube(3)) isa Polymake.Visual
     end
