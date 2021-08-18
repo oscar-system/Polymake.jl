@@ -62,12 +62,12 @@ Base.eltype(::SparseVector{Bool}) = Bool
 Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, v::Polymake.SparseVectorBool) = print(io, length(v), "-element SparseVectorBool. `true` for indices:\n", v.s...)
 
 Base.@propagate_inbounds function Base.getindex(V::SparseVector{Bool}, n::Base.Integer)
-    (V.l >= n && n >= 1) || throw(BoundsError(V, n))
+    @boundscheck checkbounds(V, n)
     return in(V, n)
 end
 
-Base.@propagate_inbounds function Base.setindex!(V::SparseVector{Bool}, val, n::Base.Integer)
-    (V.l >= n && n >= 1) || throw(BoundsError(V, n))
+Base.@propagate_inbounds function Base.setindex!(V::SparseVector{Bool}, val::Bool, n::Base.Integer)
+    @boundscheck checkbounds(V, n)
     if val
         push!(V.s, n)
     else

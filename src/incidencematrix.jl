@@ -50,9 +50,9 @@ function IncidenceMatrix{Symmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
-function IncidenceMatrix{NonSymmetric}(TrueIndices::Base.Array{Base.Array{Int64,1},1}) where T
+function IncidenceMatrix{NonSymmetric}(TrueIndices::AbstractVector{<:AbstractVector{<:Base.Integer}}) where T
     m = length(TrueIndices)
-    n = maximum([maximum(set) for set in TrueIndices])
+    n = maximum(maximum, TrueIndices)
     res = IncidenceMatrix(m, n)
     i = 1
     for set in TrueIndices
