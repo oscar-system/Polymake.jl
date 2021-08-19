@@ -59,11 +59,9 @@ spzeros(::Type{Bool}, n::Base.Integer) = SparseVectorBool(n, Polymake.Set{to_cxx
 Base.size(v::SparseVector{Bool}) = (v.l,)
 Base.eltype(::SparseVector{Bool}) = Bool
 
-Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, v::Polymake.SparseVectorBool) = print(io, length(v), "-element SparseVectorBool. `true` for indices:\n", v.s...)
-
 Base.@propagate_inbounds function Base.getindex(V::SparseVector{Bool}, n::Base.Integer)
     @boundscheck checkbounds(V, n)
-    return in(V, n)
+    return in(n, V.s)
 end
 
 Base.@propagate_inbounds function Base.setindex!(V::SparseVector{Bool}, val::Bool, n::Base.Integer)
@@ -76,11 +74,49 @@ Base.@propagate_inbounds function Base.setindex!(V::SparseVector{Bool}, val::Boo
     return val
 end
 
+function SparseArrays.nonzeroinds(V::SparseVectorBool)
+    return [i for i in V.s]
+end
+
+function SparseArrays.nonzeros(V::SparseVectorBool)
+    return trues(length(V.s))
+end
+
+function _findnz(V::SparseVectorBool)
+    len = length(V.s)
+    i = Base.Vector{Int64}(undef, len)
+    k = 1
+    for e in V.s
+        i[k] = e
+        k += 1
+    end
+    return i
+end
+
+function SparseArrays.findnz(V::SparseVectorBool)
+    i = _findnz(V)
+    len = length(i)
+    return (i, trues(len))
+end
+
 function Base.show(io::IO, ::MIME"text/plain", V::SparseVectorBool)
+    t = min(div(displaysize(io)[2], 2 + ndigits(V.l)) - 1, length(V.s))
     l = V.l
-    print(io, "$l-element SparseVectorBool\n")
-    join(io, [i for i in V.s][1:min(20, length(V.s))], ", ")
-    if (length(V.s) > 20)
+    print(io, "$l-element SparseVectorBool\n[")
+    join(io, [i for i in V.s][1:t], ", ")
+    if (length(V.s) > t)
         print(io, ", …")
     end
+    print(io, "]")
+end
+
+function Base.show(io::IOContext, ::MIME"text/plain", V::SparseVectorBool)
+    t = min(div(displaysize(io)[2], 2 + ndigits(V.l)) - 1, length(V.s))
+    l = V.l
+    print(io, "$l-element SparseVectorBool\n[")
+    join(io, [i for i in V.s][1:t], ", ")
+    if (length(V.s) > t)
+        print(io, ", …")
+    end
+    print(io, "]")
 end

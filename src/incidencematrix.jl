@@ -93,7 +93,7 @@ Base.@propagate_inbounds function col(M::IncidenceMatrix, j::Base.Integer)
 end
 
 function _findnz(M::IncidenceMatrix)
-    len = sum(([length(row(M, i)) for i in 1:size(M, 1)]))
+    len = sum(length, (row(M, i) for i in 1:size(M, 1)))
     ri = Base.Vector{Int64}(undef, len)
     ci = Base.Vector{Int64}(undef, len)
     k = 1
@@ -124,34 +124,40 @@ function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
     _resize!(M,Int64(n),Int64(n))
 end
 
-function Base.show(io::IO, ::MIME"text/plain", M::IncidenceMatrix)
+function Base.show(io::IO, ::MIME{Symbol("text/plain")}, M::IncidenceMatrix)
     m,n = size(M)
+    a,b = displaysize(io)
+    s = min(a - 5, size(M, 1))
     print(io, "$m×$n IncidenceMatrix\n")
-    for i in 1:min(20, size(M, 1))
-        print(io, "($i) - ")
-        join(io, [i for i in M[i,:].s][1:min(20,length(M[i,:].s))], ", ")
-        if (length(M[i,:]) > 20)
+    for i in 1:s
+        t = min(div(b, 2 + ndigits(size(M, 2))) - 1, length(row(M, i)))
+        print(io, "[")
+        join(io, [c for c in row(M, i)][1:t], ", ")
+        if (length(row(M,i)) > t)
             print(io, ", …")
         end
-        print(io, "\n")
+        print(io, "]\n")
     end
-    if (size(M, 1) > 20)
+    if (m > s)
         print(io, "⁝")
     end
 end
 
 function Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, M::IncidenceMatrix)
     m,n = size(M)
+    a,b = displaysize(io)
+    s = min(a - 5, size(M, 1))
     print(io, "$m×$n IncidenceMatrix\n")
-    for i in 1:min(20, size(M, 1))
-        print(io, "($i) - ")
-        join(io, [i for i in M[i,:].s][1:min(20,length(M[i,:].s))], ", ")
-        if (length(M[i,:]) > 20)
+    for i in 1:s
+        t = min(div(b, 2 + ndigits(size(M, 2))) - 1, length(row(M, i)))
+        print(io, "[")
+        join(io, [c for c in row(M, i)][1:t], ", ")
+        if (length(row(M,i)) > t)
             print(io, ", …")
         end
-        print(io, "\n")
+        print(io, "]\n")
     end
-    if (size(M, 1) > 20)
+    if (m > s)
         print(io, "⁝")
     end
 end

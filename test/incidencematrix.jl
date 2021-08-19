@@ -89,7 +89,7 @@ using SparseArrays
                 @test N[2, 2] = T(10) isa T
                 N[2, 2] = T(10)
                 @test N[2, 2] == true
-                @test string(N) == "2×3 IncidenceMatrix\n(1) - 1, 3\n(2) - 1, 2\n"
+                @test string(N) == "2×3 IncidenceMatrix\n[1, 3]\n[1, 2]\n"
                 # testing the return value when asking for a single row or column
                 @test Polymake.row(N, T(1)) isa Polymake.Set{Polymake.to_cxx_type(Int)}
                 @test Polymake.row(N, T(1)) == Set([1, 3])
@@ -126,7 +126,7 @@ using SparseArrays
                 S[1, 3] = T(0)
                 @test S[1, 3] == false
                 @test S[3, 1] == false
-                @test string(S) == "3×3 IncidenceMatrix\n(1) - 1\n(2) - \n(3) - 3\n"
+                @test string(S) == "3×3 IncidenceMatrix\n[1]\n[]\n[3]\n"
                 # testing the return value when asking for a single row or column
                 @test Polymake.row(S, T(2)) isa Polymake.Set{Polymake.to_cxx_type(Int)}
                 @test Polymake.row(S, T(2)) == Set([])
