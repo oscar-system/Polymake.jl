@@ -45,12 +45,22 @@ for dim in (1, 2)
     end
 end
 
-function Base.similar(X::Union{IncidenceMatrix, SparseVector},
+function Base.similar(X::SparseVector,
     ::Type{<:Union{Bool, CxxWrap.CxxBool}}, dims::Dims{1})
     return spzeros(Bool, dims...)
 end
 
-function Base.similar(X::Union{IncidenceMatrix, SparseVector},
+function Base.similar(X::SparseVector,
+    ::Type{<:Union{Bool, CxxWrap.CxxBool}}, dims::Dims{2})
+    return IncidenceMatrix{NonSymmetric}(undef, dims...)
+end
+
+function Base.similar(X::IncidenceMatrix,
+    ::Type{<:Union{Bool, CxxWrap.CxxBool}}, dims::Dims{1})
+    return spzeros(Bool, dims...)
+end
+
+function Base.similar(X::IncidenceMatrix,
     ::Type{<:Union{Bool, CxxWrap.CxxBool}}, dims::Dims{2})
     return IncidenceMatrix{NonSymmetric}(undef, dims...)
 end
