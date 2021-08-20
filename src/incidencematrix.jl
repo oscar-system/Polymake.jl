@@ -50,18 +50,18 @@ function IncidenceMatrix{Symmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
-function IncidenceMatrix{NonSymmetric}(TrueIndices::AbstractVector{<:AbstractVector{<:Base.Integer}}) where T
-    m = length(TrueIndices)
-    n = maximum(maximum, TrueIndices)
+function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}}) where T
+    m = length(incidenceRows)
+    n = maximum(maximum, incidenceRows)
     res = IncidenceMatrix(m, n)
     i = 1
-    for set in TrueIndices
+    for set in incidenceRows
         for j in set
             res[i,j] = 1
         end
         i = i+1
     end
-   return res
+    return res
 end
 
 # set default parameter to NonSymmetric
@@ -124,24 +124,8 @@ function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
     _resize!(M,Int64(n),Int64(n))
 end
 
-function Base.show(io::IO, ::MIME{Symbol("text/plain")}, M::IncidenceMatrix)
-    m,n = size(M)
-    a,b = displaysize(io)
-    s = min(a - 5, size(M, 1))
-    print(io, "$m×$n IncidenceMatrix\n")
-    for i in 1:s
-        t = min(div(b, 2 + ndigits(size(M, 2))) - 1, length(row(M, i)))
-        print(io, "[")
-        join(io, [c for c in row(M, i)][1:t], ", ")
-        if (length(row(M,i)) > t)
-            print(io, ", …")
-        end
-        print(io, "]\n")
-    end
-    if (m > s)
-        print(io, "⁝")
-    end
-end
+Base.show(io::IO, tp::MIME{Symbol("text/plain")}, M::IncidenceMatrix) =
+    Base.show(IOContext(io), tp, M)
 
 function Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, M::IncidenceMatrix)
     m,n = size(M)

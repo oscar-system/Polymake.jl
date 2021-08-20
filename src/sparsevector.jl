@@ -99,16 +99,8 @@ function SparseArrays.findnz(V::SparseVectorBool)
     return (i, trues(len))
 end
 
-function Base.show(io::IO, ::MIME"text/plain", V::SparseVectorBool)
-    t = min(div(displaysize(io)[2], 2 + ndigits(V.l)) - 1, length(V.s))
-    l = V.l
-    print(io, "$l-element SparseVectorBool\n[")
-    join(io, [i for i in V.s][1:t], ", ")
-    if (length(V.s) > t)
-        print(io, ", …")
-    end
-    print(io, "]")
-end
+Base.show(io::IO, tp::MIME"text/plain", V::SparseVectorBool) =
+    Base.show(IOContext(io), tp, V)
 
 function Base.show(io::IOContext, ::MIME"text/plain", V::SparseVectorBool)
     t = min(div(displaysize(io)[2], 2 + ndigits(V.l)) - 1, length(V.s))
