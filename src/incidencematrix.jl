@@ -50,6 +50,20 @@ function IncidenceMatrix{Symmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
+function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}}) where T
+    m = length(incidenceRows)
+    n = maximum(maximum, incidenceRows)
+    res = IncidenceMatrix(m, n)
+    i = 1
+    for set in incidenceRows
+        for j in set
+            res[i,j] = 1
+        end
+        i = i+1
+    end
+    return res
+end
+
 # set default parameter to NonSymmetric
 IncidenceMatrix(x...) = IncidenceMatrix{NonSymmetric}(x...)
 
@@ -78,6 +92,27 @@ Base.@propagate_inbounds function col(M::IncidenceMatrix, j::Base.Integer)
     return to_one_based_indexing(_col(M, convert(Int64, j)))
 end
 
+function _findnz(M::IncidenceMatrix)
+    len = sum(length, (row(M, i) for i in 1:size(M, 1)))
+    ri = Base.Vector{Int64}(undef, len)
+    ci = Base.Vector{Int64}(undef, len)
+    k = 1
+    for i in 1:size(M, 1)
+        for j in row(M, i)
+            ri[k] = i
+            ci[k] = j
+            k += 1
+        end
+    end
+    return (ri, ci)
+end
+
+function SparseArrays.findnz(M::IncidenceMatrix)
+    ri, ci = _findnz(M)
+    len = length(ri)
+    return (ri, ci, trues(len))
+end
+
 function Base.resize!(M::IncidenceMatrix{NonSymmetric}, m::Base.Integer, n::Base.Integer)
     m >= 0 || throw(DomainError(m, "can not resize to a negative length"))
     n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
@@ -87,4 +122,26 @@ end
 function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
     n >= 0 || throw(DomainError(n, "can not resize to a negative length"))
     _resize!(M,Int64(n),Int64(n))
+end
+
+Base.show(io::IO, tp::MIME{Symbol("text/plain")}, M::IncidenceMatrix) =
+    Base.show(IOContext(io), tp, M)
+
+function Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, M::IncidenceMatrix)
+    m,n = size(M)
+    a,b = displaysize(io)
+    s = min(a - 5, size(M, 1))
+    print(io, "$m×$n IncidenceMatrix\n")
+    for i in 1:s
+        t = min(div(b, 2 + ndigits(size(M, 2))) - 1, length(row(M, i)))
+        print(io, "[")
+        join(io, [c for c in row(M, i)][1:t], ", ")
+        if (length(row(M,i)) > t)
+            print(io, ", …")
+        end
+        print(io, "]\n")
+    end
+    if (m > s)
+        print(io, "⁝")
+    end
 end

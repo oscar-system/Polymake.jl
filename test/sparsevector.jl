@@ -156,8 +156,9 @@ using SparseArrays
         # @test float.(V)[1, :] isa SparseVector{Float64}
 
         @test similar(V, Float64) isa Polymake.SparseVectorAllocated{Float64}
-        # @test similar(V, Float64, 10) isa Polymake.SparseVectorAllocated{Float64}
         @test similar(V, Float64, 10) isa Polymake.SparseVectorAllocated{Float64}
+        @test similar(V, Bool, 10) isa Polymake.SparseVectorBool
+        @test similar(V, Bool, 2, 2) isa Polymake.IncidenceMatrixAllocated{Polymake.NonSymmetric}
 
         X = Polymake.SparseVector{Int64}(jl_v)
         V = Polymake.SparseVector{Polymake.Integer}(jl_v)
