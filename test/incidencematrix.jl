@@ -31,6 +31,13 @@ using SparseArrays
     jl_s = [1 0 1; 0 0 0; 1 0 0]
     jl_n = [0 0 1; 1 0 0]
     @testset "Constructors/Converts" begin
+        inc = [[1,2,4],[3,5]]
+        @test Polymake.IncidenceMatrix{Polymake.NonSymmetric}(inc) isa Polymake.IncidenceMatrix{Polymake.NonSymmetric}
+        M = Polymake.IncidenceMatrix{Polymake.NonSymmetric}(inc)
+        @test M[1,1] == true
+        @test M[2,1] == false
+        @test M[1,1] isa Bool
+        @test size(M) == (2,5)
         for N in [IntTypes; FloatTypes; Polymake.Integer; Polymake.Rational]
             @test Polymake.IncidenceMatrix(N.(jl_n)) isa Polymake.IncidenceMatrix{Polymake.NonSymmetric}
             @test Polymake.IncidenceMatrix{Polymake.NonSymmetric}(N.(jl_s)) isa Polymake.IncidenceMatrix{Polymake.NonSymmetric}
@@ -79,6 +86,14 @@ using SparseArrays
             resize!(N,2,3)
             @test size(N) == (2,3)
             @test N == jl_n
+
+            ri, ci, v = findnz(N)
+            @test ri == [1, 2]
+            @test ci == [3, 1]
+            @test v == [true, true]
+            nzi, v = findnz(N[1, :])
+            @test nzi == [3]
+            @test v == [true]
 
             for T in [IntTypes; Polymake.Integer]
                 N = Polymake.IncidenceMatrix(jl_n) # local copy
