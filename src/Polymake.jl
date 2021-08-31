@@ -126,8 +126,17 @@ function __init__()
 
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
+
+    # work around issue with lp2poly and looking up perl modules from different applications
     application("polytope")
     Polymake.shell_execute("require LPparser;")
+
+    # make sure 4ti2 is configured
+    application("matroid")
+    Polymake.shell_execute(raw"""
+       application("polytope")->configured->{"_4ti2.rules"} > 0 or reconfigure("polytope::_4ti2.rules");
+       application("matroid")->configured->{"_4ti2.rules"} > 0 or reconfigure("_4ti2.rules");
+    """)
 
     for app in call_function(:common, :startup_applications)
         application(app)
