@@ -35,7 +35,7 @@ end
 function LineEdit.complete_line(c::PolymakeCompletions, s)
    partial = REPL.beforecursor(LineEdit.buffer(s))
    full = LineEdit.input_string(s)
-   res = convert(Tuple{Int, Array{String}}, shell_complete(full))
+   res = convert(Tuple{Int, Base.Array{String}}, shell_complete(full))
    offset = first(res)
    proposals = res[2]
    return proposals, partial[end-offset+1:end], size(proposals,1) > 0
