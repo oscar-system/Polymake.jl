@@ -89,29 +89,31 @@ prefer("_4ti2"; application="matroid") do
 end
 ```
 
-FIXME: this is deprecated in favour of the do block syntax
-       also it doesn't really work as the labels are not looked up
-       in the correct application
 """
-function prefer(label_expression::String)
-    Base.depwarn("`prefer(label)` is deprecated, use `prefer(label) do ... end` instead.", :prefer, force=true)
-   set_preference(label_expression)
+function prefer(f::Function, label_expression::String; application::String="")
+    old_app = get_current_app()
+    scope = scope_begin()
+    res = try
+        if application == ""
+            application = lookup_label_app(label_expression)
+        end
+        # switching apps will just switch some references within polymake back and forth
+        # we need to do this for the proper label lookup
+        Polymake.application(application)
+        internal_prefer_now(scope, label_expression)
+        Polymake.application(old_app)
+
+        return f()
+    finally
+        scope_end(scope)
+    end
+    return res
 end
 
-function prefer(f::Function, label_expression::String; application::String="")
-   old_app = get_current_app()
-   scope = scope_begin()
-   if application == ""
-      application = lookup_label_app(label_expression)
-   end
-   # switching apps will just switch some references within polymake back and forth
-   # we need to do this for the proper label lookup
-   Polymake.application(application)
-   internal_prefer_now(scope, label_expression)
-   Polymake.application(old_app)
-
-   res = f()
-
-   scope_end(scope)
-   return res
+# this is deprecated in favour of the do block syntax
+# also it doesn't really work as the labels are not looked up
+# in the correct application
+function prefer(label_expression::String)
+    Base.depwarn("`prefer(label)` is deprecated, use `prefer(label) do ... end` instead.", :prefer, force=true)
+    set_preference(label_expression)
 end
