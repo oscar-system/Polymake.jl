@@ -229,6 +229,37 @@
         @test p.LP.LINEAR_OBJECTIVE == x.LP.LINEAR_OBJECTIVE
     end
 
+    @testset "multiple subobjects" begin
+        p = polytope.Polytope( INEQUALITIES=[1 1 -1; -1 0 1; 7 -1 -1] )
+        lp1 = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,0])
+        lp2 = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,0,1])
+        lp3 = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,2,1])
+        p.LP = lp1
+        Polymake.add(p,"LP",lp2)
+        Polymake.add(p,"LP","third",lp3)
+        @test Polymake._lookup_multi(p,"LP") isa Polymake.Array{Polymake.BigObject}
+        @test length(Polymake._lookup_multi(p,"LP")) == 3
+        @test Polymake._lookup_multi(p,"LP","third").LINEAR_OBJECTIVE == lp3.LINEAR_OBJECTIVE
+        @test Polymake._lookup_multi(p,"LP",1).LINEAR_OBJECTIVE == lp2.LINEAR_OBJECTIVE
+        @test p.LP.LINEAR_OBJECTIVE == lp1.LINEAR_OBJECTIVE
+        @test_throws ErrorException Polymake._lookup_multi(p,"LP",3)
+        @test_throws ErrorException Polymake._lookup_multi(p,"LP","nonexisting")
+    end
+
+    @testset "bigobject array" begin
+        c = polytope.cube(3)
+        c_type = Polymake.bigobject_type(c)
+        @test Polymake.Array{Polymake.BigObject}(c_type,2) isa Polymake.Array{Polymake.BigObject}
+        arr = Polymake.Array{Polymake.BigObject}(c_type,2)
+        @test length(arr) == 2
+        arr[1] = c
+        arr[2] = polytope.simplex(2)
+        @test arr[1] isa Polymake.BigObject
+        @test arr[2] isa Polymake.BigObject
+        @test arr[1].N_VERTICES == 8
+    end
+
+
     @testset "toplevel visual" begin
         @test visual(polytope.cube(3)) isa Polymake.Visual
     end
