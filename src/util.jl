@@ -92,6 +92,7 @@ end
 """
 function prefer(f::Function, label_expression::String; application::String="")
     old_app = get_current_app()
+    GC.gc()
     scope = scope_begin()
     res = try
         if application == ""
@@ -105,6 +106,7 @@ function prefer(f::Function, label_expression::String; application::String="")
 
         return f()
     finally
+        GC.gc()
         scope_end(scope)
     end
     return res
