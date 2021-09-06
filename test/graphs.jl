@@ -4,8 +4,8 @@
     @testset "constructors" begin
         c = Polymake.polytope.cube(3)
         eg = c.GRAPH.ADJACENCY
-        @test Polymake.nv(dg) == 8
-        @test Polymake.ne(dg) == 12
+        @test Polymake.nv(eg) == 8
+        @test Polymake.ne(eg) == 12
         g = Polymake.Graph{Polymake.Directed}(5)
         @test Polymake.nv(g) == 5
         @test Polymake.ne(g) == 0
