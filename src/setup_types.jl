@@ -47,7 +47,7 @@ fill_wrapped_types!(TypeConversionFunctions, get_type_names())
 # and cxxwrap 0.10 with libcxxwrap 0.7 might still work
 
 if libcxxwrap_build_version() >= v"0.8.0"
-    Base.deepcopy(x::T) where T<:SmallObject = Base.copy(x)
+    Base.deepcopy_internal(x::T, dict::IdDict) where T<:SmallObject = Base.copy(x)
 else
     Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
 end

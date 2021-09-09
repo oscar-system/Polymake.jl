@@ -12,7 +12,7 @@ export @pm, @convert_to, visual
 
 # We need to import all functions which will be extended on the Cxx side
 import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
-    append!, delete!, numerator, denominator,
+    append!, deepcopy_internal, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty,
     length, numerator, push!, resize!,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
