@@ -15,6 +15,14 @@ function bigobject(fname::String, name::String; kwargsdata...)
     return obj
 end
 
+# polymake can either just give a reference or do a full copy.
+# but even that full copy will contain references to the same data
+# objects in memory, but this is fine since most of them are immutable anyway.
+# those that can be modified will use a CoW approach, i.e. they will be copied
+# when they are modified.
+Base.deepcopy_internal(o::BigObject, dict::IdDict) = internal_copy(o)
+Base.copy(o::BigObject) = internal_copy(o)
+
 function setproperties!(obj::BigObject; kwargsdata...)
     for (key, val) in kwargsdata
         setproperty!(obj, string(key), val)

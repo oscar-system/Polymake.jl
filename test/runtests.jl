@@ -20,6 +20,7 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("incidencematrix.jl")
     include("convert.jl")
     include("perlobj.jl")
+    include("util.jl")
     include("interface_functions.jl")
     include("sparsematrix.jl")
     include("tropicalnumber.jl")

@@ -39,6 +39,18 @@
             @test occursin("my cuttie", String(Polymake.properties(P)))
         end
 
+        @testset "copy" begin
+            p = polytope.cube(3)
+            @test Polymake.exists(p,"F_VECTOR") == false
+            pc = copy(p)
+            @test pc.F_VECTOR isa Polymake.Vector
+            pdc = deepcopy(p)
+            @test pdc.F_VECTOR isa Polymake.Vector
+            @test Polymake.exists(p,"F_VECTOR") == false
+            @test Polymake.exists(pc,"F_VECTOR") == true
+            @test Polymake.exists(pdc,"F_VECTOR") == true
+         end
+
         @testset "conversions" begin
             p = polytope.rand_sphere(3,20);
             @test polytope.Cone(p) isa Polymake.BigObject
