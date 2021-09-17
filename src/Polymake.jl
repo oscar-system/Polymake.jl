@@ -67,26 +67,33 @@ end
 # Must also be called during precompile
 checkversion()
 
-generated_dir = joinpath(@__DIR__, "generated")
+const generated_dir = joinpath(@__DIR__, "generated")
 
 include("repl.jl")
 include("ijulia.jl")
 
 @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
 
-json_script = joinpath(@__DIR__,"polymake","apptojson.pl")
-json_folder = joinpath(generated_dir,"json")
+const json_script = joinpath(@__DIR__,"polymake","apptojson.pl")
+const json_folder = joinpath(generated_dir,"json")
 mkpath(json_folder)
 
-polymake_run_script() do runner
-   run(`$runner $json_script $json_folder`)
-end
-
-include(type_translator)
+const user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
 
 include(polymake_jll.generate_deps_tree)
 
 const polymake_deps_tree = prepare_deps_tree()
+
+polymake_run_script() do runner
+    ENV["PATH"] = string(joinpath(polymake_deps_tree,"bin"), ":", Ninja_jll.PATH[], ":", Perl_jll.PATH[], ":", ENV["PATH"])
+    settings = joinpath(user_dir,"settings")
+    # if there is already a settings file read that in read-only mode (to avoid rebuilding wrappers)
+    # otherwise we let polymake create an initial configuration
+    settings = isfile(settings) ? "--config=$settings" : "--config=user=$user_dir"
+    run(`$runner "$settings" "$json_script" "$json_folder"`)
+end
+
+include(type_translator)
 
 function __init__()
     if length(get(ENV,"POLYMAKE_CONFIG","")) > 0
@@ -97,10 +104,8 @@ function __init__()
 
     @initcxx
 
-    global user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
-    
     # prepare environment variables
-    ENV["PATH"] = string(Ninja_jll.PATH[], ":", Perl_jll.PATH[], ":", ENV["PATH"])
+    ENV["PATH"] = string(joinpath(polymake_deps_tree,"bin"), ":", Ninja_jll.PATH[], ":", Perl_jll.PATH[], ":", ENV["PATH"])
     ENV["POLYMAKE_USER_DIR"] = user_dir
     mkpath(user_dir)
 
@@ -121,8 +126,17 @@ function __init__()
 
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
+
+    # work around issue with lp2poly and looking up perl modules from different applications
     application("polytope")
     Polymake.shell_execute("require LPparser;")
+
+    # make sure 4ti2 is configured
+    application("matroid")
+    Polymake.shell_execute(raw"""
+       application("polytope")->configured->{"_4ti2.rules"} > 0 or reconfigure("polytope::_4ti2.rules");
+       application("matroid")->configured->{"_4ti2.rules"} > 0 or reconfigure("_4ti2.rules");
+    """)
 
     for app in call_function(:common, :startup_applications)
         application(app)

@@ -8,6 +8,9 @@ my $jsonpath = shift @ARGV;
 
 my @apps = @ARGV > 0 ? @ARGV : @User::start_applications;
 
+# avoid wrapper compilation
+$Polymake::Core::CPlusPlus::code_generation = "none";
+
 sub type_for_julia($$;$) {
    my ($appname, $typename, $tparam) = @_;
    if ($tparam) {
