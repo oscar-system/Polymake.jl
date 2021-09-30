@@ -119,3 +119,25 @@ function prefer(label_expression::String)
     Base.depwarn("`prefer(label)` is deprecated, use `prefer(label) do ... end` instead.", :prefer, force=true)
     set_preference(label_expression)
 end
+
+function save_data(obj::SmallObject, filename::String, canonical::Bool)
+   Polymake.call_function(:User, :save_data, obj, filename, "canonical", canonical)
+   nothing
+end
+
+# there is also another save_bigobject function coming from the CxxWrap interface
+# but that one does not support the canonical option
+function save_bigobject(obj::BigObject, filename::String, canonical::Bool)
+   Polymake.call_function(:User, :save, obj, filename, "canonical", canonical)
+   nothing
+end
+
+# this allows loading bigobjects as well
+function load_data(filename::String)
+   return Polymake.call_function(:User, :load_data, filename)
+end
+
+load(filename::String) = load_data(filename)
+
+save(obj::SmallObject, filename::String; canonical=false) = save_data(obj, filename, canonical)
+save(obj::BigObject, filename::String; canonical=false) = save_bigobject(obj, filename, canonical)
