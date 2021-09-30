@@ -7,6 +7,14 @@
 import REPL
 import REPL: LineEdit, REPLCompletions
 
+struct Shell
+end
+
+Base.getproperty(::Type{Shell}, name::Symbol) = Polymake.call_function(:User, :get_shell_scalar, String(name))
+
+Base.setproperty!(::Type{Shell}, name::Symbol, value) = Polymake.call_function(:User, :set_shell_scalar, String(name), value)
+
+
 struct PolymakeCompletions <: LineEdit.CompletionProvider end
 
 _color(str, magic_number=37) = Base.text_colors[(sum(Int, str) + magic_number) % 0xff]

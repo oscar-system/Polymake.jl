@@ -78,3 +78,19 @@ function deserialize_json_string($) {
    my $hash = decode_json($str);
    return Core::Serializer::deserialize($hash);
 }
+
+package Polymake::User;
+
+function get_shell_scalar($) {
+   my ($varname) = @_;
+   no strict 'refs';
+   return ${"Polymake::User::$varname"};
+}
+
+function set_shell_scalar($,$) {
+   my ($varname, $obj) = @_;
+   # redeclaring an existing variable will fail but we can just ignore that
+   eval "declare \$$varname;";
+   no strict 'refs';
+   ${"Polymake::User::$varname"} = $obj;
+}
