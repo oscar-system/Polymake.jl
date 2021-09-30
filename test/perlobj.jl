@@ -157,16 +157,6 @@
         @test Base.propertynames(g) isa Base.Vector{Symbol}
     end
 
-    @testset "save load" begin
-        test_polytope = @pm polytope.Polytope(POINTS=points_int)
-        mktempdir() do path
-            Polymake.save_bigobject(test_polytope,joinpath(path,"test.poly"))
-            loaded = Polymake.load_bigobject(joinpath(path,"test.poly"))
-            @test loaded isa Polymake.BigObject
-            @test Base.propertynames(test_polytope) == Base.propertynames(loaded)
-        end
-    end
-
     @testset "polymake tutorials" begin
         p = @pm polytope.Polytope(POINTS=polytope.cube(4).VERTICES)
         @test p isa Polymake.BigObject
