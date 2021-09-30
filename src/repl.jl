@@ -7,12 +7,12 @@
 import REPL
 import REPL: LineEdit, REPLCompletions
 
-struct Shell
-end
+struct ShellHelper end
+const Shell = ShellHelper()
 
-Base.getproperty(::Type{Shell}, name::Symbol) = Polymake.call_function(:User, :get_shell_scalar, String(name))
+Base.getproperty(::ShellHelper, name::Symbol) = Polymake.call_function(:User, :get_shell_scalar, String(name))
 
-Base.setproperty!(::Type{Shell}, name::Symbol, value) = Polymake.call_function(:User, :set_shell_scalar, String(name), value)
+Base.setproperty!(::ShellHelper, name::Symbol, value) = Polymake.call_function(:User, :set_shell_scalar, String(name), value)
 
 
 struct PolymakeCompletions <: LineEdit.CompletionProvider end
