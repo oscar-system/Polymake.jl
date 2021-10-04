@@ -17,6 +17,12 @@
         @test (@pm polytope.Polytope(POINTS=[pm1//pm2 pm2//pm2])) isa Polymake.BigObject
         @test (@pm polytope.Polytope(POINTS=[1//2 1//2])) isa Polymake.BigObject
 
+        @test Polymake.bigobject("fulton::CyclicQuotient", N=7, Q=2) isa Polymake.BigObject
+
+        G = Polymake.graph.complete(4).ADJACENCY
+        @test G isa Polymake.GraphAllocated{Polymake.Undirected}
+        @test Polymake.bigobject("graph::Graph", ADJACENCY=G) isa Polymake.BigObject
+
         @test polytope.cube(3, 1//4, -1//4) isa Polymake.BigObject
 
         function test_pm_macro()
