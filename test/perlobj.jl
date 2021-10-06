@@ -140,6 +140,10 @@
         @test Polymake.get_attachment(Polymake.PropertyValue,test_polytope,"ATT") isa Polymake.PropertyValue
         @test Polymake.remove_attachment(test_polytope,"ATT") === nothing
         @test Polymake.get_attachment(test_polytope,"ATT") === nothing
+
+        stra = Polymake.Array{String}(["hello", "world"])
+        @test Polymake.attach(test_polytope, "STRA", stra) === nothing
+        # @test Polymake.get_attachment(test_polytope) .== ["hello", "world"]
     end
 
     @testset "tab-completion" begin
