@@ -9,8 +9,8 @@ julia-version = [ "~1.6.0-0", "~1.7.0-0"]
   [pkgs.Oscar]
   test = true
 
-[include]
-  [include.julia]
-  Oscar = "master"
-  julia-version = "1.5"
-  os = "ubuntu-latest"
+#[include]
+#  [include.julia]
+#  Oscar = "master"
+#  julia-version = "1.5"
+#  os = "ubuntu-latest"
