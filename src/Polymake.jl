@@ -51,6 +51,8 @@ end
 # Load Cxx stuff and init
 ##########################
 
+__is_root_module(m=@__MODULE__) = haskey(Base.package_locks, Base.PkgId(m))
+
 Sys.isapple() || Sys.islinux() || error("System is not supported!")
 
 libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
@@ -112,8 +114,7 @@ function __init__()
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
 
     try
-        show_banner = isinteractive() &&
-                       !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+        show_banner = isinteractive() && __is_root_module()
 
         initialize_polymake(show_banner)
         if !show_banner
