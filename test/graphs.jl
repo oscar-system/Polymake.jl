@@ -26,5 +26,16 @@
         @test !Polymake._has_edge(g, 0, 1)
     end
 
+    @testset "save load" begin
+        G = Polymake.graph.complete(4);
+        g = G.ADJACENCY;
+        mktempdir() do path
+            Polymake.save(g, joinpath(path, "test.graph"))
+            loaded = Polymake.load(joinpath(path, "test.graph"))
+            @test loaded isa Polymake.Graph{Polymake.Undirected}
+            @test Polymake.nv(g) == Polymake.nv(loaded)
+            @test Polymake.ne(g) == Polymake.ne(loaded)
+        end
+    end
 end
 

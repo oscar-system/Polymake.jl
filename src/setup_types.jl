@@ -13,6 +13,7 @@ const SmallObject = Union{
     IncidenceMatrix,
     Polynomial,
     Map,
+    Graph,
 }
 const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, CxxWrap.CxxLong}
 
