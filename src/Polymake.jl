@@ -25,17 +25,20 @@ import SparseArrays: AbstractSparseMatrix, findnz
 import SparseArrays
 
 using CxxWrap
-import Libdl.dlext
+
+using BinaryWrappers
 
 # FLINT_jll now initializes the flint malloc functions
 # to the corresponding julia functions.
 # See also https://github.com/Nemocas/Nemo.jl/issues/788
 using FLINT_jll
 
-using Perl_jll
-using Ninja_jll
-using polymake_jll
+import Perl_jll
+import Ninja_jll
+import polymake_jll
+import lib4ti2_jll
 using libpolymake_julia_jll
+
 
 const jlpolymake_version_range = (v"0.5.0",  v"0.6")
 
@@ -67,6 +70,12 @@ end
 # Must also be called during precompile
 checkversion()
 
+const binpaths = [
+                   @generate_wrappers(lib4ti2_jll),
+                   @generate_wrappers(Ninja_jll),
+                   @generate_wrappers(Perl_jll),
+                 ]
+
 const generated_dir = joinpath(@__DIR__, "generated")
 
 include("repl.jl")
@@ -84,8 +93,10 @@ include(polymake_jll.generate_deps_tree)
 
 const polymake_deps_tree = prepare_deps_tree()
 
+
+
 polymake_run_script() do runner
-    ENV["PATH"] = string(joinpath(polymake_deps_tree,"bin"), ":", Ninja_jll.PATH[], ":", Perl_jll.PATH[], ":", ENV["PATH"])
+    ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
     settings = joinpath(user_dir,"settings")
     # if there is already a settings file read that in read-only mode (to avoid rebuilding wrappers)
     # otherwise we let polymake create an initial configuration
@@ -105,7 +116,7 @@ function __init__()
     @initcxx
 
     # prepare environment variables
-    ENV["PATH"] = string(joinpath(polymake_deps_tree,"bin"), ":", Ninja_jll.PATH[], ":", Perl_jll.PATH[], ":", ENV["PATH"])
+    ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
     ENV["POLYMAKE_USER_DIR"] = user_dir
     mkpath(user_dir)
 
