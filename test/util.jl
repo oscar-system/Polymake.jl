@@ -74,4 +74,15 @@
         # will not throw an error but just return nothing
         @test Polymake.Shell.notexisting == nothing
     end
+
+    @testset "4ti2 external" begin
+        m = matroid.r8_matroid()
+        @test m.CIRCUITS isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int)}}
+        @test Polymake.matroid._4ti2circuits(m.VECTORS) isa Polymake.SparseMatrix
+
+        c = polytope.cube(3, 3//2)
+        Polymake.Shell.c = c
+        @test Polymake.shell_execute(raw"""$c->apply_rule("_4ti2.integer_points");""") isa NamedTuple
+        @test Polymake.exists(c, "LATTICE_POINTS_GENERATORS") || Polymake.exists(c, "HILBERT_BASIS_GENERATORS")
+    end
 end
