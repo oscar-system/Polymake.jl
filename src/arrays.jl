@@ -5,7 +5,8 @@ const Array_suppT = Union{Int64, CxxWrap.CxxLong,
                         StdList{StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong}},
                         Set{Int64}, Set{CxxWrap.CxxLong},
                         Array{Int64}, Array{CxxWrap.CxxLong},
-                        Array{Integer}, Array{Rational}, Matrix{Integer}}
+                        Array{Integer}, Array{Rational}, Matrix{Integer},
+                        BigObject}
 
 function Array{T}(::UndefInitializer, n::Base.Integer) where
     T <: Array_suppT
