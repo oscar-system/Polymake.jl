@@ -4,6 +4,7 @@ repo = "https://github.com/oscar-system/Polymake.jl.git"
 version = "0.6.0"
 
 [deps]
+BinaryWrappers = "f01c122e-0ea1-4f85-ad8f-907073ad7a9f"
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
 FLINT_jll = "e134572f-a0d5-539d-bddf-3cad8db41a82"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
@@ -16,10 +17,12 @@ Perl_jll = "83958c19-0796-5285-893e-a1267f8ec499"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+lib4ti2_jll = "1493ae25-0f90-5c0e-a06c-8c5077d6d66f"
 libpolymake_julia_jll = "4d8266f6-2b3b-57e3-ad7a-d431eaaac945"
 polymake_jll = "7c209550-9012-526c-9264-55ba7a78ba2c"
 
 [compat]
+BinaryWrappers = "~0.1.0"
 CxxWrap = "0.10.1, 0.11"
 JSON = "^0.20, ^0.21"
 Mongoc = "~0.5.0, ~0.6.0"

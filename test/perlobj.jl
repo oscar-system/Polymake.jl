@@ -275,9 +275,4 @@
     @testset "toplevel visual" begin
         @test visual(polytope.cube(3)) isa Polymake.Visual
     end
-
-    @testset "matroid 4ti2 external" begin
-        m = matroid.r8_matroid()
-        @test m.CIRCUITS isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int)}}
-    end
 end
