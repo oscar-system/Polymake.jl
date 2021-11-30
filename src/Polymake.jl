@@ -24,9 +24,13 @@ using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
 import SparseArrays
 
+import Random
+
 using CxxWrap
 
 using BinaryWrappers
+
+using Scratch
 
 # FLINT_jll now initializes the flint malloc functions
 # to the corresponding julia functions.
@@ -37,10 +41,11 @@ import Perl_jll
 import Ninja_jll
 import polymake_jll
 import lib4ti2_jll
+import TOPCOM_jll
 using libpolymake_julia_jll
 
 
-const jlpolymake_version_range = (v"0.5.0",  v"0.6")
+const jlpolymake_version_range = (v"0.5.0",  v"0.7")
 
 struct PolymakeError <: Exception
     msg
@@ -54,7 +59,7 @@ end
 # Load Cxx stuff and init
 ##########################
 
-Sys.isapple() || Sys.islinux() || error("System is not supported!")
+Sys.iswindows() && error("System is not supported!")
 
 libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
 
