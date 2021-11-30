@@ -299,5 +299,7 @@ using SparseArrays
         pe, pv = findnz(psv)
         @test je == pe
         @test jv == pv
+        @test nonzeroinds(psv) == je
+        @test nonzeros(psv) == jv
     end
 end
