@@ -75,46 +75,33 @@ end
 # Must also be called during precompile
 checkversion()
 
-const binpaths = [
-                   @generate_wrappers(lib4ti2_jll),
-                   @generate_wrappers(Ninja_jll),
-                   @generate_wrappers(Perl_jll),
-                 ]
-
-const generated_dir = joinpath(@__DIR__, "generated")
+const version_key = "$(VERSION.major).$(VERSION.minor)"
+# unique per precompilation to ensure deps tree is updated
+const rand_key = Random.randstring(10)
 
 include("repl.jl")
 include("ijulia.jl")
 
 @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
 
-const json_script = joinpath(@__DIR__,"polymake","apptojson.pl")
-const json_folder = joinpath(generated_dir,"json")
-mkpath(json_folder)
-
-const user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
-
 include(polymake_jll.generate_deps_tree)
-
-const polymake_deps_tree = prepare_deps_tree()
-
-
-
-polymake_run_script() do runner
-    ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
-    settings = joinpath(user_dir,"settings")
-    # if there is already a settings file read that in read-only mode (to avoid rebuilding wrappers)
-    # otherwise we let polymake create an initial configuration
-    settings = isfile(settings) ? "--config=$settings" : "--config=user=$user_dir"
-    run(`$runner "$settings" "$json_script" "$json_folder"`)
-end
 
 include(type_translator)
 
 function __init__()
-    if length(get(ENV,"POLYMAKE_CONFIG","")) > 0
-         @warn "Setting `POLYMAKE_CONFIG` to use a custom polymake installation is no longer supported. Please use `Overrides.toml` to override `polymake_jll` and `libpolymake_julia_jll`."
+
+    binpaths = [
+                 @generate_wrappers(lib4ti2_jll),
+                 @generate_wrappers(TOPCOM_jll),
+                 @generate_wrappers(Ninja_jll),
+                 @generate_wrappers(Perl_jll),
+               ]
+    polymake_deps_tree = @get_scratch!("polymake_deps_$(version_key)_$(rand_key)")
+    if (!isdir(joinpath(polymake_deps_tree,"deps")))
+        prepare_deps_tree(polymake_deps_tree)
     end
+
+    polymake_user_dir = @get_scratch!("polymake_user_$(version_key)_$(rand_key)")
 
     checkversion()
 
@@ -122,9 +109,7 @@ function __init__()
 
     # prepare environment variables
     ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
-    ENV["POLYMAKE_USER_DIR"] = user_dir
-    mkpath(user_dir)
-
+    ENV["POLYMAKE_USER_DIR"] = polymake_user_dir
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
 
     try
