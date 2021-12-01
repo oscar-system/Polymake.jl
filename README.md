@@ -10,6 +10,10 @@ This package is developed as part of the [OSCAR](https://oscar.computeralgebra.d
 
 The current version of `Polymake.jl` relies on `polymake` version `4.0` or later.
 
+## Supported Platforms
+
+While this package does support most julia platforms apart from Windows, everything except `x86_64-linux-gnu` and `x86_64-apple-darwin` is considered experimental.
+
 ## Documentation
 The documentation can be found at [juliahub](https://juliahub.com/docs/Polymake/).
 

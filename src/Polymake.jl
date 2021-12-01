@@ -24,12 +24,9 @@ using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
 import SparseArrays
 
-import Random
-
 using CxxWrap
 
 using BinaryWrappers
-
 using Scratch
 
 # FLINT_jll now initializes the flint malloc functions
@@ -75,9 +72,8 @@ end
 # Must also be called during precompile
 checkversion()
 
-const version_key = "$(VERSION.major).$(VERSION.minor)"
-# unique per precompilation to ensure deps tree is updated
-const rand_key = Random.randstring(10)
+# to keep the scratchspaces of different Polymake.jl folders and julia versions separate
+const scratch_key = "polymake_$(string(hash(@__FILE__)))_$(VERSION.major).$(VERSION.minor)"
 
 include("repl.jl")
 include("ijulia.jl")
@@ -96,13 +92,14 @@ function __init__()
                  @generate_wrappers(Ninja_jll),
                  @generate_wrappers(Perl_jll),
                ]
-    polymake_deps_tree = @get_scratch!("polymake_deps_$(version_key)_$(rand_key)")
-    if (!isdir(joinpath(polymake_deps_tree,"deps")))
-        prepare_deps_tree(polymake_deps_tree)
-    end
+    polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree")
 
-    polymake_user_dir = @get_scratch!("polymake_user_$(version_key)_$(rand_key)")
+    # we run this on every init to make sure all artifacts still exist
+    prepare_deps_tree(polymake_deps_tree)
 
+    polymake_user_dir = @get_scratch!("$(scratch_key)_userdir")
+
+    # check libpolymake_julia version with a plain ccall before initializing libcxxwrap and libpolymake
     checkversion()
 
     @initcxx
