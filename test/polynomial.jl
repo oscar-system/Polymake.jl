@@ -92,4 +92,11 @@ using SparseArrays
             @test (5 * p) / 5 == p
         end
     end
+
+    @testset "UniPolynomial" begin
+        c = Polymake.polytope.cube(3,1,0)
+        ehr = c.EHRHART_POLYNOMIAL
+        @test Polymake.monomials_as_vector(ehr) == [0, 1, 2, 3]
+        @test Polymake.coefficients_as_vector(ehr) == [1, 3, 3, 1]
+    end
 end
