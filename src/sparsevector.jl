@@ -43,10 +43,14 @@ Base.@propagate_inbounds function Base.setindex!(V::SparseVector{T}, val, n::Bas
 end
 
 function findnz(vec::SparseVector{T}) where T
-    I = Int[to_one_based_indexing(i) for i in _nzindices(vec)]
+    I = SparseArrays.nonzeroinds(vec)
     V = to_jl_type(T)[vec[idx] for idx in I]
     return (I, V)
 end
+
+SparseArrays.nonzeroinds(vec::SparseVector) = Int[to_one_based_indexing(i) for i in _nzindices(vec)]
+
+SparseArrays.nonzeros(vec::SparseVector{T}) where T = findnz(vec)[2]
 
 # implementation of SparseVector{Bool} with Int64 length using a polymake Set
 struct SparseVectorBool <: SparseVector{Bool}

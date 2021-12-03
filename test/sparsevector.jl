@@ -299,5 +299,7 @@ using SparseArrays
         pe, pv = findnz(psv)
         @test je == pe
         @test jv == pv
+        @test SparseArrays.nonzeroinds(psv) == je
+        @test SparseArrays.nonzeros(psv) == jv
     end
 end
