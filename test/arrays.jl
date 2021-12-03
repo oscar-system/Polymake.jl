@@ -115,11 +115,11 @@
         c = Polymake.polytope.cube(2, 1, 0)
         PC = Polymake.polytope.PointConfiguration(POINTS=c.VERTICES)
         all = Polymake.polytope.topcom_all_triangulations(PC)
-        @test all isa Polymake.Array{Polymake.Array{Polymake.Set{Int64}}}
+        @test all isa Polymake.Array{Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int64)}}}
         @test length(all) == 2
         @test size(all) == (2,)
         for triang in all
-            @test triang isa Polymake.Array{Polymake.Set{Int64}}
+            @test triang isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int64)}}
         end
     end
 end
