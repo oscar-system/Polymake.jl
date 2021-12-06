@@ -27,6 +27,7 @@ import SparseArrays
 using CxxWrap
 
 using BinaryWrappers
+using Scratch
 
 # FLINT_jll now initializes the flint malloc functions
 # to the corresponding julia functions.
@@ -37,10 +38,11 @@ import Perl_jll
 import Ninja_jll
 import polymake_jll
 import lib4ti2_jll
+import TOPCOM_jll
 using libpolymake_julia_jll
 
 
-const jlpolymake_version_range = (v"0.5.0",  v"0.6")
+const jlpolymake_version_range = (v"0.6.0",  v"0.7")
 
 struct PolymakeError <: Exception
     msg
@@ -54,7 +56,7 @@ end
 # Load Cxx stuff and init
 ##########################
 
-Sys.isapple() || Sys.islinux() || error("System is not supported!")
+Sys.iswindows() && error("System is not supported!")
 
 libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
 
@@ -70,56 +72,41 @@ end
 # Must also be called during precompile
 checkversion()
 
-const binpaths = [
-                   @generate_wrappers(lib4ti2_jll),
-                   @generate_wrappers(Ninja_jll),
-                   @generate_wrappers(Perl_jll),
-                 ]
-
-const generated_dir = joinpath(@__DIR__, "generated")
+# to keep the scratchspaces of different Polymake.jl folders and julia versions separate
+const scratch_key = "polymake_$(string(hash(@__FILE__)))_$(VERSION.major).$(VERSION.minor)"
 
 include("repl.jl")
 include("ijulia.jl")
 
 @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
 
-const json_script = joinpath(@__DIR__,"polymake","apptojson.pl")
-const json_folder = joinpath(generated_dir,"json")
-mkpath(json_folder)
-
-const user_dir = abspath(joinpath(Pkg.depots1(),"polymake_user"))
-
 include(polymake_jll.generate_deps_tree)
-
-const polymake_deps_tree = prepare_deps_tree()
-
-
-
-polymake_run_script() do runner
-    ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
-    settings = joinpath(user_dir,"settings")
-    # if there is already a settings file read that in read-only mode (to avoid rebuilding wrappers)
-    # otherwise we let polymake create an initial configuration
-    settings = isfile(settings) ? "--config=$settings" : "--config=user=$user_dir"
-    run(`$runner "$settings" "$json_script" "$json_folder"`)
-end
 
 include(type_translator)
 
 function __init__()
-    if length(get(ENV,"POLYMAKE_CONFIG","")) > 0
-         @warn "Setting `POLYMAKE_CONFIG` to use a custom polymake installation is no longer supported. Please use `Overrides.toml` to override `polymake_jll` and `libpolymake_julia_jll`."
-    end
 
+    binpaths = [
+                 @generate_wrappers(lib4ti2_jll),
+                 @generate_wrappers(TOPCOM_jll),
+                 @generate_wrappers(Ninja_jll),
+                 @generate_wrappers(Perl_jll),
+               ]
+    polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree")
+
+    # we run this on every init to make sure all artifacts still exist
+    prepare_deps_tree(polymake_deps_tree)
+
+    polymake_user_dir = @get_scratch!("$(scratch_key)_userdir")
+
+    # check libpolymake_julia version with a plain ccall before initializing libcxxwrap and libpolymake
     checkversion()
 
     @initcxx
 
     # prepare environment variables
     ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
-    ENV["POLYMAKE_USER_DIR"] = user_dir
-    mkpath(user_dir)
-
+    ENV["POLYMAKE_USER_DIR"] = polymake_user_dir
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
 
     try
@@ -141,13 +128,6 @@ function __init__()
     # work around issue with lp2poly and looking up perl modules from different applications
     application("polytope")
     Polymake.shell_execute("require LPparser;")
-
-    # make sure 4ti2 is configured
-    application("matroid")
-    Polymake.shell_execute(raw"""
-       application("polytope")->configured->{"_4ti2.rules"} > 0 or reconfigure("polytope::_4ti2.rules");
-       application("matroid")->configured->{"_4ti2.rules"} > 0 or reconfigure("_4ti2.rules");
-    """)
 
     for app in call_function(:common, :startup_applications)
         application(app)
