@@ -77,14 +77,8 @@ jobs:
         # empty entry for defaults
         xcode: [ '' ]
         cxxwrap: [ '' ]
-        # add a few extra tests: macos-11, several ubuntu lts versions
+        # add a few extra tests: ubuntu lts versions
         include:
-          - os: macos-11
-            julia-version: '~1.6.0-0'
-          - os: macos-11
-            julia-version: '~1.7.0-0'
-          - os: ubuntu-20.04
-            julia-version: '~1.7.0-0'
           - os: ubuntu-18.04
             julia-version: '~1.7.0-0'
 
