@@ -60,6 +60,9 @@
                 @test a == b
                 @test b == a
             end
+            
+            @test a != 2
+            @test 2!=a
         end
 
         @testset "Polymake.Rational division" begin
