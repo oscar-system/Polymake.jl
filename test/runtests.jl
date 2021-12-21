@@ -2,7 +2,7 @@ using Polymake
 using Test
 using CxxWrap
 
-# make wrapper compilation verbose on travis
+# make wrapper compilation verbose on CI
 if (haskey(ENV, "GITHUB_ACTIONS"))
     Polymake.shell_execute(raw"$Verbose::cpp=3;")
 end
@@ -32,4 +32,9 @@ struct MyInt x::Int end # needed in test/convert.jl
     if get(ENV, "POLYDB_TEST_URI", "") != ""
         include("polydb.jl")
     end
+end
+
+# reset verbose wrapper compilation on CI
+if (haskey(ENV, "GITHUB_ACTIONS"))
+    Polymake.shell_execute(raw"reset_custom $Verbose::cpp;")
 end
