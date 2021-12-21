@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Using Polymake.jl · Polymake.jl - Documentation</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Polymake.jl - Documentation</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Polymake.jl</a></li><li><a class="tocitem" href="../getting_started/">Getting Started</a></li><li class="is-active"><a class="tocitem" href>Using Polymake.jl</a><ul class="internal"><li><a class="tocitem" href="#Executing-Polymake-Methods"><span>Executing Polymake Methods</span></a></li><li><a class="tocitem" href="#Accessing-the-polyDB"><span>Accessing the polyDB</span></a></li></ul></li><li><a class="tocitem" href="../examples/">Examples</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Using Polymake.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Using Polymake.jl</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/oscar-system/Polymake.jl/blob/master/docs/src/using_polymake_jl.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Using-Polymake.jl"><a class="docs-heading-anchor" href="#Using-Polymake.jl">Using Polymake.jl</a><a id="Using-Polymake.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Using-Polymake.jl" title="Permalink"></a></h1><p>In this section, the main functionality of <code>Polymake.jl</code> is covered: how to access <code>polymake</code>&#39;s powerful abilities. For this cause one needs to know how to call <code>polymake</code> methods and how to handle the supported types.</p><h2 id="Executing-Polymake-Methods"><a class="docs-heading-anchor" href="#Executing-Polymake-Methods">Executing Polymake Methods</a><a id="Executing-Polymake-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Executing-Polymake-Methods" title="Permalink"></a></h2><h3 id="Directly-calling-a-polymake-method"><a class="docs-heading-anchor" href="#Directly-calling-a-polymake-method">Directly calling a <code>polymake</code> method</a><a id="Directly-calling-a-polymake-method-1"></a><a class="docs-heading-anchor-permalink" href="#Directly-calling-a-polymake-method" title="Permalink"></a></h3><p>One of the simplest yet most useful possibilities <code>Polymake.jl</code> offers is to directly use a <code>polymake</code> method via the following macro:</p><article class="docstring"><header><a class="docstring-binding" id="Polymake.@pm" href="#Polymake.@pm"><code>Polymake.@pm</code></a> — <span class="docstring-category">Macro</span></header><section><div><pre><code class="language-julia">@pm polymakeapp.function_name{Template, parameters}(args)</code></pre><p>This macro can be used to</p><ul><li>create <code>polymake</code> Big Objects (such as polytopes)</li><li>call <code>polymake</code> functions with specific template parameters.</li></ul><p>The expression passed to the macro has to be:</p><ul><li>a fully qualified name of a <code>polymake</code> object (i.e. starting with the</li></ul><p><strong>lowercase</strong> name of a polymake application), or</p><ul><li>a function with template parameters enclosed in <code>{ ... }</code>.</li></ul><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; P = @pm polytope.Polytope{QuadraticExtension}(POINTS=[1 0 0; 0 1 0])
+type: Polytope&lt;QuadraticExtension&lt;Rational&gt;&gt;
+
+POINTS
+1 0 0
+0 1 0
+
+
+
+julia&gt; @pm common.convert_to{Float}(P)
+type: Polytope&lt;Float&gt;
+
+POINTS
+1 0 0
+0 1 0
+
+
+CONE_AMBIENT_DIM
+3
+
+
+
+julia&gt; @pm tropical.Polytope{Max}(POINTS=[1 0 0; 0 1 0])
+type: Polytope&lt;Max, Rational&gt;
+
+POINTS
+0 -1 -1
+0 1 0
+
+
+</code></pre><p>!!! Note     the expression in <code>@pm</code> macro is parsed syntactically, so it has to be a valid <code>julia</code> expression. However template parameters <strong>need not</strong> to be defined in <code>julia</code>, but must be valid names of <code>polymake</code> property types. Nested types (such as <code>{QuadraticExtension{Rational}}</code>) are allowed.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/call_function.jl#L57-L105">source</a></section></article><p>The <code>@pm</code> macro can be used to issue more complicated calls to polymake from julia. If You need to pass templates to <code>BigObject</code>s, some limited support is provided in costructors. For example one can construct <code>polytope.Polytope{Float64}(...)</code>. However for this to work templates need to be valid julia types/object, hence it is not possible to construct a <code>Polytope&lt;QuadraticExtension&gt;</code> through such call. For this (and in general: for passing more complicated templates) one needs the <code>@pm</code> macro:</p><pre><code class="language-perl">$obj = new BigObject&lt;Template,Parameters&gt;(args)</code></pre><p>becomes</p><pre><code class="language-julia">obj = @pm appname.BigObject{Template, Parameters}(args)</code></pre><p>Examples:</p><pre><code class="language-julia">tropical.Polytope{max, Polymake.Rational}(POINTS=[1 0 0; 1 1 0; 1 1 1])
+# call to constructor, note that max is a julia function, hence a valid object
+@pm tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])
+# macro call: none of the types in templates need to exist in julia</code></pre><p>As a rule of thumb any template passed to <code>@pm</code> macro needs to be translatable on syntax level to a <code>C++</code> one. E.g. <code>Matrix{Integer}</code> works, as it translates to <code>pm::Matrix&lt;pm::Integer&gt;</code>.</p><p>Such templates can be passed to functions as well. A very useful example is the <code>common.convert_to</code>:</p><pre><code class="language-julia">julia&gt; c = polytope.cube(3);
+
+julia&gt; f = c.FACETS;
+
+julia&gt; f[1,1] # f is an opaque pm::perl::PropertyValue to julia
+ERROR: MethodError: no method matching getindex(::Polymake.PropertyValueAllocated, ::Int64, ::Int64)
+Stacktrace:
+  [...]
+
+julia&gt; m = @pm common.convert_to{Matrix{Integer}}(f) # the template must consist of C++ names
+pm::Matrix&lt;pm::Integer&gt;
+1 1 0 0
+1 -1 0 0
+1 0 1 0
+1 0 -1 0
+1 0 0 1
+1 0 0 -1
+
+julia&gt; m[1,1]
+1</code></pre><p>Since the combination of the <code>@pm</code> macro and <code>common.convert_to</code> is quite common there is a specialized <code>@convert_to</code> macro for this:</p><pre><code class="language-julia">
+julia&gt; m = @convert_to Matrix{Integer} f # the template must consist of C++ names
+pm::Matrix&lt;pm::Integer&gt;
+1 1 0 0
+1 -1 0 0
+1 0 1 0
+1 0 -1 0
+1 0 0 1
+1 0 0 -1</code></pre><h3 id="Wrapped-methods"><a class="docs-heading-anchor" href="#Wrapped-methods">Wrapped methods</a><a id="Wrapped-methods-1"></a><a class="docs-heading-anchor-permalink" href="#Wrapped-methods" title="Permalink"></a></h3><p>As the <a href="#Polymake.@pm"><code>@pm</code></a> macro allows to access <code>polymake</code>&#39;s library, there is no need for every method to be wrapped. In general, the wrapped methods restrict to simpler ones in the context of small types, guaranteeing compatibility with <code>julia</code> or allowing easy modification/operations of/with instances of these types. This results in a handling of these types which is equivalent to <code>julia</code>&#39;s syntax, e.g. arrays can be accessed with the brackets operator <code>[]</code> or addition can be applied by using <code>+</code>:</p><pre><code class="language-julia">julia&gt; m = Polymake.Matrix{Polymake.Rational}(4,6)
+pm::Matrix&lt;pm::Rational&gt;
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+
+
+julia&gt; m[2,1] = 9
+9
+
+julia&gt; m
+pm::Matrix&lt;pm::Rational&gt;
+0 0 0 0 0 0
+9 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+
+julia&gt; a = Polymake.TropicalNumber{Polymake.Min}(7)
+pm::TropicalNumber&lt;pm::Min, pm::Rational&gt;
+7
+
+julia&gt; b = Polymake.TropicalNumber{Polymake.Min}(10)
+pm::TropicalNumber&lt;pm::Min, pm::Rational&gt;
+10
+
+julia&gt; a + b
+pm::TropicalNumber&lt;pm::Min, pm::Rational&gt;
+7</code></pre><h3 id="Function-Arguments"><a class="docs-heading-anchor" href="#Function-Arguments">Function Arguments</a><a id="Function-Arguments-1"></a><a class="docs-heading-anchor-permalink" href="#Function-Arguments" title="Permalink"></a></h3><p>Functions in <code>Polymake.jl</code> accept the following types for their arguments:</p><ul><li>simple data types (bools, machine integers, floats)</li><li>wrapped native types (<code>Polymake.Integer</code>, <code>Polymake.Rational</code>, <code>Polymake.Vector</code>, <code>Polymake.Matrix</code>, <code>Polymake.Set</code> etc.)</li><li>other objects returned by polymake:<ul><li><code>Polymake.BigObject</code>,</li><li><code>Polymake.PropertyValue</code> (containers opaque to Julia)</li></ul></li></ul><p>If an object passed to <code>Polymake.jl</code> function is of a different type the software will try its best to convert it to a known one. However, if the conversion doesn&#39;t work an <code>ArgumentError</code> will be thrown:</p><pre><code class="language-julia">ERROR: ArgumentError: Unrecognized argument type: SomeType.
+You need to convert to polymake compatible type first.</code></pre><p>You can tell <code>Polymake.jl</code> how to convert it by definig</p><pre><code class="language-julia">Base.convert(::Type{Polymake.PolymakeType}, x::SomeType)</code></pre><p>The returned value must be of one of the types as above. For example to use <code>AbstractAlgebra.jl</code> matrices as input to <code>Polymake.jl</code> one may define</p><pre><code class="language-julia">Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = Polymake.Matrix(M.entries)</code></pre><p>and the following should run smoothly.</p><pre><code class="language-julia">julia&gt; using AbstractAlgebra, Polymake
+polymake version 4.0
+Copyright (c) 1997-2020
+Ewgenij Gawrilow, Michael Joswig (TU Berlin)
+https://polymake.org
+
+This is free software licensed under GPL; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+julia&gt; mm = AbstractAlgebra.matrix(ZZ, [1 2 3; 4 5 6])
+[1 2 3]
+[4 5 6]
+
+julia&gt; polytope.Polytope(POINTS=mm)
+ERROR: ArgumentError: Unrecognized argument type: AbstractAlgebra.Generic.MatSpaceElem{Int64}.
+You need to convert to polymake compatible type first.
+  [...]
+
+julia&gt; Base.convert(::Type{Polymake.PolymakeType}, M::Generic.MatSpaceElem) = Polymake.Matrix(M.entries)
+
+julia&gt; polytope.Polytope(POINTS=mm)
+type: Polytope&lt;Rational&gt;
+
+POINTS
+1 2 3
+1 5/4 3/2
+</code></pre><h2 id="Accessing-the-polyDB"><a class="docs-heading-anchor" href="#Accessing-the-polyDB">Accessing the polyDB</a><a id="Accessing-the-polyDB-1"></a><a class="docs-heading-anchor-permalink" href="#Accessing-the-polyDB" title="Permalink"></a></h2><p><code>Polymake.jl</code> allows the user to access the objects stored within the <code>polyDB</code> via the <code>Mongoc.jl</code> package; this functionality can be found in another sub-module, <code>Polymake.Polydb</code>, which requires no additional interaction to be loaded. It offers two different ways for querying, as well as some methods for information. For demonstration purposes, there also is a <code>Jupyter notebook</code> in the <code>examples/</code> folder.</p><h3 id="General-tools"><a class="docs-heading-anchor" href="#General-tools">General tools</a><a id="General-tools-1"></a><a class="docs-heading-anchor-permalink" href="#General-tools" title="Permalink"></a></h3><p>There are three types one needs to know when working with <code>Polymake.Polydb</code>:</p><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.Database" href="#Polymake.Polydb.Database"><code>Polymake.Polydb.Database</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">  Database</code></pre><p>Type for referencing a specific database (usually the <code>polyDB</code>)</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L18-L22">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.Collection" href="#Polymake.Polydb.Collection"><code>Polymake.Polydb.Collection</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">  Collection{T}</code></pre><p>Type for referencing a specific collection. <code>T&lt;:Union{Polymake.BigObject, Mongoc.BSON}</code> defines the template and/or element types returned by operations applied on objects of this type.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L27-L33">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.Cursor" href="#Polymake.Polydb.Cursor"><code>Polymake.Polydb.Cursor</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">  Cursor{T}</code></pre><p>Type containing the results of a query. Can be iterated, but the iterator can not be reset. For this cause, one has to query again. <code>T&lt;:Union{Polymake.BigObject, Mongoc.BSON}</code> defines the element types.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L38-L44">source</a></section></article><p>To receive the <code>Database</code> object referencing to the <code>polyDB</code>, there is the <code>get_db()</code> method:</p><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.get_db-Tuple{}" href="#Polymake.Polydb.get_db-Tuple{}"><code>Polymake.Polydb.get_db</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">  get_db()</code></pre><p>Connect to the <code>polyDB</code> and return <code>Database</code> instance.</p><p>The uri of the server can be set in advance by writing its <code>String</code> representation into ENV[&quot;POLYDB<em>TEST</em>URI&quot;]. (used to connect to the github services container for testing)</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; typeof(db)
+Polymake.Polydb.Database</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L49-L64">source</a></section></article><p>A specific <code>Collection</code> object can then be obtained with the brackets operator:</p><article class="docstring"><header><a class="docstring-binding" id="Base.getindex-Tuple{Polymake.Polydb.Database, String}" href="#Base.getindex-Tuple{Polymake.Polydb.Database, String}"><code>Base.getindex</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">  getindex(db::Database, name::AbstractString)</code></pre><p>Return a <code>Polymake.Polydb.Collection{Polymake.BigObject}</code> instance from <code>db</code> with the given <code>name</code>. Sections and collections in the name are connected with the &#39;.&#39; sign.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; collection = getindex(db, &quot;Polytopes.Lattice.SmoothReflexive&quot;)
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive
+
+julia&gt; collection = db[&quot;Matroids.Small&quot;]
+Polymake.Polydb.Collection{Polymake.BigObject}: Matroids.Small</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L71-L87">source</a></section></article><p>By default, the results are parsed to <code>Polymake.BigObject</code>s when accessed, but one may choose to change this behaviour by adjusting the typing template of <code>Collection</code> or <code>Cursor</code> using the following method:</p><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.Collection-Tuple{Polymake.Polydb.Collection}" href="#Polymake.Polydb.Collection-Tuple{Polymake.Polydb.Collection}"><code>Polymake.Polydb.Collection</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">  Collection{T}(c::Collection)</code></pre><p>Create another <code>Collection</code> object with a specific template parameter referencing the same collection as <code>c</code>. <code>T</code> can be chosen from <code>Polymake.BigObject</code> and <code>Mongoc.BSON</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; collection = db[&quot;Polytopes.Lattice.SmoothReflexive&quot;]
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive
+
+julia&gt; collection_bson = Polymake.Polydb.Collection{Mongoc.BSON}(collection)
+Polymake.Polydb.Collection{Mongoc.BSON}: Polytopes.Lattice.SmoothReflexive
+
+julia&gt; collection_bo = Polymake.Polydb.Collection{Polymake.BigObject}(collection_bson)
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L133-L152">source</a></section></article><h3 id="Information"><a class="docs-heading-anchor" href="#Information">Information</a><a id="Information-1"></a><a class="docs-heading-anchor-permalink" href="#Information" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.info" href="#Polymake.Polydb.info"><code>Polymake.Polydb.info</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">  info(db::Database, level::Base.Integer=1)</code></pre><p>Print a structured list of the sections and collections of the Polydb together with information about each of these (if existent).</p><p>Detail of the output determined by value of <code>level</code>:</p><ul><li>1: short description,</li><li>2: description,</li><li>3: description, authors, maintainers,</li><li>4: full info,</li><li>5: full info and list of recommended search fields.</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L417-L428">source</a></section><section><div><pre><code class="language-none">  info(c::Collection, level::Base.Integer=1)</code></pre><p>Print information about collection <code>c</code> (if existent).</p><p>Detail of the output determined by value of <code>level</code>:</p><ul><li>1: short description,</li><li>2: description,</li><li>3: description, authors, maintainers,</li><li>4: full info,</li><li>5: full info and list of recommended search fields.</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L484-L494">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.get_collection_names" href="#Polymake.Polydb.get_collection_names"><code>Polymake.Polydb.get_collection_names</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">  get_collection_names(db::Database)</code></pre><p>Return a <code>Vector{String}</code> containing the names of all collections in the Polydb, excluding meta collections.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; Polymake.Polydb.get_collection_names(db)
+16-element Vector{String}:
+ &quot;Polytopes.Combinatorial.FacesBirkhoffPolytope&quot;
+ &quot;Polytopes.Combinatorial.SmallSpheresDim4&quot;
+ &quot;Polytopes.Geometric.01Polytopes&quot;
+ &quot;Polytopes.Lattice.SmoothReflexive&quot;
+ &quot;Polytopes.Lattice.ExceptionalMaximalHollow&quot;
+ &quot;Tropical.TOM&quot;
+ ⋮
+ &quot;Polytopes.Lattice.Panoptigons&quot;
+ &quot;Tropical.Cubics&quot;
+ &quot;Tropical.SchlaefliFan&quot;
+ &quot;Polytopes.Lattice.Reflexive&quot;
+ &quot;Polytopes.Combinatorial.CombinatorialTypes&quot;</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L323-L347">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.get_fields" href="#Polymake.Polydb.get_fields"><code>Polymake.Polydb.get_fields</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">  get_fields(c::Collection)</code></pre><p>Return a <code>Vector{String}</code> containing the names of the fields of <code>c</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; collection = db[&quot;Matroids.Small&quot;]
+Polymake.Polydb.Collection{Polymake.BigObject}: Matroids.Small
+
+julia&gt; Polymake.Polydb.get_fields(collection)
+27-element Vector{String}:
+ &quot;DUAL&quot;
+ &quot;N_BASES&quot;
+ &quot;TUTTE_POLYNOMIAL&quot;
+ &quot;SERIES_PARALLEL&quot;
+ &quot;N_FLATS&quot;
+ &quot;SPLIT_FLACETS&quot;
+ ⋮
+ &quot;TERNARY&quot;
+ &quot;REGULAR&quot;
+ &quot;TRANSVERSAL&quot;
+ &quot;IDENTICALLY_SELF_DUAL&quot;
+ &quot;BETA_INVARIANT&quot;</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L246-L271">source</a></section></article><h3 id="Querying"><a class="docs-heading-anchor" href="#Querying">Querying</a><a id="Querying-1"></a><a class="docs-heading-anchor-permalink" href="#Querying" title="Permalink"></a></h3><p>There are two ways for querying within <code>Polymake.jl</code>.</p><h4 id="Methods"><a class="docs-heading-anchor" href="#Methods">Methods</a><a id="Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Methods" title="Permalink"></a></h4><article class="docstring"><header><a class="docstring-binding" id="Mongoc.find" href="#Mongoc.find"><code>Mongoc.find</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">find(collection::Collection, bson_filter::BSON=BSON();
+    options::Union{Nothing, BSON}=nothing) :: Cursor</code></pre><p>Executes a query on <code>collection</code> and returns an iterable <code>Cursor</code>.</p><p><strong>Example</strong></p><pre><code class="language-julia">function find_contract_codes(collection, criteria::Dict=Dict()) :: Vector{String}
+    result = Vector{String}()
+
+    let
+        bson_filter = Mongoc.BSON(criteria)
+        bson_options = Mongoc.BSON(&quot;&quot;&quot;{ &quot;projection&quot; : { &quot;_id&quot; : true }, &quot;sort&quot; : { &quot;_id&quot; : 1 } }&quot;&quot;&quot;)
+        for bson_document in Mongoc.find(collection, bson_filter, options=bson_options)
+            push!(result, bson_document[&quot;_id&quot;])
+        end
+    end
+
+    return result
+end</code></pre><p>Check the <a href="http://mongoc.org/libmongoc/current/mongoc_collection_find_with_opts.html">libmongoc documentation</a> for more information.</p></div></section><section><div><pre><code class="language-none">find(bucket::Bucket, bson_filter::BSON=BSON();
+    options::BSON=BSON()) :: Cursor</code></pre><p>Looks for files in GridFS bucket.</p></div></section><section><div><pre><code class="language-none">  find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict})</code></pre><p>Search a collection <code>c</code> for documents matching the criteria given by <code>d</code>. Apply search options <code>opts</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; collection = db[&quot;Polytopes.Lattice.SmoothReflexive&quot;];
+
+julia&gt; query = Dict(&quot;DIM&quot;=&gt;3, &quot;N_FACETS&quot;=&gt;5);
+
+julia&gt; results = Polymake.Polydb.find(collection, query);
+
+julia&gt; typeof(results)
+Polymake.Polydb.Cursor{Polymake.BigObject}</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L90-L108">source</a></section><section><div><pre><code class="language-none">  find(c::Collection{T}, d::Pair...)</code></pre><p>Search a collection <code>c</code> for documents matching the criteria given by <code>d</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; collection = db[&quot;Polytopes.Lattice.SmoothReflexive&quot;];
+
+julia&gt; results = Polymake.Polydb.find(collection, &quot;DIM&quot;=&gt;3, &quot;N_FACETS&quot;=&gt;5);
+
+julia&gt; typeof(results)
+Polymake.Polydb.Cursor{Polymake.BigObject}</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L113-L128">source</a></section></article><h4 id="Macros"><a class="docs-heading-anchor" href="#Macros">Macros</a><a id="Macros-1"></a><a class="docs-heading-anchor-permalink" href="#Macros" title="Permalink"></a></h4><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.@select" href="#Polymake.Polydb.@select"><code>Polymake.Polydb.@select</code></a> — <span class="docstring-category">Macro</span></header><section><div><p>Polymake.Polydb.@select collectionName</p><p>This macro can be used as part of a chain for easy (i.e. human readable) querying. Generate a method asking a container for the entry with key <code>collectionName</code>.</p><p>See also: <a href="#Polymake.Polydb.@filter"><code>@filter</code></a>, <a href="#Polymake.Polydb.@map"><code>@map</code></a></p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; collection = db |&gt;
+       Polymake.Polydb.@select(&quot;Polytopes.Lattice.SmoothReflexive&quot;)
+Polymake.Polydb.Collection{Polymake.BigObject}: Polytopes.Lattice.SmoothReflexive</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L521-L538">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.@filter" href="#Polymake.Polydb.@filter"><code>Polymake.Polydb.@filter</code></a> — <span class="docstring-category">Macro</span></header><section><div><p>Polymake.Polydb.@filter conditions...</p><p>This macro can be used as part of a chain for easy (i.e. human readable) querying. Convert <code>conditions</code> into the corresponding <code>Dict</code> and generate a method expanding its input by this <code>Dict</code>. Multiple conditions can be passed in the same line and/or in different lines.</p><p>See also: <a href="#Polymake.Polydb.@select"><code>@select</code></a>, <a href="#Polymake.Polydb.@map"><code>@map</code></a></p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; query_tuple = db |&gt;
+       Polymake.Polydb.@select(&quot;Polytopes.Lattice.SmoothReflexive&quot;) |&gt;
+       Polymake.Polydb.@filter(&quot;DIM&quot; &lt;= 3) |&gt;
+       Polymake.Polydb.@filter(&quot;N_VERTICES&quot; == 8)
+(Polymake.Polydb.Collection{Polymake.BigObject}
+    COLLECTION: Polytopes.Lattice.SmoothReflexive
+    Smooth reflexive lattice polytopes in dimensions up to 9, up to lattice equivalence. The lists were computed with the algorithm of Mikkel Oebro (see [[http://arxiv.org/abs/0704.0049|arxiv: 0704.0049]]) and are taken from the [[http://polymake.org/polytopes/paffenholz/www/fano.html|website of Andreas Paffenholz]]. They also contain splitting data according to [[https://arxiv.org/abs/1711.02936| arxiv: 1711.02936]].
+    Authored by
+        Andreas Paffenholz, paffenholz@opt.tu-darmstadt.de, TU Darmstadt
+        Benjamin Lorenz, paffenholz@opt.tu-darmstadt.de, TU Berlin
+        Mikkel Oebro
+    Fields: AFFINE_HULL, CONE_DIM, DIM, EHRHART_POLYNOMIAL, F_VECTOR, FACET_SIZES, FACET_WIDTHS, FACETS, H_STAR_VECTOR, LATTICE_DEGREE, LATTICE_VOLUME, LINEALITY_SPACE, N_BOUNDARY_LATTICE_POINTS, N_EDGES, N_FACETS, N_INTERIOR_LATTICE_POINTS, N_LATTICE_POINTS, N_RIDGES, N_VERTICES, REFLEXIVE, SMOOTH, SELF_DUAL, SIMPLE, TERMINAL, VERTEX_SIZES, VERTICES, VERTICES_IN_FACETS, VERY_AMPLE, ALTSHULER_DET, BALANCED, CENTROID, DIAMETER, NORMAL, N_HILBERT_BASIS, IS_PRISM, IS_PRODUCT, IS_SKEW_PRISM, IS_SIMPLEX_SUM, PRISM_BASE, PRODUCT_FACTORS, SIMPLEX_SUM_BASES, SKEW_PRISM_BASES, Dict{String,Any}(&quot;DIM&quot; =&gt; Dict{String,Any}(&quot;$lte&quot; =&gt; 3),&quot;N_VERTICES&quot; =&gt; Dict{String,Any}(&quot;$eq&quot; =&gt; 8)))
+
+julia&gt; query_tuple = db |&gt;
+       Polymake.Polydb.@select(&quot;Polytopes.Lattice.SmoothReflexive&quot;) |&gt;
+       Polymake.Polydb.@filter(&quot;DIM&quot; &lt;= 3, &quot;N_VERTICES&quot; == 8)
+(Polymake.Polydb.Collection{Polymake.BigObject}
+    COLLECTION: Polytopes.Lattice.SmoothReflexive
+    Smooth reflexive lattice polytopes in dimensions up to 9, up to lattice equivalence. The lists were computed with the algorithm of Mikkel Oebro (see [[http://arxiv.org/abs/0704.0049|arxiv: 0704.0049]]) and are taken from the [[http://polymake.org/polytopes/paffenholz/www/fano.html|website of Andreas Paffenholz]]. They also contain splitting data according to [[https://arxiv.org/abs/1711.02936| arxiv: 1711.02936]].
+    Authored by
+        Andreas Paffenholz, paffenholz@opt.tu-darmstadt.de, TU Darmstadt
+        Benjamin Lorenz, paffenholz@opt.tu-darmstadt.de, TU Berlin
+        Mikkel Oebro
+    Fields: AFFINE_HULL, CONE_DIM, DIM, EHRHART_POLYNOMIAL, F_VECTOR, FACET_SIZES, FACET_WIDTHS, FACETS, H_STAR_VECTOR, LATTICE_DEGREE, LATTICE_VOLUME, LINEALITY_SPACE, N_BOUNDARY_LATTICE_POINTS, N_EDGES, N_FACETS, N_INTERIOR_LATTICE_POINTS, N_LATTICE_POINTS, N_RIDGES, N_VERTICES, REFLEXIVE, SMOOTH, SELF_DUAL, SIMPLE, TERMINAL, VERTEX_SIZES, VERTICES, VERTICES_IN_FACETS, VERY_AMPLE, ALTSHULER_DET, BALANCED, CENTROID, DIAMETER, NORMAL, N_HILBERT_BASIS, IS_PRISM, IS_PRODUCT, IS_SKEW_PRISM, IS_SIMPLEX_SUM, PRISM_BASE, PRODUCT_FACTORS, SIMPLEX_SUM_BASES, SKEW_PRISM_BASES, Dict{String,Any}(&quot;DIM&quot; =&gt; Dict{String,Any}(&quot;$lte&quot; =&gt; 3),&quot;N_VERTICES&quot; =&gt; Dict{String,Any}(&quot;$eq&quot; =&gt; 8)))</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L546-L586">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Polymake.Polydb.@map" href="#Polymake.Polydb.@map"><code>Polymake.Polydb.@map</code></a> — <span class="docstring-category">Macro</span></header><section><div><p>Polymake.Polydb.@map [optFields...]</p><p>This macro can be used as part of a chain for easy (i.e. human readable) querying. Generate a method running a query given a <code>Tuple{Collection, Dict}</code>. If <code>optFields</code> are given (as <code>String</code>s), the results only contain the stated fields and the objects metadata.</p><p>See also: <a href="#Polymake.Polydb.@select"><code>@select</code></a>, <a href="#Polymake.Polydb.@filter"><code>@filter</code></a></p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; db = Polymake.Polydb.get_db();
+
+julia&gt; results = db |&gt;
+       Polymake.Polydb.@select(&quot;Polytopes.Lattice.SmoothReflexive&quot;) |&gt;
+       Polymake.Polydb.@filter(&quot;DIM&quot; == 3, &quot;N_VERTICES&quot; == 8) |&gt;
+       Polymake.Polydb.@map() |&gt;
+       collect
+7-element Vector{Polymake.BigObject}:
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x00000000028c5320)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000abd7b40)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000a6d7bf0)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000a431470)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000bcaf290)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x00000000098fb670)
+ Polymake.BigObjectAllocated(Ptr{Nothing} @0x000000000a1ba460)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Polymake.jl/blob/cb78e77de06e5dd66e1774d27556e466bb54484e/src/polydb.jl#L603-L633">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started/">« Getting Started</a><a class="docs-footer-nextpage" href="../examples/">Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 21 December 2021 09:58">Tuesday 21 December 2021</span>. Using Julia version 1.6.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
