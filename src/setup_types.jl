@@ -14,6 +14,7 @@ const SmallObject = Union{
     Polynomial,
     Map,
     Graph,
+    HomologyGroup,
 }
 const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, CxxWrap.CxxLong}
 
