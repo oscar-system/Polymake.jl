@@ -3,7 +3,7 @@
     @testset "read data" begin
         kb = Polymake.topaz.klein_bottle().HOMOLOGY
         @test Polymake.torsion(kb[1]) isa Polymake.StdList{Polymake.StdPair{Polymake.Integer, Polymake.to_cxx_type(Int64)}}
-        @test Polymake.betti_number(kb[1]) isa Polymake.to_cxx_type(Int64)
+        @test Polymake.betti_number(kb[1]) isa Int64
         @test collect.(Polymake.torsion.(kb)) == [[], [2 => 1], []]
         @test Polymake.betti_number.(kb) == [0, 1, 0]
         t = Polymake.topaz.torus().HOMOLOGY
