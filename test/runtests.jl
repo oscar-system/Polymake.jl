@@ -29,6 +29,7 @@ struct MyInt x::Int end # needed in test/convert.jl
     include("lists.jl")
     include("map.jl")
     include("graphs.jl")
+    include("homologygroup.jl")
     if get(ENV, "POLYDB_TEST_URI", "") != ""
         include("polydb.jl")
     end
