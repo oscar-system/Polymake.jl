@@ -1,7 +1,7 @@
 name = "Polymake"
 uuid = "d720cf60-89b5-51f5-aff5-213f193123e7"
 repo = "https://github.com/oscar-system/Polymake.jl.git"
-version = "0.6.2"
+version = "0.7.0"
 
 [deps]
 BinaryWrappers = "f01c122e-0ea1-4f85-ad8f-907073ad7a9f"
@@ -30,7 +30,7 @@ JSON = "^0.20, ^0.21"
 Mongoc = "~0.5.0, ~0.6.0"
 Scratch = "1.1"
 julia = "^1.6"
-libpolymake_julia_jll = "~0.6.1"
+libpolymake_julia_jll = "~0.7.0"
 
 [extras]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
