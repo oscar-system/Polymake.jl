@@ -5,6 +5,7 @@ for f in [:to_one_based_indexing, :to_zero_based_indexing]
     @eval begin
         $f(itr) = $f.(itr)
         $f(s::S) where S<:Set = Set($f.(s))
+        $f(s::S) where S<:AbstractSet = S($f.(s))
     end
 end
 
