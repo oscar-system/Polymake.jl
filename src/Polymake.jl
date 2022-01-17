@@ -42,7 +42,7 @@ import TOPCOM_jll
 using libpolymake_julia_jll
 
 
-const jlpolymake_version_range = (v"0.6.0",  v"0.7")
+const jlpolymake_version_range = (v"0.7.0",  v"0.8")
 
 struct PolymakeError <: Exception
     msg
