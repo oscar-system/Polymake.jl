@@ -81,6 +81,7 @@ convert_to_pm_type(::Type{<:Array}) = Array
 convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
 convert_to_pm_type(::Type{<:Graph{T}}) where T<:Union{Directed,Undirected} = Graph{T}
 convert_to_pm_type(::Type{HomologyGroup{T}}) where T<:Integer = HomologyGroup{T}
+convert_to_pm_type(::Type{<:QuadraticExtension{T}}) where T<:Rational = QuadraticExtension{Rational}
 # convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
 # specific converts for container types we wrap:
@@ -88,7 +89,8 @@ convert_to_pm_type(::Type{<:Set{<:Base.Integer}}) = Set{Int64}
 convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
 
 for (pmT, jlT) in [(Integer, Base.Integer),
-                   (Rational, Union{Base.Rational, Rational})]
+                   (Rational, Union{Base.Rational, Rational}),
+                   (QuadraticExtension{Polymake.Rational}, QuadraticExtension{Polymake.Rational})]
     @eval begin
         convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{$pmT}
         convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{$pmT}

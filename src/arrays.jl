@@ -1,5 +1,5 @@
 const Array_suppT = Union{Int64, CxxWrap.CxxLong,
-                        Integer, Rational,
+                        Integer, Rational, QuadraticExtension{Rational},
                         String, CxxWrap.StdString,
                         StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong},
                         StdList{StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong}},

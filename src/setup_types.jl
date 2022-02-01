@@ -15,8 +15,9 @@ const SmallObject = Union{
     Map,
     Graph,
     HomologyGroup,
+    QuadraticExtension,
 }
-const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, CxxWrap.CxxLong}
+const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, CxxWrap.CxxLong}
 
 const TypeConversionFunctions = Dict(
     Symbol("Int") => to_int,

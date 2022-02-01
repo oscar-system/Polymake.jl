@@ -4,7 +4,7 @@ using SparseArrays
     FloatTypes = [Float32, Float64, BigFloat]
     RationalTypes = [Rational{I} for I in IntTypes]
 
-    for C in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+    for C in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
         @test Polymake.Polynomial{C,Int64} <: Any
         @test Polymake.Polynomial{C,Int64}([1, 2],[3 4 5; 6 7 8]) isa Any
         @test Polymake.Polynomial{C,Int64}([1, 2],[3 4 5; 6 7 8]) isa Polymake.Polynomial
@@ -22,7 +22,7 @@ using SparseArrays
     end
 
     @testset "Low-level operations" begin
-        for (C,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double")]
+        for (C,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational>")]
             p = Polymake.Polynomial(C.(jl_v),jl_m)
             @test Polymake.nvars(p) == size(jl_m)[2]
             @test Polymake.nvars(p) isa Int
@@ -48,7 +48,7 @@ using SparseArrays
     end
 
     @testset "Equality" begin
-        for C1 in [Int64, Polymake.Integer, Polymake.Rational, Float64], C2 in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+        for C1 in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}], C2 in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
             @test Polymake.Polynomial{C1}(jl_v,jl_m) == Polymake.Polynomial{C2}(jl_v,jl_m)
         end
     end
@@ -56,9 +56,9 @@ using SparseArrays
     @testset "Arithmetic" begin
         jl_v2 = [5, 6]
         jl_m2 = [3 4 5; 6 7 8]
-        for C1 in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+        for C1 in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
             p = Polymake.Polynomial{C1}(jl_v,jl_m)
-            for C2 in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+            for C2 in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
                 q = Polymake.Polynomial{C2}(jl_v2,jl_m2)
                 @test p + q isa Polymake.Polynomial{Polymake.to_cxx_type(promote_type(C1,C2))}
                 @test p + q == Polymake.Polynomial([6, 2, 6],[3 4 5; 6 7 0; 6 7 8])
