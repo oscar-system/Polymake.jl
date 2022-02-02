@@ -37,5 +37,16 @@
             @test Polymake.ne(g) == Polymake.ne(loaded)
         end
     end
+
+    @testset "shortest_path_dijkstra" begin
+        g = Polymake.Graph{Polymake.Directed}(5)
+        for i in 0:4
+           Polymake._add_edge(g, i, (i+1)%5)
+        end
+        em = Polymake.EdgeMap{Polymake.Directed, Int}(g)
+        Polymake._set_entry(em, 0, 1, 1)
+        Polymake._shortest_path_dijkstra(g, em, 0, 1, true) == [0,1]
+        Polymake._shortest_path_dijkstra(g, em, 0, 1, false) == [0,4,3,2,1]
+    end
 end
 
