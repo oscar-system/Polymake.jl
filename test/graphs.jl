@@ -43,7 +43,7 @@
         for i in 0:4
            Polymake._add_edge(g, i, (i+1)%5)
         end
-        em = Polymake.EdgeMap{Polymake.Directed, Int}(g)
+        em = Polymake.EdgeMap{Polymake.Directed, Polymake.to_cxx_type(Int64)}(g)
         Polymake._set_entry(em, 0, 1, 1)
         Polymake._shortest_path_dijkstra(g, em, 0, 1, true) == [0,1]
         Polymake._shortest_path_dijkstra(g, em, 0, 1, false) == [0,4,3,2,1]
