@@ -67,6 +67,7 @@ convert_to_pm_type(T::Type) = throw(ArgumentError("Unrecognized argument type: $
 convert_to_pm_type(::Type{T}) where T <: Union{Int64, Float64} = T
 convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet, TropicalNumber} = T
 
+
 convert_to_pm_type(::Type{Int32}) = Int64
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
@@ -79,10 +80,21 @@ convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
 convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
-convert_to_pm_type(::Type{<:Graph{T}}) where T<:Union{Directed,Undirected} = Graph{T}
-convert_to_pm_type(::Type{<:EdgeMap{T,Int64}}) where T<:Union{Directed,Undirected} = EdgeMap{T, Int64}
-convert_to_pm_type(::Type{<:NodeMap{T,Int64}}) where T<:Union{Directed,Undirected} = NodeMap{T, Int64}
-convert_to_pm_type(::Type{<:NodeMap{T,<:Set{Int64}}}) where T<:Union{Directed,Undirected} = NodeMap{T, <:Set{Int64}}
+
+# Graph, EdgeMap, NodeMap
+const DirType = Union{Directed, Undirected}
+convert_to_pm_type(::Type{<:Graph{T}}) where T<:DirType = Graph{T}
+
+convert_to_pm_type(::Type{<:EdgeMap{T,Int64}}) where T<:DirType = EdgeMap{T, Int64}
+EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Union{Int64, CxxWrap.CxxLong} = EdgeMap{Dir,to_cxx_type(T)}(g)
+
+convert_to_pm_type(::Type{<:NodeMap{T,Int64}}) where T<:DirType = NodeMap{T, Int64}
+NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Union{Int64, CxxWrap.CxxLong} = NodeMap{Dir,to_cxx_type(T)}(g)
+convert_to_pm_type(::Type{<:NodeMap{T,<:Set{Int64}}}) where T<:DirType = NodeMap{T, Set{Int64}}
+NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Set{<:Union{Int64, CxxWrap.CxxLong}} = NodeMap{Dir,to_cxx_type(T)}(g)
+
+
+
 convert_to_pm_type(::Type{HomologyGroup{T}}) where T<:Integer = HomologyGroup{T}
 # convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
