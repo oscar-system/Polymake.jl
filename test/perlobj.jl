@@ -136,6 +136,10 @@
 
         c = polytope.cube(3, 1//4, -1//4)
         @test c.VERTICES[1,2] == -1//4
+        
+        i = Polymake.polytope.icosahedron()
+        @test i.VERTICES[1, :] == [1, 0, Polymake.QuadraticExtension{Polymake.Rational}(1//4, 1//4, 5), 1//2]
+        @test i.VOLUME == Polymake.QuadraticExtension{Polymake.Rational}(5//4, 5//12, 5)
     end
 
     @testset "attachments" begin
