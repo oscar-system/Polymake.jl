@@ -2,7 +2,7 @@
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
-    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
         @test Polymake.Matrix{T} <: AbstractMatrix
         @test Polymake.Matrix{T}(undef, 3,4) isa AbstractMatrix
         @test Polymake.Matrix{T}(undef, 3,4) isa Polymake.Matrix
@@ -26,7 +26,7 @@
             @test Polymake.Matrix(T.(jl_m)) isa
                 Polymake.Matrix{T<:Union{Int32,Int64} ? Polymake.to_cxx_type(Int64) : Polymake.Integer}
 
-            for ElType in [Polymake.Integer, Polymake.Rational, Float64]
+            for ElType in [Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
                 for m in [jl_m, jl_m//T(1), jl_m/T(1)]
                     @test Polymake.Matrix{ElType}(m) isa Polymake.Matrix{ElType}
                     @test convert(Polymake.Matrix{ElType}, m) isa Polymake.Matrix{ElType}
@@ -150,6 +150,34 @@
                 @test string(V) == "pm::Matrix<pm::Rational>\n5/3 2 3\n10/3 5 6\n"
             end
         end
+        
+        @testset "Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}" begin
+            V = Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_m)
+            # linear indexing:
+            @test V[1] == 1//1
+            @test V[2] == 4//1
+
+            @test eltype(V) == Polymake.QuadraticExtension{Polymake.Rational}
+
+            @test_throws BoundsError V[0, 1]
+            @test_throws BoundsError V[2, 5]
+            @test_throws BoundsError V[3, 1]
+
+            @test length(V) == 6
+            @test size(V) == (2,3)
+
+            for T in [IntTypes; Polymake.Integer]
+                V = Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_m) # local copy
+                @test setindex!(V, T(5)//T(3), 1, 1) isa Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}
+                @test V[T(1), 1] isa Polymake.QuadraticExtension{Polymake.Rational}
+                @test V[1, T(1)] == 5//3
+                # testing the return value of brackets operator
+                @test V[2] = T(10)//T(3) isa typeof(T(10)//T(3))
+                V[2] = T(10)//T(3)
+                @test V[2] == 10//3
+                @test string(V) == "pm::Matrix<pm::QuadraticExtension<pm::Rational> >\n5/3 2 3\n10/3 5 6\n"
+            end
+        end
 
         @testset "Polymake.Matrix{Float64}" begin
             V = Polymake.Matrix{Float64}(jl_m)
@@ -187,6 +215,7 @@
                 V = Polymake.Matrix{Polymake.Integer}(undef, 2, 3)
                 W = Polymake.Matrix{Polymake.Rational}(undef, 2, 3)
                 U = Polymake.Matrix{Float64}(undef, 2, 3)
+                Y = Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}(undef, 2, 3)
 
                 @test (X .= T.(jl_m)) isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
                 @test (X .= T.(jl_m).//1) isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
@@ -199,8 +228,11 @@
 
                 @test (U .= T.(jl_m)) isa Polymake.Matrix{Float64}
                 @test (U .= T.(jl_m).//1) isa Polymake.Matrix{Float64}
+                
+                @test (Y .= T.(jl_m)) isa Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}
+                @test (Y .= T.(jl_m).//1) isa Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}
 
-                @test X == U == V == W
+                @test X == U == V == W == Y
 
                 # TODO:
                 # @test (V .== jl_m) isa BitPolymake.Array
@@ -232,6 +264,9 @@
         W = Polymake.Matrix{Polymake.Rational}(jl_w)
         jl_u = jl_m/4
         U = Polymake.Matrix{Float64}(jl_u)
+        sr2 = Polymake.QuadraticExtension{Polymake.Rational}(0, 1, 2)
+        jl_y = sr2 * jl_m
+        Y = Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_y)
 
         @test -X isa Polymake.Polymake.MatrixAllocated{Polymake.to_cxx_type(Int64)}
         @test -X == -jl_m
@@ -244,6 +279,9 @@
 
         @test -U isa Polymake.Polymake.MatrixAllocated{Float64}
         @test -U == -jl_u
+        
+        @test -Y isa Polymake.Matrix{Polymake.QuadraticExtension{Polymake.Rational}}
+        @test -Y == -jl_y
 
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
@@ -252,7 +290,7 @@
         @test Int32(2)X isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
 
         for T in int_scalar_types
-            for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]
+            for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
                 op = *
                 @test op(T(2), mat) isa Polymake.Matrix{ElType}
                 @test op(mat, T(2)) isa Polymake.Matrix{ElType}
@@ -277,6 +315,13 @@
                     @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
                 end
             end
+            let (op, ElType) = (//, Polymake.QuadraticExtension{Polymake.Rational})
+                
+                @test op(Y, T(2)) isa Polymake.Matrix{ElType}
+                @test broadcast(op, T(2), Y) isa Polymake.Matrix{ElType}
+                @test broadcast(op, Y, T(2)) isa Polymake.Matrix{ElType}
+                    
+            end
             let (op, ElType) = (/, Float64)
                 mat = U
                 @test op(mat, T(2)) isa Polymake.Matrix{ElType}
@@ -286,7 +331,7 @@
         end
 
         for T in rational_scalar_types
-            for (mat, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64)]
+            for (mat, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
 
                 op = *
                 @test op(T(2), mat) isa Polymake.Matrix{ElType}
@@ -340,12 +385,37 @@
                 @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
             end
         end
+        
+        let T = Polymake.QuadraticExtension{Polymake.Rational}, mat = Y, ElType = Polymake.QuadraticExtension{Polymake.Rational}
+            op = *
+            @test op(T(2), mat) isa Polymake.Matrix{ElType}
+            @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+            @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+            @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
 
-        for T in [int_scalar_types; rational_scalar_types; FloatTypes]
+            op = +
+            @test op(mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+            @test op(T.(jl_m), mat) isa Polymake.Matrix{ElType}
+
+            @test broadcast(op, mat, T.(jl_m)) isa Polymake.Matrix{ElType}
+            @test broadcast(op, T.(jl_m), mat) isa Polymake.Matrix{ElType}
+
+            @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+            @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
+
+            op = //
+            # @test op(T(2), mat) isa Polymake.Matrix{ElType}
+            @test op(mat, T(2)) isa Polymake.Matrix{ElType}
+            @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
+            @test broadcast(op, mat, T(2)) isa Polymake.Matrix{ElType}
+        end
+
+        for T in [int_scalar_types; rational_scalar_types; FloatTypes; Polymake.QuadraticExtension{Polymake.Rational}]
             @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_m
             @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_m
             @test T(2)*W == W*T(2) == T(2) .* W == W .* T(2) == 2jl_w
             @test T(2)*U == U*T(2) == T(2) .* U == U .* T(2) == 2jl_u
+            @test T(2)*Y == Y*T(2) == T(2) .* Y == Y .* T(2) == 2jl_y
 
             @test X + T.(jl_m) == T.(jl_m) + X == X .+ T.(jl_m) == T.(jl_m) .+ X == 2jl_m
 
@@ -354,6 +424,8 @@
             @test W + T.(4jl_w) == T.(4jl_w) + W == W .+ T.(4jl_w) == T.(4jl_w) .+ W == 5jl_w
 
             @test U + T.(4jl_u) == T.(4jl_u) + U == U .+ T.(4jl_u) == T.(4jl_u) .+ U == 5jl_u
+            
+            @test Y + T.(2 * jl_m) == T.(2 * jl_m) + Y == Y .+ T.(2 * jl_m) == T.(2 * jl_m) .+ Y == (1 + sr2) * jl_y
         end
     end
 end

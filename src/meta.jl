@@ -1,7 +1,7 @@
 module Meta
 import JSON
 import Polymake: appname_module_dict, module_appname_dict, shell_context_help
-import Polymake: Rational, PolymakeType, PropertyValue, OptionSet
+import Polymake: Rational, PolymakeType, PropertyValue, OptionSet, QuadraticExtension
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
@@ -33,6 +33,7 @@ translate_type_to_pm_string(::Type{<:Base.Rational}) = "Rational"
 translate_type_to_pm_string(::Type{<:Base.Integer}) = "Integer"
 translate_type_to_pm_string(::typeof(min)) = "Min"
 translate_type_to_pm_string(::typeof(max)) = "Max"
+translate_type_to_pm_string(::Type{<:QuadraticExtension{T}}) where T = string("QuadraticExtension<", translate_type_to_pm_string(T), ">")
 
 translate_type_to_pm_string(T) = throw(DomainError(T, "$T has been passed as a type parameter but no translation to a C++ template was defined. You may define such translation by appropriately extending
     `Polymake.Meta.translate_type_to_pm_string`."))

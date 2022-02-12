@@ -161,6 +161,7 @@ include("convert.jl")
 
 include("integers.jl")
 include("rationals.jl")
+include("quadraticextension.jl")
 include("sets.jl")
 include("std/lists.jl")
 include("std/pairs.jl")

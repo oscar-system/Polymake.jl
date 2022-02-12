@@ -3,7 +3,7 @@ using SparseArrays
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
-    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
         @test Polymake.SparseMatrix{T} <: AbstractSparseMatrix
         @test Polymake.spzeros(T, 3, 4) isa AbstractSparseMatrix
         @test Polymake.spzeros(T, 3, 4) isa Polymake.SparseMatrix
@@ -26,7 +26,7 @@ using SparseArrays
             @test Polymake.SparseMatrix(jl_s//1) isa Polymake.SparseMatrix{Polymake.Rational}
             @test Polymake.SparseMatrix(jl_s/1) isa Polymake.SparseMatrix{Float64}
 
-            for ElType in [Polymake.Integer, Polymake.Rational, Float64]
+            for ElType in [Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
                 for m in [jl_m, jl_m//T(1), jl_m/T(1)]
                     @test Polymake.SparseMatrix{ElType}(m) isa Polymake.SparseMatrix{ElType}
                     @test convert(Polymake.SparseMatrix{ElType}, m) isa Polymake.SparseMatrix{ElType}
@@ -215,12 +215,49 @@ using SparseArrays
 
             @test string(Polymake.SparseMatrix{Float64}(jl_s)) == "pm::SparseMatrix<double, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
         end
+        
+        @testset "Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}" begin
+            V = Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_m)
+            # linear indexing:
+            @test V[1] == 1
+            @test V[2] == 4
+
+            @test eltype(V) == Polymake.QuadraticExtension{Polymake.Rational}
+
+            @test_throws BoundsError V[0, 1]
+            @test_throws BoundsError V[2, 5]
+            @test_throws BoundsError V[3, 1]
+
+            @test length(V) == 6
+            @test size(V) == (2,3)
+
+            for T in [IntTypes; Polymake.Integer]
+                V = Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_m) # local copy
+                setindex!(V, T(5)//T(3), 1, 1)
+                @test V isa Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}
+                @test V[T(1), 1] isa Polymake.QuadraticExtension{Polymake.Rational}
+                @test V[1, T(1)] == 5//3
+                # testing the return value of brackets operator
+                if T != Polymake.Integer
+                    @test V[2] = T(10)//T(3) isa Base.Rational{T}
+                else
+                    @test V[2] = T(10)//T(3) isa Polymake.Rational
+                end
+                V[2] = T(10)//T(3)
+                @test V[2] == 10//3
+                @test string(V) == "pm::SparseMatrix<pm::QuadraticExtension<pm::Rational>, pm::NonSymmetric>\n5/3 2 3\n10/3 5 6\n"
+            end
+
+            @test string(Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_s)) == "pm::SparseMatrix<pm::QuadraticExtension<pm::Rational>, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
+            
+        end
 
         @testset "Equality" begin
             for T in [IntTypes; Polymake.Integer]
                 V = Polymake.SparseMatrix{Polymake.Integer}(2, 3)
                 W = Polymake.SparseMatrix{Polymake.Rational}(2, 3)
                 U = Polymake.SparseMatrix{Float64}(2, 3)
+                Y = Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}(2, 3)
 
                 #TODO T.(jl_s)
                 @test (V .= T.(jl_m)) isa Polymake.SparseMatrix{Polymake.Integer}
@@ -231,8 +268,11 @@ using SparseArrays
 
                 @test (U .= T.(jl_m)) isa Polymake.SparseMatrix{Float64}
                 @test (U .= T.(jl_m).//1) isa Polymake.SparseMatrix{Float64}
+                
+                @test (Y .= T.(jl_m)) isa Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}
+                @test (Y .= T.(jl_m).//1) isa Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}
 
-                @test U == V == W
+                @test U == V == W == Y
 
                 # TODO:
                 # @test (V .== jl_m) isa BitPolymake.Array
@@ -264,6 +304,9 @@ using SparseArrays
         W = Polymake.SparseMatrix{Polymake.Rational}(jl_w)
         jl_u = jl_m/4
         U = Polymake.SparseMatrix{Float64}(jl_u)
+        sr2 = Polymake.QuadraticExtension{Polymake.Rational}(0, 1, 2)
+        jl_y = jl_m * sr2
+        Y = Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_y)
 
         @test -X isa Polymake.SparseMatrixAllocated{Polymake.to_cxx_type(Int)}
         @test -X == -jl_m
@@ -277,6 +320,9 @@ using SparseArrays
         @test -U isa Polymake.SparseMatrixAllocated{Float64}
         @test -U == -jl_u
 
+        @test -Y isa Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}
+        @test -Y == -jl_y
+
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
@@ -284,7 +330,7 @@ using SparseArrays
         @test Int32(2)X isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int)}
 
         for T in int_scalar_types
-            for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]
+            for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
                 op = *
                 @test op(T(2), mat) isa Polymake.SparseMatrix{ElType}
                 @test op(mat, T(2)) isa Polymake.SparseMatrix{ElType}
@@ -315,10 +361,16 @@ using SparseArrays
                 @test broadcast(op, T(2), mat) isa Polymake.SparseMatrix{ElType}
                 @test broadcast(op, mat, T(2)) isa Polymake.SparseMatrix{ElType}
             end
+            let (op, ElType) = (//, Polymake.QuadraticExtension{Polymake.Rational})
+                mat = Y
+                @test op(mat, T(2)) isa Polymake.SparseMatrix{ElType}
+                @test broadcast(op, T(2), mat) isa Polymake.SparseMatrix{ElType}
+                @test broadcast(op, mat, T(2)) isa Polymake.SparseMatrix{ElType}
+            end
         end
 
         for T in rational_scalar_types
-            for (mat, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64)]
+            for (mat, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
 
                 op = *
                 @test op(T(2), mat) isa Polymake.SparseMatrix{ElType}
@@ -373,11 +425,12 @@ using SparseArrays
             end
         end
 
-        for T in [int_scalar_types; rational_scalar_types; FloatTypes]
+        for T in [int_scalar_types; rational_scalar_types; FloatTypes; Polymake.QuadraticExtension{Polymake.Rational}]
             @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_m
             @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_m
             @test T(2)*W == W*T(2) == T(2) .* W == W .* T(2) == 2jl_w
             @test T(2)*U == U*T(2) == T(2) .* U == U .* T(2) == 2jl_u
+            @test T(2)*Y == Y*T(2) == T(2) .* Y == Y .* T(2) == 2jl_y
 
             @test X + T.(jl_m) == T.(jl_m) + X == X .+ T.(jl_m) == T.(jl_m) .+ X == 2jl_m
 
@@ -386,6 +439,8 @@ using SparseArrays
             @test W + T.(4jl_w) == T.(4jl_w) + W == W .+ T.(4jl_w) == T.(4jl_w) .+ W == 5jl_w
 
             @test U + T.(4jl_u) == T.(4jl_u) + U == U .+ T.(4jl_u) == T.(4jl_u) .+ U == 5jl_u
+            
+            @test Y + T.(2 * jl_m) == T.(2 * jl_m) + Y == Y .+ T.(2 * jl_m) == T.(2 * jl_m) .+ Y == (1 + sr2) * jl_y
         end
     end
 

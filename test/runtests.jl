@@ -12,6 +12,7 @@ struct MyInt x::Int end # needed in test/convert.jl
 @testset "Polymake" begin
     include("integers.jl")
     include("rationals.jl")
+    include("quadraticextension.jl")
     include("vectors.jl")
     include("sparsevector.jl")
     include("matrices.jl")

@@ -3,7 +3,7 @@ using SparseArrays
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
-    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64]
+    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
         @test Polymake.SparseVector{T} <: AbstractSparseVector
         @test Polymake.spzeros(T, 3) isa AbstractSparseVector
         @test Polymake.spzeros(T, 3) isa Polymake.SparseVector
@@ -29,7 +29,7 @@ using SparseArrays
             @test Polymake.SparseVector(jl_s//1) isa Polymake.SparseVector{Polymake.Rational}
             @test Polymake.SparseVector(jl_s/1) isa Polymake.SparseVector{Float64}
 
-            for ElType in [Polymake.Integer, Polymake.Rational, Float64]
+            for ElType in [Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
                 for v in [jl_v, jl_v//T(1), jl_v/T(1)]
                     @test Polymake.SparseVector{ElType}(v) isa Polymake.SparseVector{ElType}
                     @test convert(Polymake.SparseVector{ElType}, v) isa Polymake.SparseVector{ElType}
@@ -88,7 +88,7 @@ using SparseArrays
     end
 
     @testset "Low-level operations" begin
-        for (E,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double")]
+        for (E,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational> ")]
             @testset "Polymake.SparseVector{$E}" begin
                 V = Polymake.SparseVector{E}(jl_v)
 
@@ -122,6 +122,7 @@ using SparseArrays
                 V = Polymake.SparseVector{Polymake.Integer}(3)
                 W = Polymake.SparseVector{Polymake.Rational}(3)
                 U = Polymake.SparseVector{Float64}(3)
+                Y = Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}(3)
 
                 #TODO T.(jl_s)
                 @test (V .= T.(jl_v)) isa Polymake.SparseVector{Polymake.Integer}
@@ -132,8 +133,11 @@ using SparseArrays
 
                 @test (U .= T.(jl_v)) isa Polymake.SparseVector{Float64}
                 @test (U .= T.(jl_v).//1) isa Polymake.SparseVector{Float64}
+                
+                @test (Y .= T.(jl_v)) isa Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}
+                @test (Y .= T.(jl_v).//1) isa Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}
 
-                @test U == V == W
+                @test U == V == W == Y
 
                 # TODO:
                 # @test (V .== jl_v) isa BitArray
@@ -166,6 +170,9 @@ using SparseArrays
         W = Polymake.SparseVector{Polymake.Rational}(jl_w)
         jl_u = jl_v/4
         U = Polymake.SparseVector{Float64}(jl_u)
+        sr2 = Polymake.QuadraticExtension{Polymake.Rational}(0, 1, 2)
+        jl_y = sr2 * jl_v
+        Y = Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}(jl_y)
 
         @test -X isa Polymake.SparseVectorAllocated{Polymake.to_cxx_type(Int64)}
         @test -X == -jl_v
@@ -178,6 +185,9 @@ using SparseArrays
 
         @test -U isa Polymake.SparseVectorAllocated{Float64}
         @test -U == -jl_u
+        
+        @test -Y isa Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}
+        @test -Y == -jl_y
 
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
@@ -186,7 +196,7 @@ using SparseArrays
         @test Int32(2)X isa Polymake.SparseVector{Polymake.to_cxx_type(Int64)}
 
         for T in int_scalar_types
-            for (vec, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64)]
+            for (vec, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
                 op = *
                 @test op(T(2), vec) isa Polymake.SparseVector{ElType}
                 @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
@@ -217,10 +227,16 @@ using SparseArrays
                 @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
                 @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
             end
+            let (op, ElType) = (//, Polymake.QuadraticExtension{Polymake.Rational})
+                vec = Y
+                @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, T(2), vec) isa Polymake.SparseVector{ElType}
+                @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
+            end
         end
 
         for T in rational_scalar_types
-            for (vec, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64)]
+            for (vec, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
 
                 op = *
                 @test op(T(2), vec) isa Polymake.SparseVector{ElType}
@@ -275,11 +291,12 @@ using SparseArrays
             end
         end
 
-        for T in [int_scalar_types; rational_scalar_types; FloatTypes]
+        for T in [int_scalar_types; rational_scalar_types; FloatTypes; Polymake.QuadraticExtension{Polymake.Rational}]
             @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_v
             @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_v
             @test T(2)*W == W*T(2) == T(2) .* W == W .* T(2) == 2jl_w
             @test T(2)*U == U*T(2) == T(2) .* U == U .* T(2) == 2jl_u
+            @test T(2)*Y == Y*T(2) == T(2) .* Y == Y .* T(2) == 2jl_y
 
             @test X + T.(jl_v) == T.(jl_v) + X == X .+ T.(jl_v) == T.(jl_v) .+ X == 2jl_v
 
@@ -288,6 +305,8 @@ using SparseArrays
             @test W + T.(4jl_w) == T.(4jl_w) + W == W .+ T.(4jl_w) == T.(4jl_w) .+ W == 5jl_w
 
             @test U + T.(4jl_u) == T.(4jl_u) + U == U .+ T.(4jl_u) == T.(4jl_u) .+ U == 5jl_u
+            
+            @test Y + T.(2 * jl_v) == T.(2 * jl_v) + Y == Y .+ T.(2 * jl_v) == T.(2 * jl_v) .+ Y == (1 + sr2) * jl_y
         end
     end
 

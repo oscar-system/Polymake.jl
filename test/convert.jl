@@ -21,7 +21,7 @@
 
     @testset "convert_to_pm_type(PolymakeType)" begin
         for T in [Polymake.Integer, Polymake.Rational, Polymake.Array, Polymake.IncidenceMatrix,
-            Polymake.Matrix, Polymake.Set{Int64}, Polymake.SparseMatrix, Polymake.TropicalNumber, Polymake.Vector]
+            Polymake.Matrix, Polymake.Set{Int64}, Polymake.SparseMatrix, Polymake.TropicalNumber, Polymake.Vector, Polymake.QuadraticExtension{Polymake.Rational}]
             @test T == Polymake.convert_to_pm_type(T)
         end
     end

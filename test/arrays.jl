@@ -3,6 +3,7 @@
         (Int64, 2),
         (Polymake.Integer, Polymake.Integer(2)),
         (Polymake.Rational, Polymake.Rational(2 //3)),
+        (Polymake.QuadraticExtension{Polymake.Rational}, Polymake.QuadraticExtension{Polymake.Rational}(1, 2, 3)),
         (String, "a"),
         (Polymake.Set{Polymake.to_cxx_type(Int)}, Polymake.Set{Int64}([1,2,1])),
         (Polymake.Matrix{Polymake.Integer}, Polymake.Matrix{Polymake.Integer}([1 0; 2 1])),
