@@ -53,7 +53,7 @@ function recursive_replace(str::AbstractString, replacement_pairs)
     return str
 end
 
-replace_braces(str) = recursive_replace(str, ["{"=>"<", "}"=>">"])
+replace_braces(str) = recursive_replace(str, ["{"=>"<", "}"=>">", "Polymake." => ""])
 
 function extract_args_kwargs(expr::Expr)
     kwarg_idx = findfirst(a -> a isa Expr && a.head == :kw, expr.args)
