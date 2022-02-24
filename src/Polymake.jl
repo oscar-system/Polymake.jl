@@ -56,7 +56,13 @@ end
 # Load Cxx stuff and init
 ##########################
 
-Sys.iswindows() && error("System is not supported!")
+Sys.iswindows() &&
+   error("""Windows is not supported, please try the Windows Subsystem for Linux.
+            For details please check: https://oscar.computeralgebra.de/install/""")
+
+libpolymake_julia_jll.is_available() ||
+   error("""This platform or julia version is currently not supported by Polymake:
+            $(Base.BinaryPlatforms.host_triplet())""")
 
 libcxxwrap_build_version() = VersionNumber(unsafe_string(ccall((:jlpolymake_libcxxwrap_build_version,libpolymake_julia), Cstring, ())))
 
