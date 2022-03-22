@@ -26,6 +26,7 @@ jobs:
         julia-version:
           - '~1.6.0-0'
           - '~1.7.0-0'
+          - '~1.8.0-0'
           - 'nightly'
         os: ['ubuntu-latest']
       fail-fast: false
@@ -72,6 +73,7 @@ jobs:
         julia-version:
           - '~1.6.0-0'
           - '~1.7.0-0'
+          - '~1.8.0-0'
           - 'nightly'
         os: ['ubuntu-latest', 'macOS-latest']
         # empty entry for defaults
