@@ -27,7 +27,7 @@
                 Polymake.Vector{T<:Union{Int32,Int64} ? Polymake.to_cxx_type(Int64) : Polymake.Integer}
 
             for ElType in [Polymake.Integer, Polymake.Rational, Float64]
-                for v in [jl_v, jl_v//T(1), jl_v/T(1)]
+                for v in (jl_v, jl_v//T(1), jl_v/T(1))
                     @test Polymake.Vector{ElType}(v) isa Polymake.Vector{ElType}
                     @test convert(Polymake.Vector{ElType}, v) isa Polymake.Vector{ElType}
 
@@ -37,7 +37,7 @@
                 end
             end
 
-            for v in [jl_v, jl_v//T(1), jl_v/T(1)]
+            for v in (jl_v, jl_v//T(1), jl_v/T(1))
                 V = Polymake.Vector(v)
                 @test Polymake.convert(Polymake.PolymakeType, V) === V
                 @test float.(V) isa Polymake.Vector{Float64}
@@ -269,7 +269,7 @@
         @test Int32(2)X isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
 
         for T in int_scalar_types
-            for (vec, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
+            for (vec, ElType) in ((V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
                 op = *
                 @test op(T(2), vec)                 isa Polymake.Vector{ElType}
                 @test op(vec, T(2))                 isa Polymake.Vector{ElType}
@@ -287,7 +287,7 @@
             end
 
             let (op, ElType) = (//, Polymake.Rational)
-                for vec in [V, W]
+                for vec in (V, W)
                     @test op(vec, T(2))             isa Polymake.Vector{ElType}
                     @test broadcast(op, T(2), vec)  isa Polymake.Vector{ElType}
                     @test broadcast(op, vec, T(2))  isa Polymake.Vector{ElType}
@@ -308,7 +308,7 @@
         end
 
         for T in rational_scalar_types
-            for (vec, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
+            for (vec, ElType) in ((V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
                 op = *
                 @test op(T(2), vec)                 isa Polymake.Vector{ElType}
                 @test op(vec, T(2))                 isa Polymake.Vector{ElType}

@@ -27,7 +27,7 @@
                 Polymake.Matrix{T<:Union{Int32,Int64} ? Polymake.to_cxx_type(Int64) : Polymake.Integer}
 
             for ElType in [Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
-                for m in [jl_m, jl_m//T(1), jl_m/T(1)]
+                for m in (jl_m, jl_m//T(1), jl_m/T(1))
                     @test Polymake.Matrix{ElType}(m) isa Polymake.Matrix{ElType}
                     @test convert(Polymake.Matrix{ElType}, m) isa Polymake.Matrix{ElType}
 
@@ -37,7 +37,7 @@
                 end
             end
 
-            for m in [jl_m, jl_m//T(1), jl_m/T(1)]
+            for m in (jl_m, jl_m//T(1), jl_m/T(1))
                 M = Polymake.Matrix(m)
                 @test Polymake.convert(Polymake.PolymakeType, M) === M
                 @test float.(M) isa Polymake.Matrix{Float64}
@@ -290,7 +290,7 @@
         @test Int32(2)X isa Polymake.Matrix{Polymake.to_cxx_type(Int64)}
 
         for T in int_scalar_types
-            for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
+            for (mat, ElType) in ((V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
                 op = *
                 @test op(T(2), mat) isa Polymake.Matrix{ElType}
                 @test op(mat, T(2)) isa Polymake.Matrix{ElType}
@@ -308,7 +308,7 @@
             end
 
             let (op, ElType) = (//, Polymake.Rational)
-                for mat in [V, W]
+                for mat in (V, W)
 
                     @test op(mat, T(2)) isa Polymake.Matrix{ElType}
                     @test broadcast(op, T(2), mat) isa Polymake.Matrix{ElType}
@@ -331,7 +331,7 @@
         end
 
         for T in rational_scalar_types
-            for (mat, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
+            for (mat, ElType) in ((V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
 
                 op = *
                 @test op(T(2), mat) isa Polymake.Matrix{ElType}
