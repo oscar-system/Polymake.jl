@@ -104,6 +104,7 @@ convert_to_pm_type(::Type{<:Set{<:Base.Integer}}) = Set{Int64}
 convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
 
 for (pmT, jlT) in [(Integer, Base.Integer),
+                   (Int64, Union{Int32,Int64}),
                    (Rational, Union{Base.Rational, Rational}),
                    (QuadraticExtension{Polymake.Rational}, QuadraticExtension{Polymake.Rational})]
     @eval begin
