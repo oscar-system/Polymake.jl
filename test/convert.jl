@@ -1,6 +1,6 @@
 @testset "converting" begin
-    @test Polymake.convert_to_pm_type(Base.Vector{Base.Int}) == Polymake.Vector{Polymake.Int64}
-    @test Polymake.convert_to_pm_type(Base.Matrix{Base.Int}) == Polymake.Matrix{Polymake.Int64}
+    @test Polymake.convert_to_pm_type(Base.Vector{Base.Int}) == Polymake.Vector{Polymake.to_cxx_type(Int64)}
+    @test Polymake.convert_to_pm_type(Base.Matrix{Base.Int}) == Polymake.Matrix{Polymake.to_cxx_type(Int64)}
     @test Polymake.convert_to_pm_type(Base.Vector{BigInt}) == Polymake.Vector{Polymake.Integer}
     @test Polymake.convert_to_pm_type(Base.Matrix{BigInt}) == Polymake.Matrix{Polymake.Integer}
     @test Polymake.convert_to_pm_type(Base.Matrix{Base.Rational{BigInt}}) == Polymake.Matrix{Polymake.Rational}
