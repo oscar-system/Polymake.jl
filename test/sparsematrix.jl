@@ -27,7 +27,7 @@ using SparseArrays
             @test Polymake.SparseMatrix(jl_s/1) isa Polymake.SparseMatrix{Float64}
 
             for ElType in [Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
-                for m in [jl_m, jl_m//T(1), jl_m/T(1)]
+                for m in (jl_m, jl_m//T(1), jl_m/T(1))
                     @test Polymake.SparseMatrix{ElType}(m) isa Polymake.SparseMatrix{ElType}
                     @test convert(Polymake.SparseMatrix{ElType}, m) isa Polymake.SparseMatrix{ElType}
 
@@ -35,7 +35,7 @@ using SparseArrays
                     @test convert(Base.Matrix{T}, M) isa Base.Matrix{T}
                     @test jl_m == convert(Base.Matrix{T}, M)
                 end
-                for s in [jl_s, jl_s//T(1), jl_s/T(1)] #TODO
+                for s in (jl_s, jl_s//T(1), jl_s/T(1)) #TODO
                     @test Polymake.SparseMatrix{ElType}(s) isa Polymake.SparseMatrix{ElType}
                     @test convert(Polymake.SparseMatrix{ElType}, s) isa Polymake.SparseMatrix{ElType}
 
@@ -45,7 +45,7 @@ using SparseArrays
                 end
             end
 
-            for m in [jl_m, jl_m//T(1), jl_m/T(1), jl_s, jl_s//T(1), jl_s/T(1)]
+            for m in (jl_m, jl_m//T(1), jl_m/T(1), jl_s, jl_s//T(1), jl_s/T(1))
                 M = Polymake.SparseMatrix(m)
                 @test Polymake.convert(Polymake.PolymakeType, M) === M
                 @test float.(M) isa Polymake.SparseMatrix{Float64}
@@ -330,7 +330,7 @@ using SparseArrays
         @test Int32(2)X isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int)}
 
         for T in int_scalar_types
-            for (mat, ElType) in [(V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
+            for (mat, ElType) in ((V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
                 op = *
                 @test op(T(2), mat) isa Polymake.SparseMatrix{ElType}
                 @test op(mat, T(2)) isa Polymake.SparseMatrix{ElType}
@@ -348,7 +348,7 @@ using SparseArrays
             end
 
             let (op, ElType) = (//, Polymake.Rational)
-                for mat in [V, W]
+                for mat in (V, W)
 
                     @test op(mat, T(2)) isa Polymake.SparseMatrix{ElType}
                     @test broadcast(op, T(2), mat) isa Polymake.SparseMatrix{ElType}
@@ -370,7 +370,7 @@ using SparseArrays
         end
 
         for T in rational_scalar_types
-            for (mat, ElType) in [(V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational})]
+            for (mat, ElType) in ((V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
 
                 op = *
                 @test op(T(2), mat) isa Polymake.SparseMatrix{ElType}

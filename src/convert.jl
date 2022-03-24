@@ -104,11 +104,12 @@ convert_to_pm_type(::Type{<:Set{<:Base.Integer}}) = Set{Int64}
 convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
 
 for (pmT, jlT) in [(Integer, Base.Integer),
+                   (Int64, Union{Int32,Int64,CxxWrap.CxxLong}),
                    (Rational, Union{Base.Rational, Rational}),
                    (QuadraticExtension{Polymake.Rational}, QuadraticExtension{Polymake.Rational})]
     @eval begin
-        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{$pmT}
-        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{$pmT}
+        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{to_cxx_type($pmT)}
+        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{to_cxx_type($pmT)}
     end
 end
 
