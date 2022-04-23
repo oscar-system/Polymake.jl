@@ -116,7 +116,7 @@ function __init__()
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
 
     try
-        show_banner = isinteractive() &&
+        show_banner = isinteractive() && Base.JLOptions().banner != 0 &&
                        !any(x->x.name in ["Oscar"], keys(Base.package_locks))
 
         initialize_polymake(show_banner)
