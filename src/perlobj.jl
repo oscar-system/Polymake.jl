@@ -5,8 +5,12 @@ function bigobject(fname::String; kwargsdata...)
 end
 
 function bigobject(fname::String, other::BigObject; kwargsdata...)
-    obj = BigObject(BigObjectType(fname), other; kwargsdata...)
-    return obj
+    type = BigObjectType(fname)
+    # use converting copy but make sure types are related
+    if _isa(other, type) || _isa(BigObject(type), bigobject_type(other))
+        return BigObject(type, other; kwargsdata...)
+    end
+    throw(ArgumentError("cannot copy-convert unrelated types: $(Polymake.type_name(other)) to $fname"))
 end
 
 function bigobject(fname::String, name::String; kwargsdata...)
