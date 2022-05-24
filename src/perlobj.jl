@@ -10,7 +10,7 @@ function bigobject(fname::String, other::BigObject; kwargsdata...)
     if _isa(other, type) || _isa(BigObject(type), bigobject_type(other))
         return BigObject(type, other; kwargsdata...)
     end
-    throw(ArgumentError("cannot copy-convert unrelated types: $(Polymake.type_name(other)) to $fname"))
+    throw(ArgumentError("cannot copy-convert unrelated types: $(Polymake.type_name(other)) to $(Polymake.type_name(type))"))
 end
 
 function bigobject(fname::String, name::String; kwargsdata...)
