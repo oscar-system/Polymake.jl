@@ -1,14 +1,12 @@
 module Polydb
 
-import Polymake: call_function
-
 using Polymake
 
 # julia itself also has a cert.pem but this one should be more recent
 # and provides a variable for the path
 using MozillaCACerts_jll
 
-using Mongoc
+import Mongoc
 
 import Mongoc: find
 
