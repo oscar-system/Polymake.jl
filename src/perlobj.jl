@@ -64,13 +64,31 @@ function give(obj::BigObject, prop::String)
     return convert_from_property_value(return_obj)
 end
 
+function give(obj::BigObject, prop::Symbol)
+    return_obj = try
+        disable_sigint() do
+            internal_give(obj, prop)
+        end
+    catch ex
+        ex isa ErrorException && throw(PolymakeError(ex.msg))
+        if (ex isa InterruptException)
+            @warn """Interrupting polymake is not safe.
+            SIGINT is disabled while waiting for polymake to finish its computations."""
+        end
+        rethrow(ex)
+    end
+    return convert_from_property_value(return_obj)
+end
+
 function Base.getproperty(obj::BigObject, prop::Symbol)
     if prop == :cpp_object
         return getfield(obj, :cpp_object)
     else
-        return give(obj, string(prop))
+        return give(obj, prop)
     end
 end
+
+Base.getproperty(obj::BigObject, prop::String) = give(obj, prop)
 
 function complete_property(obj::BigObject, prefix::String)
    call_function(:common, :complete_property, obj, prefix)
