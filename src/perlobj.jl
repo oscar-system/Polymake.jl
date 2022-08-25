@@ -95,12 +95,11 @@ function complete_property(obj::BigObject, prefix::String)
 end
 
 function convert_from_property_value(obj::PropertyValue)
-    type_name = typeinfo_string(obj,true)
-    T = Symbol(replace(type_name," "=>""))
+    T = typeinfo_string(obj,true)
     if haskey(TypeConversionFunctions, T)
         f = TypeConversionFunctions[T]
         return f(obj)
-    elseif startswith(type_name,"Visual::")
+    elseif startswith(string(T),"Visual::")
         return Visual(obj)
     else
         return obj
