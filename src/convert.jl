@@ -72,6 +72,7 @@ convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
 convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
 convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
+convert_to_pm_type(::Type{<:JuliaFieldElement}) = JuliaFieldElement
 convert_to_pm_type(::Type{<:Union{AbstractVector, Vector}}) = Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, Matrix}}) = Matrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = SparseMatrix
@@ -106,7 +107,8 @@ convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
 for (pmT, jlT) in [(Integer, Base.Integer),
                    (Int64, Union{Int32,Int64,CxxWrap.CxxLong}),
                    (Rational, Union{Base.Rational, Rational}),
-                   (QuadraticExtension{Polymake.Rational}, QuadraticExtension{Polymake.Rational})]
+                   (QuadraticExtension{Polymake.Rational}, QuadraticExtension{Polymake.Rational}),
+                   (JuliaFieldElement, JuliaFieldElement)]
     @eval begin
         convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{to_cxx_type($pmT)}
         convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{to_cxx_type($pmT)}
