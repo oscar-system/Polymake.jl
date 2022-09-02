@@ -118,7 +118,7 @@ end
       @cfunction(Base.isone, Bool, (Ref{ArgT},))
    end
 
-_jfe_sign_int(e::T) where T = Base.cmp(e,0)
+_jfe_sign_int(e::T) where T = Base.cmp(e,0)::Int
 @generated _jfe_gen_sign_int(::Type{ArgT}) where ArgT =
    quote
       @cfunction(_jfe_sign_int, Clong, (Ref{ArgT},))
@@ -193,7 +193,7 @@ end
 #end
 
 function JuliaFieldElement(e)
-   id = register_julia_element(parent(e), typeof(e))
+   id = register_julia_element(e, parent(e), typeof(e))
    #@info "copying $e from $(objectid(e)) in construction"
    return GC.@preserve e begin
       jfe = JuliaFieldElement(pointer_from_objref(e), id)
@@ -201,13 +201,23 @@ function JuliaFieldElement(e)
    return jfe
 end
 
-function register_julia_element(p, t::Type)
+function register_julia_element(e, p, t::Type)
    if haskey(_jfe_dispatch_helper, p)
       return _jfe_dispatch_helper[p][1]
    end
-   global field_count+=1
+   newid = field_count+1
+
+   if isimmutable(e)
+      @error "JuliaFieldElement: immutable julia types not supported"
+   end
+
+   for type in (Int64, Base.Rational{BigInt})
+      hasmethod(p, (type,)) ||
+         @error "JuliaFieldElement: no constructor ($p)($type)"
+   end
+
    dispatch = julia_field_dispatch_helper()
-   dispatch.index = field_count
+   dispatch.index = newid
    dispatch.init = _jfe_gen_init(t)
    dispatch.init_from_mpz = _jfe_gen_init_frac(t)
    dispatch.copy = _jfe_gen_copy(t)
@@ -238,11 +248,11 @@ function register_julia_element(p, t::Type)
    # no inf value for nemo types ...
    #dispatch.is_inf  = _jfe_gen_is_inf(t)
 
-   _register_julia_field(pointer_from_objref(dispatch), field_count)
-   _jfe_dispatch_helper[p] = (field_count, dispatch)
-   _jfe_parent_by_id[field_count] = p
+   _register_julia_field(pointer_from_objref(dispatch), newid)
+   _jfe_dispatch_helper[p] = (newid, dispatch)
+   _jfe_parent_by_id[newid] = p
 
+   global field_count=newid
    return field_count
-
 end
 
