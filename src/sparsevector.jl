@@ -42,7 +42,7 @@ Base.@propagate_inbounds function Base.setindex!(V::SparseVector{T}, val, n::Bas
     return val
 end
 
-function findnz(vec::SparseVector{T}) where T
+function SparseArrays.findnz(vec::SparseVector{T}) where T
     I = SparseArrays.nonzeroinds(vec)
     V = to_jl_type(T)[vec[idx] for idx in I]
     return (I, V)
@@ -115,4 +115,22 @@ function Base.show(io::IOContext, ::MIME"text/plain", V::SparseVectorBool)
         print(io, ", …")
     end
     print(io, "]")
+end
+
+function Base.:*(a::Number, sv::SparseVector{T}) where T<:VecOrMat_eltypes
+    res = spzeros(convert_to_pm_type(promote_type(T, typeof(a))), length(sv))
+    for idx in SparseArrays.nonzeroinds(sv)
+        res[idx] = a * sv[idx]
+    end
+    return res
+end
+
+Base.:*(sv::SparseVector, a::Number) = a * sv
+
+function Base.:/(sv::SparseVector{Float64}, a::Number)
+    res = spzeros(Float64, length(sv))
+    for idx in SparseArrays.nonzeroinds(sv)
+        res[idx] = sv[idx] / a
+    end
+    return res
 end
