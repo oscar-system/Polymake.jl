@@ -118,7 +118,7 @@ function Base.show(io::IOContext, ::MIME"text/plain", V::SparseVectorBool)
 end
 
 function Base.:*(a::Number, sv::SparseVector{T}) where T<:VecOrMat_eltypes
-    res = spzeros(convert_to_pm_type(promote_type(T, typeof(a))), length(sv))
+    res = spzeros(promote_type(T, convert_to_pm_type(typeof(a))), length(sv))
     for idx in SparseArrays.nonzeroinds(sv)
         res[idx] = a * sv[idx]
     end
