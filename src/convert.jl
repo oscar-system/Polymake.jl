@@ -188,3 +188,4 @@ macro convert_to(args...)
 end
 
 Base.promote_rule(::Type{Float32}, ::Type{<:CxxWrap.CxxLong}) = Float64
+Base.promote_rule(::Type{Float64}, ::Type{<:CxxWrap.CxxLong}) = Float64
