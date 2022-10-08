@@ -53,9 +53,10 @@ SparseArrays.nonzeroinds(vec::SparseVector) = Int[to_one_based_indexing(i) for i
 SparseArrays.nonzeros(vec::SparseVector{T}) where T = findnz(vec)[2]
 
 function Base.:*(s::Number, vec::SparseVector{T}) where T
-    P = promote_to_pm_type(SparseVector, promote_type(T, typeof(s)))
-    if P == T
-        return convert(T, s) * vec
+    JT = to_jl_type(T)
+    P = promote_to_pm_type(SparseVector, promote_type(JT, typeof(s)))
+    if P == JT
+        return convert(JT, s) * vec
     else
         return convert(P, s) * SparseVector{P}(vec)
     end
@@ -64,9 +65,10 @@ end
 Base.:*(vec::SparseVector, s::Number) = s * vec
 
 function Base.:/(vec::SparseVector{T}, s::Number) where T
-    P = promote_to_pm_type(SparseVector, promote_type(T, typeof(s)))
-    if P == T
-        return vec / convert(T, s)
+    JT = to_jl_type(T)
+    P = promote_to_pm_type(SparseVector, promote_type(JT, typeof(s)))
+    if P == JT
+        return vec / convert(JT, s)
     else
         return SparseVector{P}(vec) / convert(P, s)
     end
