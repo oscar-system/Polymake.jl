@@ -95,7 +95,7 @@ function complete_property(obj::BigObject, prefix::String)
 end
 
 function convert_from_property_value(obj::PropertyValue)
-    T = typeinfo_string(obj,true)
+    T = typeinfo_symbol(obj,true)
     if haskey(TypeConversionFunctions, T)
         f = TypeConversionFunctions[T]
         return f(obj)
