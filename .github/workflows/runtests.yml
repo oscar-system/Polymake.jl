@@ -8,6 +8,7 @@ on:
    pull_request:
      branches:
        - master
+   workflow_dispatch:
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
@@ -79,10 +80,10 @@ jobs:
         # empty entry for defaults
         xcode: [ '' ]
         cxxwrap: [ '' ]
-        # add a few extra tests: ubuntu lts versions
+        # add a few extra tests
         include:
-          - os: ubuntu-18.04
-            julia-version: '~1.7.0-0'
+          - os: ubuntu-22.04
+            julia-version: '~1.8.0-0'
 
       fail-fast: false
 
