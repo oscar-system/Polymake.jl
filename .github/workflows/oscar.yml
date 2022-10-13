@@ -4,6 +4,7 @@ on:
    pull_request:
      branches:
        - master
+   workflow_dispatch:
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
@@ -18,11 +19,11 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     env:
-      PR_NUMBER: ${{github.event.number}}
+      PR_NUMBER: ${{ github.event.number || 0 }}
       JULIA_PKG_SERVER: ""
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-    - uses: actions/checkout@v2.1.0
+    - uses: actions/checkout@v3
     - name: "Set up Julia"
       uses: julia-actions/setup-julia@v1
       with:
@@ -55,7 +56,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
     env:
-      PR_NUMBER: ${{github.event.number}}
+      PR_NUMBER: ${{ github.event.number || 0 }}
       JULIA_PKG_SERVER: ""
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
@@ -63,7 +64,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
