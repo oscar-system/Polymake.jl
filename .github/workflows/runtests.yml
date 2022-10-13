@@ -8,6 +8,7 @@ on:
    pull_request:
      branches:
        - master
+   workflow_dispatch:
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
@@ -47,7 +48,7 @@ jobs:
       JULIA_PKG_SERVER: ""
       POLYDB_TEST_URI: "mongodb://admin:admin@localhost:27017/?authSource=admin"
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
@@ -79,15 +80,15 @@ jobs:
         # empty entry for defaults
         xcode: [ '' ]
         cxxwrap: [ '' ]
-        # add a few extra tests: ubuntu lts versions
+        # add a few extra tests
         include:
-          - os: ubuntu-18.04
-            julia-version: '~1.7.0-0'
+          - os: ubuntu-22.04
+            julia-version: '~1.8.0-0'
 
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
