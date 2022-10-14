@@ -123,4 +123,16 @@
             @test triang isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int64)}}
         end
     end
+
+    @testset "Polymake.Array{Polymake.StdPair{Polymake.Array{Int64}, Polymake.Array{Int64}}}" begin
+        c = Polymake.polytope.cube(2, 1, 0)
+        aut = Polymake.graph.automorphisms(c.VERTICES_IN_FACETS)
+        @test length(aut) == 2
+        @test aut isa Polymake.Array{Polymake.StdPair{Polymake.Array{Polymake.to_cxx_type(Int64)}, Polymake.Array{Polymake.to_cxx_type(Int64)}}}
+        for p in aut
+            @test p isa Polymake.StdPair{Polymake.Array{Polymake.to_cxx_type(Int64)}, Polymake.Array{Polymake.to_cxx_type(Int64)}}
+            @test first(p) isa Polymake.Array{Polymake.to_cxx_type(Int64)}
+            @test last(p) isa Polymake.Array{Polymake.to_cxx_type(Int64)}
+        end
+    end
 end
