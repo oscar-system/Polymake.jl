@@ -48,7 +48,7 @@ end
 
 Base.setproperty!(obj::BigObject, prop::String, val) = setproperty!(obj, Symbol(prop), val)
 
-function give(obj::BigObject, prop::String)
+function give(obj::BigObject, prop::Union{Symbol,String})
     return_obj = try
         disable_sigint() do
             internal_give(obj, prop)
@@ -68,21 +68,22 @@ function Base.getproperty(obj::BigObject, prop::Symbol)
     if prop == :cpp_object
         return getfield(obj, :cpp_object)
     else
-        return give(obj, string(prop))
+        return give(obj, prop)
     end
 end
+
+Base.getproperty(obj::BigObject, prop::String) = give(obj, prop)
 
 function complete_property(obj::BigObject, prefix::String)
    call_function(:common, :complete_property, obj, prefix)
 end
 
 function convert_from_property_value(obj::PropertyValue)
-    type_name = typeinfo_string(obj,true)
-    T = Symbol(replace(type_name," "=>""))
+    T = typeinfo_symbol(obj,true)
     if haskey(TypeConversionFunctions, T)
         f = TypeConversionFunctions[T]
         return f(obj)
-    elseif startswith(type_name,"Visual::")
+    elseif startswith(string(T),"Visual::")
         return Visual(obj)
     else
         return obj
