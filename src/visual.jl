@@ -115,7 +115,7 @@ function Base.show(io::IO,::MIME"image/svg+xml",v::Visual)
     print(io,_get_visual_string_svg(v))
 end
 
-display_svg(obj::BigObject) = display_svg(visual(obj))
+display_svg(obj::BigObject) = display_svg(visual(Visual, obj))
 display_svg(v::Visual) = display(MIME"image/svg+xml"(), v)
 
 """
@@ -130,4 +130,12 @@ c = polytope.cube(3)
 visual(c)
 ```
 """
-visual(obj::BigObject; kwargs...) = call_method(obj, :VISUAL; kwargs...)
+function visual(obj::BigObject; kwargs...)
+   # TODO change to call_method(Nothing,...)
+   # once the void-call exceptions are fixed in polymake_jll
+   vis = call_method(obj, :VISUAL; kwargs...)
+   call_function(:common, :safe_to_string, vis.obj)
+   return nothing
+end
+
+visual(::Type{Visual}, obj::BigObject; kwargs...) = call_method(obj, :VISUAL; kwargs...)
