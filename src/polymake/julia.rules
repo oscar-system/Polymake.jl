@@ -79,6 +79,11 @@ function deserialize_json_string($) {
    return Core::Serializer::deserialize($hash);
 }
 
+function safe_to_string($) {
+   my ($var) = @_;
+   return "$var";
+}
+
 package Polymake::User;
 
 function get_shell_scalar($) {

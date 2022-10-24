@@ -72,8 +72,8 @@ end
 function Base.show(io::IO, ::MIME"text/plain", pv::PropertyValue)
     type_info = typeinfo_string(pv, true)
     println(io, "PropertyValue wrapping $type_info")
-    if  type_info != "undefined"
-        print(io, to_string(pv))
+    if  type_info != "undefined" && !startswith(type_info,"Visual::")
+        print(io, call_function(:common, :safe_to_string, pv))
     end
 end
 
