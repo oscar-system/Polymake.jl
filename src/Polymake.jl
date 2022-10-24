@@ -130,6 +130,16 @@ function __init__()
     application("common")
     shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
 
+    # try using wslviewer to open threejs / svg / pdf properly on WSL
+    # Note: the binfmt_misc check might not detect all cases of wsl but we need exactly
+    # that feature enabled to be able to launch a windows process for the visualization
+    # alternative check might be: WSL2 occuring in /proc/sys/kernel/osrelease
+    if Sys.islinux() && isfile("/proc/sys/fs/binfmt_misc/WSLInterop")
+        shell_execute("script(\"$(joinpath(@__DIR__, "polymake", "wslviewer.pl"))\");")
+        shell_execute(raw"""application("common")->configured->{"webbrowser.rules"} > 0 or reconfigure("webbrowser.rules");""")
+        shell_execute(raw"""application("common")->configured->{"pdfviewer.rules"} > 0 or reconfigure("pdfviewer.rules");""")
+    end
+
     # work around issue with lp2poly and looking up perl modules from different applications
     application("polytope")
     Polymake.shell_execute("require LPparser;")
