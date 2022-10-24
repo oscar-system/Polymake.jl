@@ -76,6 +76,8 @@ function complete_property(obj::BigObject, prefix::String)
    call_function(:common, :complete_property, obj, prefix)
 end
 
+convert_from_property_value(::Nothing) = nothing
+
 function convert_from_property_value(obj::PropertyValue)
     type_name = typeinfo_string(obj,true)
     T = Symbol(replace(type_name," "=>""))
