@@ -12,22 +12,37 @@ and a raw `PropertyValue` is returned.
 """
 
 function call_function(::Type{PropertyValue}, app::Symbol, func::Symbol, args...;
-    template_parameters::Base.AbstractVector{<:AbstractString}=String[], kwargs...)
+    template_parameters::Base.AbstractVector{<:AbstractString}=String[],
+    calltype::Symbol=:scalar, kwargs...)
     fname = Meta.pm_name_qualified(app, func)
     cargs = Meta.polymake_arguments(args...; kwargs...)
     templ = CxxWrap.StdVector{CxxWrap.StdString}(template_parameters)
     return disable_sigint() do
-        internal_call_function(fname, templ, cargs)
+        if calltype == :void
+            internal_call_function_void(fname, templ, cargs)
+            return nothing
+        elseif calltype == :list
+            return internal_call_function_list(fname, templ, cargs)
+        else
+            return internal_call_function(fname, templ, cargs)
+        end
     end
 end
 
 function call_function(app::Symbol, func::Symbol, args...;
     template_parameters::Base.AbstractVector{<:AbstractString}=String[], kwargs...)
-
     return convert_from_property_value(
         call_function(PropertyValue, app, func, args...;
-        template_parameters=template_parameters, kwargs...)
+                      template_parameters=template_parameters, kwargs...)
         )
+end
+
+function call_function(::Type{Nothing}, app::Symbol, func::Symbol, args...;
+    template_parameters::Base.AbstractVector{<:AbstractString}=String[], kwargs...)
+
+    call_function(PropertyValue, app, func, args...;
+                  template_parameters=template_parameters, calltype=:void, kwargs...)
+    return nothing
 end
 
 """
@@ -39,19 +54,32 @@ If `PropertyValue` is specified as the first argument no unwrapping is performed
 and a raw `PropertyValue` is returned.
 """
 function call_method(::Type{PropertyValue}, obj::BigObject, func::Symbol, args...;
-    kwargs...)
+    calltype::Symbol=:scalar, kwargs...)
     fname = string(func)
     cargs = Meta.polymake_arguments(args...; kwargs...)
     return disable_sigint() do
-        internal_call_method(fname, obj, cargs)
+        if calltype == :void
+            internal_call_method_void(fname, obj, cargs)
+            return nothing
+        elseif calltype == :list
+            return internal_call_method_list(fname, obj, cargs)
+        else
+            return internal_call_method(fname, obj, cargs)
+        end
     end
 end
 
 function call_method(obj::BigObject, func::Symbol, args...; kwargs...)
     return convert_from_property_value(
         call_method(PropertyValue, obj::BigObject, func::Symbol, args...;
-        kwargs...)
+                    kwargs...)
         )
+end
+
+function call_method(::Type{Nothing}, obj::BigObject, func::Symbol, args...; kwargs...)
+    call_method(PropertyValue, obj::BigObject, func::Symbol, args...;
+                calltype=:void, kwargs...)
+    return nothing
 end
 
 """

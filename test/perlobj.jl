@@ -278,6 +278,6 @@
 
 
     @testset "toplevel visual" begin
-        @test visual(polytope.cube(3)) isa Polymake.Visual
+        @test visual(Polymake.Visual, polytope.cube(3)) isa Polymake.Visual
     end
 end
