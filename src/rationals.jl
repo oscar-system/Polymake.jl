@@ -7,7 +7,9 @@ function Rational(num::T, den::S) where {T<:Base.Integer, S<:Base.Integer}
     return Rational(Integer(convert(BigInt, num)), Integer(convert(BigInt, den)))
 end
 
-Rational(x::Base.Rational) = Rational(numerator(x), denominator(x))
+@inline function Rational(x::Base.Rational)
+    new_rational_from_baserational(pointer_from_objref(numerator(x)), pointer_from_objref(denominator(x)))
+end
 Rational(int::Base.Integer) = Rational(int, one(int))
 Rational(x::Number) = Rational(Base.Rational(x))
 
@@ -38,12 +40,6 @@ Base.promote_rule(::Type{<:Integer}, ::Type{<:Base.Rational}) = Rational
 @inline function Base.Rational{T}(rat::Rational) where T<:Base.Integer
     return Base.Rational(convert(T, numerator(rat)),convert(T, denominator(rat)))
 end
-
-# @inline function Base.Rational{BigInt}(rat::Rational)
-#     res = Base.Rational{BigInt}(0)
-#     new_baserational_from_rational(rat, pointer_from_objref(res.num), pointer_from_objref(res.den))
-#     return res
-# end
 
 @inline function Base.Rational{BigInt}(rat::Rational)
     res = Base.Rational{BigInt}(0)
