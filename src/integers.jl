@@ -29,19 +29,17 @@ Base.promote_rule(::Type{BigInt}, ::Type{<:Integer}) = Integer
 Base.promote_rule(::Type{<:Integer}, ::Type{<:AbstractFloat}) = Float64
 
 # BigInt constructor from Integer
-@inline function Base.BigInt(int::pmI) where pmI<:Integer
-    GC.@preserve int begin
-        i = deepcopy(unsafe_load(reinterpret(Ptr{BigInt},int.cpp_object)))
-    end
-    return i
-end
+@inline Base.BigInt(int::Integer) = GC.@preserve int unsafe_load(Ptr{BigInt}(int.cpp_object))
 # all convert(T, x) fallbacks to T(x)
 # big(::Integer) goes through convert(BigInt, x)
-for T in [:Int8,  :Int16,  :Int32,  :Int64,  :Int128,
+for T in [:Int8,  :Int16,  :Int32,  :Int128,
           :UInt8, :UInt16, :UInt32, :UInt64, :UInt128]
     @eval Base.$T(int::Integer) = $T(BigInt(int))
 end
 
+Base.Int64(int::Integer) = convert(Int64, new_int_from_integer(int))
+
+convert(::Type{Rational}, int::Integer) = new_rational_from_integer(int)
 convert(::Type{T}, int::Integer) where {T<:Number} = convert(T, BigInt(int))
 convert(::Type{T}, int::Integer) where {T<:AbstractFloat} = convert(T, Float64(int))
 Base.float(int::Integer) = Float64(int)

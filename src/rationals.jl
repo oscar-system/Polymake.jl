@@ -39,9 +39,22 @@ Base.promote_rule(::Type{<:Integer}, ::Type{<:Base.Rational}) = Rational
     return Base.Rational(convert(T, numerator(rat)),convert(T, denominator(rat)))
 end
 
+# @inline function Base.Rational{BigInt}(rat::Rational)
+#     res = Base.Rational{BigInt}(0)
+#     new_baserational_from_rational(rat, pointer_from_objref(res.num), pointer_from_objref(res.den))
+#     return res
+# end
+
+@inline function Base.Rational{BigInt}(rat::Rational)
+    res = Base.Rational{BigInt}(0)
+    new_baserational_from_rational(rat, pointer_from_objref(res.num), pointer_from_objref(res.den))
+    return res
+end
+
 Base.Rational(rat::Rational) = Base.Rational{BigInt}(rat)
 Base.big(rat::Rational) = Base.Rational{BigInt}(rat)
 
+convert(::Type{Integer}, rat::Rational) = new_integer_from_rational(rat)
 convert(::Type{T}, rat::Rational) where T<:Number = convert(T, big(rat))
 convert(::Type{T}, rat::Rational) where T<:AbstractFloat = convert(T, Float64(rat))
 Base.float(rat::Rational) = Float64(rat)
