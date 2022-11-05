@@ -7,7 +7,8 @@ function Rational(num::T, den::S) where {T<:Base.Integer, S<:Base.Integer}
     return Rational(Integer(convert(BigInt, num)), Integer(convert(BigInt, den)))
 end
 
-@inline function Rational(x::Base.Rational)
+Rational(x::Base.Rational) = Rational(numerator(x), denominator(x))
+@inline function Rational(x::Base.Rational{BigInt})
     new_rational_from_baserational(pointer_from_objref(numerator(x)), pointer_from_objref(denominator(x)))
 end
 Rational(int::Base.Integer) = Rational(int, one(int))
