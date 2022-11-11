@@ -54,10 +54,7 @@ to_jl_type(::Type{CxxWrap.StdString}) = String
 
 Base.convert(::Type{CxxWrap.CxxLong}, n::Integer) = Int64(n)
 
-function Base.convert(::Type{CxxWrap.CxxLong}, r::Rational)
-    isone(denominator(r)) || throw(InexactError(:convert, Int64, r))
-    return Int64(numerator(r))
-end
+Base.convert(::Type{CxxWrap.CxxLong}, r::Rational) = new_int_from_rational(r)
 
 ####################  Guessing the polymake type  ######################
 
