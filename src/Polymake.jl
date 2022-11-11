@@ -42,7 +42,7 @@ import TOPCOM_jll
 using libpolymake_julia_jll
 
 
-const jlpolymake_version_range = (v"0.8.2",  v"0.9")
+const jlpolymake_version_range = (v"0.8.3",  v"0.9")
 
 struct PolymakeError <: Exception
     msg
@@ -112,14 +112,13 @@ function __init__()
 
     # prepare environment variables
     ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
-    ENV["POLYMAKE_USER_DIR"] = polymake_user_dir
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
 
     try
         show_banner = isinteractive() && Base.JLOptions().banner != 0 &&
                        !any(x->x.name in ["Oscar"], keys(Base.package_locks))
 
-        initialize_polymake(show_banner)
+        initialize_polymake_with_dir("user=$(polymake_user_dir)",show_banner)
         if !show_banner
             shell_execute(raw"$Verbose::credits=\"0\";")
         end
