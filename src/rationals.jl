@@ -9,7 +9,7 @@ end
 
 Rational(x::Base.Rational) = Rational(numerator(x), denominator(x))
 @inline function Rational(x::Base.Rational{BigInt})
-    new_rational_from_baserational(pointer_from_objref(numerator(x)), pointer_from_objref(denominator(x)))
+    GC.@preserve x new_rational_from_baserational(pointer_from_objref(numerator(x)), pointer_from_objref(denominator(x)))
 end
 Rational(int::Base.Integer) = Rational(int, one(int))
 Rational(x::Number) = Rational(Base.Rational(x))
