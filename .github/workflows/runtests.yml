@@ -28,6 +28,7 @@ jobs:
           - '~1.6.0-0'
           - '~1.7.0-0'
           - '~1.8.0-0'
+          - '~1.9.0-0'
           - 'nightly'
         os: ['ubuntu-latest']
       fail-fast: false
@@ -69,6 +70,7 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: false
 
+  # this one is only for macos, ubuntu is run with mongodb in the other job
   test:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
@@ -78,18 +80,9 @@ jobs:
       matrix:
         julia-version:
           - '~1.6.0-0'
-          - '~1.7.0-0'
           - '~1.8.0-0'
           - 'nightly'
-        os: ['ubuntu-latest', 'macOS-latest']
-        # empty entry for defaults
-        xcode: [ '' ]
-        cxxwrap: [ '' ]
-        # add a few extra tests
-        include:
-          - os: ubuntu-22.04
-            julia-version: '~1.8.0-0'
-
+        os: ['macOS-latest']
       fail-fast: false
 
     steps:
@@ -98,12 +91,6 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
-      - name: "pin CxxWrap"
-        if: matrix.cxxwrap != ''
-        run: julia --project -e 'using Pkg; pkg"add CxxWrap@${{ matrix.cxxwrap }}"; pkg"pin CxxWrap";'
-      - name: "set xcode"
-        if: matrix.xcode != ''
-        run: echo "DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer" >> $GITHUB_ENV
       - uses: julia-actions/julia-runtest@latest
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v2
