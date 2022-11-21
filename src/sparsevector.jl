@@ -109,7 +109,7 @@ function SparseArrays.nonzeros(V::SparseVectorBool)
 end
 
 function _findnz(V::SparseVectorBool)
-    len = length(V.s)
+    len = nnz(V)
     i = Base.Vector{Int64}(undef, len)
     k = 1
     for e in V.s
@@ -121,9 +121,11 @@ end
 
 function SparseArrays.findnz(V::SparseVectorBool)
     i = _findnz(V)
-    len = length(i)
+    len = nnz(V)
     return (i, trues(len))
 end
+
+SparseArrays.nnz(V::SparseVectorBool) = length(V.s)
 
 Base.show(io::IO, tp::MIME"text/plain", V::SparseVectorBool) =
     Base.show(IOContext(io), tp, V)
