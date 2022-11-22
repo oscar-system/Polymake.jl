@@ -50,7 +50,7 @@ function IncidenceMatrix{Symmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
-function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}}) where T
+function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}})
     m = length(incidenceRows)
     n = maximum(maximum, incidenceRows)
     res = IncidenceMatrix(m, n)
