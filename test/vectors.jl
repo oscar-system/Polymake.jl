@@ -384,7 +384,7 @@
     end
     
     for S in [Polymake.Rational]
-        T = Polymake.Polynomial{S, CxxWrap.CxxLong}
+        T = Polymake.Polynomial{S, Int64}
         @test Polymake.Vector{T} <: AbstractVector
         @test Polymake.Vector{T}(undef, 3) isa AbstractVector
         @test Polymake.Vector{T}(undef, 3) isa Polymake.Vector
