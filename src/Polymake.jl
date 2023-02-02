@@ -135,14 +135,12 @@ function __init__()
     # that feature enabled to be able to launch a windows process for the visualization
     # alternative check might be: WSL2 occuring in /proc/sys/kernel/osrelease
     if Sys.islinux() && isfile("/proc/sys/fs/binfmt_misc/WSLInterop")
-        shell_execute("script(\"$(joinpath(@__DIR__, "polymake", "wslviewer.pl"))\");")
-        shell_execute(raw"""application("common")->configured->{"webbrowser.rules"} > 0 or reconfigure("webbrowser.rules");""")
-        shell_execute(raw"""application("common")->configured->{"pdfviewer.rules"} > 0 or reconfigure("pdfviewer.rules");""")
+        configure_wslview(force=false);
     end
 
     # work around issue with lp2poly and looking up perl modules from different applications
     application("polytope")
-    Polymake.shell_execute("require LPparser;")
+    shell_execute("require LPparser;")
 
     for app in call_function(:common, :startup_applications)
         application(app)
