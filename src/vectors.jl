@@ -3,6 +3,10 @@ function Vector{T}(::UndefInitializer, n::Base.Integer) where
     return Vector{to_cxx_type(T)}(convert(Int64, n))
 end
 
+function Vector{Polynomial{Rational, Int64}}(::UndefInitializer, n::Base.Integer)
+    return Vector{Polynomial{Rational, CxxWrap.CxxLong}}(convert(Int64, n), Polynomial{Rational, CxxWrap.CxxLong}([0], permutedims([0])))
+end
+
 function Vector{T}(vec::AbstractVector) where T
     res = Vector{T}(undef, size(vec)...)
     @inbounds res .= vec

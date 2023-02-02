@@ -428,4 +428,41 @@
             @test Y + T.(2 * jl_m) == T.(2 * jl_m) + Y == Y .+ T.(2 * jl_m) == T.(2 * jl_m) .+ Y == (1 + sr2) * jl_y
         end
     end
+    
+    for S in [Polymake.Rational]
+        T = Polymake.Polynomial{S, CxxWrap.CxxLong}
+        @test Polymake.Matrix{T} <: AbstractMatrix
+        @test Polymake.Matrix{T}(undef, 3,4) isa AbstractMatrix
+        @test Polymake.Matrix{T}(undef, 3,4) isa Polymake.Matrix
+        @test Polymake.Matrix{T}(undef, 3,4) isa Polymake.Matrix{<:supertype(T)}
+        @test Polymake.Matrix{T}(undef, 3,4) isa Polymake.Matrix{Polymake.to_cxx_type(T)}
+        M = Polymake.Matrix{T}(undef, 3,4)
+        M[1,1] = T([-1, 2], [0 1 1; 1 0 1])
+        M[end] = T([1, 1, 1], [1 0 0; 0 1 0; 0 0 1])
+        @test M[1,1] isa T
+        @test M[1,1] == T([-1, 2], [0 1 1; 1 0 1])
+        @test M[end] isa T
+        @test M[end] == M[end, end] == T([1, 1, 1], [1 0 0; 0 1 0; 0 0 1])
+
+        @test eltype(M) == Polymake.Polynomial{Polymake.Rational, CxxWrap.CxxLong}
+
+        @test_throws BoundsError M[0, 1]
+        @test_throws BoundsError M[2, 5]
+
+        @test length(M) == 12
+        @test size(M) == (3,4)
+
+        for U in [IntTypes; Polymake.Integer]
+            V = Polymake.Matrix{T}(M) # local copy
+            @test setindex!(V, T([2, 3], [2 3 0; 0 2 3]), 1, 1) isa Polymake.Matrix{T}
+            @test V[U(1), 1] isa T
+            @test V[1, U(1)] == T([2, 3], [2 3 0; 0 2 3])
+            # testing the return value of brackets operator
+            @test (V[2, 1] = T([4, 5], [1 0 0; 0 0 1])) isa T
+            V[2, 1] = T([4, 5], [1 0 0; 0 0 1])
+            @test V[2, 1] == T([4, 5], [1 0 0; 0 0 1])
+            @test string(V) == "pm::Matrix<pm::Polynomial<pm::Rational, long> >\n2*x_0^2*x_1^3 + 3*x_1^2*x_2^3 0 0 0\n4*x_0 + 5*x_2 0 0 0\n0 0 0 x_0 + x_1 + x_2\n"
+        end
+    end
+    
 end

@@ -77,6 +77,7 @@ convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
 convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
+convert_to_pm_type(::Type{<:Polynomial{<:Rational, CxxWrap.CxxLong}}) = Polynomial{Rational, CxxWrap.CxxLong}
 
 # Graph, EdgeMap, NodeMap
 const DirType = Union{Directed, Undirected}
