@@ -280,4 +280,16 @@
     @testset "toplevel visual" begin
         @test visual(Polymake.Visual, polytope.cube(3)) isa Polymake.Visual
     end
+
+    @testset "names and description" begin
+        p = polytope.cube(3)
+        Polymake.setname!(p,"somename")
+        @test occursin("somename", String(Polymake.getname(p)))
+        Polymake.setname!(p,"other")
+        @test occursin("other", String(Polymake.getname(p)))
+        @test occursin("cube of dimension", String(Polymake.getdescription(p)))
+        Polymake.setdescription!(p, "dual of the cross polytope")
+        @test occursin("cross polytope", String(Polymake.getdescription(p)))
+    end
+
 end
