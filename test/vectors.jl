@@ -393,9 +393,9 @@
         V = Polymake.Vector{T}(undef, 3)
         V[1] = T([-1, 2], [0 1 1; 1 0 1])
         V[end] = T([1, 1, 1], [1 0 0; 0 1 0; 0 0 1])
-        @test V[1] isa T
+        @test V[1] isa Polymake.to_cxx_type(T)
         @test V[1] == T([-1, 2], [0 1 1; 1 0 1])
-        @test V[end] isa T
+        @test V[end] isa Polymake.to_cxx_type(T)
         @test V[end] == T([1, 1, 1], [1 0 0; 0 1 0; 0 0 1])
 
         @test eltype(V) == Polymake.Polynomial{Polymake.Rational, CxxWrap.CxxLong}
@@ -408,11 +408,11 @@
 
         for U in [IntTypes; Polymake.Integer]
             W = Polymake.Vector{T}(V) # local copy
-            @test setindex!(W, T([2, 3], [2 3 0; 0 2 3]), 1) isa Polymake.Vector{T}
-            @test W[U(1)] isa T
+            @test setindex!(W, T([2, 3], [2 3 0; 0 2 3]), 1) isa Polymake.Vector{Polymake.to_cxx_type(T)}
+            @test W[U(1)] isa Polymake.to_cxx_type(T)
             @test W[U(1)] == T([2, 3], [2 3 0; 0 2 3])
             # testing the return value of brackets operator
-            @test (W[3] = T([4, 5], [1 0 0; 0 0 1])) isa T
+            @test (W[3] = T([4, 5], [1 0 0; 0 0 1])) isa Polymake.to_cxx_type(T)
             W[3] = T([4, 5], [1 0 0; 0 0 1])
             @test W[3] == T([4, 5], [1 0 0; 0 0 1])
             @test string(W) == "pm::Vector<pm::Polynomial<pm::Rational, long> >\n2*x_0^2*x_1^3 + 3*x_1^2*x_2^3 0 4*x_0 + 5*x_2"
