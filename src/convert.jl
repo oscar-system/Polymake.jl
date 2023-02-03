@@ -45,6 +45,8 @@ to_cxx_type(::Type{<:AbstractSet{T}}) where T =
     Set{to_cxx_type(T)}
 to_cxx_type(::Type{<:Array{T}}) where T =
     Array{to_cxx_type(T)}
+to_cxx_type(::Type{<:Polynomial{S,T}}) where {S,T} =
+    Polynomial{to_cxx_type(S), to_cxx_type(T)}
 
 to_jl_type(::Type{T}) where T = T
 to_jl_type(::Type{CxxWrap.CxxBool}) = Bool
