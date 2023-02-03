@@ -139,3 +139,16 @@ function visual(obj::BigObject; kwargs...)
 end
 
 visual(::Type{Visual}, obj::BigObject; kwargs...) = call_method(obj, :VISUAL; kwargs...)
+
+
+function configure_wslview(; force=true)
+   (out, err) = shell_execute("script(\"$(joinpath(@__DIR__, "polymake", "wslviewer.pl"))\", $force);")
+   if force
+      isempty(err) || error(err)
+      isempty(out) || @info out
+   else
+      isempty(err) || @warn err
+      isempty(out) || @debug out
+   end
+   nothing
+end
