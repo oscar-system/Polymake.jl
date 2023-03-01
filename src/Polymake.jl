@@ -58,7 +58,7 @@ end
 
 Sys.iswindows() &&
    error("""Windows is not supported, please try the Windows Subsystem for Linux.
-            For details please check: https://oscar.computeralgebra.de/install/""")
+            For details please check: https://www.oscar-system.org/install/""")
 
 libpolymake_julia_jll.is_available() ||
    error("""This platform or julia version is currently not supported by Polymake:
