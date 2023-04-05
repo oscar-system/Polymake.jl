@@ -111,41 +111,54 @@ function __init__()
     @initcxx
 
     # prepare environment variables
+    # these are needed for the whole session
     ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
 
-    try
-        show_banner = isinteractive() && Base.JLOptions().banner != 0 &&
-                       !any(x->x.name in ["Oscar"], keys(Base.package_locks))
-
-        initialize_polymake_with_dir("user=$(polymake_user_dir)",show_banner)
-        if !show_banner
-            shell_execute(raw"$Verbose::credits=\"0\";")
-        end
-    catch ex # initialize_polymake may throw jl_error
-        ex isa ErrorException && throw(PolymakeError(ex.msg))
-        rethrow(ex)
+    # Temporarily unset PERL5LIB during initialization
+    # This variable can cause errors if the perl modules in this folder were not
+    # built with the same configuration as Perl_jll.
+    # If this is really intended please set POLYMAKE_FORCE_PERL5LIB to "true".
+    adjustenv = Dict{String,Union{String,Nothing}}()
+    if !isempty(get(ENV,"PERL5LIB","")) && get(ENV, "POLYMAKE_FORCE_PERL5LIB", false) != "true"
+       adjustenv["PERL5LIB"] = nothing
     end
 
-    application("common")
-    shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
 
-    # try using wslviewer to open threejs / svg / pdf properly on WSL
-    # Note: the binfmt_misc check might not detect all cases of wsl but we need exactly
-    # that feature enabled to be able to launch a windows process for the visualization
-    # alternative check might be: WSL2 occuring in /proc/sys/kernel/osrelease
-    if Sys.islinux() && isfile("/proc/sys/fs/binfmt_misc/WSLInterop")
-        configure_wslview(force=false);
+    withenv(adjustenv...) do
+       try
+           show_banner = isinteractive() && Base.JLOptions().banner != 0 &&
+                          !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+
+           initialize_polymake_with_dir("user=$(polymake_user_dir)",show_banner)
+           if !show_banner
+               shell_execute(raw"$Verbose::credits=\"0\";")
+           end
+       catch ex # initialize_polymake may throw jl_error
+           ex isa ErrorException && throw(PolymakeError(ex.msg))
+           rethrow(ex)
+       end
+
+       application("common")
+       shell_execute("include(\"$(joinpath(@__DIR__, "polymake", "julia.rules"))\");")
+
+       # try using wslviewer to open threejs / svg / pdf properly on WSL
+       # Note: the binfmt_misc check might not detect all cases of wsl but we need exactly
+       # that feature enabled to be able to launch a windows process for the visualization
+       # alternative check might be: WSL2 occuring in /proc/sys/kernel/osrelease
+       if Sys.islinux() && isfile("/proc/sys/fs/binfmt_misc/WSLInterop")
+           configure_wslview(force=false);
+       end
+
+       # work around issue with lp2poly and looking up perl modules from different applications
+       application("polytope")
+       shell_execute("require LPparser;")
+
+       for app in call_function(:common, :startup_applications)
+           application(app)
+       end
+       application("common")
     end
-
-    # work around issue with lp2poly and looking up perl modules from different applications
-    application("polytope")
-    shell_execute("require LPparser;")
-
-    for app in call_function(:common, :startup_applications)
-        application(app)
-    end
-    application("common")
 
     # We need to set the Julia types as c types for polymake
     for (name, c_type) in C_TYPES
