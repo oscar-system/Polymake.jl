@@ -1,17 +1,23 @@
 import JSON
 
-function copy_javascript_files(target_dir)
-    jupyter_resources = joinpath(polymake_jll.artifact_dir, "share",
+const _jupyter_resources = joinpath(polymake_jll.artifact_dir, "share",
                                  "polymake", "resources", "jupyter-polymake",
                                  "jupyter_kernel_polymake", "resources")
-    mkpath(target_dir)
-    for file in readdir(jupyter_resources)
-        if endswith(file,".svg") || endswith(file,".js") && file != "kernel.js"
-            cp(joinpath(jupyter_resources, file),
-               joinpath(target_dir, file); force=true)
-        end
-    end
-    nothing
+
+function check_or_install_js(source, target_dir)
+   target_path = joinpath(target_dir, basename(source))
+   if !isfile(target_path) || filesize(source) != filesize(target_path)
+      cp(source, target_path; force=true)
+   end
+end
+
+function check_jupyter_resources(target_dir)
+   mkpath(target_dir)
+   for file in readdir(_jupyter_resources, join=true)
+      if endswith(file,".svg") || endswith(file,".js") && !endswith(file, "kernel.js")
+         check_or_install_js(file, target_dir)
+      end
+   end
 end
 
 """
@@ -23,13 +29,44 @@ So we just copy into the Julia kernel directory...
 """
 function prepare_jupyter_kernel_for_visualization()
 
-    json = read(`$(Main.IJulia.JUPYTER) kernelspec list --json`, String)
-    kernelspecs = JSON.parse(json)["kernelspecs"]
+   warning="Could not install threejs files for jupyter, in-notebook visualization might not work:"
+   kerneldirs = String[]
+   success = false
 
-    for (kernel, spec) in kernelspecs
-        if occursin("julia", kernel)
-            copy_javascript_files(joinpath(spec["resource_dir"],"polymake"))
-        end
-    end
-    nothing
+   # first try with kernelspec command
+   try
+      json = read(`$(Main.IJulia.find_jupyter_subcommand("kernelspec")) list --json`, String)
+      kernelspecs = JSON.parse(json)["kernelspecs"]
+
+      for (kernel, spec) in kernelspecs
+         if occursin("julia", kernel)
+            push!(kerneldirs, spec["resource_dir"])
+         end
+      end
+   finally
+      # if kernelspec failed or nothing was found
+      # we go through the directories in the IJulia kerneldir
+      if isempty(kerneldirs)
+         kerneldir = Main.IJulia.kerneldir()
+         for dir in readdir(kerneldir)
+            if isdir(joinpath(kerneldir, dir)) && startswith(dir, "julia")
+               push!(kerneldirs, joinpath(kerneldir, dir))
+            end
+         end
+      end
+   end
+   for dir in kerneldirs
+      try
+         check_jupyter_resources(joinpath(dir, "polymake"))
+         success = true
+      catch e
+         warning *= "\n  failed to check or install threejs resources in $dir: \n  $e"
+      end
+   end
+   if !success
+      # at least one kernel directory should have the correct files,
+      # otherwise print a warning
+      @warn warning
+   end
+   nothing
 end

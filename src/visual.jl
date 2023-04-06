@@ -131,11 +131,15 @@ visual(c)
 ```
 """
 function visual(obj::BigObject; kwargs...)
-   # TODO change to call_method(Nothing,...)
-   # once the void-call exceptions are fixed in polymake_jll
-   vis = call_method(obj, :VISUAL; kwargs...)
-   call_function(:common, :safe_to_string, vis.obj)
-   return nothing
+   if isdefined(Main, :IJulia) && Main.IJulia.inited
+      # this will return a visual object,
+      # the visualization is then triggered by the show method
+      return call_method(obj, :VISUAL; kwargs...)
+   else
+      # this will call visual in void context and trigger the background viewer
+      call_method(Nothing, obj, :VISUAL; kwargs...)
+      return nothing
+   end
 end
 
 visual(::Type{Visual}, obj::BigObject; kwargs...) = call_method(obj, :VISUAL; kwargs...)
