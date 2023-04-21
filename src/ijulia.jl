@@ -34,7 +34,7 @@ function prepare_jupyter_kernel_for_visualization()
    success = false
 
    # first try with kernelspec command
-   kernelspecs = try
+   try
       c = ignorestatus(`$(Main.IJulia.find_jupyter_subcommand("kernelspec")) list --json`)
       err = Pipe()
       # If there is no kernelspec command, this will return an empty string (but
@@ -42,14 +42,12 @@ function prepare_jupyter_kernel_for_visualization()
       json = read(pipeline(c, stderr = err), String)
       close(err.in)
       # If isempty(json), then JSON.parse will throw an error
-      JSON.parse(json)["kernelspecs"]
-   catch e
-      Dict{String, Any}()
-   end
-   for (kernel, spec) in kernelspecs
-      if occursin("julia", kernel)
-         push!(kerneldirs, spec["resource_dir"])
+      for (kernel, spec) in JSON.parse(json)["kernelspecs"]
+         if occursin("julia", kernel)
+            push!(kerneldirs, spec["resource_dir"])
+         end
       end
+   catch
    end
    # if kernelspec failed or nothing was found
    # we go through the directories in the IJulia kerneldir
