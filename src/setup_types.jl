@@ -16,11 +16,11 @@ const SmallObject = Union{
     Graph,
     HomologyGroup,
     QuadraticExtension,
-    JuliaFieldElement,
+    OscarNumber,
     EdgeMap,
     NodeMap,
 }
-const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, JuliaFieldElement, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}}
+const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, OscarNumber, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}}
 
 const TypeConversionFunctions = Dict(
     Symbol("Int") => to_int,
