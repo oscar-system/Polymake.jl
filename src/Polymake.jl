@@ -113,15 +113,27 @@ const exclude = [:__init__, :eval, :include]
 for name in names(_PolymakeWrap; all=true)
    (name in exclude || !isdefined(_PolymakeWrap, name)) && continue
    startswith(string(name), "#") && continue
+   startswith(string(name), "__cxxwrap") && continue
 
    @eval import ._PolymakeWrap: $name
 end
 
 module _NumberWrap
+  import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
+    append!, deepcopy_internal, delete!, numerator, denominator,
+    empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
+    length, numerator, push!, resize!,
+    setdiff, setdiff!, setindex!, symdiff, symdiff!,
+    union, union!
   using CxxWrap
+  using SparseArrays
+  import SparseArrays: AbstractSparseMatrix, findnz
+  import SparseArrays
   using polymake_jll
   using libpolymake_julia_jll
   using polymake_oscarnumber_jll
+
+  import .._PolymakeWrap: show_small_obj
 
   @wrapmodule(joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
 
@@ -133,7 +145,15 @@ module _NumberWrap
 
 end
 
-import ._NumberWrap: OscarNumber
+import ._NumberWrap
+
+for name in names(_NumberWrap; all=true)
+   (name in exclude || !isdefined(_NumberWrap, name)) && continue
+   startswith(string(name), "#") && continue
+   startswith(string(name), "__cxxwrap") && continue
+
+   @eval import ._NumberWrap: $name
+end
 
 include(polymake_jll.generate_deps_tree)
 
