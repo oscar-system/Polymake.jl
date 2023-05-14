@@ -11,6 +11,7 @@ module Polymake
 export @pm, @convert_to, visual
 
 # We need to import all functions which will be extended on the Cxx side
+# FIXME: check with imports of _PolymakeWrap further down
 import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     append!, deepcopy_internal, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
@@ -35,7 +36,7 @@ import polymake_jll
 import lib4ti2_jll
 import TOPCOM_jll
 using libpolymake_julia_jll
-
+using polymake_oscarnumber_jll
 
 const jlpolymake_version_range = (v"0.9.0",  v"0.10")
 
@@ -79,7 +80,60 @@ const scratch_key = "polymake_$(string(hash(@__FILE__)))_$(VERSION.major).$(VERS
 include("repl.jl")
 include("ijulia.jl")
 
-@wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
+module _PolymakeWrap
+  # copied from the top for overriding methods ...
+  import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
+    append!, deepcopy_internal, delete!, numerator, denominator,
+    empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
+    length, numerator, push!, resize!,
+    setdiff, setdiff!, setindex!, symdiff, symdiff!,
+    union, union!
+  using CxxWrap
+  using SparseArrays
+  import SparseArrays: AbstractSparseMatrix, findnz
+  import SparseArrays
+  using polymake_jll
+  using libpolymake_julia_jll
+  using polymake_oscarnumber_jll
+
+  @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
+
+  function __init__()
+
+     @initcxx
+
+  end
+
+end
+import ._PolymakeWrap
+
+const exclude = [:__init__, :eval, :include]
+
+# for now we just import all libpolymake_julia names except for some julia internal ones
+for name in names(_PolymakeWrap; all=true)
+   (name in exclude || !isdefined(_PolymakeWrap, name)) && continue
+   startswith(string(name), "#") && continue
+
+   @eval import ._PolymakeWrap: $name
+end
+
+module _NumberWrap
+  using CxxWrap
+  using polymake_jll
+  using libpolymake_julia_jll
+  using polymake_oscarnumber_jll
+
+  @wrapmodule(joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
+
+  function __init__()
+
+     @initcxx
+
+  end
+
+end
+
+import ._NumberWrap: OscarNumber
 
 include(polymake_jll.generate_deps_tree)
 
@@ -102,8 +156,6 @@ function __init__()
 
     # check libpolymake_julia version with a plain ccall before initializing libcxxwrap and libpolymake
     checkversion()
-
-    @initcxx
 
     # prepare environment variables
     # these are needed for the whole session

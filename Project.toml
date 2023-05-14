@@ -20,6 +20,7 @@ TOPCOM_jll = "36f60fef-b880-50dc-9289-4aaecee93cc3"
 lib4ti2_jll = "1493ae25-0f90-5c0e-a06c-8c5077d6d66f"
 libpolymake_julia_jll = "4d8266f6-2b3b-57e3-ad7a-d431eaaac945"
 polymake_jll = "7c209550-9012-526c-9264-55ba7a78ba2c"
+polymake_oscarnumber_jll = "10f31823-b687-53e6-9f29-edb9d4da9f9f"
 
 [compat]
 BinaryWrappers = "~0.1.0"
