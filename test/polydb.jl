@@ -1,4 +1,4 @@
-using Mongoc
+using Polymake.Polydb.Mongoc
 
 @testset "polyDB" begin
     # conditions from which the test database dump was generated.
