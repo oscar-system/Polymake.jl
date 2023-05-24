@@ -1,4 +1,5 @@
-using SparseArrays
+using Polymake.SparseArrays
+
 @testset "Polymake.SparseVector" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]

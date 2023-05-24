@@ -1,5 +1,4 @@
 using Base.Docs
-using Markdown
 include("meta.jl")
 
 using Polymake.Meta

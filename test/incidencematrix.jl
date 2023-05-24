@@ -1,4 +1,4 @@
-using SparseArrays
+using Polymake.SparseArrays
 
 @testset "IncidenceMatrix" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]

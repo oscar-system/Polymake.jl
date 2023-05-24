@@ -1,6 +1,6 @@
 using Polymake
 using Test
-using CxxWrap
+using Polymake.CxxWrap
 
 # make wrapper compilation verbose on CI
 if (haskey(ENV, "GITHUB_ACTIONS"))
