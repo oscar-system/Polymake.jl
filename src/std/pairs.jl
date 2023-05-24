@@ -12,5 +12,5 @@ Base.iterate(p::StdPair) = first(p), Val{:first}()
 Base.iterate(p::StdPair, ::Val{:first}) = last(p), Val{:last}()
 Base.iterate(p::StdPair, ::Val{:last}) = nothing
 
-Base.:(==)(p::StdPair{S, T}, q::Pair) where {S, T} = convert(Pair{S, T}, p) == q
+Base.:(==)(p::StdPair{S, T}, q::Union{StdPair{U, V}, Pair{U, V}}) where {S, T, U, V} = convert(Pair{S, T}, p) == convert(Pair{U, V}, q)
 Base.:(==)(p::Pair, q::StdPair{S, T}) where {S, T} = p == convert(Pair{S, T}, q)
