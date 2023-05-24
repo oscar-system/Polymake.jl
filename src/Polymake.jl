@@ -29,11 +29,6 @@ using CxxWrap
 using BinaryWrappers
 using Scratch
 
-# FLINT_jll now initializes the flint malloc functions
-# to the corresponding julia functions.
-# See also https://github.com/Nemocas/Nemo.jl/issues/788
-using FLINT_jll
-
 import Perl_jll
 import Ninja_jll
 import polymake_jll
