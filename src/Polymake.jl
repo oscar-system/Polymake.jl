@@ -156,7 +156,7 @@ for name in names(LibOscarNumber; all=true)
    @eval import .LibOscarNumber: $name
 end
 
-include(polymake_jll.generate_deps_tree)
+include(libpolymake_julia_jll.generate_deps_tree)
 
 include(type_translator)
 
