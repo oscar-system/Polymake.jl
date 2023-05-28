@@ -81,7 +81,7 @@ include("ijulia.jl")
 
 @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
 
-include(polymake_jll.generate_deps_tree)
+include(libpolymake_julia_jll.generate_deps_tree)
 
 include(type_translator)
 
