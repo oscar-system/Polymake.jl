@@ -168,7 +168,9 @@ function __init__()
                  @generate_wrappers(Ninja_jll),
                  @generate_wrappers(Perl_jll),
                ]
-    polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree")
+
+    # to avoid conflicts between symlinks and directories we switch to a new depstree folder name
+    polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree_v2")
 
     # we run this on every init to make sure all artifacts still exist
     prepare_deps_tree(polymake_deps_tree)
@@ -182,6 +184,29 @@ function __init__()
     # these are needed for the whole session
     ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
+    installtop = joinpath(polymake_deps_tree, "share", "polymake")
+    installarch = joinpath(polymake_deps_tree, "lib", "polymake")
+
+    extensions = [(polymake_oscarnumber_jll, "oscarnumber")]
+    extensionpaths = []
+
+    exttop = joinpath("share", "polymake", "ext")
+    extarch = joinpath("lib", "polymake", "ext")
+    target(name...) = joinpath(polymake_deps_tree, name...)
+    mkpath(target(exttop))
+    mkpath(target(extarch))
+
+    for (ext, dirname) in extensions
+       src(name...) = joinpath(ext.artifact_dir, name...)
+       force_symlink(src(exttop, dirname), target(exttop, dirname))
+       force_symlink(src(extarch, dirname), target(extarch, dirname))
+       push!(extensionpaths, target(exttop, dirname))
+    end
+
+    polymake_extension_config = joinpath(polymake_deps_tree, "extensions.json")
+    open(polymake_extension_config, "w") do file
+       JSON.print(file, Dict("Polymake::User::extensions" => extensionpaths))
+    end
 
     # Temporarily unset PERL5LIB during initialization
     # This variable can cause errors if the perl modules in this folder were not
@@ -198,7 +223,7 @@ function __init__()
            show_banner = isinteractive() && Base.JLOptions().banner != 0 &&
                           !any(x->x.name in ["Oscar"], keys(Base.package_locks))
 
-           initialize_polymake_with_dir("user=$(polymake_user_dir)",show_banner)
+           initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
            if !show_banner
                shell_execute(raw"$Verbose::credits=\"0\";")
            end
