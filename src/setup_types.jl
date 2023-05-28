@@ -42,6 +42,7 @@ function fill_wrapped_types!(wrapped_types_dict, function_type_list)
 end
 
 fill_wrapped_types!(TypeConversionFunctions, get_type_names())
+fill_wrapped_types!(TypeConversionFunctions, get_type_names_oscarnumber())
 
 # libcxxwrap-julia prior to 0.8 mapped C++ copy to Base.deepcopy
 # now it is mapped to Base.copy

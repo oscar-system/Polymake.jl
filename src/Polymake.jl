@@ -259,6 +259,19 @@ function __init__()
         set_julia_type(name, current_type)
     end
 
+    # oscarnumber types
+    on_type = Ptr{Cvoid}(pointer_from_objref(OscarNumber))
+    set_julia_type("OscarNumber", on_type)
+    for (name, c_type) in [("Array", Array),
+                           ("Vector", Vector),
+                           ("Matrix", Matrix),
+                           ("SparseVector", SparseVector),
+                           ("SparseMatrix", SparseMatrix)]
+        current_type = Ptr{Cvoid}(pointer_from_objref(c_type{OscarNumber}))
+        set_julia_type("$(name)_OscarNumber", current_type)
+    end
+
+
     if isdefined(Base, :active_repl)
         run_polymake_repl()
     end
