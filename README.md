@@ -9,7 +9,6 @@ using Pkg;
 Pkg.activate("fieldelemproject")
 
 Pkg.develop(PackageSpec(url="https://github.com/benlorenz/libpolymake_julia_jll.jl"));
-Pkg.develop(PackageSpec(url="https://github.com/benlorenz/polymake_jll.jl"));
 Pkg.add(PackageSpec(name="Polymake",rev="bl/juliafieldelem"));
 
 Pkg.add("Oscar");
@@ -25,13 +24,13 @@ Qx, x = QQ["x"];
 
 K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)]);
 
-enf = Polymake.JuliaFieldElement(a1+2)
+enf = Polymake.OscarNumber(a1+2)
 
-enf2 = Polymake.JuliaFieldElement(a2+1);
+enf2 = Polymake.OscarNumber(a2+1);
 
 c = Polymake.polytope.cube(3,enf,-enf2);
 
-p = Polymake.polytope.Polytope{Polymake.JuliaFieldElement}(POINTS=c.VERTICES);
+p = Polymake.polytope.Polytope{Polymake.OscarNumber}(POINTS=c.VERTICES);
 
 p.FACETS
 p.VERTICES
