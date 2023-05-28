@@ -11,7 +11,7 @@ module Polymake
 export @pm, @convert_to, visual
 
 # We need to import all functions which will be extended on the Cxx side
-# FIXME: check with imports of _PolymakeWrap further down
+# FIXME: check with imports of LibPolymake further down
 import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     append!, deepcopy_internal, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
@@ -20,6 +20,7 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     union, union!
 
 import Pkg
+import JSON
 
 using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
@@ -80,7 +81,7 @@ const scratch_key = "polymake_$(string(hash(@__FILE__)))_$(VERSION.major).$(VERS
 include("repl.jl")
 include("ijulia.jl")
 
-module _PolymakeWrap
+module LibPolymake
   # copied from the top for overriding methods ...
   import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     append!, deepcopy_internal, delete!, numerator, denominator,
@@ -105,20 +106,20 @@ module _PolymakeWrap
   end
 
 end
-import ._PolymakeWrap
+import .LibPolymake
 
 const exclude = [:__init__, :eval, :include]
 
 # for now we just import all libpolymake_julia names except for some julia internal ones
-for name in names(_PolymakeWrap; all=true)
-   (name in exclude || !isdefined(_PolymakeWrap, name)) && continue
+for name in names(LibPolymake; all=true)
+   (name in exclude || !isdefined(LibPolymake, name)) && continue
    startswith(string(name), "#") && continue
    startswith(string(name), "__cxxwrap") && continue
 
-   @eval import ._PolymakeWrap: $name
+   @eval import .LibPolymake: $name
 end
 
-module _NumberWrap
+module LibOscarNumber
   import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     append!, deepcopy_internal, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
@@ -133,7 +134,7 @@ module _NumberWrap
   using libpolymake_julia_jll
   using polymake_oscarnumber_jll
 
-  import .._PolymakeWrap: show_small_obj
+  import ..LibPolymake: show_small_obj
 
   @wrapmodule(joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
 
@@ -145,14 +146,14 @@ module _NumberWrap
 
 end
 
-import ._NumberWrap
+import .LibOscarNumber
 
-for name in names(_NumberWrap; all=true)
-   (name in exclude || !isdefined(_NumberWrap, name)) && continue
+for name in names(LibOscarNumber; all=true)
+   (name in exclude || !isdefined(LibOscarNumber, name)) && continue
    startswith(string(name), "#") && continue
    startswith(string(name), "__cxxwrap") && continue
 
-   @eval import ._NumberWrap: $name
+   @eval import .LibOscarNumber: $name
 end
 
 include(polymake_jll.generate_deps_tree)
