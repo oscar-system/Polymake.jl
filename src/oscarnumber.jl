@@ -24,6 +24,20 @@ Base.:/(x::OscarNumber, y::OscarNumber) = x // y
 # no-copy convert
 convert(::Type{<:OscarNumber}, on::OscarNumber) = on
 
+function unwrap(on::OscarNumber)
+   if Polymake.isinf(on) != 0
+      error("cannot unwrap OscarNumber containing infinity")
+   elseif _uses_rational(on)
+      return _get_rational(on)
+   else
+      return GC.@preserve on begin
+         ptr = _unsafe_get_ptr(on)
+         jn = unsafe_pointer_to_objref(ptr)
+         return deepcopy(jn)
+      end
+   end
+end
+
 mutable struct oscar_number_dispatch_helper
     index::Clong
     init::Ptr{Cvoid}

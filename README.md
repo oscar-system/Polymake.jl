@@ -44,6 +44,8 @@ ps.FACETS
 
 ps.VERTICES
 
+mat = Polymake.unwrap.(collect(ps.FACETS))
+
 ```
 
 # Polymake.jl
