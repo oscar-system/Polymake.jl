@@ -1,6 +1,6 @@
 # Oscar number types
 
-To experiment with Oscar number types. The typename will probably be changed soon.
+To experiment with Oscar number types.
 
 ### Initial setup:
 
@@ -8,8 +8,6 @@ To experiment with Oscar number types. The typename will probably be changed soo
 using Pkg;
 Pkg.activate("fieldelemproject")
 
-Pkg.develop(PackageSpec(url="https://github.com/benlorenz/libpolymake_julia_jll.jl"));
-Pkg.develop(PackageSpec(url="https://github.com/benlorenz/polymake_oscarnumber_jll.jl"));
 Pkg.add(PackageSpec(name="Polymake",rev="bl/juliafieldelem"));
 
 Pkg.add("Oscar");
