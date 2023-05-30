@@ -92,6 +92,8 @@ global function run_polymake_repl(;
                      key = '$')
    repl = Base.active_repl
    mirepl = isdefined(repl,:mi) ? repl.mi : repl
+   # skip repl init if it is not fully loaded
+   isdefined(mirepl, :interface) && isdefined(mirepl.interface, :modes) || return nothing
    main_mode = mirepl.interface.modes[1]
 
    panel = CreatePolymakeREPL(; prompt=prompt, name=name, repl=repl)
