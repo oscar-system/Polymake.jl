@@ -277,3 +277,6 @@ function register_julia_element(e, p, t::Type)
    return field_count
 end
 
+convert(::Type{T}, on::OscarNumber) where T<:Number = convert(T, unwrap(on))
+
+Base.float(on::OscarNumber) = float(unwrap(on))
