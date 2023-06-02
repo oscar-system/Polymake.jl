@@ -271,6 +271,6 @@ using Polymake.SparseArrays
         end
     end
 
-    @test graph.Graph(ADJACENCY=Polymake.IncidenceMatrix(jl_s)) isa Polymake.BigObject
+    @test Polymake.graph.Graph(ADJACENCY=Polymake.IncidenceMatrix(jl_s)) isa Polymake.BigObject
 
 end

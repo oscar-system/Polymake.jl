@@ -1,9 +1,13 @@
 @testset "Polymake.Array" begin
+    Qx, x = QQ["x"]
+    K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
+    m = a1 + 3*a2^2 + 7
     @testset "Polymake.Array generics: $T " for (T, elt) in [
         (Int64, 2),
         (Polymake.Integer, Polymake.Integer(2)),
         (Polymake.Rational, Polymake.Rational(2 //3)),
         (Polymake.QuadraticExtension{Polymake.Rational}, Polymake.QuadraticExtension{Polymake.Rational}(1, 2, 3)),
+        (Polymake.OscarNumber, Polymake.OscarNumber(m)),
         (String, "a"),
         (Polymake.Set{Polymake.to_cxx_type(Int)}, Polymake.Set{Int64}([1,2,1])),
         (Polymake.Matrix{Polymake.Integer}, Polymake.Matrix{Polymake.Integer}([1 0; 2 1])),

@@ -22,7 +22,10 @@ using Polymake.SparseArrays
         end
     end
 
+    
     @testset "Low-level operations" begin
+        p = Polymake.Polynomial{Polymake.Rational, Int64}([1, 1, 1], [1 0 0; 0 1 0; 0 0 1])
+        oldnames = Polymake.get_var_names(p)
         for (C,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational>")]
             p = Polymake.Polynomial(C.(jl_v),jl_m)
             @test Polymake.nvars(p) == size(jl_m)[2]
@@ -46,6 +49,7 @@ using Polymake.SparseArrays
             m = Polymake.monomials_as_matrix(p)
             @test m[perm2, :] == jl_m[perm1, :]
         end
+        Polymake.set_var_names(p, oldnames)
     end
 
     @testset "Equality" begin

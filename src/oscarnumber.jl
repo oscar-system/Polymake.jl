@@ -106,12 +106,10 @@ function _on_abs_fallback(e::ArgT)::ArgT where ArgT
 end
 @generated function _on_gen_abs(::Type{ArgT}) where ArgT
    if hasmethod(abs, (ArgT,))
-      @info "abs using Base.abs"
       return quote
          @cfunction(Base.abs, Ref{ArgT}, (Ref{ArgT},))
       end
    else
-      @info "abs using fallback"
       return quote
          @cfunction(_on_abs_fallback, Ref{ArgT}, (Ref{ArgT},))
       end
@@ -277,3 +275,6 @@ function register_julia_element(e, p, t::Type)
    return field_count
 end
 
+convert(::Type{T}, on::OscarNumber) where T<:Number = convert(T, unwrap(on))
+
+Base.float(on::OscarNumber) = float(unwrap(on))
