@@ -81,7 +81,7 @@
             @test polytope.Polytope(c) isa Polymake.BigObject
 
             @test_throws ErrorException Polymake.cast!(c,Polymake.BigObjectType("fan::PolyhedralFan"))
-            @test_throws ArgumentError fan.PolyhedralFan(c)
+            @test_throws ArgumentError Polymake.fan.PolyhedralFan(c)
         end
     end
 
