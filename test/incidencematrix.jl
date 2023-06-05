@@ -1,6 +1,6 @@
 using Polymake.SparseArrays
 
-@testset "IncidenceMatrix" begin
+@testset verbose=true "IncidenceMatrix" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
     SymTypes = [Polymake.NonSymmetric, Polymake.Symmetric]
@@ -30,7 +30,7 @@ using Polymake.SparseArrays
 
     jl_s = [1 0 1; 0 0 0; 1 0 0]
     jl_n = [0 0 1; 1 0 0]
-    @testset "Constructors/Converts" begin
+    @testset verbose=true "Constructors/Converts" begin
         inc = [[1,2,4],[3,5]]
         @test Polymake.IncidenceMatrix{Polymake.NonSymmetric}(inc) isa Polymake.IncidenceMatrix{Polymake.NonSymmetric}
         M = Polymake.IncidenceMatrix{Polymake.NonSymmetric}(inc)
@@ -56,8 +56,8 @@ using Polymake.SparseArrays
         end
     end
 
-    @testset "Low-level operations" begin
-        @testset "Polymake.IncidenceMatrix{Polymake.NonSymmetric}" begin
+    @testset verbose=true "Low-level operations" begin
+        @testset verbose=true "Polymake.IncidenceMatrix{Polymake.NonSymmetric}" begin
             N = Polymake.IncidenceMatrix(jl_n)
             # linear indexing:
             @test N[1] == false
@@ -118,7 +118,7 @@ using Polymake.SparseArrays
             end
         end
 
-        @testset "Polymake.IncidenceMatrix{Polymake.Symmetric}" begin
+        @testset verbose=true "Polymake.IncidenceMatrix{Polymake.Symmetric}" begin
             S = Polymake.IncidenceMatrix{Polymake.Symmetric}(jl_s)
             # linear indexing:
             @test S[1] == true
@@ -156,7 +156,7 @@ using Polymake.SparseArrays
         end
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
         for S in SymTypes
             V = Polymake.IncidenceMatrix{S}(jl_s)
             @test (!).(V) isa Polymake.IncidenceMatrixAllocated{Polymake.NonSymmetric}
@@ -181,6 +181,7 @@ using Polymake.SparseArrays
             @test 2V isa Polymake.Matrix{Polymake.to_cxx_type(Int)}
             @test Int32(2)V isa Polymake.Matrix{Polymake.to_cxx_type(Int)}
 
+            @testset verbose=true "Arithmetic1 $S" begin
             for T in int_scalar_types
                 U = Polymake.promote_to_pm_type(Polymake.Matrix, T)
                 U = Polymake.to_cxx_type(U)
@@ -208,7 +209,8 @@ using Polymake.SparseArrays
                 @test op(V, T(2)) isa Polymake.Matrix{Float64}
                 @test broadcast(op, V, T(2)) isa Polymake.Matrix{Float64}
             end
-
+            end
+            @testset verbose=true "Arithmetic2 $S" begin
             for T in rational_scalar_types
                 U = Polymake.promote_to_pm_type(Polymake.Matrix,T)
 
@@ -238,6 +240,8 @@ using Polymake.SparseArrays
                 #@test broadcast(op, T(2), V) isa Polymake.Matrix{U}
                 @test broadcast(op, V, T(2)) isa Polymake.Matrix{U}
             end
+            end
+            @testset verbose=true "Arithmetic3 $S" begin
             for T in FloatTypes
                 U = Polymake.promote_to_pm_type(Polymake.Matrix,T)
                 op = *
@@ -262,11 +266,14 @@ using Polymake.SparseArrays
                 # @test broadcast(op, T(2), V) isa Polymake.Matrix{U}
                 @test broadcast(op, V, T(2)) isa Polymake.Matrix{U}
             end
+            end
+            @testset verbose=true "Arithmetic4 $S" begin
 
             for T in [int_scalar_types; rational_scalar_types; FloatTypes]
                 @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_s
 
                 @test V + T.(jl_s) == T.(jl_s) + V == V .+ T.(jl_s) == T.(jl_s) .+ V == 2jl_s
+            end
             end
         end
     end

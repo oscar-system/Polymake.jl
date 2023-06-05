@@ -1,6 +1,6 @@
 using Polymake.SparseArrays
 
-@testset "Polymake.SparseMatrix" begin
+@testset verbose=true "Polymake.SparseMatrix" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
@@ -24,7 +24,7 @@ using Polymake.SparseArrays
     
     jl_m = [1 2 3; 4 5 6]
     jl_s = sparse([0 0 0; 0 1 0])
-    @testset "Constructors/Converts" begin
+    @testset verbose=true "Constructors/Converts" begin
         for T in IntTypes #TODO Polymake.Integer
             @test Polymake.SparseMatrix(T.(jl_m)) isa Polymake.SparseMatrix{Polymake.to_cxx_type(Polymake.convert_to_pm_type(T))}
             @test Polymake.SparseMatrix(jl_m//1) isa Polymake.SparseMatrix{Polymake.Rational}
@@ -110,8 +110,8 @@ using Polymake.SparseArrays
         end
     end
 
-    @testset "Low-level operations" begin
-        @testset "Polymake.SparseMatrix{Int64}" begin
+    @testset verbose=true "Low-level operations" begin
+        @testset verbose=true "Polymake.SparseMatrix{Int64}" begin
             jl_m_32 = Int32.(jl_m)
             V = Polymake.SparseMatrix{Int64}(jl_m_32)
             # linear indexing:
@@ -143,7 +143,7 @@ using Polymake.SparseArrays
             @test string(Polymake.SparseMatrix{Int64}(jl_s)) == "pm::SparseMatrix<long, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
         end
 
-        @testset "Polymake.SparseMatrix{Polymake.Integer}" begin
+        @testset verbose=true "Polymake.SparseMatrix{Polymake.Integer}" begin
             V = Polymake.SparseMatrix{Polymake.Integer}(jl_m)
             # linear indexing:
             @test V[1] == 1
@@ -174,7 +174,7 @@ using Polymake.SparseArrays
             @test string(Polymake.SparseMatrix{Polymake.Integer}(jl_s)) == "pm::SparseMatrix<pm::Integer, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
         end
 
-        @testset "Polymake.SparseMatrix{Polymake.Rational}" begin
+        @testset verbose=true "Polymake.SparseMatrix{Polymake.Rational}" begin
             V = Polymake.SparseMatrix{Polymake.Rational}(jl_m)
             # linear indexing:
             @test V[1] == 1//1
@@ -209,7 +209,7 @@ using Polymake.SparseArrays
             @test string(Polymake.SparseMatrix{Polymake.Rational}(jl_s)) == "pm::SparseMatrix<pm::Rational, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
         end
 
-        @testset "Polymake.SparseMatrix{Float64}" begin
+        @testset verbose=true "Polymake.SparseMatrix{Float64}" begin
             V = Polymake.SparseMatrix{Float64}(jl_m)
             # linear indexing:
             @test V[1] == 1.0
@@ -242,7 +242,7 @@ using Polymake.SparseArrays
             @test string(Polymake.SparseMatrix{Float64}(jl_s)) == "pm::SparseMatrix<double, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
         end
         
-        @testset "Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}" begin
+        @testset verbose=true "Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}" begin
             V = Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_m)
             # linear indexing:
             @test V[1] == 1
@@ -277,7 +277,7 @@ using Polymake.SparseArrays
             @test string(Polymake.SparseMatrix{Polymake.QuadraticExtension{Polymake.Rational}}(jl_s)) == "pm::SparseMatrix<pm::QuadraticExtension<pm::Rational>, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
         end
 
-            @testset "Polymake.SparseMatrix{Polymake.OscarNumber}" begin
+            @testset verbose=true "Polymake.SparseMatrix{Polymake.OscarNumber}" begin
             V = Polymake.SparseMatrix{Polymake.OscarNumber}(jl_m)
             # linear indexing:
             @test V[1] == 1
@@ -309,7 +309,7 @@ using Polymake.SparseArrays
             
         end
 
-        @testset "Equality" begin
+        @testset verbose=true "Equality" begin
             for T in [IntTypes; Polymake.Integer]
                 V = Polymake.SparseMatrix{Polymake.Integer}(2, 3)
                 W = Polymake.SparseMatrix{Polymake.Rational}(2, 3)
@@ -348,7 +348,7 @@ using Polymake.SparseArrays
         end
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
         V = Polymake.SparseMatrix{Polymake.Integer}(jl_m)
         @test float.(V) isa Polymake.SparseMatrixAllocated{Float64}
         # @test V[1, :] isa Polymake.SparseVectorAllocated{Polymake.Integer}
@@ -394,6 +394,7 @@ using Polymake.SparseArrays
         @test 2X isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int)}
         @test Int32(2)X isa Polymake.SparseMatrix{Polymake.to_cxx_type(Int)}
 
+        @testset verbose=true "Arithmetic1" begin
         for T in int_scalar_types
             for (mat, ElType) in ((V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}), (Z, Polymake.OscarNumber))
                 op = *
@@ -434,6 +435,8 @@ using Polymake.SparseArrays
             end
         end
 
+        end
+        @testset verbose=true "Arithmetic2" begin
         for T in rational_scalar_types
             for (mat, ElType) in ((V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
 
@@ -464,6 +467,8 @@ using Polymake.SparseArrays
                 @test broadcast(op, mat, T(2)) isa Polymake.SparseMatrix{ElType}
             end
         end
+        end
+        @testset verbose=true "Arithmetic3" begin
         for T in FloatTypes
             let mat = U, ElType = Float64
                 op = *
@@ -490,7 +495,10 @@ using Polymake.SparseArrays
             end
         end
 
+        end
+        @testset verbose=true "Arithmetic4" begin
         for T in [int_scalar_types; rational_scalar_types; FloatTypes; Polymake.QuadraticExtension{Polymake.Rational}]
+        @testset verbose=true "Arithmetic4 $T" begin
             @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_m
             @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_m
             @test T(2)*W == W*T(2) == T(2) .* W == W .* T(2) == 2jl_w
@@ -507,14 +515,18 @@ using Polymake.SparseArrays
             
             @test Y + T.(2 * jl_m) == T.(2 * jl_m) + Y == Y .+ T.(2 * jl_m) == T.(2 * jl_m) .+ Y == (1 + sr2) * jl_y
         end
+        end
+        end
+        @testset verbose=true "Arithmetic5" begin
         
         for T in [int_scalar_types; rational_scalar_types]
             @test T(2)*Z == Z*T(2) == T(2) .* Z == Z .* T(2) == 2jl_z
             @test Z + T.(2 * jl_m) == T.(2 * jl_m) + Z == Z .+ T.(2 * jl_m) == T.(2 * jl_m) .+ Z == [Polymake.OscarNumber(m + 2) Polymake.OscarNumber(2*m + 4) Polymake.OscarNumber(3*m + 6); Polymake.OscarNumber(4*m + 8) Polymake.OscarNumber(5*m + 10) Polymake.OscarNumber(6*m + 12)]
         end
+        end
     end
 
-    @testset "findnz" begin
+    @testset verbose=true "findnz" begin
         jsm = sprand(1015,1841,.00014)
         droptol!(jsm,Polymake._get_global_epsilon())
         psm = Polymake.SparseMatrix(jsm)

@@ -1,13 +1,13 @@
 using Oscar
 
-@testset "Polymake.OscarNumber" begin
+@testset verbose=true "Polymake.OscarNumber" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     PolymakeTypes = [Polymake.Integer, Polymake.Rational]
     AllTypes = [IntTypes; PolymakeTypes; Base.Rational;
                 # Float64; BigFloat
                 ]
 
-    @testset "Constructors/Conversions" begin
+    @testset verbose=true "Constructors/Conversions" begin
         @test Polymake.OscarNumber <: Number
 
         # constructors
@@ -62,9 +62,9 @@ using Oscar
     m = a1 + 3*a2^2 + 7
     M = Polymake.OscarNumber(m)
     
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
 
-        @testset "Equality" begin
+        @testset verbose=true "Equality" begin
             a = Polymake.OscarNumber(6)
             for T in AllTypes
                 b = T(6)
@@ -111,7 +111,7 @@ using Oscar
         @test Polymake.OscarNumber(5) // A2 == Polymake.OscarNumber(a2^2)
     end
 
-    @testset "Show" begin
+    @testset verbose=true "Show" begin
         @test sprint(show, M) == string("common::OscarNumber\n(", sprint(show, m), ")")
     end
 end

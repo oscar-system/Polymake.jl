@@ -1,4 +1,4 @@
-@testset "Polymake.Vector" begin
+@testset verbose=true "Polymake.Vector" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
@@ -25,7 +25,7 @@
     A2 = Polymake.OscarNumber(a2)
     
     jl_v = [1,2,3]
-    @testset "Constructors/Converts" begin
+    @testset verbose=true "Constructors/Converts" begin
         @test Polymake.Vector(jl_v//1) isa Polymake.Vector{Polymake.Rational}
         @test Polymake.Vector(jl_v/1) isa Polymake.Vector{Float64}
 
@@ -80,9 +80,9 @@
         end
     end
 
-    @testset "Low-level operations" begin
+    @testset verbose=true "Low-level operations" begin
 
-        @testset "Polymake.Vector{Int64}" begin
+        @testset verbose=true "Polymake.Vector{Int64}" begin
             jl_v_32 = Int32.(jl_v)
             @test Polymake.Vector(jl_v_32) isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
             V = Polymake.Vector{Int64}(jl_v_32)
@@ -107,7 +107,7 @@
             end
         end
 
-        @testset "Polymake.Vector{Polymake.Integer}" begin
+        @testset verbose=true "Polymake.Vector{Polymake.Integer}" begin
             V = Polymake.Vector{Polymake.Integer}(jl_v)
 
             @test eltype(V) == Polymake.Integer
@@ -131,7 +131,7 @@
             end
         end
 
-        @testset "Polymake.Vector{Polymake.Rational}" begin
+        @testset verbose=true "Polymake.Vector{Polymake.Rational}" begin
             V = Polymake.Vector{Polymake.Rational}(jl_v)
 
             @test eltype(V) == Polymake.Rational
@@ -158,7 +158,7 @@
             end
         end
 
-        @testset "Polymake.Vector{Float64}" begin
+        @testset verbose=true "Polymake.Vector{Float64}" begin
             V = Polymake.Vector{Float64}(jl_v)
 
             @test eltype(V) == Float64
@@ -180,7 +180,7 @@
                 @test string(V) == "pm::Vector<double>\n1.66667 3.33333 3"
             end
             
-            @testset "Polymake.Vector{Polymake.QuadraticExtension{Polymake.Rational}}" begin
+            @testset verbose=true "Polymake.Vector{Polymake.QuadraticExtension{Polymake.Rational}}" begin
                 V = Polymake.Vector{Polymake.QuadraticExtension{Polymake.Rational}}(jl_v)
 
                 @test eltype(V) == Polymake.QuadraticExtension{Polymake.Rational}
@@ -207,7 +207,7 @@
                 end
             end
 
-            @testset "Polymake.Vector{Polymake.OscarNumber}" begin
+            @testset verbose=true "Polymake.Vector{Polymake.OscarNumber}" begin
                 V = Polymake.Vector{Polymake.Polymake.OscarNumber}(jl_v)
 
                 @test eltype(V) == Polymake.OscarNumber
@@ -232,7 +232,7 @@
             
         end
 
-        @testset "Equality" begin
+        @testset verbose=true "Equality" begin
             X = Polymake.Vector{Int64}(undef, 3)
             V = Polymake.Vector{Polymake.Integer}(undef, 3)
             W = Polymake.Vector{Polymake.Rational}(undef, 3)
@@ -275,7 +275,7 @@
         end
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
         X = Polymake.Vector{Int64}(jl_v)
         V = Polymake.Vector{Polymake.Integer}(jl_v)
         jl_w = jl_v//4
@@ -320,6 +320,7 @@
         @test 2X isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
         @test Int32(2)X isa Polymake.Vector{Polymake.to_cxx_type(Int64)}
 
+        @testset verbose=true "Arithmetic1" begin
         for T in int_scalar_types
             for (vec, ElType) in ((V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}), (Z, Polymake.OscarNumber))
                 op = *
@@ -359,6 +360,8 @@
             end
         end
 
+        end
+        @testset verbose=true "Arithmetic2" begin
         for T in rational_scalar_types
             for (vec, ElType) in ((V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
                 op = *
@@ -390,6 +393,8 @@
             end
         end
 
+        end
+        @testset verbose=true "Arithmetic3" begin
         for T in FloatTypes
             let vec = U, ElType = Float64
                 op = *
@@ -416,6 +421,8 @@
             end
         end
 
+        end
+        @testset verbose=true "Arithmetic4" begin
         for T in [int_scalar_types; rational_scalar_types; FloatTypes; Polymake.QuadraticExtension{Polymake.Rational}]
             @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_v
             @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_v
@@ -434,12 +441,16 @@
             @test Y + T.(2 * jl_v) == T.(2 * jl_v) + Y == Y .+ T.(2 * jl_v) == T.(2 * jl_v) .+ Y == (1 + sr2) * jl_y
         end
 
+        end
+        @testset verbose=true "Arithmetic5" begin
         for T in [int_scalar_types; rational_scalar_types]
             @test T(2)*Z == Z*T(2) == T(2) .* Z == Z .* T(2) == 2jl_z
             @test Z + T.(2 * jl_v) == T.(2 * jl_v) + Z == Z .+ T.(2 * jl_v) == T.(2 * jl_v) .+ Z == [Polymake.OscarNumber(m + 2), Polymake.OscarNumber(2*m + 4), Polymake.OscarNumber(3*m + 6)]
         end
+        end
     end
     
+    @testset verbose=true "Arithmetic6" begin
     for S in [Polymake.Rational]
         T = Polymake.Polynomial{S, Int64}
         @test Polymake.Vector{T} <: AbstractVector
@@ -474,6 +485,7 @@
             @test W[3] == T([4, 5], [1 0 0; 0 0 1])
             @test string(W) == "pm::Vector<pm::Polynomial<pm::Rational, long> >\n2*x_0^2*x_1^3 + 3*x_1^2*x_2^3 0 4*x_0 + 5*x_2"
         end
+    end
     end
 
 end

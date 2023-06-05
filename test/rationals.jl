@@ -1,7 +1,7 @@
-@testset "Polymake.Rational" begin
+@testset verbose=true "Polymake.Rational" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
 
-    @testset "Constructors/Conversions" begin
+    @testset verbose=true "Constructors/Conversions" begin
         @test Polymake.Rational <: Real
 
         # constructors
@@ -44,9 +44,9 @@
         @test [a,a] isa Base.Vector{Polymake.RationalAllocated}
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
 
-        @testset "Equality" begin
+        @testset verbose=true "Equality" begin
             a = Polymake.Rational(2, 6)
             for T in IntTypes
                 b = Base.Rational(T(2), T(6))
@@ -62,7 +62,7 @@
             end
         end
 
-        @testset "Polymake.Rational division" begin
+        @testset verbose=true "Polymake.Rational division" begin
             a = Polymake.Rational(4,5)
             for T in [IntTypes; Polymake.Integer]
                 @test Polymake.Integer(4)//T(5) isa Polymake.Rational
@@ -121,7 +121,7 @@
         end
     end
 
-    @testset "zero / one" begin
+    @testset verbose=true "zero / one" begin
         ZERO = Polymake.Rational(0)
         ONE = Polymake.Rational(1)
 
@@ -134,7 +134,7 @@
         @test zero(Polymake.Rational) == zero(ONE) == 0 // 1 == ZERO
     end
 
-    @testset "Show" begin
+    @testset verbose=true "Show" begin
         @test sprint(show, Polymake.Rational(3, 5)) == "3/5"
     end
 end

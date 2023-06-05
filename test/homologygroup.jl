@@ -1,6 +1,6 @@
-@testset "Polymake.HomologyGroup" begin
+@testset verbose=true "Polymake.HomologyGroup" begin
     
-    @testset "read data" begin
+    @testset verbose=true "read data" begin
         kb = Polymake.topaz.klein_bottle().HOMOLOGY
         @test Polymake.torsion(kb[1]) isa Polymake.StdList{Polymake.StdPair{Polymake.Integer, Polymake.to_cxx_type(Int64)}}
         @test Polymake.betti_number(kb[1]) isa Int64

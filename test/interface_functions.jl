@@ -1,4 +1,4 @@
-@testset "Interface functions" begin
+@testset verbose=true "Interface functions" begin
     for (args, val) in [((4,2), 5), ((Polymake.Integer(4), 2), 5)]
         @test Polymake.call_function(:polytope, :pseudopower, args...) == val
         @test (@pm polytope.pseudopower(args...)) == val
@@ -28,7 +28,7 @@
     @test !isempty(Polymake.get_docs("polytope::cube"))
 end
 
-@testset "Indexing helpers" begin
+@testset verbose=true "Indexing helpers" begin
     X = [2, [2,3], Polymake.Set([3,2,2])]
     Y = [3, [3,4], Polymake.Set([4,3,3])]
     Z = [1, [1,2], Polymake.Set([2,1,1])]

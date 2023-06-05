@@ -1,5 +1,5 @@
-@testset "Polymake.StdList" begin
-    @testset "Constructors" begin
+@testset verbose=true "Polymake.StdList" begin
+    @testset verbose=true "Constructors" begin
         
         l = Polymake.StdList{Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}()
         @test l isa Polymake.StdList
@@ -8,7 +8,7 @@
 
     end
 
-    @testset "List operations" begin
+    @testset verbose=true "List operations" begin
         l = Polymake.StdList{Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}()
         p = Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}(4,2) 
         push!(l,p)

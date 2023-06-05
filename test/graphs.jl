@@ -1,7 +1,7 @@
-@testset "Polymake.Graph" begin
+@testset verbose=true "Polymake.Graph" begin
     IntTypes = [Int64]
 
-    @testset "constructors" begin
+    @testset verbose=true "constructors" begin
         c = Polymake.polytope.cube(3)
         eg = c.GRAPH.ADJACENCY
         @test Polymake.nv(eg) == 8
@@ -11,7 +11,7 @@
         @test Polymake.ne(g) == 0
     end
 
-    @testset "manipulating edges and vertices" begin
+    @testset verbose=true "manipulating edges and vertices" begin
         g = Polymake.Graph{Polymake.Directed}(5)
         Polymake._add_edge(g, 0, 1)
         @test Polymake.ne(g) == 1
@@ -26,7 +26,7 @@
         @test !Polymake._has_edge(g, 0, 1)
     end
 
-    @testset "save load" begin
+    @testset verbose=true "save load" begin
         G = Polymake.graph.complete(4);
         g = G.ADJACENCY;
         mktempdir() do path
@@ -38,7 +38,7 @@
         end
     end
 
-    @testset "EdgeMap" begin
+    @testset verbose=true "EdgeMap" begin
         g = Polymake.Graph{Polymake.Directed}(5)
         for i in 0:4
            Polymake._add_edge(g, i, (i+1)%5)
@@ -50,7 +50,7 @@
         @test Polymake._get_entry(em, 1, 2) == 0
     end
 
-    @testset "NodeMap" begin
+    @testset verbose=true "NodeMap" begin
         c = Polymake.polytope.cube(3)
         faces = c.HASSE_DIAGRAM.FACES
         @test faces isa Polymake.NodeMap
@@ -61,7 +61,7 @@
         @test Polymake._get_entry(nm, 0) == 10
     end
 
-    @testset "shortest_path_dijkstra" begin
+    @testset verbose=true "shortest_path_dijkstra" begin
         g = Polymake.Graph{Polymake.Directed}(5)
         for i in 0:4
            Polymake._add_edge(g, i, (i+1)%5)

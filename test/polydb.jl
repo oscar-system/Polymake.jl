@@ -1,6 +1,6 @@
 using Polymake.Polydb.Mongoc
 
-@testset "polyDB" begin
+@testset verbose=true "polyDB" begin
     # conditions from which the test database dump was generated.
     add_constraints_poly = ["DIM" => Dict("\$lte" => 3)]
     function _acp(a::Array)
@@ -11,7 +11,7 @@ using Polymake.Polydb.Mongoc
         return append!(Array{Expr}(a), add_constraints_mat)
     end
 
-    @testset "Basic functionality" begin
+    @testset verbose=true "Basic functionality" begin
         # Types
         @test Polymake.Polydb.get_db() isa Polymake.Polydb.Database
         db = Polymake.Polydb.get_db()
@@ -45,7 +45,7 @@ using Polymake.Polydb.Mongoc
         results_bson = Polymake.Polydb.find(collection_bson, constraints...)
         @test Polymake.Polydb.Cursor{Polymake.BigObject}(results_bson) isa Polymake.Polydb.Cursor
         @test Polymake.Polydb.Cursor{Polymake.BigObject}(results_bson) isa Polymake.Polydb.Cursor{Polymake.BigObject}
-        @testset "Iterator (Cursor)" begin
+        @testset verbose=true "Iterator (Cursor)" begin
             @test iterate(results_bo) isa Tuple{Polymake.BigObject, Nothing}
             @test iterate(results_bson) isa Tuple{Mongoc.BSON, Nothing}
             results_bo = Polymake.Polydb.find(collection_bo, constraints...)
@@ -53,11 +53,11 @@ using Polymake.Polydb.Mongoc
             @test collect(results_bo) isa Vector{Polymake.BigObject}
             @test collect(results_bson) isa Vector{Mongoc.BSON}
         end
-        @testset "Iterator (Collection)" begin
+        @testset verbose=true "Iterator (Collection)" begin
             @test iterate(collection_bo) isa Tuple{Polymake.BigObject, Polymake.Polydb.Cursor{Polymake.BigObject}}
             @test iterate(collection_bson) isa Tuple{Mongoc.BSON, Mongoc.Cursor}
         end
-        @testset "Information" begin
+        @testset verbose=true "Information" begin
             for (col, f_name) in [(collection_bo, "FACETS"), (db["Matroids.Small"], "N_ELEMENTS")]
                 @test Polymake.Polydb.get_fields(col) isa Vector{String}
                 fields = Polymake.Polydb.get_fields(col)
@@ -75,13 +75,13 @@ using Polymake.Polydb.Mongoc
         end
     end
 
-    @testset "Basic querying" begin
+    @testset verbose=true "Basic querying" begin
         db = Polymake.Polydb.get_db()
         collection_bo = db["Polytopes.Lattice.SmoothReflexive"]
         for (template, access) in   [(Polymake.BigObject, :((x,y) -> getproperty(x, Symbol(y)))),
                                     (Mongoc.BSON, :((x,y) -> x[y]))]
             collection = Polymake.Polydb.Collection{template}(collection_bo)
-            @testset "`$template`-templated types" begin
+            @testset verbose=true "`$template`-templated types" begin
                 for (constraints, amount, op) in    [(_acp(["N_VERTICES" => 8]), 7, :(==)),
                                                     (_acp(["N_VERTICES" => Dict("\$lt" => 8)]), 12, :<),
                                                     (_acp(["N_VERTICES" => Dict("\$gt" => 8)]), 6, :>)]
@@ -108,7 +108,7 @@ using Polymake.Polydb.Mongoc
         end
     end
 
-    @testset "Query macros" begin
+    @testset verbose=true "Query macros" begin
         db = Polymake.Polydb.get_db()
         @test Polymake.Polydb.@select("Matroids.Small") isa Function
         @test Polymake.Polydb.@select("Matroids.Small")(db) isa Polymake.Polydb.Collection

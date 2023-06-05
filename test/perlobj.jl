@@ -1,9 +1,9 @@
-@testset "bigobject" begin
+@testset verbose=true "bigobject" begin
     points_int = [ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]
     points_rat = Rational{Int}[ 1 0 0 ; 1 3 0 ; 1 0 3 ; 1 3 3 ]
     points_unbounded = [1 0 0; 0 1 1]
 
-    @testset "constructors" begin
+    @testset verbose=true "constructors" begin
         @test Polymake.bigobject("polytope::Polytope", POINTS=points_int ) isa Polymake.BigObject
         @test Polymake.bigobject("polytope::Polytope", POINTS=points_rat ) isa Polymake.BigObject
         # macro literals
@@ -38,14 +38,14 @@
         c = polytope.cube(Polymake.PropertyValue, 3);
         @test polytope.spherize(c) isa Polymake.BigObject
 
-        @testset "giving polytope a name" begin
+        @testset verbose=true "giving polytope a name" begin
             p = polytope.rand_sphere(3,20);
             @test polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS) isa Polymake.BigObject
             P = polytope.Polytope("my cuttie", INEQUALITIES=p.POINTS)
             @test occursin("my cuttie", String(Polymake.properties(P)))
         end
 
-        @testset "copy" begin
+        @testset verbose=true "copy" begin
             p = polytope.cube(3)
             @test Polymake.exists(p,"F_VECTOR") == false
             pc = copy(p)
@@ -57,7 +57,7 @@
             @test Polymake.exists(pdc,"F_VECTOR") == true
          end
 
-        @testset "conversions" begin
+        @testset verbose=true "conversions" begin
             p = polytope.rand_sphere(3,20);
             @test polytope.Cone(p) isa Polymake.BigObject
 
@@ -85,7 +85,7 @@
         end
     end
 
-    @testset "template parameters" begin
+    @testset verbose=true "template parameters" begin
         @test (@pm polytope.Polytope(POINTS=points_int)) isa Polymake.BigObject
         @test (@pm polytope.Polytope{Rational}(POINTS=points_int)) isa Polymake.BigObject
         @test (@pm polytope.Polytope{QuadraticExtension}(POINTS=points_int)) isa Polymake.BigObject
@@ -114,13 +114,13 @@
         @test P.VERTICES isa Polymake.Matrix{Polymake.Rational}
     end
 
-    @testset "PolymakeException" begin
+    @testset verbose=true "PolymakeException" begin
         test_polytope = @pm polytope.Polytope(POINTS=points_int)
         @test !(:STH in Base.propertynames(test_polytope))
         @test_throws Polymake.PolymakeError test_polytope.STH
     end
 
-    @testset "properties" begin
+    @testset verbose=true "properties" begin
         test_polytope = @pm polytope.Polytope(POINTS=points_int)
         @test test_polytope.F_VECTOR == [ 4, 4 ]
         @test test_polytope.INTERIOR_LATTICE_POINTS ==
@@ -143,7 +143,7 @@
         @test i.VOLUME == Polymake.QuadraticExtension{Polymake.Rational}(5//4, 5//12, 5)
     end
 
-    @testset "attachments" begin
+    @testset verbose=true "attachments" begin
         test_polytope = polytope.Polytope(POINTS=points_int)
         att = Polymake.Matrix{Polymake.Rational}(3,3)
         @test Polymake.attach(test_polytope,"ATT",att) === nothing
@@ -157,7 +157,7 @@
         # @test Polymake.get_attachment(test_polytope) .== ["hello", "world"]
     end
 
-    @testset "tab-completion" begin
+    @testset verbose=true "tab-completion" begin
         test_polytope = @pm polytope.Polytope(POINTS=points_int)
 
         @test Base.propertynames(test_polytope) isa Base.Vector{Symbol}
@@ -172,7 +172,7 @@
         @test Base.propertynames(g) isa Base.Vector{Symbol}
     end
 
-    @testset "polymake tutorials" begin
+    @testset verbose=true "polymake tutorials" begin
         p = @pm polytope.Polytope(POINTS=polytope.cube(4).VERTICES)
         @test p isa Polymake.BigObject
 
@@ -216,7 +216,7 @@
         @test p.VERTICES[collect(s), :] == special_points
     end
 
-    @testset "polymake MILP" begin
+    @testset verbose=true "polymake MILP" begin
         p = @pm polytope.Polytope( INEQUALITIES=[1 1 -1; -1 0 1; 7 -1 -1] )
         intvar = Polymake.Set([0,1,2])
         @test Polymake.convert(Polymake.PolymakeType, intvar) isa Polymake.Set{Polymake.to_cxx_type(Int64)}
@@ -234,7 +234,7 @@
         @test p.MILP.MINIMAL_VALUE == -7
     end
 
-    @testset "poly2lp2poly" begin
+    @testset verbose=true "poly2lp2poly" begin
         p = polytope.Polytope( INEQUALITIES=[1 1 -1; -1 0 1; 7 -1 -1] )
         lp = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,1])
         p.LP = lp
@@ -246,7 +246,7 @@
         @test p.LP.LINEAR_OBJECTIVE == x.LP.LINEAR_OBJECTIVE
     end
 
-    @testset "multiple subobjects" begin
+    @testset verbose=true "multiple subobjects" begin
         p = polytope.Polytope( INEQUALITIES=[1 1 -1; -1 0 1; 7 -1 -1] )
         lp1 = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,0])
         lp2 = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,0,1])
@@ -263,7 +263,7 @@
         @test_throws ErrorException Polymake._lookup_multi(p,"LP","nonexisting")
     end
 
-    @testset "bigobject array" begin
+    @testset verbose=true "bigobject array" begin
         c = polytope.cube(3)
         c_type = Polymake.bigobject_type(c)
         @test Polymake.Array{Polymake.BigObject}(c_type,2) isa Polymake.Array{Polymake.BigObject}
@@ -277,11 +277,11 @@
     end
 
 
-    @testset "toplevel visual" begin
+    @testset verbose=true "toplevel visual" begin
         @test visual(Polymake.Visual, polytope.cube(3)) isa Polymake.Visual
     end
 
-    @testset "names and description" begin
+    @testset verbose=true "names and description" begin
         p = polytope.cube(3)
         Polymake.setname!(p,"somename")
         @test occursin("somename", String(Polymake.getname(p)))

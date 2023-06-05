@@ -1,8 +1,8 @@
-@testset "Polymake.QuadraticExtension{Polymake.Rational}" begin
+@testset verbose=true "Polymake.QuadraticExtension{Polymake.Rational}" begin
     FloatTypes = [Float32, Float64, BigFloat]
     MoreNumberTypes = [Int32, Int64, UInt64, BigInt, Polymake.Integer, Polymake.Rational]
 
-    @testset "Constructors/Conversions" begin
+    @testset verbose=true "Constructors/Conversions" begin
         
         # constructors
         for T in  [FloatTypes; MoreNumberTypes]
@@ -35,9 +35,9 @@
         @test [a,a] isa Vector{Polymake.QuadraticExtensionAllocated{Polymake.Rational}}
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
     
-        @testset "(In-)Equality" begin
+        @testset verbose=true "(In-)Equality" begin
             a = Polymake.QuadraticExtension{Polymake.Rational}(5)
             for T in [FloatTypes; MoreNumberTypes], b in [Polymake.QuadraticExtension{Polymake.Rational}(T(5)), Polymake.QuadraticExtension{Polymake.Rational}(T(5), T(0), T(0)), Polymake.QuadraticExtension{Polymake.Rational}(T(5), T(1), T(0)), Polymake.QuadraticExtension{Polymake.Rational}(T(5), T(0), T(2))]
                 @test a == b
@@ -55,7 +55,7 @@
             end
         end
         
-        @testset "Addition" begin
+        @testset verbose=true "Addition" begin
             a = Polymake.QuadraticExtension{Polymake.Rational}(5)
             b = Polymake.QuadraticExtension{Polymake.Rational}(17, 1, 5)
             @test a + b isa Polymake.QuadraticExtension{Polymake.Rational}
@@ -66,7 +66,7 @@
             @test b == Polymake.QuadraticExtension{Polymake.Rational}(39, 2, 5)
         end
         
-        @testset "Subtraction" begin
+        @testset verbose=true "Subtraction" begin
             a = Polymake.QuadraticExtension{Polymake.Rational}(5)
             b = Polymake.QuadraticExtension{Polymake.Rational}(17, 1, 5)
             @test a - b isa Polymake.QuadraticExtension{Polymake.Rational}
@@ -77,7 +77,7 @@
             @test b == Polymake.QuadraticExtension{Polymake.Rational}(29, 2, 5)
         end
         
-        @testset "Multiplication" begin
+        @testset verbose=true "Multiplication" begin
             a = Polymake.QuadraticExtension{Polymake.Rational}(5)
             b = Polymake.QuadraticExtension{Polymake.Rational}(17, 1, 5)
             @test a * b isa Polymake.QuadraticExtension{Polymake.Rational}
@@ -86,7 +86,7 @@
             @test a == Polymake.QuadraticExtension{Polymake.Rational}(85, 5, 5)
         end
         
-        @testset "Division" begin
+        @testset verbose=true "Division" begin
             a = Polymake.QuadraticExtension{Polymake.Rational}(5)
             b = Polymake.QuadraticExtension{Polymake.Rational}(17, 1, 5)
             @test a // b isa Polymake.QuadraticExtension{Polymake.Rational}
@@ -103,7 +103,7 @@
         
     end
     
-    @testset "zero / one" begin
+    @testset verbose=true "zero / one" begin
         ZERO = Polymake.QuadraticExtension{Polymake.Rational}(0)
         ONE = Polymake.QuadraticExtension{Polymake.Rational}(1)
     
@@ -116,7 +116,7 @@
         @test one(Polymake.QuadraticExtension{Polymake.Rational}) == one(ZERO) == ONE
     end
     
-    @testset "Promotion" begin
+    @testset verbose=true "Promotion" begin
         for T in MoreNumberTypes
             a = Polymake.QuadraticExtension{Polymake.Rational}(5, 1, 3)
             b = T(17)
@@ -167,7 +167,7 @@
         end
     end
     
-    @testset "precise access" begin
+    @testset verbose=true "precise access" begin
         
         a = Polymake.QuadraticExtension{Polymake.Rational}(5, 1, 3)
         @test Polymake.generating_field_elements(a) isa NamedTuple{(:a, :b, :r), Tuple{Polymake.RationalAllocated, Polymake.RationalAllocated, Polymake.RationalAllocated}}

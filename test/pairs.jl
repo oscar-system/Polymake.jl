@@ -1,10 +1,10 @@
-@testset "Polymake.StdPair" begin
-    @testset "Constructors" begin
+@testset verbose=true "Polymake.StdPair" begin
+    @testset verbose=true "Constructors" begin
         @test Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}() isa Polymake.StdPair
     end
     
 
-    @testset "Low-level operations" begin
+    @testset verbose=true "Low-level operations" begin
         p = Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}(1,2) 
         @test Polymake.first(p) == 1
         @test Polymake.last(p) == 2
@@ -12,12 +12,12 @@
         @test p == Pair(1, 2)
     end
 
-    @testset "High-level operations" begin
+    @testset verbose=true "High-level operations" begin
         p = Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}(1,2) 
         @test +(p...) == 3
     end
     
-    @testset "FUNDAMENTAL_GROUP" begin
+    @testset verbose=true "FUNDAMENTAL_GROUP" begin
         t = Polymake.topaz.torus()
         p1 = t.FUNDAMENTAL_GROUP
         @test p1 isa Polymake.StdPair{CxxWrap.CxxLong, Polymake.StdList{Polymake.StdList{Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}}}}

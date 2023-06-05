@@ -1,7 +1,7 @@
-@testset "Polymake.Set" begin
+@testset verbose=true "Polymake.Set" begin
     IntTypes = [Int64]
 
-    @testset "constructors" begin
+    @testset verbose=true "constructors" begin
         for T in IntTypes
             @test Polymake.Set{T}() isa Polymake.Set
             @test Polymake.Set{T}() isa AbstractSet
@@ -20,7 +20,7 @@
         end
     end
 
-    @testset "equality" begin
+    @testset verbose=true "equality" begin
         for T in IntTypes, S in IntTypes
             @test Polymake.Set{S}() == Polymake.Set{T}()
             @test Polymake.Set(T[1]) == Polymake.Set(S[1,1])
@@ -36,7 +36,7 @@
         end
     end
 
-    @testset "conversions" begin
+    @testset verbose=true "conversions" begin
         for T in IntTypes
             A = Polymake.Set(T[1,2,3,1,2,3])
 
@@ -56,7 +56,7 @@
     end
 
 
-    @testset "relations" begin
+    @testset verbose=true "relations" begin
 
         for T in IntTypes, S in IntTypes
             @test incl(Polymake.Set(S[1]), Polymake.Set(T[1])) == 0
@@ -79,7 +79,7 @@
         end
     end
 
-    @testset "basic functionality" begin
+    @testset verbose=true "basic functionality" begin
         for T in IntTypes
             A = Polymake.Set(T[1,2,3,1])
             B = Polymake.Set(T[5,6,6])
@@ -119,7 +119,7 @@
         end
     end
 
-    @testset "elements operations" begin
+    @testset verbose=true "elements operations" begin
         for T in IntTypes, S in IntTypes
             A = Polymake.Set(T[3,2,1,3,2,1])
             jlA = Base.Set(T[1,2,3,1,2,3])
@@ -161,12 +161,12 @@
         end
     end
 
-    @testset "operations" begin
+    @testset verbose=true "operations" begin
         for T in IntTypes
 
             A_orig, B_orig = Polymake.Set(T[1,2,3]), Polymake.Set(T[2,3,4])
 
-            @testset "union $T" begin
+            @testset verbose=true "union $T" begin
                 let A = Polymake.Set(T[1,2,3]), B = Polymake.Set(T[2,3,4])
                     jlA, jlB = Base.Set(A), Base.Set(B)
                     @test union(A,A) == union(jlA,jlA)
@@ -188,7 +188,7 @@
                 end
             end
 
-            @testset "intersect $T" begin
+            @testset verbose=true "intersect $T" begin
                 let A = Polymake.Set(T[1,2,3]), B = Polymake.Set(T[2,3,4])
                     jlA, jlB = Base.Set(A), Base.Set(B)
 
@@ -210,7 +210,7 @@
                 end
             end
 
-            @testset "setdiff $T" begin
+            @testset verbose=true "setdiff $T" begin
                 let A = Polymake.Set(T[1,2,3]), B = Polymake.Set(T[2,3,4])
                     jlA, jlB = Base.Set(A), Base.Set(B)
                     @test isempty(setdiff(A,A)) == isempty(setdiff(jlA, jlA))
@@ -236,7 +236,7 @@
                 end
             end
 
-            @testset "symdiff $T" begin
+            @testset verbose=true "symdiff $T" begin
                 let A = Polymake.Set(T[1,2,3]), B = Polymake.Set(T[2,3,4])
                     jlA, jlB = Base.Set(A), Base.Set(B)
                     @test isempty(symdiff(A,A)) == isempty(symdiff(jlA,jlA))
@@ -261,7 +261,7 @@
         end
     end
 
-    @testset "polymake constructors" begin
+    @testset verbose=true "polymake constructors" begin
         for T in IntTypes
             @test Polymake.range(T(-1), T(5)) == Polymake.Set(collect(-1:5))
             @test Polymake.sequence(T(-1), T(5)) == Polymake.Set(collect(-1:3))
@@ -270,9 +270,9 @@
     end
 end
 
-@testset "julia Base.Sets compatibility" begin
+@testset verbose=true "julia Base.Sets compatibility" begin
 
-    @testset "Construction" begin
+    @testset verbose=true "Construction" begin
         let f17741 = x -> x < 0 ? 0 : 1
             @test isa(Polymake.Set(x for x = 1:3), Polymake.Set{Polymake.to_cxx_type(Int)})
             @test isa(Polymake.Set(x for x = 1:3 for j = 1:1), Polymake.Set{Polymake.to_cxx_type(Int)})
@@ -294,7 +294,7 @@ end
         end
     end
 
-    @testset "hash" begin
+    @testset verbose=true "hash" begin
         s1 = Polymake.Set([1, 2, 1])
         s2 = Polymake.Set([2, 1, 1])
         s3 = Polymake.Set([3])
@@ -305,7 +305,7 @@ end
         @test hash(d1) != hash(d2)
     end
 
-    @testset "equality" for eq in (isequal, ==)
+    @testset verbose=true "equality" for eq in (isequal, ==)
         for T in [Int64]
             @test  eq(Polymake.Set{T}(), Polymake.Set{T}())
             @test !eq(Polymake.Set{T}(), Polymake.Set(T[1]))
@@ -325,7 +325,7 @@ end
         end
     end
 
-    @testset "eltype, empty" begin
+    @testset verbose=true "eltype, empty" begin
         s1 = empty(Polymake.Set([1,2]))
         @test isequal(s1, Polymake.Set{Int}())
         @test ===(eltype(s1), Base.Int)
@@ -337,7 +337,7 @@ end
         @test ===(eltype(s3), Int64)
     end
 
-    @testset "isempty, length, in, push, pop, delete" begin
+    @testset verbose=true "isempty, length, in, push, pop, delete" begin
         # also test for no duplicates
         s = Polymake.Set{Base.Int}(); push!(s,1); push!(s,2); push!(s,3)
         @test !isempty(s)
@@ -362,7 +362,7 @@ end
         @test length(Polymake.Set([2,120])) == 2
     end
 
-    @testset "copy" begin
+    @testset verbose=true "copy" begin
         data_in = (1,2,9,8,4)
         s = Polymake.Set(data_in)
         c = copy(s)
@@ -376,13 +376,13 @@ end
         @test !in(200,s)
     end
 
-    @testset "sizehint, empty" begin
+    @testset verbose=true "sizehint, empty" begin
         s = Polymake.Set([1])
         @test isequal(sizehint!(s, 10), Polymake.Set([1]))
         @test isequal(empty!(s), Polymake.Set{Base.Int}())
     end
 
-    @testset "iteration" begin
+    @testset verbose=true "iteration" begin
         x = (7, 8, 4, 5, 4, 8)
         for data_in = [x, Base.Set(x), collect(x)]
             s = Polymake.Set(data_in)
@@ -401,7 +401,7 @@ end
         end
     end
 
-    @testset "union" begin
+    @testset verbose=true "union" begin
         S = Polymake.Set{Polymake.to_cxx_type(Int)}
         s = ∪(S([1,2]), S([3,4]))
         @test s == S([1,2,3,4])
@@ -423,7 +423,7 @@ end
         @test union([1], S()) isa Base.Vector{Int}
     end
 
-    @testset "intersect" begin
+    @testset verbose=true "intersect" begin
         S = Polymake.Set{Int}
         s = S([1,2]) ∩ S([3,4])
         @test s == S()
@@ -443,7 +443,7 @@ end
         @test intersect([1], S()) isa Base.Vector{Int}
     end
 
-    @testset "setdiff" begin
+    @testset verbose=true "setdiff" begin
         S = Polymake.Set{Polymake.to_cxx_type(Int)}
         @test setdiff(S([1,2,3]), S())        == S([1,2,3])
         @test setdiff(S([1,2,3]), S([1]))     == S([2,3])
@@ -471,7 +471,7 @@ end
         @test isequal(s,Base.Set([1,3]))
     end
 
-    @testset "ordering" begin
+    @testset verbose=true "ordering" begin
         S = Polymake.Set{Base.Int}
         @test S() < S([1])
         @test S([1]) < S([1,2])
@@ -488,7 +488,7 @@ end
         @test !(S([1,2,3]) <= S([1,2,4]))
     end
 
-    @testset "issubset, symdiff" begin
+    @testset verbose=true "issubset, symdiff" begin
         S = Polymake.Set{Base.Int}
         for (l,r) in ((S([1,2]),     S([3,4])),
                       (S([5,6,7,8]), S([7,8,9])),
@@ -527,7 +527,7 @@ end
         @test symdiff([1], S()) isa Base.Vector{Int}
     end
 
-    @testset "filter(f, ::Polymake.Set), first" begin
+    @testset verbose=true "filter(f, ::Polymake.Set), first" begin
         S = Polymake.Set{Int}
         s = S([1,2,3,4])
         @test s !== filter( isodd, s) == S([1,3])
@@ -536,7 +536,7 @@ end
         @test first(S(2)) == 2
     end
 
-    @testset "pop!" begin
+    @testset verbose=true "pop!" begin
         s = Polymake.Set(1:5)
         @test 2 in s
         @test pop!(s, 2) == 2
@@ -549,7 +549,7 @@ end
         @test pop!(Base.Set(1:2), 2, nothing) == 2
     end
 
-    @testset "replace! & replace" begin
+    @testset verbose=true "replace! & replace" begin
         s = Polymake.Set([1, 2, 3])
         @test replace(x -> x > 1 ? 2x : x, s) == Polymake.Set([1, 4, 6])
         for count = (1, 0x1, big(1))
@@ -565,7 +565,7 @@ end
         @test replace!(x->2x, Polymake.Set([1:20;])) == Polymake.Set([2:2:40;])
     end
 
-    @testset "⊆, ⊊, ⊈, ⊇, ⊋, ⊉, <, <=, issetequal" begin
+    @testset verbose=true "⊆, ⊊, ⊈, ⊇, ⊋, ⊉, <, <=, issetequal" begin
         a = [1, 2]
         b = [2, 1, 3]
         let C = Polymake.Set{Int64}

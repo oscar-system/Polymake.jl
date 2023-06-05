@@ -11,7 +11,7 @@ struct MyInt x::Int end # needed in test/convert.jl
 
 include("Aqua.jl")
 
-@testset "Polymake" begin
+@testset verbose=true "Polymake" begin
     include("integers.jl")
     include("rationals.jl")
     include("quadraticextension.jl")

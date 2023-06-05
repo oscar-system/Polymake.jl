@@ -1,6 +1,6 @@
 using Polymake.SparseArrays
 
-@testset "Polymake.Polynomial" begin
+@testset verbose=true "Polymake.Polynomial" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
     RationalTypes = [Rational{I} for I in IntTypes]
@@ -14,7 +14,7 @@ using Polymake.SparseArrays
 
     jl_v = [1, 2]
     jl_m = [3 4 5; 6 7 0]
-    @testset "Constructors/Converts" begin
+    @testset verbose=true "Constructors/Converts" begin
         for C in [Int64, Polymake.Integer, Polymake.Rational, Float64]
             @test Polymake.Polynomial(C.(jl_v), jl_m) isa Polymake.Polynomial{Polymake.to_cxx_type(C),Polymake.to_cxx_type(Int64)}
             @test Polymake.Polynomial{Float64}(C.(jl_v), jl_m) isa Polymake.Polynomial{Polymake.to_cxx_type(Float64),Polymake.to_cxx_type(Int64)}
@@ -23,7 +23,7 @@ using Polymake.SparseArrays
     end
 
     
-    @testset "Low-level operations" begin
+    @testset verbose=true "Low-level operations" begin
         p = Polymake.Polynomial{Polymake.Rational, Int64}([1, 1, 1], [1 0 0; 0 1 0; 0 0 1])
         oldnames = Polymake.get_var_names(p)
         for (C,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational>")]
@@ -52,13 +52,13 @@ using Polymake.SparseArrays
         Polymake.set_var_names(p, oldnames)
     end
 
-    @testset "Equality" begin
+    @testset verbose=true "Equality" begin
         for C1 in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}], C2 in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
             @test Polymake.Polynomial{C1}(jl_v,jl_m) == Polymake.Polynomial{C2}(jl_v,jl_m)
         end
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
         jl_v2 = [5, 6]
         jl_m2 = [3 4 5; 6 7 8]
         for C1 in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
@@ -98,7 +98,7 @@ using Polymake.SparseArrays
         end
     end
 
-    @testset "UniPolynomial" begin
+    @testset verbose=true "UniPolynomial" begin
         c = Polymake.polytope.cube(3,1,0)
         ehr = c.EHRHART_POLYNOMIAL
         @test Polymake.monomials_as_vector(ehr) == [0, 1, 2, 3]
