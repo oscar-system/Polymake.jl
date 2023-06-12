@@ -19,7 +19,7 @@ const SmallObject = Union{
     EdgeMap,
     NodeMap,
 }
-const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}}
+const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}, TropicalNumber{Polymake.Max, Polymake.Rational}, TropicalNumber{Polymake.Min, Polymake.Rational}}
 
 const TypeConversionFunctions = Dict(
     Symbol("Int") => to_int,
