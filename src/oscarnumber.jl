@@ -38,6 +38,7 @@ function unwrap(on::OscarNumber)
    end
 end
 
+# this struct must match the struct in OscarNumber.cc
 mutable struct oscar_number_dispatch_helper
     index::Clong
     init::Ptr{Cvoid}
@@ -59,21 +60,22 @@ mutable struct oscar_number_dispatch_helper
     is_inf::Ptr{Cvoid}
     sign::Ptr{Cvoid}
     abs::Ptr{Cvoid}
+    hash::Ptr{Cvoid}
 end
-oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 19)...)
+oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 20)...)
 
 #mutable struct jl_pm_type_map{T}
 #   index::Int
 #   gc::Dict{T,Int}
 #end
 
-_on_gc_refs = IdDict()
+const _on_gc_refs = IdDict()
 
 field_count = 0
 
 # mapping parent -> (id, element, dispatch)
-_on_dispatch_helper = Dict{Any, Tuple{Clong, oscar_number_dispatch_helper}}()
-_on_parent_by_id = Dict{Clong, Any}()
+const _on_dispatch_helper = Dict{Any, Tuple{Clong, oscar_number_dispatch_helper}}()
+const _on_parent_by_id = Dict{Clong, Any}()
 
 @generated _on_gen_add(::Type{ArgT}) where ArgT =
    quote
@@ -136,10 +138,34 @@ _on_sign_int(e::T) where T = Base.cmp(e,0)::Int
       @cfunction(_on_sign_int, Clong, (Ref{ArgT},))
    end
 
+function _fieldelem_to_rational(e::T) where T
+   if !hasmethod(Rational{BigInt}, Tuple{T})
+      error("OscarNumber: cannot check is_rational, please define 'Polymake._fieldelem_to_rational(e::$T)::Rational{BigInt}'")
+   end
+   return Base.Rational{BigInt}(e)
+end
+function _fieldelem_is_rational(e::T) where T
+   error("OscarNumber: cannot check is_rational, please define 'Polymake._fieldelem_is_rational(e::$T)::Bool'")
+end
+
+function _on_hash(e::T) where T
+   if !_fieldelem_is_rational(e)
+      return hash(e)
+   end
+   r = _fieldelem_to_rational(e)
+   return GC.@preserve r begin
+      Polymake._hash_mpz(numerator(r)) - Polymake._hash_mpz(denominator(r))
+   end
+end
+
+@generated _on_gen_hash(::Type{ArgT}) where ArgT =
+   quote
+      @cfunction(_on_hash, Csize_t, (Ref{ArgT},))
+   end
+
 # the Ptr arg in the following functions allows us to fix the return type
 # from the @cfunction call
 function _on_init(id::Clong, ::Ptr{ArgT}, i::Clong)::ArgT where ArgT
-   #@info "init on $i"
    return _on_parent_by_id[id](i)
 end
 @generated _on_gen_init(::Type{ArgT}) where ArgT =
@@ -150,11 +176,11 @@ end
 function _on_init_frac(id::Clong, ::Ptr{ArgT}, np::Ptr{BigInt}, dp::Ptr{BigInt})::ArgT where ArgT
    n = unsafe_load(np)::BigInt
    d = unsafe_load(dp)::BigInt
-   #@info "init on frac $n // $d"
+   #println("init on frac $n // $d -- $id")
    #rat = Base.Rational{BigInt}(n, d)
-   #@info "init on frac -> $rat $(typeof(rat))"
+   #println("init on frac -> $rat $(typeof(rat))")
    #res = _on_parent_by_id[id](rat)
-   #@info "init on frac -> -> $res $(typeof(res))"
+   #println("init on frac -> -> $res $(typeof(res))")
    #return res::ArgT
    return _on_parent_by_id[id](Base.Rational{BigInt}(n, d))
 end
@@ -164,7 +190,6 @@ end
    end
 
 function _on_copy(e::T)::T where T
-   #@info "copy on $e"
    return deepcopy(e)
 end
 @generated _on_gen_copy(::Type{ArgT}) where ArgT =
@@ -175,7 +200,7 @@ end
 
 function _on_gc_protect(x::T) where T
    if haskey(Polymake._on_gc_refs, x)
-      @error "gc_protect: duplicate on $x : $(objectid(x))"
+      error("gc_protect: duplicate on $x : $(objectid(x))")
    end
    Polymake._on_gc_refs[x] = x
    return nothing
@@ -187,7 +212,7 @@ end
 
 function _on_gc_free(x::T) where T
    if !haskey(Polymake._on_gc_refs, x)
-      @error "gc_free: invalid on $x : $(objectid(x))"
+      error("gc_free: invalid on $x : $(objectid(x))")
    end
    delete!(Polymake._on_gc_refs, x)
    return nothing
@@ -198,11 +223,13 @@ end
    end
 
 
-#function _on_to_string(fp::Ptr{Nothing}, str::Ptr{Ptr{UInt8}})
-#   f = unsafe_pointer_to_objref(fp)::on_t
-#   @info "to_string on $(f) at $fp"
-#   Base.unsafe_convert(Cstring,string(f))
-#end
+function _on_to_string(e::T) where T
+   return Cstring(pointer("$e"))
+end
+@generated _on_gen_to_string(::Type{ArgT}) where ArgT =
+   quote
+      @cfunction(_on_to_string, Cstring, (Ref{ArgT},))
+   end
 
 function OscarNumber(e)
    id = register_julia_element(e, parent(e), typeof(e))
@@ -220,12 +247,11 @@ function register_julia_element(e, p, t::Type)
    newid = field_count+1
 
    if isimmutable(e)
-      @error "OscarNumber: immutable julia types not supported"
+      error("OscarNumber: immutable julia types not supported")
    end
 
    for type in (Int64, Base.Rational{BigInt})
-      hasmethod(p, (type,)) ||
-         @error "OscarNumber: no constructor ($p)($type)"
+      hasmethod(p, (type,)) || error("OscarNumber: no constructor ($p)($type)")
    end
 
 
@@ -253,19 +279,16 @@ function register_julia_element(e, p, t::Type)
    dispatch.is_zero = _on_gen_is_zero(t)
    dispatch.is_one  = _on_gen_is_one(t)
    dispatch.sign    = _on_gen_sign_int(t)
+   dispatch.hash    = _on_gen_hash(t)
 
    dispatch.cmp = _on_gen_cmp(t)
 
-   # to_string done on c++ side
-   # to_string::Ptr{Cvoid}
-   # TODO:
+   dispatch.to_string = _on_gen_to_string(t)
+   # maybe:
    # from_string::Ptr{Cvoid}
 
    # no inf value for nemo types ...
    #dispatch.is_inf  = _on_gen_is_inf(t)
-   #
-   #TODO:
-   #retrieve oscar object?
 
    _register_oscar_number(pointer_from_objref(dispatch), newid)
    _on_dispatch_helper[p] = (newid, dispatch)
