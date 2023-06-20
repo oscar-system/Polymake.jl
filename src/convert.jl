@@ -108,6 +108,7 @@ for (pmT, jlT) in [(Integer, Base.Integer),
                    (Int64, Union{Int32,Int64,CxxWrap.CxxLong}),
                    (Rational, Union{Base.Rational, Rational}),
                    (TropicalNumber{Max, Rational}, TropicalNumber{Max, Rational}),
+                   (TropicalNumber{Min, Rational}, TropicalNumber{Min, Rational}),
                    (QuadraticExtension{Rational}, QuadraticExtension{Rational})]
     @eval begin
         convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{to_cxx_type($pmT)}
