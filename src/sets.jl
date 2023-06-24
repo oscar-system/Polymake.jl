@@ -74,8 +74,6 @@ end
 
 Base.allunique(::Set) = true
 
-# delete! : Defined on the C++ side
-Base.delete!(s::Set{T}, x) where T = delete!(s, T(x))
 # empty!  : Defined on the C++ side
 Base.empty(s::Set{T}, ::Type{U}=T) where {T, U} = Set{to_cxx_type(U)}()
 #
@@ -90,10 +88,6 @@ function Base.filter!(pred, s::Set{T}) where T
     return s
 end
 
-# in      : Defined on the C++ side
-Base.in(x::Base.Integer, s::Set{T}) where T = in(T(x), s)
-
-#
 # # isempty : Defined on the C++
 
 function Base.iterate(S::Set)
@@ -125,8 +119,6 @@ function Base.pop!(s::Set{T}) where T
     return pop!(s, first(s))
 end
 
-# push! : Defined on the C++ side
-Base.push!(s::Set{T}, x::Base.Integer) where T = push!(s, T(x))
 # show : Defined on the C++ side
 
 Base.sizehint!(s::Set, newsz) = s
