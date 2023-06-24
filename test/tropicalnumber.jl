@@ -156,4 +156,33 @@
             end
         end
     end
+
+    @testset "Containers" begin
+        for VType in [Polymake.Vector, Polymake.Array]
+            for A in AdditionTypes
+                v = VType{Polymake.TropicalNumber{A, Polymake.Rational}}(5)
+                @test v isa VType{Polymake.TropicalNumber{A, Polymake.Rational}}
+                # If this at some point might work, we want to get notified:
+                @test_broken v isa VType{Polymake.TropicalNumber{A}}
+                @test length(v) == 5
+                @test v+v == v
+                for e in v
+                    @test iszero(e)
+                end
+            end
+        end
+        for MType in [Polymake.Matrix, Polymake.SparseMatrix]
+            for A in AdditionTypes
+                v = MType{Polymake.TropicalNumber{A, Polymake.Rational}}(5,5)
+                @test v isa MType{Polymake.TropicalNumber{A, Polymake.Rational}}
+                # If this at some point might work, we want to get notified:
+                @test_broken v isa MType{Polymake.TropicalNumber{A}}
+                @test size(v) == (5,5)
+                @test v+v == v
+                for e in v
+                    @test iszero(e)
+                end
+            end
+        end
+    end
 end

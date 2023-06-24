@@ -37,7 +37,7 @@ import TOPCOM_jll
 using libpolymake_julia_jll
 
 
-const jlpolymake_version_range = (v"0.9.0",  v"0.10")
+const jlpolymake_version_range = (v"0.10.0",  v"0.11")
 
 struct PolymakeError <: Exception
     msg
@@ -81,7 +81,7 @@ include("ijulia.jl")
 
 @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
 
-include(polymake_jll.generate_deps_tree)
+include(libpolymake_julia_jll.generate_deps_tree)
 
 include(type_translator)
 
@@ -93,7 +93,7 @@ function __init__()
                  @generate_wrappers(Ninja_jll),
                  @generate_wrappers(Perl_jll),
                ]
-    polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree")
+    polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree_v2")
 
     # we run this on every init to make sure all artifacts still exist
     prepare_deps_tree(polymake_deps_tree)
