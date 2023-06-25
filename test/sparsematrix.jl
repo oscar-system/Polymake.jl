@@ -302,10 +302,10 @@ using Polymake.SparseArrays
                 @test V[2] = A2 isa Polymake.OscarNumber
                 V[2] = A2
                 @test V[2] == A2
-                @test string(V) == string("pm::SparseMatrix<common::OscarNumber, pm::NonSymmetric>\n(", m, ") 2 3\n(", a2, ") 5 6\n")
+                @test string(V) == string("pm::SparseMatrix<common::OscarNumber, pm::NonSymmetric>\n(", m, ") (2) (3)\n(", a2, ") (5) (6)\n")
             end
 
-            @test string(Polymake.SparseMatrix{Polymake.OscarNumber}(jl_s)) == "pm::SparseMatrix<common::OscarNumber, pm::NonSymmetric>\n(3)\n(3) (1 1)\n"
+            @test string(Polymake.SparseMatrix{Polymake.OscarNumber}(jl_s)) == "pm::SparseMatrix<common::OscarNumber, pm::NonSymmetric>\n(3)\n(3) (1 (1))\n"
             
         end
 

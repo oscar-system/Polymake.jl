@@ -130,10 +130,17 @@ using Polymake.SparseArrays
                     @test V[2] = T(10) isa T
                     V[2] = T(10)
                     @test V[2] == 10
-                    @test string(V) == string("pm::SparseVector<", s, ">\n5 10 3")
+                    if E == Polymake.OscarNumber
+                       @test string(V) == string("pm::SparseVector<", s, ">\n(5) (10) (3)")
+                    else
+                       @test string(V) == string("pm::SparseVector<", s, ">\n5 10 3")
+                    end
                 end
-
-                @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 1)")
+                if E == Polymake.OscarNumber
+                   @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 (1))")
+                else
+                   @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 1)")
+                end
             end
         end
 

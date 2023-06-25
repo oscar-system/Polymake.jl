@@ -217,7 +217,7 @@
                 @test V[2] = A2 isa Polymake.OscarNumber
                 V[2] = A2
                 @test V[2] == A2
-                @test string(V) == string("pm::Matrix<common::OscarNumber>\n(", m, ") 2 3\n(", a2, ") 5 6\n")
+                @test string(V) == string("pm::Matrix<common::OscarNumber>\n(", m, ") (2) (3)\n(", a2, ") (5) (6)\n")
             end
         end
 
