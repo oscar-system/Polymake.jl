@@ -116,6 +116,6 @@
     end
 
     @testset verbose=true "Show" begin
-        @test sprint(show, M) == string("common::OscarNumber\n(", sprint(show, m), ")")
+        @test sprint(show, M) == string("(", sprint(show, m), ")")
     end
 end
