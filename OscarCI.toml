@@ -9,23 +9,35 @@ julia-version = [ "~1.6.0-0", "~1.8.0-0", "~1.9.0-0"]
   [pkgs.Oscar]
   test = true
 
+  [pkgs.Polymake]
+  branches = [ "<matching>" ]
+  test = true
+
 [include]
   [include.julia16mac]
   Oscar = "release"
   julia-version = "~1.6.0-0"
   os = "macos-latest"
 
-  [include.julia18mac]
+  [include.julia19mac]
   Oscar = "release"
-  julia-version = "~1.8.0-0"
+  julia-version = "~1.9.0-0"
   os = "macos-latest"
 
   [include.julia16macmatch]
   Oscar = "<matching>"
+  Polymake = "<matching>"
   julia-version = "~1.6.0-0"
   os = "macos-latest"
 
-  [include.julia18macmatch]
+  [include.julia19macmatch]
   Oscar = "<matching>"
-  julia-version = "~1.8.0-0"
+  Polymake = "<matching>"
+  julia-version = "~1.9.0-0"
   os = "macos-latest"
+
+  [include.nightly]
+  Oscar = "<matching>"
+  Polymake = "<matching>"
+  julia-version = "nightly"
+  os = "ubuntu-latest"

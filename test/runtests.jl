@@ -2,6 +2,19 @@ using Polymake
 using Test
 using Polymake.CxxWrap
 
+_with_oscar = false
+try
+  using Oscar
+  println("Running tests with Oscar")
+  global _with_oscar = true
+catch e
+  if !(isa(e, ArgumentError))
+    rethrow(e)
+  else
+    println("Oscar not found, skipping extra OscarNumber tests.")
+  end
+end
+
 # make wrapper compilation verbose on CI
 if (haskey(ENV, "GITHUB_ACTIONS"))
     Polymake.shell_execute(raw"$Verbose::cpp=3;")
