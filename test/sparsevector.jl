@@ -203,9 +203,14 @@ using Polymake.SparseArrays
         sr2 = Polymake.QuadraticExtension{Polymake.Rational}(0, 1, 2)
         jl_y = sr2 * jl_v
         Y = Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}(jl_y)
-        Qx, x = QQ["x"]
-        K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
-        m = a1 + 3*a2^2 + 7
+
+        m = 42
+        if _with_oscar
+            Qx, x = QQ["x"]
+            K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
+            m = a1 + 3*a2^2 + 7
+        end
+
         M = Polymake.OscarNumber(m)
         jl_z = M * jl_v
         Z = Polymake.SparseVector{Polymake.OscarNumber}(jl_z)
@@ -226,7 +231,7 @@ using Polymake.SparseArrays
         @test -Y == -jl_y
 
         @test -Z isa Polymake.SparseVector{Polymake.OscarNumber}
-        @test unwrap(-Z) == -jl_z
+        @test -Z == -jl_z
 
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]

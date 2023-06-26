@@ -15,10 +15,14 @@ using Polymake.SparseArrays
         @test M[1,1] == 10
     end
 
-    # prepare instances of OscarNumber to be used for multiple tests
-    Qx, x = QQ["x"]
-    K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
-    m = a1 + 3*a2^2 + 7
+    m = 42
+    a2 = 7
+    if _with_oscar
+        # prepare instances of OscarNumber to be used for multiple tests
+        Qx, x = QQ["x"]
+        K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
+        m = a1 + 3*a2^2 + 7
+    end
     Mon = Polymake.OscarNumber(m)
     A2 = Polymake.OscarNumber(a2)
     
@@ -386,7 +390,7 @@ using Polymake.SparseArrays
         @test -Y == -jl_y
 
         @test -Z isa Polymake.SparseMatrix{Polymake.OscarNumber}
-        @test unwrap(-Z) == -jl_z
+        @test -Z == -jl_z
 
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]

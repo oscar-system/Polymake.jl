@@ -1,11 +1,18 @@
-using Oscar
-
 @testset verbose=true "Polymake.OscarNumber" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     PolymakeTypes = [Polymake.Integer, Polymake.Rational]
     AllTypes = [IntTypes; PolymakeTypes; Base.Rational;
                 # Float64; BigFloat
                 ]
+
+    a1 = 8
+    a2 = 3
+    if _with_oscar
+        Qx, x = QQ["x"]
+        K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
+    end
+    m = a1 + 3*a2^2 + 7
+    M = Polymake.OscarNumber(m)
 
     @testset verbose=true "Constructors/Conversions" begin
         @test Polymake.OscarNumber <: Number
@@ -16,12 +23,10 @@ using Oscar
             @test Polymake.unwrap(Polymake.OscarNumber(T(2))) isa Polymake.Rational
         end
 
-        Qx, x = QQ["x"]
-        K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
-        m = a1 + 3*a2^2 + 7
         @test Polymake.OscarNumber(m) isa Polymake.OscarNumber
-        M = Polymake.OscarNumber(m)
-        @test Polymake.unwrap(M) isa Hecke.EmbeddedNumFieldElem{NfAbsNSElem}
+        if _with_oscar
+            @test Polymake.unwrap(M) isa Hecke.EmbeddedNumFieldElem{NfAbsNSElem}
+        end
         @test Polymake.unwrap(M) == m
         @test M == Polymake.OscarNumber(m)
 
@@ -56,11 +61,6 @@ using Oscar
             @test vec[1] + vec[2] == Polymake.OscarNumber(a1 + 3*a2^2 + 8)
         end
     end
-
-    Qx, x = QQ["x"]
-    K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
-    m = a1 + 3*a2^2 + 7
-    M = Polymake.OscarNumber(m)
     
     @testset verbose=true "Arithmetic" begin
 
@@ -106,9 +106,13 @@ using Oscar
         @test M + A2 == A2 + M == Polymake.OscarNumber(a1 + a2 + 3*a2^2 + 7)
         @test M - A2 == Polymake.OscarNumber(a1 - a2 + 3*a2^2 + 7)
         @test A2 - M == Polymake.OscarNumber(-a1 + a2 - 3*a2^2 - 7)
-        @test M * A2 == A2 * M == Polymake.OscarNumber(a1*a2 + 15 + 7*a2)
         @test M // Polymake.OscarNumber(5) == Polymake.OscarNumber(a1//5 + 3//5*a2^2 + 7//5)
-        @test Polymake.OscarNumber(5) // A2 == Polymake.OscarNumber(a2^2)
+
+        # these only work in the correct field and not with dummy values
+        if _with_oscar
+            @test M * A2 == A2 * M == Polymake.OscarNumber(a1*a2 + 15 + 7*a2)
+            @test Polymake.OscarNumber(5) // A2 == Polymake.OscarNumber(a2^2)
+        end
     end
 
     @testset verbose=true "Show" begin
