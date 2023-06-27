@@ -7,6 +7,10 @@ QuadraticExtension{T}(a::Number) where T<:qe_suppT = QuadraticExtension{T}(a, 0,
 
 QuadraticExtension(x...) = QuadraticExtension{Rational}(x...)
 
+# needed to avoid ambiguities
+QuadraticExtension{T}(a::Integer) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
+QuadraticExtension(x::Integer) = QuadraticExtension{Rational}(x)
+
 Base.zero(::Type{<:QuadraticExtension{T}}) where T<:qe_suppT = QuadraticExtension{T}(0)
 Base.zero(::QuadraticExtension{T}) where T<:qe_suppT = QuadraticExtension{T}(0)
 Base.one(::Type{<:QuadraticExtension{T}}) where T<:qe_suppT = QuadraticExtension{T}(1)

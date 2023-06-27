@@ -12,6 +12,11 @@ TropicalNumber{A}() where A = TropicalNumber{A, Rational}()
 TropicalNumber(x...) = throw(ArgumentError("TropicalNumber needs to be called with type parameter 'Max' or 'Min'."))
 TropicalNumber(::TropicalNumber) = TropicalNumber()
 
+# to avoid ambiguities with rather generic constructors for Polymake.Integer
+TropicalNumber{A,S}(scalar::Integer) where {A <: TropicalNumber_suppAddition, S <: TropicalNumber_suppScalar} = TropicalNumber{A,S}(convert(S,scalar))
+TropicalNumber{A}(scalar::Integer) where A = TropicalNumber{A,Rational}(scalar)
+TropicalNumber(::Integer) = TropicalNumber()
+
 # workaround for https://github.com/JuliaInterop/CxxWrap.jl/issues/199
 for (jlF, pmF) in (
     (:(==), :_isequal),

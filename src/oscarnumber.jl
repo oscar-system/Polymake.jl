@@ -3,7 +3,9 @@ function Base.promote_rule(::Type{<:OscarNumber},
     return OscarNumber
 end
 
-OscarNumber(a::Union{Integer, Base.Integer, Base.Rational{<:Base.Integer}}) = OscarNumber(Rational(a))
+OscarNumber(a::Union{Base.Integer, Base.Rational{<:Base.Integer}}) = OscarNumber(Rational(a))
+# this needs to be separate to avoid ambiguities
+OscarNumber(a::Integer) = OscarNumber(Rational(a))
 
 Base.zero(::Type{<:OscarNumber}) = OscarNumber(0)
 Base.zero(::OscarNumber) = OscarNumber(0)

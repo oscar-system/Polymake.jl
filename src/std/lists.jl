@@ -9,7 +9,7 @@ function Base.iterate(L::StdList)
     state = beginiterator(L)
     elt = get_element(state)
     increment(state)
-    return elt, state
+    return eltype(L)(elt), state
 end
 
 function Base.iterate(L::StdList, state)
@@ -18,6 +18,6 @@ function Base.iterate(L::StdList, state)
     else
         elt = get_element(state)
         increment(state)
-        return elt, state
+        return eltype(L)(elt), state
     end
 end

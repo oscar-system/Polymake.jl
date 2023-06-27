@@ -6,10 +6,8 @@ Integer(int::Number) = Integer(BigInt(int))
 Integer(rat::Base.Rational) = Integer(BigInt(rat))
 Integer(flt::BigFloat) = Integer(BigInt(flt))
 
-Base.one(::Type{<:Integer}) = Integer(1)
-Base.one(::Integer) = Integer(1)
-Base.zero(::Integer) = Integer(0)
-Base.zero(::Type{<:Integer}) = Integer(0)
+# we need thie to make the fallbacks like Base.one work
+IntegerAllocated(int::Union{BigInt,Base.Rational,BigFloat,<:Number}) = Integer(int)
 
 import Base: ==, <, <=
 # These are operations we delegate to gmp
@@ -45,14 +43,17 @@ for T in [:Int8,  :Int16,  :Int32, :UInt8, :UInt16, :UInt32]
     @eval Base.$T(int::Integer) = $T(Int64(int))
 end
 
-convert(::Type{Rational}, int::Integer) = new_rational_from_integer(int)
-convert(::Type{T}, int::Integer) where {T<:Number} = convert(T, BigInt(int))
-convert(::Type{T}, int::Integer) where {T<:AbstractFloat} = convert(T, Float64(int))
+Rational(int::Integer) = new_rational_from_integer(int)
+(::Type{T})(int::Integer) where {T<:Number} = convert(T, BigInt(int))
+(::Type{T})(int::Integer) where {T<:AbstractFloat} = convert(T, Float64(int))
+# to avoid ambiguity
+Float64(int::Integer) = Float64(CxxWrap.CxxRef(int))
+BigFloat(int::Integer) = BigFloat(BigInt(int))
 Base.float(int::Integer) = Float64(int)
 
 # no-copy converts
 convert(::Type{<:Integer}, int::T) where T <: Integer = int
-convert(::Type{Base.Integer}, int::Integer) = int
+Base.Integer(int::Integer) = int
 
 Base.trailing_zeros(int::Integer) = trailing_zeros(BigInt(int))
 Base.trailing_ones(int::Integer) = trailing_ones(BigInt(int))
