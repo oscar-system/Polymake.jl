@@ -55,9 +55,10 @@ to_jl_type(::Type{CxxWrap.CxxULong}) = UInt64
 to_jl_type(::Type{CxxWrap.StdString}) = String
 
 if Int64 != CxxWrap.CxxLong
-   CxxWrap.CxxLong(n::Integer) = Int64(n)
+   CxxWrap.CxxLong(n::Integer) = CxxLong(new_int_from_integer(n))
+   CxxWrap.CxxLong(r::Rational) = CxxLong(new_int_from_rational(r))
 end
-CxxWrap.CxxLong(r::Rational) = new_int_from_rational(r)
+Int64(r::Rational) = Int64(new_int_from_rational(r))
 
 
 ####################  Guessing the polymake type  ######################
