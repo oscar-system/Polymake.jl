@@ -14,11 +14,6 @@ Base.one(::OscarNumber) = OscarNumber(1)
 Base.sign(e::OscarNumber) = OscarNumber(_sign(e))
 
 import Base: <, //, <=
-# defining for `Real` to avoid disambiguities
-#Base.:<(x::Real, y::OscarNumber) = convert(OscarNumber, x) < y
-#Base.:<(x::OscarNumber, y::Real) = x < convert(OscarNumber, y)
-#Base.://(x::Real, y::OscarNumber) = convert(OscarNumber, x) // y
-#Base.://(x::OscarNumber, y::Real) = x // convert(OscarNumber, y)
 
 Base.:<=(x::OscarNumber, y::OscarNumber) = x < y || x == y
 Base.:/(x::OscarNumber, y::OscarNumber) = x // y
@@ -63,13 +58,9 @@ mutable struct oscar_number_dispatch_helper
     sign::Ptr{Cvoid}
     abs::Ptr{Cvoid}
     hash::Ptr{Cvoid}
+    to_rational::Ptr{Cvoid}
 end
-oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 20)...)
-
-#mutable struct jl_pm_type_map{T}
-#   index::Int
-#   gc::Dict{T,Int}
-#end
+oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 21)...)
 
 const _on_gc_refs = IdDict()
 
@@ -144,8 +135,25 @@ function _fieldelem_to_rational(e::T) where T
    if !hasmethod(Rational{BigInt}, Tuple{T})
       error("OscarNumber: cannot check is_rational, please define 'Polymake._fieldelem_to_rational(e::$T)::Rational{BigInt}'")
    end
+   Polymake._fieldelem_is_rational(e) || error("not a rational number")
    return Base.Rational{BigInt}(e)
 end
+
+function _on_to_rational(e::ArgT)::Ptr{Base.GMP.MPQ.mpq_t} where ArgT
+   r = try
+      _fieldelem_to_rational(e)
+   catch e
+      return C_NULL
+   end
+   q = Base.GMP.MPQ._MPQ(r)
+   return pointer_from_objref(q)
+end
+
+@generated _on_gen_to_rational(::Type{ArgT}) where ArgT =
+   quote
+      @cfunction(_on_to_rational, Ptr{Base.GMP.MPQ.mpq_t}, (Ref{ArgT},))
+   end
+
 function _fieldelem_is_rational(e::T) where T
    error("OscarNumber: cannot check is_rational, please define 'Polymake._fieldelem_is_rational(e::$T)::Bool'")
 end
@@ -178,12 +186,6 @@ end
 function _on_init_frac(id::Clong, ::Ptr{ArgT}, np::Ptr{BigInt}, dp::Ptr{BigInt})::ArgT where ArgT
    n = unsafe_load(np)::BigInt
    d = unsafe_load(dp)::BigInt
-   #println("init on frac $n // $d -- $id")
-   #rat = Base.Rational{BigInt}(n, d)
-   #println("init on frac -> $rat $(typeof(rat))")
-   #res = _on_parent_by_id[id](rat)
-   #println("init on frac -> -> $res $(typeof(res))")
-   #return res::ArgT
    return _on_parent_by_id[id](Base.Rational{BigInt}(n, d))
 end
 @generated _on_gen_init_frac(::Type{ArgT}) where ArgT =
@@ -235,7 +237,6 @@ end
 
 function OscarNumber(e)
    id = register_julia_element(e, parent(e), typeof(e))
-   #@info "copying $e from $(objectid(e)) in construction"
    return GC.@preserve e begin
       on = OscarNumber(pointer_from_objref(e), id)
    end
@@ -255,10 +256,6 @@ function register_julia_element(e, p, t::Type)
    for type in (Int64, Base.Rational{BigInt})
       hasmethod(p, (type,)) || error("OscarNumber: no constructor ($p)($type)")
    end
-
-
-   # maybe add some code block to evaluate and check if all required operations
-   # are available
 
    dispatch = oscar_number_dispatch_helper()
    dispatch.index = newid
@@ -283,13 +280,15 @@ function register_julia_element(e, p, t::Type)
    dispatch.sign    = _on_gen_sign_int(t)
    dispatch.hash    = _on_gen_hash(t)
 
+   dispatch.to_rational = _on_gen_to_rational(t)
+
    dispatch.cmp = _on_gen_cmp(t)
 
    dispatch.to_string = _on_gen_to_string(t)
-   # maybe:
+   # later:
    # from_string::Ptr{Cvoid}
 
-   # no inf value for nemo types ...
+   # currently not really needed
    #dispatch.is_inf  = _on_gen_is_inf(t)
 
    _register_oscar_number(pointer_from_objref(dispatch), newid)

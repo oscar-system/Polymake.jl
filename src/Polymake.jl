@@ -46,7 +46,7 @@ struct PolymakeError <: Exception
 end
 
 function Base.showerror(io::IO, ex::PolymakeError)
-    print(io, "Exception occured at Polymake side:\n$(ex.msg)")
+    print(io, "polymake: $(ex.msg)")
 end
 
 ###########################
