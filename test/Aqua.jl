@@ -1,6 +1,6 @@
 using Aqua
 
-@testset "Aqua.jl" begin
+@testset verbose=true "Aqua.jl" begin
    Aqua.test_all(
       Polymake;
       # this check is disabled as it returns thousands of ambiguities from

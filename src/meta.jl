@@ -1,7 +1,7 @@
 module Meta
 import JSON
 import Polymake: appname_module_dict, module_appname_dict, shell_context_help
-import Polymake: Rational, PolymakeType, PropertyValue, OptionSet, QuadraticExtension
+import Polymake: Rational, PolymakeType, PropertyValue, OptionSet, QuadraticExtension, OscarNumber
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
@@ -31,6 +31,7 @@ translate_type_to_pm_string(::Type{<:AbstractFloat}) = "Float"
 translate_type_to_pm_string(::Type{<:Rational}) = "Rational"
 translate_type_to_pm_string(::Type{<:Base.Rational}) = "Rational"
 translate_type_to_pm_string(::Type{<:Base.Integer}) = "Integer"
+translate_type_to_pm_string(::Type{<:OscarNumber}) = "OscarNumber"
 translate_type_to_pm_string(::typeof(min)) = "Min"
 translate_type_to_pm_string(::typeof(max)) = "Max"
 translate_type_to_pm_string(::Type{<:QuadraticExtension{T}}) where T = string("QuadraticExtension<", translate_type_to_pm_string(T), ">")

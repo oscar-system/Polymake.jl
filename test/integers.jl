@@ -1,7 +1,7 @@
-@testset "Polymake.Integer" begin
+@testset verbose=true "Polymake.Integer" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
 
-    @testset "Constructors/Conversions" begin
+    @testset verbose=true "Constructors/Conversions" begin
         @test Polymake.Integer <: Base.Integer
 
         # constructors
@@ -36,7 +36,7 @@
         @test [a,a] isa Base.Vector{Polymake.IntegerAllocated}
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
         a = Polymake.Integer(2)
         @test -a == -2
         # for T in [IntTypes; Polymake.Integer]
@@ -67,7 +67,7 @@
         end
     end
 
-    @testset "zero / one" begin
+    @testset verbose=true "zero / one" begin
         ZERO = Polymake.Integer(0)
         ONE = Polymake.Integer(1)
 
@@ -80,7 +80,7 @@
         @test one(Polymake.Integer) == one(ZERO) == ONE
     end
 
-    @testset "Fun with bits" begin
+    @testset verbose=true "Fun with bits" begin
         @test trailing_zeros(Polymake.Integer(2)) == 1
         @test trailing_zeros(Polymake.Integer(4)) == 2
         @test trailing_ones(Polymake.Integer(2)) == 0
@@ -89,7 +89,7 @@
         @test Polymake.Integer(4) >> 2 == 1
     end
 
-    @testset "weird BigInt issue" begin
+    @testset verbose=true "weird BigInt issue" begin
         test_f(n) = (k = Polymake.Integer(n); BigInt(k))
         bn = test_f(5)
         GC.gc();

@@ -1,10 +1,10 @@
 using Polymake.SparseArrays
 
-@testset "Polymake.SparseVector" begin
+@testset verbose=true "Polymake.SparseVector" begin
     IntTypes = [Int32, Int64, UInt64, BigInt]
     FloatTypes = [Float32, Float64, BigFloat]
 
-    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}]
+    for T in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}, Polymake.OscarNumber]
         @test Polymake.SparseVector{T} <: AbstractSparseVector
         @test Polymake.spzeros(T, 3) isa AbstractSparseVector
         @test Polymake.spzeros(T, 3) isa Polymake.SparseVector
@@ -20,7 +20,7 @@ using Polymake.SparseArrays
 
     jl_v = [1, 2, 3]
     jl_s = sparsevec([0 1 0])
-    @testset "Constructors/Converts" begin
+    @testset verbose=true "Constructors/Converts" begin
         for T in IntTypes #TODO Polymake.Integer
             @test Polymake.SparseVector(T.(jl_v)) isa Polymake.SparseVector{Polymake.to_cxx_type(Polymake.convert_to_pm_type(T))}
             @test Polymake.SparseVector(jl_v//1) isa Polymake.SparseVector{Polymake.Rational}
@@ -40,6 +40,25 @@ using Polymake.SparseArrays
                     @test jl_v == convert(Base.Vector{T}, V)
                 end
                 for s in (jl_s, jl_s//T(1), jl_s/T(1)) #TODO
+                    @test Polymake.SparseVector{ElType}(s) isa Polymake.SparseVector{ElType}
+                    @test convert(Polymake.SparseVector{ElType}, s) isa Polymake.SparseVector{ElType}
+
+                    S = Polymake.SparseVector(s)
+                    # @test convert(SparseArrays.Polymake.SparseVectorCSC{T,}, S) isa SparseArrays.Polymake.SparseVectorCSC{T}
+                    # @test jl_s == convert(SparseArrays.Polymake.SparseVectorCSC{T}, S)
+                end
+            end
+
+            let ElType = Polymake.OscarNumber
+                for v in (jl_v, jl_v//T(1))
+                    @test Polymake.SparseVector{ElType}(v) isa Polymake.SparseVector{ElType}
+                    @test convert(Polymake.SparseVector{ElType}, v) isa Polymake.SparseVector{ElType}
+
+                    V = Polymake.SparseVector(v)
+                    @test convert(Base.Vector{T}, V) isa Base.Vector{T}
+                    @test jl_v == convert(Base.Vector{T}, V)
+                end
+                for s in (jl_s, jl_s//T(1)) #TODO
                     @test Polymake.SparseVector{ElType}(s) isa Polymake.SparseVector{ElType}
                     @test convert(Polymake.SparseVector{ElType}, s) isa Polymake.SparseVector{ElType}
 
@@ -88,9 +107,9 @@ using Polymake.SparseArrays
         end
     end
 
-    @testset "Low-level operations" begin
-        for (E,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational> ")]
-            @testset "Polymake.SparseVector{$E}" begin
+    @testset verbose=true "Low-level operations" begin
+        for (E,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational> "), (Polymake.OscarNumber, "common::OscarNumber")]
+            @testset verbose=true "Polymake.SparseVector{$E}" begin
                 V = Polymake.SparseVector{E}(jl_v)
 
                 @test eltype(V) == E
@@ -111,19 +130,27 @@ using Polymake.SparseArrays
                     @test V[2] = T(10) isa T
                     V[2] = T(10)
                     @test V[2] == 10
-                    @test string(V) == string("pm::SparseVector<", s, ">\n5 10 3")
+                    if E == Polymake.OscarNumber
+                       @test string(V) == string("pm::SparseVector<", s, ">\n(5) (10) (3)")
+                    else
+                       @test string(V) == string("pm::SparseVector<", s, ">\n5 10 3")
+                    end
                 end
-
-                @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 1)")
+                if E == Polymake.OscarNumber
+                   @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 (1))")
+                else
+                   @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 1)")
+                end
             end
         end
 
-        @testset "Equality" begin
+        @testset verbose=true "Equality" begin
             for T in [IntTypes; Polymake.Integer]
                 V = Polymake.SparseVector{Polymake.Integer}(3)
                 W = Polymake.SparseVector{Polymake.Rational}(3)
                 U = Polymake.SparseVector{Float64}(3)
                 Y = Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}(3)
+                Z = Polymake.SparseVector{Polymake.OscarNumber}(3)
 
                 #TODO T.(jl_s)
                 @test (V .= T.(jl_v)) isa Polymake.SparseVector{Polymake.Integer}
@@ -138,7 +165,9 @@ using Polymake.SparseArrays
                 @test (Y .= T.(jl_v)) isa Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}
                 @test (Y .= T.(jl_v).//1) isa Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}
 
-                @test U == V == W == Y
+                @test (Z .= T.(jl_v)) isa Polymake.SparseVector{Polymake.OscarNumber}
+
+                @test U == V == W == Y == Z
 
                 # TODO:
                 # @test (V .== jl_v) isa BitArray
@@ -154,7 +183,7 @@ using Polymake.SparseArrays
         end
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
         V = Polymake.SparseVector{Polymake.Integer}(jl_v)
         @test float.(V) isa Polymake.SparseVectorAllocated{Float64}
         # @test V[1, :] isa Polymake.SparseVectorAllocated{Polymake.Integer}
@@ -175,6 +204,17 @@ using Polymake.SparseArrays
         jl_y = sr2 * jl_v
         Y = Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}(jl_y)
 
+        m = 42
+        if _with_oscar
+            Qx, x = QQ["x"]
+            K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
+            m = a1 + 3*a2^2 + 7
+        end
+
+        M = Polymake.OscarNumber(m)
+        jl_z = M * jl_v
+        Z = Polymake.SparseVector{Polymake.OscarNumber}(jl_z)
+
         @test -X isa Polymake.SparseVectorAllocated{Polymake.to_cxx_type(Int64)}
         @test -X == -jl_v
 
@@ -190,14 +230,18 @@ using Polymake.SparseArrays
         @test -Y isa Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}
         @test -Y == -jl_y
 
+        @test -Z isa Polymake.SparseVector{Polymake.OscarNumber}
+        @test -Z == -jl_z
+
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
         @test 2X isa Polymake.SparseVector{Polymake.to_cxx_type(Int64)}
         @test Int32(2)X isa Polymake.SparseVector{Polymake.to_cxx_type(Int64)}
 
+        @testset verbose=true "Arithmetic1" begin
         for T in int_scalar_types
-            for (vec, ElType) in ((V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
+            for (vec, ElType) in ((V, Polymake.Integer), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}), (Z, Polymake.OscarNumber))
                 op = *
                 @test op(T(2), vec) isa Polymake.SparseVector{ElType}
                 @test op(vec, T(2)) isa Polymake.SparseVector{ElType}
@@ -236,6 +280,8 @@ using Polymake.SparseArrays
             end
         end
 
+        end
+        @testset verbose=true "Arithmetic2" begin
         for T in rational_scalar_types
             for (vec, ElType) in ((V, Polymake.Rational), (W, Polymake.Rational), (U, Float64), (Y, Polymake.QuadraticExtension{Polymake.Rational}))
 
@@ -266,6 +312,8 @@ using Polymake.SparseArrays
                 @test broadcast(op, vec, T(2)) isa Polymake.SparseVector{ElType}
             end
         end
+        end
+        @testset verbose=true "Arithmetic3" begin
         for T in FloatTypes
             let vec = U, ElType = Float64
                 op = *
@@ -292,6 +340,8 @@ using Polymake.SparseArrays
             end
         end
 
+        end
+        @testset verbose=true "Arithmetic4" begin
         for T in [int_scalar_types; rational_scalar_types; FloatTypes; Polymake.QuadraticExtension{Polymake.Rational}]
             @test T(2)*X == X*T(2) == T(2) .* X == X .* T(2) == 2jl_v
             @test T(2)*V == V*T(2) == T(2) .* V == V .* T(2) == 2jl_v
@@ -309,9 +359,16 @@ using Polymake.SparseArrays
             
             @test Y + T.(2 * jl_v) == T.(2 * jl_v) + Y == Y .+ T.(2 * jl_v) == T.(2 * jl_v) .+ Y == (1 + sr2) * jl_y
         end
+        end
+        @testset verbose=true "Arithmetic5" begin
+        for T in [int_scalar_types; rational_scalar_types]
+            @test T(2)*Z == Z*T(2) == T(2) .* Z == Z .* T(2) == 2jl_z
+            @test Z + T.(2 * jl_v) == T.(2 * jl_v) + Z == Z .+ T.(2 * jl_v) == T.(2 * jl_v) .+ Z == [Polymake.OscarNumber(m + 2), Polymake.OscarNumber(2*m + 4), Polymake.OscarNumber(3*m + 6)]
+        end
+        end
     end
 
-    @testset "findnz" begin
+    @testset verbose=true "findnz" begin
         jsv = sprand(10151821,.0000014)
         droptol!(jsv,Polymake._get_global_epsilon())
         psv = Polymake.SparseVector(jsv)

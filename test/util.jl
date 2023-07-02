@@ -1,7 +1,7 @@
-@testset "utilities" begin
+@testset verbose=true "utilities" begin
     facets = [ 0 1 0 ; 0 0 1 ; 1 -1 0 ; 1 0 -1 ]
 
-    @testset "prefer" begin
+    @testset verbose=true "prefer" begin
         pcdd = polytope.Polytope(INEQUALITIES=facets)
         plrs = polytope.Polytope(INEQUALITIES=facets)
         @test Polymake.prefer("cdd") do
@@ -19,7 +19,7 @@
         @test_throws Polymake.PolymakeError Polymake.prefer("nonexistentlabel") do print end
     end
 
-    @testset "save load" begin
+    @testset verbose=true "save load" begin
         test_polytope = @pm polytope.Polytope(INEQUALITIES=facets)
         mat = test_polytope.VERTICES
         vec = test_polytope.F_VECTOR
@@ -44,7 +44,7 @@
         end
     end
 
-    @testset "shell vars" begin
+    @testset verbose=true "shell vars" begin
         test_polytope = @pm polytope.Polytope(INEQUALITIES=facets)
 
         Polymake.Shell.myvar = "Hello "
@@ -75,7 +75,7 @@
         @test Polymake.Shell.notexisting == nothing
     end
 
-    @testset "4ti2 external" begin
+    @testset verbose=true "4ti2 external" begin
         m = matroid.r8_matroid()
         @test m.CIRCUITS isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int)}}
         @test Polymake.matroid._4ti2circuits(m.VECTORS) isa Polymake.SparseMatrix

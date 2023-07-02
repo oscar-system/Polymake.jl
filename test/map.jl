@@ -1,15 +1,15 @@
-@testset "Polymake.Map" begin
+@testset verbose=true "Polymake.Map" begin
     @test Polymake.Map{String,String} <: AbstractDict{String,String}
-    @testset "Constructors" begin
+    @testset verbose=true "Constructors" begin
         @test Polymake.Map{String,String}() isa Polymake.Map{Polymake.to_cxx_type(String),Polymake.to_cxx_type(String)}
     end
-    @testset "Accessing the content" begin
+    @testset verbose=true "Accessing the content" begin
         M = Polymake.Map{String,String}()
         M["one"] = "Eins"
         @test M["one"] isa String
         @test M["one"] == "Eins"
         @test_throws ErrorException M["two"]
-        @testset "Iterator" begin
+        @testset verbose=true "Iterator" begin
             M["zero"] = "Null"
             M["infinity"] = "Unendlich"
             @test eltype(M) == Pair{String,String}

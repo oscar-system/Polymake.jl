@@ -11,6 +11,7 @@ module Polymake
 export @pm, @convert_to, visual
 
 # We need to import all functions which will be extended on the Cxx side
+# FIXME: check with imports of LibPolymake further down
 import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     append!, deepcopy_internal, delete!, numerator, denominator,
     empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
@@ -19,6 +20,7 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     union, union!
 
 import Pkg
+import JSON
 
 using SparseArrays
 import SparseArrays: AbstractSparseMatrix, findnz
@@ -35,7 +37,7 @@ import polymake_jll
 import lib4ti2_jll
 import TOPCOM_jll
 using libpolymake_julia_jll
-
+using polymake_oscarnumber_jll
 
 const jlpolymake_version_range = (v"0.10.0",  v"0.11")
 
@@ -44,7 +46,7 @@ struct PolymakeError <: Exception
 end
 
 function Base.showerror(io::IO, ex::PolymakeError)
-    print(io, "Exception occured at Polymake side:\n$(ex.msg)")
+    print(io, "polymake: $(ex.msg)")
 end
 
 ###########################
@@ -79,7 +81,80 @@ const scratch_key = "polymake_$(string(hash(@__FILE__)))_$(VERSION.major).$(VERS
 include("repl.jl")
 include("ijulia.jl")
 
-@wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
+module LibPolymake
+  # copied from the top for overriding methods ...
+  import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
+    append!, deepcopy_internal, delete!, numerator, denominator,
+    empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
+    length, numerator, push!, resize!,
+    setdiff, setdiff!, setindex!, symdiff, symdiff!,
+    union, union!
+  using CxxWrap
+  using SparseArrays
+  import SparseArrays: AbstractSparseMatrix, findnz
+  import SparseArrays
+  using polymake_jll
+  using libpolymake_julia_jll
+  using polymake_oscarnumber_jll
+
+  @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
+
+  function __init__()
+
+     @initcxx
+
+  end
+
+end
+import .LibPolymake
+
+const exclude = [:__init__, :eval, :include]
+
+# for now we just import all libpolymake_julia names except for some julia internal ones
+for name in names(LibPolymake; all=true)
+   (name in exclude || !isdefined(LibPolymake, name)) && continue
+   startswith(string(name), "#") && continue
+   startswith(string(name), "__cxxwrap") && continue
+
+   @eval import .LibPolymake: $name
+end
+
+module LibOscarNumber
+  import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
+    append!, deepcopy_internal, delete!, numerator, denominator,
+    empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
+    length, numerator, push!, resize!,
+    setdiff, setdiff!, setindex!, symdiff, symdiff!,
+    union, union!
+  using CxxWrap
+  using SparseArrays
+  import SparseArrays: AbstractSparseMatrix, findnz
+  import SparseArrays
+  using polymake_jll
+  using libpolymake_julia_jll
+  using polymake_oscarnumber_jll
+
+  import ..LibPolymake: show_small_obj
+
+  @wrapmodule(joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
+
+  function __init__()
+
+     @initcxx
+
+  end
+
+end
+
+import .LibOscarNumber
+
+for name in names(LibOscarNumber; all=true)
+   (name in exclude || !isdefined(LibOscarNumber, name)) && continue
+   startswith(string(name), "#") && continue
+   startswith(string(name), "__cxxwrap") && continue
+
+   @eval import .LibOscarNumber: $name
+end
 
 include(libpolymake_julia_jll.generate_deps_tree)
 
@@ -93,6 +168,8 @@ function __init__()
                  @generate_wrappers(Ninja_jll),
                  @generate_wrappers(Perl_jll),
                ]
+
+    # to avoid conflicts between symlinks and directories we switch to a new depstree folder name
     polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree_v2")
 
     # we run this on every init to make sure all artifacts still exist
@@ -103,12 +180,33 @@ function __init__()
     # check libpolymake_julia version with a plain ccall before initializing libcxxwrap and libpolymake
     checkversion()
 
-    @initcxx
-
     # prepare environment variables
     # these are needed for the whole session
     ENV["PATH"] = join([binpaths...,ENV["PATH"]], ":")
     ENV["POLYMAKE_DEPS_TREE"] = polymake_deps_tree
+    installtop = joinpath(polymake_deps_tree, "share", "polymake")
+    installarch = joinpath(polymake_deps_tree, "lib", "polymake")
+
+    extensions = [(polymake_oscarnumber_jll, "oscarnumber")]
+    extensionpaths = []
+
+    exttop = joinpath("share", "polymake", "ext")
+    extarch = joinpath("lib", "polymake", "ext")
+    target(name...) = joinpath(polymake_deps_tree, name...)
+    mkpath(target(exttop))
+    mkpath(target(extarch))
+
+    for (ext, dirname) in extensions
+       src(name...) = joinpath(ext.artifact_dir, name...)
+       force_symlink(src(exttop, dirname), target(exttop, dirname))
+       force_symlink(src(extarch, dirname), target(extarch, dirname))
+       push!(extensionpaths, target(exttop, dirname))
+    end
+
+    polymake_extension_config = joinpath(polymake_deps_tree, "extensions.json")
+    open(polymake_extension_config, "w") do file
+       JSON.print(file, Dict("Polymake::User::extensions" => extensionpaths))
+    end
 
     # Temporarily unset PERL5LIB during initialization
     # This variable can cause errors if the perl modules in this folder were not
@@ -125,7 +223,7 @@ function __init__()
            show_banner = isinteractive() && Base.JLOptions().banner != 0 &&
                           !any(x->x.name in ["Oscar"], keys(Base.package_locks))
 
-           initialize_polymake_with_dir("user=$(polymake_user_dir)",show_banner)
+           initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
            if !show_banner
                shell_execute(raw"$Verbose::credits=\"0\";")
            end
@@ -161,6 +259,19 @@ function __init__()
         set_julia_type(name, current_type)
     end
 
+    # oscarnumber types
+    on_type = Ptr{Cvoid}(pointer_from_objref(OscarNumber))
+    set_julia_type("OscarNumber", on_type)
+    for (name, c_type) in [("Array", Array),
+                           ("Vector", Vector),
+                           ("Matrix", Matrix),
+                           ("SparseVector", SparseVector),
+                           ("SparseMatrix", SparseMatrix)]
+        current_type = Ptr{Cvoid}(pointer_from_objref(c_type{OscarNumber}))
+        set_julia_type("$(name)_OscarNumber", current_type)
+    end
+
+
     if isdefined(Base, :active_repl)
         run_polymake_repl()
     end
@@ -183,6 +294,7 @@ include("convert.jl")
 include("integers.jl")
 include("rationals.jl")
 include("quadraticextension.jl")
+include("oscarnumber.jl")
 include("sets.jl")
 include("std/lists.jl")
 include("std/pairs.jl")

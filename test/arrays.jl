@@ -1,9 +1,16 @@
-@testset "Polymake.Array" begin
-    @testset "Polymake.Array generics: $T " for (T, elt) in [
+@testset verbose=true "Polymake.Array" begin
+    m = 42
+    if _with_oscar
+        Qx, x = QQ["x"]
+        K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
+        m = a1 + 3*a2^2 + 7
+    end
+    @testset verbose=true "Polymake.Array generics: $T " for (T, elt) in [
         (Int64, 2),
         (Polymake.Integer, Polymake.Integer(2)),
         (Polymake.Rational, Polymake.Rational(2 //3)),
         (Polymake.QuadraticExtension{Polymake.Rational}, Polymake.QuadraticExtension{Polymake.Rational}(1, 2, 3)),
+        (Polymake.OscarNumber, Polymake.OscarNumber(m)),
         (String, "a"),
         (Polymake.Set{Polymake.to_cxx_type(Int)}, Polymake.Set{Int64}([1,2,1])),
         (Polymake.Matrix{Polymake.Integer}, Polymake.Matrix{Polymake.Integer}([1 0; 2 1])),
@@ -34,7 +41,7 @@
         @test arr == Polymake.Array{T}(10, elt)
     end
 
-    @testset "Polymake.Array{Polymake.Matrix{Polymake.Integer}}" begin
+    @testset verbose=true "Polymake.Array{Polymake.Matrix{Polymake.Integer}}" begin
         elt = [1 2; 3 4]
         T = Polymake.Matrix{Polymake.Integer}
 
@@ -75,7 +82,7 @@
         @test A == Polymake.Array{T}(2l+2, elt)
     end
 
-    @testset "Polymake.Array{Polymake.Set{Int64}}" begin
+    @testset verbose=true "Polymake.Array{Polymake.Set{Int64}}" begin
         elt = Base.Set([1,2,3,4])
         T = Polymake.Set{Polymake.to_cxx_type(Int64)}
 
@@ -112,7 +119,7 @@
         @test A == Polymake.Array{T}(2l+2, elt)
     end
 
-    @testset "Polymake.Array{Polymake.Set{Polymake.Set{Int64}}}" begin
+    @testset verbose=true "Polymake.Array{Polymake.Set{Polymake.Set{Int64}}}" begin
         c = Polymake.polytope.cube(2, 1, 0)
         PC = Polymake.polytope.PointConfiguration(POINTS=c.VERTICES)
         all = Polymake.polytope.topcom_all_triangulations(PC)
@@ -124,7 +131,7 @@
         end
     end
 
-    @testset "Polymake.Array{Polymake.StdPair{Polymake.Array{Int64}, Polymake.Array{Int64}}}" begin
+    @testset verbose=true "Polymake.Array{Polymake.StdPair{Polymake.Array{Int64}, Polymake.Array{Int64}}}" begin
         c = Polymake.polytope.cube(2, 1, 0)
         aut = Polymake.graph.automorphisms(c.VERTICES_IN_FACETS)
         @test length(aut) == 2

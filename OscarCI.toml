@@ -1,31 +1,21 @@
 title = "metadata for oscar CI run"
 
 [env]
-os = [ "ubuntu-latest" ]
-julia-version = [ "~1.6.0-0", "~1.8.0-0", "~1.9.0-0"]
+os = [ "ubuntu-latest", "macos-latest" ]
+julia-version = [ "~1.6.0-0", "~1.9.0-0"]
 # branches = [ "release", "<matching>" ]
 
 [pkgs]
   [pkgs.Oscar]
   test = true
 
+  [pkgs.Polymake]
+  branches = []
+  test = true
+
 [include]
-  [include.julia16mac]
-  Oscar = "release"
-  julia-version = "~1.6.0-0"
-  os = "macos-latest"
-
-  [include.julia18mac]
-  Oscar = "release"
-  julia-version = "~1.8.0-0"
-  os = "macos-latest"
-
-  [include.julia16macmatch]
+  [include.nightly]
   Oscar = "<matching>"
-  julia-version = "~1.6.0-0"
-  os = "macos-latest"
-
-  [include.julia18macmatch]
-  Oscar = "<matching>"
-  julia-version = "~1.8.0-0"
-  os = "macos-latest"
+  Polymake = ""
+  julia-version = "nightly"
+  os = "ubuntu-latest"

@@ -16,10 +16,11 @@ const SmallObject = Union{
     Graph,
     HomologyGroup,
     QuadraticExtension,
+    OscarNumber,
     EdgeMap,
     NodeMap,
 }
-const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}, TropicalNumber{Polymake.Max, Polymake.Rational}, TropicalNumber{Polymake.Min, Polymake.Rational}}
+const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, OscarNumber, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}, TropicalNumber{Polymake.Max, Polymake.Rational}, TropicalNumber{Polymake.Min, Polymake.Rational}}
 
 const TypeConversionFunctions = Dict(
     Symbol("Int") => to_int,
@@ -41,6 +42,7 @@ function fill_wrapped_types!(wrapped_types_dict, function_type_list)
 end
 
 fill_wrapped_types!(TypeConversionFunctions, get_type_names())
+fill_wrapped_types!(TypeConversionFunctions, get_type_names_oscarnumber())
 
 # libcxxwrap-julia prior to 0.8 mapped C++ copy to Base.deepcopy
 # now it is mapped to Base.copy

@@ -1,8 +1,8 @@
-@testset "Polymake.TropicalNumber" begin
+@testset verbose=true "Polymake.TropicalNumber" begin
     NumberTypes = [Int32, Int64, UInt64, BigInt, Float32, Float64, BigFloat, Polymake.Integer, Polymake.Rational]
     AdditionTypes = [Polymake.Min, Polymake.Max]
 
-    @testset "Constructors/Conversions" begin
+    @testset verbose=true "Constructors/Conversions" begin
         for T in [NumberTypes; Polymake.TropicalNumber{Polymake.Min}; Polymake.TropicalNumber{Polymake.Max}]
             @test_throws ArgumentError Polymake.TropicalNumber(T(2))
         end
@@ -33,10 +33,10 @@
         end
     end
 
-    @testset "Arithmetic" begin
+    @testset verbose=true "Arithmetic" begin
 
         for A in AdditionTypes
-            @testset "(In-)Equality $A" begin
+            @testset verbose=true "(In-)Equality $A" begin
                 a = Polymake.TropicalNumber{A}(Polymake.Rational(5))
                 for T in [NumberTypes; Polymake.TropicalNumber{Polymake.Min}; Polymake.TropicalNumber{Polymake.Max}]
                     b = Polymake.TropicalNumber{A}(T(5))
@@ -54,7 +54,7 @@
                 @test b > a
             end
 
-            @testset "Multiplication $A" begin
+            @testset verbose=true "Multiplication $A" begin
                 a = Polymake.TropicalNumber{A}(5)
                 b = Polymake.TropicalNumber{A}(17)
                 @test a * b isa Polymake.TropicalNumber{A}
@@ -63,7 +63,7 @@
                 @test a == Polymake.TropicalNumber{A}(22)
             end
 
-            @testset "Division $A" begin
+            @testset verbose=true "Division $A" begin
                 a = Polymake.TropicalNumber{A}(5)
                 b = Polymake.TropicalNumber{A}(17)
                 @test a // b isa Polymake.TropicalNumber{A}
@@ -79,7 +79,7 @@
             end
         end
 
-        @testset "Addition" begin
+        @testset verbose=true "Addition" begin
             a = Polymake.TropicalNumber{Polymake.Min}(5)
             b = Polymake.TropicalNumber{Polymake.Min}(17)
             c = Polymake.TropicalNumber{Polymake.Max}(5)
@@ -98,7 +98,7 @@
             @test c == d
         end
 
-        @testset "Catching mismatching parameters" begin
+        @testset verbose=true "Catching mismatching parameters" begin
             a = Polymake.TropicalNumber{Polymake.Min}(5)
             b = Polymake.TropicalNumber{Polymake.Max}(17)
             @test_throws DomainError a + b
@@ -116,7 +116,7 @@
         end
     end
 
-    @testset "zero / one" begin
+    @testset verbose=true "zero / one" begin
         ZEROmin = Polymake.TropicalNumber{Polymake.Min}()
         ONEmin = Polymake.TropicalNumber{Polymake.Min}(0)
         DZEROmin = Polymake.TropicalNumber{Polymake.Min}(-Inf)
@@ -147,7 +147,7 @@
         @test Polymake.orientation(Polymake.TropicalNumber{Polymake.Min}) == Polymake.orientation(ZEROmin) == -Polymake.orientation(Polymake.TropicalNumber{Polymake.Max}) == - Polymake.orientation(ZEROmax) == 1
     end
 
-    @testset "Promotion (equality)" begin
+    @testset verbose=true "Promotion (equality)" begin
         for A in AdditionTypes
             for T in NumberTypes
                 a = Polymake.TropicalNumber{A}(5)

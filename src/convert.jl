@@ -54,9 +54,12 @@ to_jl_type(::Type{CxxWrap.CxxLong}) = Int64
 to_jl_type(::Type{CxxWrap.CxxULong}) = UInt64
 to_jl_type(::Type{CxxWrap.StdString}) = String
 
-Base.convert(::Type{CxxWrap.CxxLong}, n::Integer) = Int64(n)
+if Int64 != CxxWrap.CxxLong
+   CxxWrap.CxxLong(n::Integer) = CxxLong(new_int_from_integer(n))
+   CxxWrap.CxxLong(r::Rational) = CxxLong(new_int_from_rational(r))
+end
+Int64(r::Rational) = Int64(new_int_from_rational(r))
 
-Base.convert(::Type{CxxWrap.CxxLong}, r::Rational) = new_int_from_rational(r)
 
 ####################  Guessing the polymake type  ######################
 
@@ -72,6 +75,7 @@ convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
 convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
 convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
+convert_to_pm_type(::Type{<:OscarNumber}) = OscarNumber
 convert_to_pm_type(::Type{<:Union{AbstractVector, Vector}}) = Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, Matrix}}) = Matrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = SparseMatrix
@@ -109,6 +113,7 @@ for (pmT, jlT) in [(Integer, Base.Integer),
                    (Rational, Union{Base.Rational, Rational}),
                    (TropicalNumber{Max, Rational}, TropicalNumber{Max, Rational}),
                    (TropicalNumber{Min, Rational}, TropicalNumber{Min, Rational}),
+                   (OscarNumber, OscarNumber),
                    (QuadraticExtension{Rational}, QuadraticExtension{Rational})]
     @eval begin
         convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{to_cxx_type($pmT)}

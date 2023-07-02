@@ -97,7 +97,9 @@ jobs:
                    github_env_run_doctests(meta;
                                            varname=\"oscar_run_doctests\",
                                            filename=\"${GITHUB_ENV}\");"
-
+      - name: "Inject Test-Dependency for Oscar"
+        run: |
+          sed -i -e "s/Test =/Oscar = \"f1435218-dba5-11e9-1e4d-f1a5fab5fc13\"\nTest =/" test/Project.toml
       - name: "Run tests"
         run: |
           echo '${{ env.oscar_run_tests }}'

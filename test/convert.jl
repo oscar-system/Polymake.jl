@@ -1,4 +1,4 @@
-@testset "converting" begin
+@testset verbose=true "converting" begin
     @test Polymake.convert_to_pm_type(Base.Vector{Base.Int}) == Polymake.Vector{Polymake.to_cxx_type(Int64)}
     @test Polymake.convert_to_pm_type(Base.Matrix{Base.Int}) == Polymake.Matrix{Polymake.to_cxx_type(Int64)}
     @test Polymake.convert_to_pm_type(Base.Vector{BigInt}) == Polymake.Vector{Polymake.Integer}
@@ -21,7 +21,7 @@
     y = Base.Vector{Base.Set{Int64}}([Base.Set([3,3]), Base.Set([3]), Base.Set([1,2])])
     @test convert(Polymake.PolymakeType, y) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int)}}
 
-    @testset "convert_to_pm_type(PolymakeType)" begin
+    @testset verbose=true "convert_to_pm_type(PolymakeType)" begin
         for T in [Polymake.Integer, Polymake.Rational, Polymake.Array, Polymake.IncidenceMatrix,
             Polymake.Matrix, Polymake.Set{Int64}, Polymake.SparseMatrix, Polymake.TropicalNumber, Polymake.Vector, Polymake.QuadraticExtension{Polymake.Rational}]
             @test T == Polymake.convert_to_pm_type(T)
@@ -29,13 +29,13 @@
     end
 
 
-    @testset "convert to PolymakeType" begin
+    @testset verbose=true "convert to PolymakeType" begin
         Base.convert(::Type{Polymake.PolymakeType}, n::MyInt) = n.x
 
         @test polytope.cube(MyInt(3)) isa Polymake.BigObject
     end
 
-    @testset "@convert_to" begin
+    @testset verbose=true "@convert_to" begin
         @test (@convert_to Integer 64) isa Polymake.Integer
         @test (@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int64)}}
         @test (@convert_to Vector{Float} [10, 11, 12]) isa Polymake.Vector{Float64}
