@@ -263,7 +263,8 @@
                 @test (Z .= T.(jl_v)) isa Polymake.Vector{Polymake.OscarNumber}
                 @test (Z .= T.(jl_v).//1) isa Polymake.Vector{Polymake.OscarNumber}
 
-                @test X == U == V == W == Y == Z
+                @test X == U == V == W == Y
+                @test W == Z
 
                 # TODO:
                 # @test (V .== jl_v) isa BitPolymake.Array
