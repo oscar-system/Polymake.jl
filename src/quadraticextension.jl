@@ -10,6 +10,8 @@ QuadraticExtension(x...) = QuadraticExtension{Rational}(x...)
 # needed to avoid ambiguities
 QuadraticExtension{T}(a::Integer) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
 QuadraticExtension(x::Integer) = QuadraticExtension{Rational}(x)
+QuadraticExtension{T}(a::Rational) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
+QuadraticExtension(a::Rational) = QuadraticExtension{Rational}(a, 0, 0)
 
 Base.zero(::Type{<:QuadraticExtension{T}}) where T<:qe_suppT = QuadraticExtension{T}(0)
 Base.zero(::QuadraticExtension{T}) where T<:qe_suppT = QuadraticExtension{T}(0)
@@ -38,13 +40,18 @@ Base.:/(x::QuadraticExtension{T}, y::QuadraticExtension{T}) where T<:qe_suppT = 
 # no-copy convert
 convert(::Type{<:QuadraticExtension{T}}, qe::QuadraticExtension{T}) where T<:qe_suppT = qe
 
-function convert(to::Type{<:Number}, qe::QuadraticExtension)
+function _qe_to_rational(::Type{T}, qe::QuadraticExtension) where T<:Number
     !iszero(_b(qe)) && !iszero(_r(qe)) && throw(DomainError("Given QuadraticExtension not trivial."))
-    return convert(to, _a(qe))
+    return convert(T, _a(qe))
 end
 
 # compatibility with Float64
 Float64(x::QuadraticExtension{T}) where T<:qe_suppT = Float64(_a(x)) + Float64(_b(x)) * sqrt(Float64(_r(x)))
 Base.promote_rule(::Type{<:QuadraticExtension{Rational}}, ::Type{<:AbstractFloat}) = Float64
 
-convert(to::Type{<:AbstractFloat}, qe::QuadraticExtension) = convert(to, Float64(qe))
+(::Type{T})(qe::QuadraticExtension) where {T<:AbstractFloat} = convert(T, Float64(qe))
+
+# avoid ambiguities
+Rational(qe::QuadraticExtension) = _qe_to_rational(Rational,qe)
+Integer(qe::QuadraticExtension) = _qe_to_rational(Integer,qe)
+(::Type{T})(qe::QuadraticExtension) where {T<:Base.Integer} = _qe_to_rational(T,qe)

@@ -37,7 +37,7 @@ for T in [:Int128, :UInt64, :UInt128]
     @eval Base.$T(int::Integer) = $T(BigInt(int))
 end
 
-Base.Int64(int::Integer) = convert(Int64, new_int_from_integer(int))
+Base.Int64(int::Integer) = Int64(new_int_from_integer(int))
 
 for T in [:Int8,  :Int16,  :Int32, :UInt8, :UInt16, :UInt32]
     @eval Base.$T(int::Integer) = $T(Int64(int))
@@ -52,7 +52,7 @@ BigFloat(int::Integer) = BigFloat(BigInt(int))
 Base.float(int::Integer) = Float64(int)
 
 # no-copy converts
-convert(::Type{<:Integer}, int::T) where T <: Integer = int
+Integer(int::Integer) = int
 Base.Integer(int::Integer) = int
 
 Base.trailing_zeros(int::Integer) = trailing_zeros(BigInt(int))

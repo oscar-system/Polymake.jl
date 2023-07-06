@@ -51,13 +51,15 @@ end
 Base.Rational(rat::Rational) = Base.Rational{BigInt}(rat)
 Base.big(rat::Rational) = Base.Rational{BigInt}(rat)
 
-convert(::Type{Integer}, rat::Rational) = new_integer_from_rational(rat)
-convert(::Type{T}, rat::Rational) where T<:Number = convert(T, big(rat))
-convert(::Type{T}, rat::Rational) where T<:AbstractFloat = convert(T, Float64(rat))
+Integer(rat::Rational) = new_integer_from_rational(rat)
+(::Type{T})(rat::Rational) where T<:Number = convert(T, big(rat))
+(::Type{T})(rat::Rational) where T<:AbstractFloat = convert(T, Float64(rat))
 Base.float(rat::Rational) = Float64(rat)
+# to avoid ambiguities...
+Float64(rat::Rational) = Float64(CxxWrap.CxxRef(rat))
 
 # no-copy convert
-convert(::Type{<:Rational}, rat::T) where T <: Rational = rat
+Rational(rat::Rational) = rat
 
 # Rational division:
 

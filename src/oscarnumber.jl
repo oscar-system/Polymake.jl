@@ -6,6 +6,7 @@ end
 OscarNumber(a::Union{Base.Integer, Base.Rational{<:Base.Integer}}) = OscarNumber(Rational(a))
 # this needs to be separate to avoid ambiguities
 OscarNumber(a::Integer) = OscarNumber(Rational(a))
+OscarNumber(a::Rational) = OscarNumber(CxxWrap.ConstCxxRef(a))
 
 Base.zero(::Type{<:OscarNumber}) = OscarNumber(0)
 Base.zero(::OscarNumber) = OscarNumber(0)
@@ -299,6 +300,12 @@ function register_julia_element(e, p, t::Type)
    return field_count
 end
 
-convert(::Type{T}, on::OscarNumber) where T<:Number = convert(T, unwrap(on))
+(::Type{T})(on::OscarNumber) where T<:Number = convert(T, unwrap(on))
+Integer(on::OscarNumber) = convert(Integer, unwrap(on))
+Rational(on::OscarNumber) = convert(Rational, unwrap(on))
+
+# we don't support conversion for concrete types inside the OscarNumber here
+QuadraticExtension{Rational}(on::OscarNumber) = QuadraticExtension{Rational}(Rational(on))
+OscarNumber(qe::QuadraticExtension) = OscarNumber(Rational(qe))
 
 Base.float(on::OscarNumber) = float(unwrap(on))
