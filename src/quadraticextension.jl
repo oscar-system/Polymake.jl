@@ -4,13 +4,17 @@ QuadraticExtension{T}(a::Number, b::Number, r::Number) where T<:qe_suppT =
     QuadraticExtension{T}(convert(T, a), convert(T, b), convert(T, r))
     
 QuadraticExtension{T}(a::Number) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
+(::Type{<:QuadraticExtension{T}})(a::Number) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
 
 QuadraticExtension(x...) = QuadraticExtension{Rational}(x...)
+(::Type{<:QuadraticExtension})(x...) = QuadraticExtension{Rational}(x...)
 
 # needed to avoid ambiguities
 QuadraticExtension{T}(a::Integer) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
+(::Type{<:QuadraticExtension{T}})(a::Integer) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
 QuadraticExtension(x::Integer) = QuadraticExtension{Rational}(x)
 QuadraticExtension{T}(a::Rational) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
+(::Type{<:QuadraticExtension{T}})(a::Rational) where T<:qe_suppT = QuadraticExtension{T}(a, 0, 0)
 QuadraticExtension(a::Rational) = QuadraticExtension{Rational}(a, 0, 0)
 
 Base.zero(::Type{<:QuadraticExtension{T}}) where T<:qe_suppT = QuadraticExtension{T}(0)
@@ -39,6 +43,8 @@ Base.:/(x::QuadraticExtension{T}, y::QuadraticExtension{T}) where T<:qe_suppT = 
 
 # no-copy convert
 convert(::Type{<:QuadraticExtension{T}}, qe::QuadraticExtension{T}) where T<:qe_suppT = qe
+(::Type{<:QuadraticExtension{T}})(qe::QuadraticExtension{T}) where T<:qe_suppT = qe
+(QuadraticExtension{T})(qe::QuadraticExtension{T}) where T<:qe_suppT = qe
 
 function _qe_to_rational(::Type{T}, qe::QuadraticExtension) where T<:Number
     !iszero(_b(qe)) && !iszero(_r(qe)) && throw(DomainError("Given QuadraticExtension not trivial."))
@@ -52,6 +58,8 @@ Base.promote_rule(::Type{<:QuadraticExtension{Rational}}, ::Type{<:AbstractFloat
 (::Type{T})(qe::QuadraticExtension) where {T<:AbstractFloat} = convert(T, Float64(qe))
 
 # avoid ambiguities
+(::Type{<:Rational})(qe::QuadraticExtension) = _qe_to_rational(Rational,qe)
+(::Type{<:Integer})(qe::QuadraticExtension) = _qe_to_rational(Integer,qe)
 Rational(qe::QuadraticExtension) = _qe_to_rational(Rational,qe)
 Integer(qe::QuadraticExtension) = _qe_to_rational(Integer,qe)
 (::Type{T})(qe::QuadraticExtension) where {T<:Base.Integer} = _qe_to_rational(T,qe)

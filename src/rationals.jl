@@ -1,16 +1,23 @@
+(::Type{<:Rational})(num::Int64, den::Int64) =
+    rational_si_si(convert(CxxLong, num), convert(CxxLong, den))
 Rational(num::Int64, den::Int64) =
     rational_si_si(convert(CxxLong, num), convert(CxxLong, den))
 
-function Rational(num::T, den::S) where {T<:Base.Integer, S<:Base.Integer}
+function (::Type{<:Rational})(num::T, den::S) where {T<:Base.Integer, S<:Base.Integer}
     R = promote_type(promote_type(T, Int64), promote_type(S, Int64))
     R == Int64 && return Rational(convert(Int64, num), convert(Int64, den))
     return Rational(Integer(convert(BigInt, num)), Integer(convert(BigInt, den)))
 end
 
+(::Type{<:Rational})(x::Base.Rational) = Rational(numerator(x), denominator(x))
 Rational(x::Base.Rational) = Rational(numerator(x), denominator(x))
+
 @inline function Rational(x::Base.Rational{BigInt})
     GC.@preserve x new_rational_from_baserational(pointer_from_objref(numerator(x)), pointer_from_objref(denominator(x)))
 end
+
+(::Type{<:Rational})(int::Base.Integer) = Rational(int, one(int))
+(::Type{<:Rational})(x::Number) = Rational(Base.Rational(x))
 Rational(int::Base.Integer) = Rational(int, one(int))
 Rational(x::Number) = Rational(Base.Rational(x))
 
@@ -51,6 +58,7 @@ end
 Base.Rational(rat::Rational) = Base.Rational{BigInt}(rat)
 Base.big(rat::Rational) = Base.Rational{BigInt}(rat)
 
+(::Type{<:Integer})(rat::Rational) = new_integer_from_rational(rat)
 Integer(rat::Rational) = new_integer_from_rational(rat)
 (::Type{T})(rat::Rational) where T<:Number = convert(T, big(rat))
 (::Type{T})(rat::Rational) where T<:AbstractFloat = convert(T, Float64(rat))
@@ -59,6 +67,7 @@ Base.float(rat::Rational) = Float64(rat)
 Float64(rat::Rational) = Float64(CxxWrap.CxxRef(rat))
 
 # no-copy convert
+(::Type{<:Rational})(rat::Rational) = rat
 Rational(rat::Rational) = rat
 
 # Rational division:

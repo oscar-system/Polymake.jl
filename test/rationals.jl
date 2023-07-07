@@ -121,6 +121,16 @@
         end
     end
 
+    @testset verbose=true "sign abs" begin
+        a = Polymake.Rational(2, 3)
+        @test sign(a) == 1
+        @test sign(-a) == -1
+        @test sign(a-a) == 0
+
+        @test abs(a) * sign(a) == a
+        @test abs(-a) * -sign(a) == -a
+    end
+
     @testset verbose=true "zero / one" begin
         ZERO = Polymake.Rational(0)
         ONE = Polymake.Rational(1)
