@@ -167,7 +167,8 @@ using Polymake.SparseArrays
 
                 @test (Z .= T.(jl_v)) isa Polymake.SparseVector{Polymake.OscarNumber}
 
-                @test U == V == W == Y == Z
+                @test U == V == W == Y
+                @test W == Z
 
                 # TODO:
                 # @test (V .== jl_v) isa BitArray

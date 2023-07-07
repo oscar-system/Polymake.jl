@@ -39,8 +39,16 @@
     @testset verbose=true "Arithmetic" begin
         a = Polymake.Integer(2)
         @test -a == -2
-        # for T in [IntTypes; Polymake.Integer]
-        for T in IntTypes
+
+        @test sign(a) == 1
+        @test sign(-a) == -1
+        @test sign(a-a) == 0
+
+        @test abs(a) * sign(a) == a
+        @test abs(-a) * -sign(a) == -a
+
+        #for T in IntTypes
+        for T in [IntTypes; Polymake.Integer]
             b = T(5)
             # Equality
             @test a == T(2)

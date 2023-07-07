@@ -100,7 +100,18 @@
             a /= b
             @test a == Polymake.QuadraticExtension{Polymake.Rational}(735//40328, -85//40328, 5)
         end
-        
+
+        @testset verbose=true "sign abs" begin
+            a = Polymake.QuadraticExtension{Polymake.Rational}(5)
+            b = Polymake.QuadraticExtension{Polymake.Rational}(17, 1, 5)
+            @test sign(a) == 1
+            @test sign(b) == 1
+            @test sign(-b) == -1
+            @test sign(b-b) == 0
+
+            @test abs(a) * sign(a) == a
+            @test abs(-a) * -sign(a) == -a
+        end
     end
     
     @testset verbose=true "zero / one" begin

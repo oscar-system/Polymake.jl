@@ -281,7 +281,8 @@
 
                 @test (Z .= T.(jl_m)) isa Polymake.Matrix{Polymake.OscarNumber}
 
-                @test X == U == V == W == Y == Z
+                @test X == U == V == W == Y
+                @test W == Z
 
                 # TODO:
                 # @test (V .== jl_m) isa BitPolymake.Array

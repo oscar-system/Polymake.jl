@@ -41,8 +41,6 @@ end
 
 Base.Vector(s::Set) = collect(s)
 
-Base.Set(s::Set{T}) where T = Base.Set{to_jl_type(T)}(Base.Vector(s))
-
 function Base.Set{T}(s::Set{S}) where {T, S}
     jls = Base.Set{T}()
     sizehint!(jls, length(s))
