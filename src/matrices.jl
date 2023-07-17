@@ -3,6 +3,9 @@ function Matrix{T}(::UndefInitializer, m::Base.Integer, n::Base.Integer) where
     return Matrix{to_cxx_type(T)}(convert(Int64, m), convert(Int64,n))
 end
 
+_same_element_matrix_polynomial(p::Polynomial, m::Base.Integer, n::Base.Integer) =
+   _same_element_matrix(p,m,n)
+
 function Matrix{Polynomial{Rational, CxxWrap.CxxLong}}(::UndefInitializer, m::Base.Integer, n::Base.Integer)
     return _same_element_matrix_polynomial(Polynomial{Rational, CxxWrap.CxxLong}([0], permutedims([0])), convert(Int64, m), convert(Int64, n))
 end
@@ -19,6 +22,17 @@ Matrix(mat::AbstractMatrix{T}) where T =
 Base.size(m::Matrix) = (nrows(m), ncols(m))
 
 Base.eltype(v::Matrix{T}) where T = to_jl_type(T)
+
+function Base.vcat(M::Matrix...)
+    allequal(ncols.(M)) || throw(ArgumentError("matrices must have the same number of columns"))
+    T = convert_to_pm_type(Base.promote_eltype(M...))
+    return reduce(_vcat, Matrix{T}.(M))
+end
+function Base.hcat(M::Matrix...)
+    allequal(nrows.(M)) || throw(ArgumentError("matrices must have the same number of rows"))
+    T = convert_to_pm_type(Base.promote_eltype(M...))
+    return reduce(_hcat, Matrix{T}.(M))
+end
 
 Base.@propagate_inbounds function Base.getindex(M::Matrix , i::Base.Integer, j::Base.Integer)
     @boundscheck checkbounds(M, i, j)

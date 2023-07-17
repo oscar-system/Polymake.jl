@@ -2,15 +2,22 @@ function Map{String,String}()
     return Map{to_cxx_type(String),to_cxx_type(String)}()
 end
 
-function Base.getindex(M::Map{TV, TK}, key) where {TV, TK}
-    return convert(to_jl_type(TV), _getindex(M, convert(to_cxx_type(String), key)))
+function Base.getindex(M::Map{TK, TV}, key) where {TK, TV}
+    return convert(to_jl_type(TV), _getindex(M, convert(to_cxx_type(TK), key)))
 end
 
-function Base.setindex!(M::Map{TV, TK}, val, key::AbstractString) where {TV, TK}
-    _setindex!(M, convert(TV, val), convert(TK, key))
+function Base.setindex!(M::Map{TK, TV}, val, key) where {TK, TV}
+   _setindex!(M, convert(to_cxx_type(TV), val), convert(to_cxx_type(TK), key))
     return val
 end
 
+function Base.haskey(M::Map{TK, TV}, key) where {TK, TV}
+    return _haskey(M, convert(to_cxx_type(TK), key))
+end
+
+function Base.:(==)(M::Map{TK,TV}, N::Map{TK,TV}) where {TK, TV}
+   return _isequal(M,N)
+end
 # show method
 function Base.show(io::IO, M::Map)
     print(io, join(collect(M), "\n"))
