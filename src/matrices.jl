@@ -3,11 +3,8 @@ function Matrix{T}(::UndefInitializer, m::Base.Integer, n::Base.Integer) where
     return Matrix{to_cxx_type(T)}(convert(Int64, m), convert(Int64,n))
 end
 
-_same_element_matrix_polynomial(p::Polynomial, m::Base.Integer, n::Base.Integer) =
-   _same_element_matrix(p,m,n)
-
 function Matrix{Polynomial{Rational, CxxWrap.CxxLong}}(::UndefInitializer, m::Base.Integer, n::Base.Integer)
-    return _same_element_matrix_polynomial(Polynomial{Rational, CxxWrap.CxxLong}([0], permutedims([0])), convert(Int64, m), convert(Int64, n))
+    return _same_element_matrix(Polynomial{Rational, CxxWrap.CxxLong}([0], permutedims([0])), convert(Int64, m), convert(Int64, n))
 end
 
 function Matrix{T}(mat::AbstractMatrix) where T
