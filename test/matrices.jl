@@ -339,6 +339,10 @@
         @test -Z isa Polymake.Matrix{Polymake.OscarNumber}
         @test -Z == -jl_z
 
+        @test vcat(W,V) isa Polymake.Polymake.MatrixAllocated{Polymake.Rational}
+        @test vcat(W,V) == Polymake.Matrix{Polymake.Rational}([1//4 1//2 3//4; 1 5//4 3//2; 1 2 3; 4 5 6])
+        @test hcat(W,V) == Polymake.Matrix{Polymake.Rational}([1//4 1//2 3//4 1 2 3; 1 5//4 3//2 4 5 6])
+
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 
