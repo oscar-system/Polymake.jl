@@ -125,11 +125,11 @@ function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
 end
 
 function Base.vcat(M::IncidenceMatrix...)
-    allequal(ncols.(M)) || throw(ArgumentError("matrices must have the same number of columns"))
+    all(==(ncols(first(M))),ncols.(M)) || throw(DimensionMismatch("matrices must have the same number of columns"))
     return reduce(_vcat, M)
 end
 function Base.hcat(M::IncidenceMatrix...)
-    allequal(nrows.(M)) || throw(ArgumentError("matrices must have the same number of rows"))
+    all(==(nrows(first(M))),nrows.(M)) || throw(DimensionMismatch("matrices must have the same number of rows"))
     return reduce(_hcat, M)
 end
 

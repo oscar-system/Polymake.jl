@@ -41,12 +41,12 @@ Base.size(m::SparseMatrix) = (nrows(m), ncols(m))
 Base.eltype(m::SparseMatrix{T}) where T = to_jl_type(T)
 
 function Base.vcat(M::Union{SparseMatrix,Matrix}...)
-    allequal(ncols.(M)) || throw(ArgumentError("matrices must have the same number of columns"))
+    all(==(ncols(first(M))), ncols.(M)) || throw(DimensionMismatch("matrices must have the same number of columns"))
     T = convert_to_pm_type(Base.promote_eltype(M...))
     return reduce(_vcat, SparseMatrix{T}.(M))
 end
 function Base.hcat(M::Union{SparseMatrix,Matrix}...)
-    allequal(nrows.(M)) || throw(ArgumentError("matrices must have the same number of rows"))
+    all(==(nrows(first(M))), nrows.(M)) || throw(DimensionMismatch("matrices must have the same number of rows"))
     T = convert_to_pm_type(Base.promote_eltype(M...))
     return reduce(_hcat, SparseMatrix{T}.(M))
 end

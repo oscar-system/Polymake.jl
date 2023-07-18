@@ -24,12 +24,12 @@ Base.size(m::Matrix) = (nrows(m), ncols(m))
 Base.eltype(v::Matrix{T}) where T = to_jl_type(T)
 
 function Base.vcat(M::Matrix...)
-    allequal(ncols.(M)) || throw(ArgumentError("matrices must have the same number of columns"))
+    all(==(ncols(first(M))), ncols.(M)) || throw(DimensionMismatch("matrices must have the same number of columns"))
     T = convert_to_pm_type(Base.promote_eltype(M...))
     return reduce(_vcat, Matrix{T}.(M))
 end
 function Base.hcat(M::Matrix...)
-    allequal(nrows.(M)) || throw(ArgumentError("matrices must have the same number of rows"))
+    all(==(nrows(first(M))), nrows.(M)) || throw(DimensionMismatch("matrices must have the same number of rows"))
     T = convert_to_pm_type(Base.promote_eltype(M...))
     return reduce(_hcat, Matrix{T}.(M))
 end
