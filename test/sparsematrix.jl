@@ -393,6 +393,12 @@ using Polymake.SparseArrays
         @test -Z isa Polymake.SparseMatrix{Polymake.OscarNumber}
         @test -Z == -jl_z
 
+        DV = Polymake.Matrix{Polymake.Integer}(jl_m)
+        @test vcat(W,V) isa Polymake.Polymake.SparseMatrixAllocated{Polymake.Rational}
+        @test vcat(W,V) == Polymake.SparseMatrix{Polymake.Rational}([1//4 1//2 3//4; 1 5//4 3//2; 1 2 3; 4 5 6])
+        @test vcat(DV,W) == Polymake.SparseMatrix{Polymake.Rational}([1 2 3; 4 5 6; 1//4 1//2 3//4; 1 5//4 3//2])
+        @test hcat(W,DV) == Polymake.SparseMatrix{Polymake.Rational}([1//4 1//2 3//4 1 2 3; 1 5//4 3//2 4 5 6])
+
         int_scalar_types = [IntTypes; Polymake.Integer]
         rational_scalar_types = [[Base.Rational{T} for T in IntTypes]; Polymake.Rational]
 

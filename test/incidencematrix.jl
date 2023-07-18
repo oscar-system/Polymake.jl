@@ -95,6 +95,10 @@ using Polymake.SparseArrays
             @test nzi == [3]
             @test v == [true]
 
+            @test vcat(N,N) isa Polymake.IncidenceMatrixAllocated{Polymake.NonSymmetric}
+            @test vcat(N,N) == Polymake.IncidenceMatrix([[3],[1],[3],[1]])
+            @test hcat(N,N) == Polymake.IncidenceMatrix([[3,6],[1,4]])
+
             for T in [IntTypes; Polymake.Integer]
                 N = Polymake.IncidenceMatrix(jl_n) # local copy
                 @test setindex!(N, T(5), 1, 1) isa T

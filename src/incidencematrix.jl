@@ -124,6 +124,15 @@ function Base.resize!(M::IncidenceMatrix{Symmetric}, n::Base.Integer)
     _resize!(M,Int64(n),Int64(n))
 end
 
+function Base.vcat(M::IncidenceMatrix...)
+    all(==(ncols(first(M))),ncols.(M)) || throw(DimensionMismatch("matrices must have the same number of columns"))
+    return reduce(_vcat, M)
+end
+function Base.hcat(M::IncidenceMatrix...)
+    all(==(nrows(first(M))),nrows.(M)) || throw(DimensionMismatch("matrices must have the same number of rows"))
+    return reduce(_hcat, M)
+end
+
 Base.show(io::IO, tp::MIME{Symbol("text/plain")}, M::IncidenceMatrix) =
     Base.show(IOContext(io), tp, M)
 
