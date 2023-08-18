@@ -204,9 +204,11 @@ function __init__()
     end
 
     polymake_extension_config = joinpath(polymake_deps_tree, "extensions.json")
-    open(polymake_extension_config, "w") do file
+    tmpfile = tempname(polymake_deps_tree; cleanup=false)
+    open(tmpfile, "w") do file
        JSON.print(file, Dict("Polymake::User::extensions" => extensionpaths))
     end
+    Base.Filesystem.rename(tmpfile, polymake_extension_config)
 
     # Temporarily unset PERL5LIB during initialization
     # This variable can cause errors if the perl modules in this folder were not
