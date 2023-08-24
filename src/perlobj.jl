@@ -19,6 +19,12 @@ function bigobject(fname::String, name::String; kwargsdata...)
     return obj
 end
 
+function bigobject_eltype(obj::BigObject)
+   res = call_function(:User, :get_bigobject_elemtype, obj)
+   res isa CxxWrap.StdString && !isempty(res) || error("could not determine element type of BigObject")
+   return String(res)
+end
+
 # polymake can either just give a reference or do a full copy.
 # but even that full copy will contain references to the same data
 # objects in memory, but this is fine since most of them are immutable anyway.

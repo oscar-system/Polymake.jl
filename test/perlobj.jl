@@ -95,7 +95,9 @@
 
         @test (@pm tropical.Polytope{Max}(POINTS=points_int)) isa Polymake.BigObject
 
-        @test (@pm tropical.Polytope{Max}(POINTS=points_int)) isa Polymake.BigObject
+        tp = @pm tropical.Polytope{Max}(POINTS=points_int)
+        @test Polymake.bigobject_eltype(tp) == "Rational"
+
         @test (@pm tropical.Polytope{Max, Rational}(POINTS=points_int)) isa Polymake.BigObject
         @test (@pm tropical.Polytope{Max, QuadraticExtension}(POINTS=points_int)) isa Polymake.BigObject
 
@@ -108,10 +110,12 @@
         @test P.VERTICES isa Polymake.Matrix{Float64}
         P = @pm polytope.Polytope{Float}(POINTS=[1 0.5 0; 1 0 1])
         @test P.VERTICES isa Polymake.Matrix{Float64}
+        @test Polymake.bigobject_eltype(P) == "Float"
         P = @pm polytope.Polytope(POINTS=[1 0.5 0; 1 0 1])
         @test P.VERTICES isa Polymake.Matrix{Polymake.Rational}
         P = @pm polytope.Polytope{Rational}(POINTS=[1 0.5 0; 1 0 1])
         @test P.VERTICES isa Polymake.Matrix{Polymake.Rational}
+        @test Polymake.bigobject_eltype(P) == "Rational"
     end
 
     @testset verbose=true "PolymakeException" begin
@@ -141,6 +145,7 @@
         i = Polymake.polytope.icosahedron()
         @test i.VERTICES[1, :] == [1, 0, Polymake.QuadraticExtension{Polymake.Rational}(1//4, 1//4, 5), 1//2]
         @test i.VOLUME == Polymake.QuadraticExtension{Polymake.Rational}(5//4, 5//12, 5)
+        @test Polymake.bigobject_eltype(i) == "QuadraticExtension"
     end
 
     @testset verbose=true "attachments" begin
