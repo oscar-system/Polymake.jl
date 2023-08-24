@@ -99,3 +99,13 @@ function set_shell_scalar($,$) {
    no strict 'refs';
    ${"Polymake::User::$varname"} = $obj;
 }
+
+sub get_bigobject_elemtype($) {
+   my $params = $_[0]->type->params;
+   return "" unless defined($params) && @$params > 0;
+   if ($params->[0]->name =~ /^Min|Max$/) {
+      return $params->[1]->name;
+   } else {
+      return $params->[0]->name;
+   }
+}

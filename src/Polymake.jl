@@ -281,7 +281,12 @@ function __init__()
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         prepare_jupyter_kernel_for_visualization()
     end
-
+    # this will disable callbacks for oscarnumber gc free calls
+    # to avoid some crashes during exit
+    # the data will be cleaned anyway once the iddict is cleared
+    Base.atexit() do
+        Polymake.oscarnumber_prepare_cleanup()
+    end
 end
 
 include("setup_apps.jl")
