@@ -126,7 +126,13 @@
 
     @testset verbose=true "properties" begin
         test_polytope = @pm polytope.Polytope(POINTS=points_int)
+        @test Polymake.list_properties(test_polytope) isa Polymake.Array
+        @test Polymake.list_properties(test_polytope) == ["POINTS"]
         @test test_polytope.F_VECTOR == [ 4, 4 ]
+        let prli = Polymake.list_properties(test_polytope)
+            @test "POINTS" in prli
+            @test "F_VECTOR" in prli
+        end
         @test test_polytope.INTERIOR_LATTICE_POINTS ==
             [ 1 1 1 ; 1 1 2 ; 1 2 1 ; 1 2 2 ]
 

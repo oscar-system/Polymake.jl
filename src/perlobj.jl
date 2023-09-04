@@ -42,6 +42,11 @@ end
 
 Base.propertynames(p::BigObject) = Symbol.(Polymake.complete_property(p, ""))
 
+function list_properties(obj::BigObject)
+    l = Polymake.call_method(Polymake.PropertyValue, obj, :list_properties; calltype = :list)
+    return Polymake.to_array_string(l)
+end
+
 function Base.setproperty!(obj::BigObject, prop::Symbol, val)
     @assert prop != :cpp_object
     return take(obj, string(prop), convert(PolymakeType, val))
