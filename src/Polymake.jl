@@ -96,8 +96,13 @@ module LibPolymake
   using polymake_jll
   using libpolymake_julia_jll
   using polymake_oscarnumber_jll
+  import ..Polymake: libcxxwrap_build_version
 
-  @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
+  if libcxxwrap_build_version() >= v"0.11.0"
+    @wrapmodule(() -> joinpath(libpolymake_julia), :define_module_polymake)
+  else
+    @wrapmodule(joinpath(libpolymake_julia), :define_module_polymake)
+  end
 
   function __init__()
 
@@ -135,8 +140,13 @@ module LibOscarNumber
   using polymake_oscarnumber_jll
 
   import ..LibPolymake: show_small_obj
+  import ..Polymake: libcxxwrap_build_version
 
-  @wrapmodule(joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
+  if libcxxwrap_build_version() >= v"0.11.0"
+    @wrapmodule(() -> joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
+  else
+    @wrapmodule(joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
+  end
 
   function __init__()
 
