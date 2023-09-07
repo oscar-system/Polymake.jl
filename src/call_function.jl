@@ -1,7 +1,3 @@
-function CxxWrap.StdVector{CxxWrap.StdString}(vec::AbstractVector{<:AbstractString})
-    return CxxWrap.StdVector(convert.(CxxWrap.StdString, vec))
-end
-
 """
     call_function([::Type{PropertyValue},] app::Symbol, func::Symbol, args...;
         template_parameters=String[], kwargs...)
@@ -16,7 +12,8 @@ function call_function(::Type{PropertyValue}, app::Symbol, func::Symbol, args...
     calltype::Symbol=:scalar, kwargs...)
     fname = Meta.pm_name_qualified(app, func)
     cargs = Meta.polymake_arguments(args...; kwargs...)
-    templ = CxxWrap.StdVector{CxxWrap.StdString}(template_parameters)
+    templ = CxxWrap.StdVector{CxxWrap.StdString}()
+    append!(templ, StdString.(template_parameters))
     return disable_sigint() do
         if calltype == :void
             internal_call_function_void(fname, templ, cargs)
