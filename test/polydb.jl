@@ -45,6 +45,12 @@ using Polymake.Polydb.Mongoc
         results_bson = Polymake.Polydb.find(collection_bson, constraints...)
         @test Polymake.Polydb.Cursor{Polymake.BigObject}(results_bson) isa Polymake.Polydb.Cursor
         @test Polymake.Polydb.Cursor{Polymake.BigObject}(results_bson) isa Polymake.Polydb.Cursor{Polymake.BigObject}
+
+        @test length(collection_bo, constraints...) == 7
+        @test length(collection_bo, query) == 7
+        @test length(collection_bson, constraints...) == 7
+        @test length(collection_bson, query) == 7
+
         @testset verbose=true "Iterator (Cursor)" begin
             @test iterate(results_bo) isa Tuple{Polymake.BigObject, Nothing}
             @test iterate(results_bson) isa Tuple{Mongoc.BSON, Nothing}

@@ -86,6 +86,45 @@ Polymake.Polydb.Collection{Polymake.BigObject}: Matroids.Small
 Base.getindex(db::Database, name::AbstractString) = Collection{Polymake.BigObject}(db.mdb[name])
 
 """
+      length(c::Collection{T}, d::Dict=Dict())
+
+Count documents in a collection `c` matching the criteria given by `d`.
+
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"];
+
+julia> query = Dict("DIM"=>3, "N_FACETS"=>5);
+
+julia> length(collection, query)
+4
+```
+"""
+function Base.length(c::Collection{T}, d::Dict=Dict()) where T
+   return Base.length(c.mcol, Mongoc.BSON(d))
+end
+
+"""
+      length(c::Collection{T}, d::Pair...)
+
+Count documents in a collection `c` matching the criteria given by `d`.
+
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"];
+
+julia> length(collection, "DIM"=>3, "N_FACETS"=>5)
+4
+```
+"""
+function Base.length(c::Collection{T}, d::Pair...) where T
+   return Base.length(c.mcol, Mongoc.BSON(d...))
+end
+"""
       find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict})
 
 Search a collection `c` for documents matching the criteria given by `d`.
