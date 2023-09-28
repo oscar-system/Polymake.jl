@@ -112,9 +112,12 @@
         if _with_oscar
             @test M * A2 == A2 * M == Polymake.OscarNumber(a1*a2 + 15 + 7*a2)
             @test Polymake.OscarNumber(5) // A2 == Polymake.OscarNumber(a2^2)
-            @test Polymake.common.convert_to{Float64}(A2) isa Float64
-            fa2 = Polymake.common.convert_to{Float64}(A2)
-            @test isapprox(fa2, 1.71; rtol=0.001)
+            # avoid test error for older oscar versions
+            if length(methods(Polymake._fieldelem_to_float, (EmbeddedElem,), Oscar)) > 0
+               @test Polymake.common.convert_to{Float64}(A2) isa Float64
+               fa2 = Polymake.common.convert_to{Float64}(A2)
+               @test isapprox(fa2, 1.71; rtol=0.001)
+            end
         end
     end
 
