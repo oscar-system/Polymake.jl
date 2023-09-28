@@ -24,7 +24,7 @@ polymake_oscarnumber_jll = "10f31823-b687-53e6-9f29-edb9d4da9f9f"
 
 [compat]
 BinaryWrappers = "~0.1.0"
-CxxWrap = "~0.10.1, ~0.11, ~0.12, ~0.13.1, ~0.14"
+CxxWrap = "~0.14"
 JSON = "^0.20, ^0.21"
 Mongoc = "~0.6.0, ~0.7.0, ~0.8.0, ~0.9.0"
 Ninja_jll = "^1.11.1"
