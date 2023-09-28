@@ -63,8 +63,9 @@ mutable struct oscar_number_dispatch_helper
     abs::Ptr{Cvoid}
     hash::Ptr{Cvoid}
     to_rational::Ptr{Cvoid}
+    to_float::Ptr{Cvoid}
 end
-oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 21)...)
+oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 22)...)
 
 const _on_gc_refs = IdDict()
 
@@ -133,6 +134,22 @@ _on_sign_int(e::T) where T = Base.cmp(e,0)::Int
 @generated _on_gen_sign_int(::Type{ArgT}) where ArgT =
    quote
       @cfunction(_on_sign_int, Clong, (Ref{ArgT},))
+   end
+
+function _fieldelem_to_float(e::T) where T
+   if !hasmethod(Float64, Tuple{T})
+      error("OscarNumber: cannot coerce to Float64, please define 'Polymake._fieldelem_to_float(e::$T)::Float64'")
+   end
+   return Float64(e)
+end
+
+function _on_to_float(e::ArgT)::Float64 where ArgT
+   return _fieldelem_to_float(e)
+end
+
+@generated _on_gen_to_float(::Type{ArgT}) where ArgT =
+   quote
+      @cfunction(_on_to_float, Float64, (Ref{ArgT},))
    end
 
 function _fieldelem_to_rational(e::T) where T
@@ -285,6 +302,7 @@ function register_julia_element(e, p, t::Type)
    dispatch.hash    = _on_gen_hash(t)
 
    dispatch.to_rational = _on_gen_to_rational(t)
+   dispatch.to_float = _on_gen_to_float(t)
 
    dispatch.cmp = _on_gen_cmp(t)
 
@@ -316,4 +334,3 @@ QuadraticExtension{Rational}(on::OscarNumber) = QuadraticExtension{Rational}(Rat
 (::Type{<:OscarNumber})(qe::QuadraticExtension) = OscarNumber(Rational(qe))
 OscarNumber(qe::QuadraticExtension) = OscarNumber(Rational(qe))
 
-Base.float(on::OscarNumber) = float(unwrap(on))

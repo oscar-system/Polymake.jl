@@ -31,16 +31,10 @@ jobs:
         os: ['ubuntu-latest']
         cxxwrap: [ '' ]
         include:
-          - cxxwrap: '0.13.4'
+          - cxxwrap: '0.14'
             os: ubuntu-latest
             julia-version: 1.9
-          - cxxwrap: '0.14.0'
-            os: ubuntu-latest
-            julia-version: 1.9
-          - cxxwrap: '0.13.4'
-            os: ubuntu-latest
-            julia-version: nightly
-          - cxxwrap: '0.14.0'
+          - cxxwrap: '0.14'
             os: ubuntu-latest
             julia-version: nightly
 
