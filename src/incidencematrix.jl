@@ -50,10 +50,8 @@ function IncidenceMatrix{Symmetric}(mat::AbstractSparseMatrix)
     return res
 end
 
-function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}})
-    m = length(incidenceRows)
-    n = maximum(maximum, incidenceRows)
-    res = IncidenceMatrix(m, n)
+function IncidenceMatrix{NonSymmetric}(r::Base.Integer, c::Base.Integer, incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}})
+    res = IncidenceMatrix(r, c)
     i = 1
     for set in incidenceRows
         for j in set
@@ -62,6 +60,12 @@ function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractV
         i = i+1
     end
     return res
+end
+
+function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}})
+    r = length(incidenceRows)
+    c = maximum(maximum, incidenceRows)
+    return IncidenceMatrix{NonSymmetric}(r, c, incidenceRows)
 end
 
 # set default parameter to NonSymmetric
