@@ -46,6 +46,7 @@ include("lists.jl")
 include("map.jl")
 include("graphs.jl")
 include("homologygroup.jl")
+include("groups.jl")
 if get(ENV, "POLYDB_TEST_URI", "") != ""
    include("polydb.jl")
 end
