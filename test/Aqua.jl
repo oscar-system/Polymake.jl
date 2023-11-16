@@ -12,8 +12,7 @@ using Aqua
       project_extras=true,
       stale_deps=true,
       deps_compat=true,
-      project_toml_formatting=true,
       # this is also disabled to to the way libcxxwrap defines c++ function mappings
-      piracy=false,
+      piracies=false,
    )
 end
