@@ -1,6 +1,6 @@
 @testset verbose=true "Polymake.Array" begin
     m = 42
-    if _with_oscar
+    if isdefined(@__MODULE__, :_with_oscar) && _with_oscar
         Qx, x = QQ["x"]
         K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
         m = a1 + 3*a2^2 + 7

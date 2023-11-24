@@ -21,7 +21,7 @@ using Polymake.SparseArrays
 
     m = 42
     a2 = 7
-    if _with_oscar
+    if isdefined(@__MODULE__, :_with_oscar) && _with_oscar
         # prepare instances of OscarNumber to be used for multiple tests
         Qx, x = QQ["x"]
         K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
