@@ -20,6 +20,8 @@ if (haskey(ENV, "GITHUB_ACTIONS"))
     Polymake.shell_execute(raw"$Verbose::cpp=3;")
 end
 
+const short_test = haskey(ENV,"JULIA_PKGEVAL")
+
 struct MyInt x::Int end # needed in test/convert.jl
 
 include("Aqua.jl")

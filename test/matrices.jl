@@ -1,6 +1,10 @@
 @testset verbose=true "Polymake.Matrix" begin
-    IntTypes = [Int32, Int64, UInt64, BigInt]
-    FloatTypes = [Float32, Float64, BigFloat]
+    IntTypes = [Int64, BigInt]
+    FloatTypes = [Float64, BigFloat]
+    if isdefined(@__MODULE__, :short_test) && !short_test
+       append!(IntTypes, [Int32, UInt64])
+       append!(FloatTypes, [Float32])
+    end
 
     for T in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}, Polymake.OscarNumber]
         @test Polymake.Matrix{T} <: AbstractMatrix
