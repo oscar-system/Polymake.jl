@@ -1,3 +1,5 @@
+using Polymake.CxxWrap
+
 @testset verbose=true "Polymake.StdList" begin
     @testset verbose=true "Constructors" begin
         

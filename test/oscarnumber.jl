@@ -7,7 +7,7 @@
 
     a1 = 8
     a2 = 3
-    if _with_oscar
+    if isdefined(@__MODULE__, :_with_oscar) && _with_oscar
         Qx, x = QQ["x"]
         K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
     end
@@ -24,7 +24,7 @@
         end
 
         @test Polymake.OscarNumber(m) isa Polymake.OscarNumber
-        if _with_oscar
+        if isdefined(@__MODULE__, :_with_oscar) && _with_oscar
             @test Polymake.unwrap(M) isa Hecke.EmbeddedNumFieldElem{NfAbsNSElem}
         end
         @test Polymake.unwrap(M) == m
@@ -109,7 +109,7 @@
         @test M // Polymake.OscarNumber(5) == Polymake.OscarNumber(a1//5 + 3//5*a2^2 + 7//5)
 
         # these only work in the correct field and not with dummy values
-        if _with_oscar
+        if isdefined(@__MODULE__, :_with_oscar) && _with_oscar
             @test M * A2 == A2 * M == Polymake.OscarNumber(a1*a2 + 15 + 7*a2)
             @test Polymake.OscarNumber(5) // A2 == Polymake.OscarNumber(a2^2)
             # avoid test error for older oscar versions

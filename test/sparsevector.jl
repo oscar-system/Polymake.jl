@@ -1,8 +1,12 @@
 using Polymake.SparseArrays
 
 @testset verbose=true "Polymake.SparseVector" begin
-    IntTypes = [Int32, Int64, UInt64, BigInt]
-    FloatTypes = [Float32, Float64, BigFloat]
+    IntTypes = [Int64, BigInt]
+    FloatTypes = [Float64, BigFloat]
+    if isdefined(@__MODULE__, :short_test) && !short_test
+       append!(IntTypes, [Int32, UInt64])
+       append!(FloatTypes, [Float32])
+    end
 
     for T in [Int64, Polymake.Integer, Polymake.Rational, Float64, Polymake.QuadraticExtension{Polymake.Rational}, Polymake.OscarNumber]
         @test Polymake.SparseVector{T} <: AbstractSparseVector
@@ -206,7 +210,7 @@ using Polymake.SparseArrays
         Y = Polymake.SparseVector{Polymake.QuadraticExtension{Polymake.Rational}}(jl_y)
 
         m = 42
-        if _with_oscar
+        if isdefined(@__MODULE__, :_with_oscar) && _with_oscar
             Qx, x = QQ["x"]
             K, (a1, a2) = embedded_number_field([x^2 - 2, x^3 - 5], [(0, 2), (0, 2)])
             m = a1 + 3*a2^2 + 7

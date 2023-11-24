@@ -1,3 +1,5 @@
+using Polymake.CxxWrap
+
 @testset verbose=true "Polymake.StdPair" begin
     @testset verbose=true "Constructors" begin
         @test Polymake.StdPair{CxxWrap.CxxLong, CxxWrap.CxxLong}() isa Polymake.StdPair
