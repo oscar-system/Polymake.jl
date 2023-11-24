@@ -85,4 +85,21 @@
         @test Polymake.shell_execute(raw"""$c->apply_rule("_4ti2.integer_points");""") isa NamedTuple
         @test Polymake.exists(c, "LATTICE_POINTS_GENERATORS") || Polymake.exists(c, "HILBERT_BASIS_GENERATORS")
     end
+    @testset verbose=true "seeding" begin
+      try
+        Polymake.set_rand_source(() -> return 42)
+        v1 = Polymake.polytope.rand_sphere(3,10).VERTICES
+        v2 = Polymake.polytope.rand_sphere(3,10).VERTICES
+        vs1 = Polymake.polytope.rand_sphere(3,10; seed=42).VERTICES
+        vs2 = Polymake.polytope.rand_sphere(3,10; seed=43).VERTICES
+        @test v1 == v2
+        @test v1 == vs1
+        @test v1 != vs2
+        Polymake.reset_rand_source()
+        vr = Polymake.polytope.rand_sphere(3,10).VERTICES
+        @test v1 != vr
+      finally
+        Polymake.set_rand_source(Polymake._pm_rand_helper)
+      end
+    end
 end
