@@ -249,7 +249,10 @@ end
 
 
 function _on_to_string(e::T) where T
-   return Cstring(pointer("$e"))
+   str = "$e"
+   return GC.@preserve str begin
+      Base.unsafe_convert(Cstring, str)
+   end
 end
 @generated _on_gen_to_string(::Type{ArgT}) where ArgT =
    quote
