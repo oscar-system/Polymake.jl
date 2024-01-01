@@ -101,7 +101,7 @@ module LibPolymake
   @wrapmodule(() -> joinpath(libpolymake_julia), :define_module_polymake)
 
   function __init__()
-
+     ccall(:jl_generating_output, Cint, ()) == 1 && return nothing
      @initcxx
 
   end
@@ -141,7 +141,7 @@ module LibOscarNumber
   @wrapmodule(() -> joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
 
   function __init__()
-
+     ccall(:jl_generating_output, Cint, ()) == 1 && return nothing
      @initcxx
 
   end
@@ -170,6 +170,7 @@ function set_rand_source(f::Function)
 end
 
 function __init__()
+    ccall(:jl_generating_output, Cint, ()) == 1 && return nothing
 
     binpaths = [
                  @generate_wrappers(lib4ti2_jll),
