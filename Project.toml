@@ -1,7 +1,7 @@
 name = "Polymake"
 uuid = "d720cf60-89b5-51f5-aff5-213f193123e7"
 repo = "https://github.com/oscar-system/Polymake.jl.git"
-version = "0.11.9"
+version = "0.11.10"
 
 [deps]
 BinaryWrappers = "f01c122e-0ea1-4f85-ad8f-907073ad7a9f"
@@ -30,7 +30,7 @@ Downloads = "^1.6"
 JSON = "^0.20, ^0.21"
 Libdl = "^1.6"
 Mongoc = "~0.6.0, ~0.7.0, ~0.8.0, ~0.9.0"
-MozillaCACerts_jll = "2020 - 2023"
+MozillaCACerts_jll = "2020 - 2024"
 Ninja_jll = "^1.11.1"
 Perl_jll = "^5.34.0"
 Pkg = "^1.6"
