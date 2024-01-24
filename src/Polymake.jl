@@ -164,9 +164,9 @@ include(libpolymake_julia_jll.generate_deps_tree)
 include(type_translator)
 
 _pm_rand_helper() = rand(Int64)
-const _default_rand_helper = CxxWrap.@safe_cfunction(_pm_rand_helper, Int64, ())
 
 function set_rand_source()
+   _default_rand_helper = CxxWrap.@safe_cfunction(_pm_rand_helper, Int64, ())
    set_rand_source(_default_rand_helper)
 end
 
