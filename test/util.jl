@@ -1,3 +1,5 @@
+_test_rand_fun() = return 42
+
 @testset verbose=true "utilities" begin
     facets = [ 0 1 0 ; 0 0 1 ; 1 -1 0 ; 1 0 -1 ]
 
@@ -85,9 +87,12 @@
         @test Polymake.shell_execute(raw"""$c->apply_rule("_4ti2.integer_points");""") isa NamedTuple
         @test Polymake.exists(c, "LATTICE_POINTS_GENERATORS") || Polymake.exists(c, "HILBERT_BASIS_GENERATORS")
     end
+
+
     @testset verbose=true "seeding" begin
       try
-        Polymake.set_rand_source(() -> return 42)
+        _test_rand_cfun = Polymake.CxxWrap.@safe_cfunction(_test_rand_fun, Int64, ())
+        Polymake.set_rand_source(_test_rand_cfun)
         v1 = Polymake.polytope.rand_sphere(3,10).VERTICES
         v2 = Polymake.polytope.rand_sphere(3,10).VERTICES
         vs1 = Polymake.polytope.rand_sphere(3,10; seed=42).VERTICES
@@ -99,7 +104,7 @@
         vr = Polymake.polytope.rand_sphere(3,10).VERTICES
         @test v1 != vr
       finally
-        Polymake.set_rand_source(Polymake._pm_rand_helper)
+        Polymake.set_rand_source()
       end
     end
 end
