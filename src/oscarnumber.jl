@@ -116,9 +116,10 @@ end
    end
 end
 
+_on_cmp_int(e1::T, e2::T) where T = Clong(Base.cmp(e1, e2))
 @generated _on_gen_cmp(::Type{ArgT}) where ArgT =
    quote
-      @cfunction(Base.cmp, Clong, (Ref{ArgT}, Ref{ArgT}))
+      @cfunction(_on_cmp_int, Clong, (Ref{ArgT}, Ref{ArgT}))
    end
 
 @generated _on_gen_is_zero(::Type{ArgT}) where ArgT =
@@ -130,16 +131,13 @@ end
       @cfunction(Base.isone, Bool, (Ref{ArgT},))
    end
 
-_on_sign_int(e::T) where T = Base.cmp(e,0)::Int
+_on_sign_int(e::T) where T = Clong(Base.cmp(e,0))
 @generated _on_gen_sign_int(::Type{ArgT}) where ArgT =
    quote
       @cfunction(_on_sign_int, Clong, (Ref{ArgT},))
    end
 
 function _fieldelem_to_float(e::T) where T
-   if !hasmethod(Float64, Tuple{T})
-      error("OscarNumber: cannot coerce to Float64, please define 'Polymake._fieldelem_to_float(e::$T)::Float64'")
-   end
    return Float64(e)
 end
 
@@ -153,9 +151,6 @@ end
    end
 
 function _fieldelem_to_rational(e::T) where T
-   if !hasmethod(Rational{BigInt}, Tuple{T})
-      error("OscarNumber: cannot check is_rational, please define 'Polymake._fieldelem_to_rational(e::$T)::Rational{BigInt}'")
-   end
    Polymake._fieldelem_is_rational(e) || error("not a rational number")
    return Base.Rational{BigInt}(e)
 end
@@ -204,10 +199,14 @@ end
       @cfunction(_on_init, Ref{ArgT}, (Clong, Ptr{ArgT}, Clong))
    end
 
+function _fieldelem_from_rational(f::Any, r::Base.Rational{BigInt})
+   return f(r)
+end
+
 function _on_init_frac(id::Clong, ::Ptr{ArgT}, np::Ptr{BigInt}, dp::Ptr{BigInt})::ArgT where ArgT
    n = unsafe_load(np)::BigInt
    d = unsafe_load(dp)::BigInt
-   return _on_parent_by_id[id](Base.Rational{BigInt}(n, d))
+   return _fieldelem_from_rational(_on_parent_by_id[id], Base.Rational{BigInt}(n, d))::ArgT
 end
 @generated _on_gen_init_frac(::Type{ArgT}) where ArgT =
    quote
@@ -277,9 +276,7 @@ function register_julia_element(e, p, t::Type)
       error("OscarNumber: immutable julia types not supported")
    end
 
-   for type in (Int64, Base.Rational{BigInt})
-      hasmethod(p, (type,)) || error("OscarNumber: no constructor ($p)($type)")
-   end
+   hasmethod(p, (Int64,)) || error("OscarNumber: no constructor ($p)(Int64)")
 
    dispatch = oscar_number_dispatch_helper()
    dispatch.index = newid
