@@ -199,7 +199,9 @@ using Polymake.CxxWrap
                 @test V[2] = T(10)//T(3) isa typeof(T(10)//T(3))
                 V[2] = T(10)//T(3)
                 @test V[2] == 10//3
-                @test string(V) == "pm::Matrix<pm::QuadraticExtension<pm::Rational> >\n5/3 2 3\n10/3 5 6\n"
+                type = "pm::Matrix<pm::QuadraticExtension<pm::Rational>>"
+                mat = "5/3 2 3\n10/3 5 6\n"
+                @test string(V) in typename_variants("$type\n$mat")
             end
         end
 
@@ -545,7 +547,9 @@ using Polymake.CxxWrap
             @test (V[2, 1] = T([4, 5], [1 0 0; 0 0 1])) isa T
             V[2, 1] = T([4, 5], [1 0 0; 0 0 1])
             @test V[2, 1] == T([4, 5], [1 0 0; 0 0 1])
-            @test string(V) == "pm::Matrix<pm::Polynomial<pm::Rational, long> >\n2*x_0^2*x_1^3 + 3*x_1^2*x_2^3 0 0 0\n4*x_0 + 5*x_2 0 0 0\n0 0 0 x_0 + x_1 + x_2\n"
+            type = "pm::Matrix<pm::Polynomial<pm::Rational, long>>"
+            mat = "2*x_0^2*x_1^3 + 3*x_1^2*x_2^3 0 0 0\n4*x_0 + 5*x_2 0 0 0\n0 0 0 x_0 + x_1 + x_2\n"
+            @test string(V) in typename_variants("$type\n$mat")
         end
     end
     end

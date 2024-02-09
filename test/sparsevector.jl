@@ -112,7 +112,7 @@ using Polymake.SparseArrays
     end
 
     @testset verbose=true "Low-level operations" begin
-        for (E,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational> "), (Polymake.OscarNumber, "common::OscarNumber")]
+        for (E,s) in [(Int64, "long"), (Polymake.Integer, "pm::Integer"), (Polymake.Rational, "pm::Rational"), (Float64, "double"), (Polymake.QuadraticExtension{Polymake.Rational}, "pm::QuadraticExtension<pm::Rational>"), (Polymake.OscarNumber, "common::OscarNumber")]
             @testset verbose=true "Polymake.SparseVector{$E}" begin
                 V = Polymake.SparseVector{E}(jl_v)
 
@@ -124,6 +124,8 @@ using Polymake.SparseArrays
                 @test length(V) == 3
                 @test size(V) == (3,)
 
+                type = "pm::SparseVector<$s>"
+
                 for T in [IntTypes; Polymake.Integer]
                     V = Polymake.SparseVector{E}(jl_v) # local copy
                     setindex!(V, T(5), 1)
@@ -134,17 +136,11 @@ using Polymake.SparseArrays
                     @test V[2] = T(10) isa T
                     V[2] = T(10)
                     @test V[2] == 10
-                    if E == Polymake.OscarNumber
-                       @test string(V) == string("pm::SparseVector<", s, ">\n(5) (10) (3)")
-                    else
-                       @test string(V) == string("pm::SparseVector<", s, ">\n5 10 3")
-                    end
+                    vec = E != Polymake.OscarNumber ? "5 10 3" : "(5) (10) (3)"
+                    @test string(V) in typename_variants("$type\n$vec")
                 end
-                if E == Polymake.OscarNumber
-                   @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 (1))")
-                else
-                   @test string(Polymake.SparseVector{E}(jl_s)) == string("pm::SparseVector<", s, ">\n(3) (1 1)")
-                end
+                vec = E != Polymake.OscarNumber ? "(3) (1 1)" : "(3) (1 (1))"
+                @test string(Polymake.SparseVector{E}(jl_s)) in typename_variants("$type\n$vec")
             end
         end
 
