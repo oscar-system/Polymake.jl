@@ -10,6 +10,11 @@ on:
        - master
    workflow_dispatch:
 
+# needed to allow julia-actions/cache to delete old caches that it has created
+permissions:
+  actions: write
+  contents: read
+
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
   # requests, we limit to 1 concurrent job, but for the master branch we don't
@@ -49,11 +54,15 @@ jobs:
       JULIA_PKG_SERVER: ""
       POLYDB_TEST_URI: "mongodb://admin:admin@localhost:27017/?authSource=admin"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
+      - uses: julia-actions/cache@v1
+        with:
+          cache-name: julia-cache;workflow=${{ github.workflow }};julia=${{ matrix.julia-version }};arch=${{ runner.arch }}
+          include-matrix: false
       - name: "pin CxxWrap"
         if: matrix.cxxwrap != ''
         run: julia --project -e 'using Pkg; pkg"add CxxWrap@${{ matrix.cxxwrap }}"; pkg"pin CxxWrap";'
@@ -66,12 +75,13 @@ jobs:
           mongorestore --host localhost -u admin -p admin --port 27017 .github/polydb_dump
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v4
         with:
           file: ./lcov.info
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   # this one is only for macos, ubuntu is run with mongodb in the other job
   test:
@@ -91,16 +101,21 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
+      - uses: julia-actions/cache@v1
+        with:
+          cache-name: julia-cache;workflow=${{ github.workflow }};julia=${{ matrix.julia-version }};arch=${{ runner.arch }}
+          include-matrix: false
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v4
         with:
           file: ./lcov.info
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
