@@ -28,6 +28,7 @@ struct PolymakeType end
 
 convert(::Type{PolymakeType}, x::T) where T = convert(convert_to_pm_type(T), x)
 convert(::Type{PolymakeType}, v::Visual) = v.obj
+convert(::Type{PolymakeType}, ::Nothing) = call_function(PropertyValue, :common, :get_undef)
 convert(::Type{OptionSet}, dict) = OptionSet(dict)
 
 ###############  Adjusting type parameter to CxxWrap  ##################
@@ -69,7 +70,7 @@ convert_to_pm_type(T::Type) = throw(ArgumentError("Unrecognized argument type: $
 convert_to_pm_type(::Type{T}) where T <: Union{Int64, Float64} = T
 convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet, TropicalNumber} = T
 
-
+convert_to_pm_type(::Nothing) = Nothing
 convert_to_pm_type(::Type{Int32}) = Int64
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
