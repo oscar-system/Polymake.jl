@@ -92,12 +92,12 @@ jobs:
     strategy:
       matrix:
         julia-version:
-          - '~1.10.0-0'
+          - '1.6'
           - 'nightly'
-        os: ['macos-14']
+        os: ['macos-latest']
         include:
-          - os: 'macos-latest'
-            julia-version: 1.6
+          - os: 'macos-14'
+            julia-version: '1.10'
       fail-fast: false
 
     steps:
