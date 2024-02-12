@@ -267,6 +267,13 @@ function __init__()
        application("polytope")
        shell_execute("require LPparser;")
 
+       # workaround until next polymake release to make sure mcf does not get stuck
+       Polymake.shell_execute(raw"""
+                              if (application("graph")->configured->{"mcf.rules"} > 0) {
+                                $mcf = "$mcf -q" unless ($mcf =~ / -q/);
+                              }
+                              """)
+
        for app in call_function(:common, :startup_applications)
            application(app)
        end
