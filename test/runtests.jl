@@ -26,6 +26,11 @@ struct MyInt x::Int end # needed in test/convert.jl
 
 include("Aqua.jl")
 
+function typename_variants(s::AbstractString)
+   r = replace(s, ">>" => "> >")
+   return [r, s]
+end
+
 include("integers.jl")
 include("rationals.jl")
 include("quadraticextension.jl")

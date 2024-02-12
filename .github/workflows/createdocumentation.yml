@@ -8,6 +8,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# needed to allow julia-actions/cache to delete old caches that it has created
+permissions:
+  actions: write
+
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
   # requests, we limit to 1 concurrent job, but for the master branch we don't
@@ -20,16 +24,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.6'
-      - uses: julia-actions/julia-buildpkg@v1
+          version: '1.10'
+      - uses: julia-actions/cache@v1
       - name: "Add Documenter package"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
                                                   Pkg.instantiate()'
       - name: "Build and deploy documentation"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
         run: julia --project=docs/ docs/make.jl

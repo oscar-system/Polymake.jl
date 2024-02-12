@@ -25,7 +25,9 @@
 
         @test Polymake.OscarNumber(m) isa Polymake.OscarNumber
         if isdefined(@__MODULE__, :_with_oscar) && _with_oscar
-            @test Polymake.unwrap(M) isa Hecke.EmbeddedNumFieldElem{NfAbsNSElem}
+            if isdefined(Hecke, :EmbeddedNumFieldElem)
+                @test Polymake.unwrap(M) isa Hecke.EmbeddedNumFieldElem
+            end
         end
         @test Polymake.unwrap(M) == m
         @test M == Polymake.OscarNumber(m)
@@ -113,10 +115,12 @@
             @test M * A2 == A2 * M == Polymake.OscarNumber(a1*a2 + 15 + 7*a2)
             @test Polymake.OscarNumber(5) // A2 == Polymake.OscarNumber(a2^2)
             # avoid test error for older oscar versions
-            if length(methods(Polymake._fieldelem_to_float, (EmbeddedElem,), Oscar)) > 0
-               @test Polymake.common.convert_to{Float64}(A2) isa Float64
-               fa2 = Polymake.common.convert_to{Float64}(A2)
-               @test isapprox(fa2, 1.71; rtol=0.001)
+            if isdefined(Hecke, :EmbeddedNumFieldElem)
+               if length(methods(Polymake._fieldelem_to_float, (EmbeddedNumFieldElem,), Oscar)) > 0
+                  @test Polymake.common.convert_to{Float64}(A2) isa Float64
+                  fa2 = Polymake.common.convert_to{Float64}(A2)
+                  @test isapprox(fa2, 1.71; rtol=0.001)
+               end
             end
         end
     end

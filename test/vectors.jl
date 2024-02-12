@@ -213,7 +213,9 @@ using Polymake.CxxWrap
                     end
                     V[2] = T(10)//T(3)
                     @test V[2] == 10//3
-                    @test string(V) == "pm::Vector<pm::QuadraticExtension<pm::Rational> >\n5/3 10/3 3"
+                    type = "pm::Vector<pm::QuadraticExtension<pm::Rational>>"
+                    vec = "5/3 10/3 3"
+                    @test string(V) in typename_variants("$type\n$vec")
                 end
             end
 
@@ -494,7 +496,9 @@ using Polymake.CxxWrap
             @test (W[3] = T([4, 5], [1 0 0; 0 0 1])) isa Polymake.to_cxx_type(T)
             W[3] = T([4, 5], [1 0 0; 0 0 1])
             @test W[3] == T([4, 5], [1 0 0; 0 0 1])
-            @test string(W) == "pm::Vector<pm::Polynomial<pm::Rational, long> >\n2*x_0^2*x_1^3 + 3*x_1^2*x_2^3 0 4*x_0 + 5*x_2"
+            type = "pm::Vector<pm::Polynomial<pm::Rational, long>>"
+            polystr = "2*x_0^2*x_1^3 + 3*x_1^2*x_2^3 0 4*x_0 + 5*x_2"
+            @test string(W) in typename_variants("$type\n$polystr")
         end
     end
     end

@@ -51,6 +51,11 @@ function is_boolean_wrapper($) {
    return is_boolean($c);
 }
 
+# helper function for converting `nothing`
+function get_undef() {
+   return undef;
+}
+
 function jupyter_visual_threejs(Visual::Object+) {
    my $string = "";
    local $ThreeJS::is_used_in_jupyter=1;
