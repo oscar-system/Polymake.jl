@@ -20,14 +20,14 @@ julia-version = [ "~1.6.0-0", "~1.10.0-0"]
   julia-version = "nightly"
   os = "ubuntu-latest"
 
-  [include.macamd64]
+  [include.macamd64lts]
   Oscar = "<matching>"
   Polymake = ""
   julia-version = "1.6"
   os = "macos-latest"
 
-  [include.macaarch64]
+  [include.macamd64]
   Oscar = "<matching>"
   Polymake = ""
   julia-version = "1.10"
-  os = "macos-14"
+  os = "macos-13"
