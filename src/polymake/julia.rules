@@ -89,6 +89,20 @@ function safe_to_string($) {
    return "$var";
 }
 
+function get_bigobject_elemtype($) {
+   my $params = $_[0]->type->params;
+   return "" unless defined($params) && @$params > 0;
+   if ($params->[0]->name =~ /^Min|Max$/) {
+      return $params->[1]->name;
+   } else {
+      return $params->[0]->name;
+   }
+}
+
+function get_bigobject_qualified_name($) {
+   return $_[0]->type->qualified_name;
+}
+
 package Polymake::User;
 
 function get_shell_scalar($) {
@@ -103,14 +117,4 @@ function set_shell_scalar($,$) {
    eval "declare \$$varname;";
    no strict 'refs';
    ${"Polymake::User::$varname"} = $obj;
-}
-
-sub get_bigobject_elemtype($) {
-   my $params = $_[0]->type->params;
-   return "" unless defined($params) && @$params > 0;
-   if ($params->[0]->name =~ /^Min|Max$/) {
-      return $params->[1]->name;
-   } else {
-      return $params->[0]->name;
-   }
 }

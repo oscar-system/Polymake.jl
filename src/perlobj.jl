@@ -20,8 +20,14 @@ function bigobject(fname::String, name::String; kwargsdata...)
 end
 
 function bigobject_eltype(obj::BigObject)
-   res = call_function(:User, :get_bigobject_elemtype, obj)
+   res = call_function(:common, :get_bigobject_elemtype, obj)
    res isa CxxWrap.StdString && !isempty(res) || error("could not determine element type of BigObject")
+   return String(res)
+end
+
+function bigobject_qualifiedname(obj::BigObject)
+   res = call_function(:common, :get_bigobject_qualified_name, obj)
+   res isa CxxWrap.StdString && !isempty(res) || error("could not determine full type of BigObject")
    return String(res)
 end
 
