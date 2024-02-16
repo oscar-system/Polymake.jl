@@ -116,6 +116,7 @@
         P = @pm polytope.Polytope{Rational}(POINTS=[1 0.5 0; 1 0 1])
         @test P.VERTICES isa Polymake.Matrix{Polymake.Rational}
         @test Polymake.bigobject_eltype(P) == "Rational"
+        @test Polymake.bigobject_qualifiedname(P) == "polytope::Polytope<Rational>"
     end
 
     @testset verbose=true "PolymakeException" begin
