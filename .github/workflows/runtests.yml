@@ -26,13 +26,14 @@ jobs:
   # github services (for mongodb service) only works on linux
   test-with-mongodb:
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.julia-version == '1.11-nightly' }}
+    continue-on-error: ${{ matrix.julia-version == '1.11-nightly' || matrix.julia-version == 'nightly' }}
     strategy:
       matrix:
         julia-version:
           - '~1.6.0-0'
           - '~1.10.0-0'
           - '1.11-nightly'
+          - 'nightly'
         os: ['ubuntu-latest']
         cxxwrap: [ '' ]
 
@@ -86,7 +87,7 @@ jobs:
   # this one is only for macos, ubuntu is run with mongodb in the other job
   test:
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.julia-version == '1.11-nightly' }}
+    continue-on-error: ${{ matrix.julia-version == '1.11-nightly' || matrix.julia-version == 'nightly' }}
     env:
       JULIA_PKG_SERVER: ""
     strategy:
@@ -94,6 +95,7 @@ jobs:
         julia-version:
           - '1.10'
           - '1.11-nightly'
+          - 'nightly'
         os: [ 'macos-14' ] # aarch64
         include:
           - os: 'macos-13' # x86_64
