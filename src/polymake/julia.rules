@@ -103,6 +103,31 @@ function get_bigobject_qualified_name($) {
    return $_[0]->type->qualified_name;
 }
 
+function nodemap_as_array<Dir,Elem>(NodeMap<Dir,Elem>) {
+   my ($nm) = @_;
+   return new Array<Elem>($nm);
+}
+
+function as_perl_array($) {
+   return [@{$_[0]}];
+}
+
+function as_perl_array_of_array($) {
+   return [map {[@$_]} @{$_[0]}];
+}
+
+function bigobject_prop_type($$) {
+   my ($bot, $path) = @_;
+   while (my ($parent, $elem) = $path =~ /^([^\.]*)\.(.*)$/) {
+      my $prop = $bot->lookup_property($parent);
+      $bot = $prop->subobject_type();
+      return "" unless defined($bot);
+      $path = $elem;
+   }
+   my $t = $bot->lookup_property($path)->type;
+   return instanceof Core::BigObjectType($t) ? $t->pure_type->name : $t->name;
+}
+
 package Polymake::User;
 
 function get_shell_scalar($) {

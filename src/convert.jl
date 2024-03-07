@@ -22,6 +22,8 @@ convert(::Type{Set{T}}, itr::AbstractArray) where T = Set{T}(itr)
 convert(::Type{<:Polynomial{C,E}}, itr::Polynomial{C,E}) where {C,E} = itr
 convert(::Type{<:Polynomial{C1,E1}}, itr::Polynomial{C2,E2}) where {C1,C2,E1,E2} = Polynomial{C1,E1}(itr)
 
+convert(::Type{BasicDecoration}, p::StdPair) = BasicDecoration(first(p),last(p))
+
 ###########  Converting to objects polymake understands  ###############
 
 struct PolymakeType end
@@ -30,6 +32,9 @@ convert(::Type{PolymakeType}, x::T) where T = convert(convert_to_pm_type(T), x)
 convert(::Type{PolymakeType}, v::Visual) = v.obj
 convert(::Type{PolymakeType}, ::Nothing) = call_function(PropertyValue, :common, :get_undef)
 convert(::Type{OptionSet}, dict) = OptionSet(dict)
+
+as_perl_array(t::SmallObject) = Polymake.call_function(PropertyValue, :common, :as_perl_array, t)
+as_perl_array_of_array(t::SmallObject) = Polymake.call_function(PropertyValue, :common, :as_perl_array_of_array, t)
 
 ###############  Adjusting type parameter to CxxWrap  ##################
 
@@ -68,7 +73,8 @@ Int64(r::Rational) = Int64(new_int_from_rational(r))
 convert_to_pm_type(T::Type) = throw(ArgumentError("Unrecognized argument type: $T.\nYou need to convert to polymake compatible type first."))
 
 convert_to_pm_type(::Type{T}) where T <: Union{Int64, Float64} = T
-convert_to_pm_type(::Type{T}) where T <: Union{BigObject, PropertyValue, OptionSet, TropicalNumber} = T
+convert_to_pm_type(::Type{T}) where T <: Union{BigObject, BigObjectType, PropertyValue, OptionSet} = T
+convert_to_pm_type(::Type{T}) where T <: TropicalNumber = T
 
 convert_to_pm_type(::Nothing) = Nothing
 convert_to_pm_type(::Type{Int32}) = Int64
@@ -77,6 +83,7 @@ convert_to_pm_type(::Type{<:AbstractString}) = String
 convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
 convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
 convert_to_pm_type(::Type{<:OscarNumber}) = OscarNumber
+convert_to_pm_type(::Type{<:NodeMap}) = NodeMap
 convert_to_pm_type(::Type{<:Union{AbstractVector, Vector}}) = Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, Matrix}}) = Matrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = SparseMatrix
@@ -84,7 +91,9 @@ convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
 convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
+convert_to_pm_type(::Type{<:Tuple{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Polynomial{<:Rational, <:Union{Int64, CxxWrap.CxxLong}}}) = Polynomial{Rational, CxxWrap.CxxLong}
+convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Tuple = Polymake.Array{convert_to_pm_type(T)}
 
 # Graph, EdgeMap, NodeMap
 const DirType = Union{Directed, Undirected}

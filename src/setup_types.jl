@@ -19,6 +19,7 @@ const SmallObject = Union{
     OscarNumber,
     EdgeMap,
     NodeMap,
+    BasicDecoration,
 }
 const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, OscarNumber, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}, TropicalNumber{Polymake.Max, Polymake.Rational}, TropicalNumber{Polymake.Min, Polymake.Rational}}
 
