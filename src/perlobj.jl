@@ -31,6 +31,11 @@ function bigobject_qualifiedname(obj::BigObject)
    return String(res)
 end
 
+function bigobject_prop_type(obj::BigObjectType, path::String)
+   res = call_function(:common, :bigobject_prop_type, obj, path)
+   return String(res)
+end
+
 # polymake can either just give a reference or do a full copy.
 # but even that full copy will contain references to the same data
 # objects in memory, but this is fine since most of them are immutable anyway.
