@@ -42,6 +42,8 @@ using Polymake.SparseArrays
         @test size(M) == (3, 6)
         @test M == Polymake.IncidenceMatrix{Polymake.NonSymmetric}(3, 6, inc)
 
+        @test Polymake.IncidenceMatrix([Int[], [2,3]]) isa Polymake.IncidenceMatrix{Polymake.NonSymmetric}
+
         for N in [IntTypes; FloatTypes; Polymake.Integer; Polymake.Rational]
             @test Polymake.IncidenceMatrix(N.(jl_n)) isa Polymake.IncidenceMatrix{Polymake.NonSymmetric}
             @test Polymake.IncidenceMatrix{Polymake.NonSymmetric}(N.(jl_s)) isa Polymake.IncidenceMatrix{Polymake.NonSymmetric}
