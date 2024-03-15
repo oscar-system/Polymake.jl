@@ -289,6 +289,13 @@
         @test arr[1] isa Polymake.BigObject
         @test arr[2] isa Polymake.BigObject
         @test arr[1].N_VERTICES == 8
+
+        c = polytope.cross(3)
+        @test Polymake.polytope.free_sum_decomposition(c) isa Polymake.Array{Polymake.BigObject}
+        arr = Polymake.polytope.free_sum_decomposition(c)
+        @test length(arr) == 3
+        @test arr[1].CONE_DIM == 2
+        @test arr[3].CONE_DIM == 2
     end
 
 
