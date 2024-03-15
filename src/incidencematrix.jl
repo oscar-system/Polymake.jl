@@ -64,7 +64,7 @@ end
 
 function IncidenceMatrix{NonSymmetric}(incidenceRows::AbstractVector{<:AbstractVector{<:Base.Integer}})
     r = length(incidenceRows)
-    c = maximum(maximum, incidenceRows)
+    c = maximum(x->maximum(x; init=0), incidenceRows)
     return IncidenceMatrix{NonSymmetric}(r, c, incidenceRows)
 end
 
