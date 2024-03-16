@@ -37,7 +37,7 @@ function classify_perl_pv($) {
       if instanceof Polymake::Core::BigObject($pv);
    return "pm::perl::BigObjectType"
       if instanceof Polymake::Core::BigObjectType($pv);
-   return "pm::perl::Array<pm::perl::BigObject>"
+   return "pm::Array<pm::perl::BigObject>"
       if instanceof Polymake::Core::BigObjectArray($pv);
    # a plain perl string is also done here
    return "std::string"
