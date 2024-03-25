@@ -18,7 +18,6 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     length, numerator, push!, resize!,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
-import AbstractAlgebra: should_show_banner
 
 import Pkg
 import Downloads
@@ -241,7 +240,7 @@ function __init__()
 
     withenv(adjustenv...) do
        try
-           show_banner = should_show_banner() &&
+           show_banner = isinteractive() && Base.JLOptions().banner != 0 &&
                           !any(x->x.name in ["Oscar"], keys(Base.package_locks))
 
            initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
