@@ -1,10 +1,9 @@
 module Polydb
 
-using Polymake
+using ..Polymake
 
-# julia itself also has a cert.pem but this one should be more recent
-# and provides a variable for the path
-using MozillaCACerts_jll
+# for ca certificates
+import NetworkOptions
 
 import Mongoc
 
@@ -62,7 +61,7 @@ Polymake.Polydb.Database
 """
 function get_db()
    # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
-   client = Mongoc.Client(get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(MozillaCACerts_jll.cacert)"))
+   client = Mongoc.Client(get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(NetworkOptions.ca_roots_path())"))
    return Database(client["polydb"])
 end
 
