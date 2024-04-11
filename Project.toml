@@ -4,6 +4,7 @@ repo = "https://github.com/oscar-system/Polymake.jl.git"
 version = "0.11.15"
 
 [deps]
+AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 BinaryWrappers = "f01c122e-0ea1-4f85-ad8f-907073ad7a9f"
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
 Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
@@ -43,3 +44,4 @@ lib4ti2_jll = "^1.6.10"
 libpolymake_julia_jll = "~0.11.1"
 polymake_jll = "^400.1100.1"
 polymake_oscarnumber_jll = "~0.2.7"
+AbstractAlgebra = "~0.40.8"
