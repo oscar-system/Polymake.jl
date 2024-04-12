@@ -11,6 +11,16 @@
         @test Polymake.ne(g) == 0
     end
 
+    @testset verbose=true "bigobjects" begin
+        c = Polymake.polytope.cube(3)
+        eg = c.GRAPH.ADJACENCY
+        g = Polymake.Graph{Polymake.Directed}(5)
+        bg = Polymake.graph.Graph{Polymake.Directed}(ADJACENCY=g)
+        @test bg.N_NODES == 5
+        bg2 = Polymake.graph.Graph(ADJACENCY=eg)
+        @test bg2.N_NODES == 8
+    end
+
     @testset verbose=true "manipulating edges and vertices" begin
         g = Polymake.Graph{Polymake.Directed}(5)
         Polymake._add_edge(g, 0, 1)
