@@ -1,7 +1,7 @@
 module Meta
 import JSON
 import Polymake: appname_module_dict, module_appname_dict, shell_context_help
-import Polymake: Rational, PolymakeType, PropertyValue, OptionSet, QuadraticExtension, OscarNumber
+import Polymake: Rational, PolymakeType, PropertyValue, OptionSet, QuadraticExtension, OscarNumber, DirType
 
 struct UnparsablePolymakeFunction <: Exception
     msg::String
