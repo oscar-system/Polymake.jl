@@ -315,3 +315,7 @@
     end
 
 end
+
+@testset verbose=true "OptionSet" begin
+    @test Polymake.OptionSet(Dict(:asdf => [1, 2, 3])) isa Polymake.OptionSet
+end

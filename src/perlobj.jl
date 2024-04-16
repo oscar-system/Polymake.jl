@@ -120,7 +120,7 @@ end
 function OptionSet(iter)
     opt_set = OptionSet()
     for (key, value) in iter
-        option_set_take(opt_set, string(key), value)
+        option_set_take(opt_set, string(key), convert(PolymakeType, value))
     end
     return opt_set
 end
