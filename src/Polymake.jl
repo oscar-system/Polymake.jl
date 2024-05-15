@@ -32,6 +32,7 @@ using CxxWrap
 
 using BinaryWrappers
 using Scratch
+import Pidfile
 
 import Perl_jll
 import Ninja_jll
@@ -188,6 +189,7 @@ function __init__()
       Downloads.default_downloader!(Downloads.Downloader(grace=0.01))
     end
     # we run this on every init to make sure all artifacts still exist
+    # (this code should be race condition free even with multiple processes)
     prepare_deps_tree(polymake_deps_tree)
     @static if isdefined(Downloads, :default_downloader!)
       # restore default
@@ -243,8 +245,11 @@ function __init__()
        try
            show_banner = should_show_banner() &&
                           !any(x->x.name in ["Oscar"], keys(Base.package_locks))
-
-           initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
+           mkpath(polymake_user_dir)
+           # lock to avoid race-conditions when recompiling wrappers in multiple processes
+           Pidfile.mkpidlock("$(polymake_user_dir)/userdir.lock") do
+               initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
+           end
            if !show_banner
                shell_execute(raw"$Verbose::credits=\"0\";")
            end
