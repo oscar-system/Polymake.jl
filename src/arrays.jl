@@ -38,7 +38,7 @@ Base.eltype(v::Array{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function getindex(A::Array{T}, n::Base.Integer) where T
     @boundscheck checkbounds(A, n)
-    return convert(to_jl_type(T), _getindex(A, convert(Int64, n)))
+    return convert(to_jl_type(T), _getindex(A, convert(Int64, n))[])
 end
 
 Base.@propagate_inbounds function Base.setindex!(A::Array{T}, val, n::Base.Integer) where T

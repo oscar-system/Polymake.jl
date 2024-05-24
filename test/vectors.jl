@@ -131,7 +131,7 @@ using Polymake.CxxWrap
             for T in [IntTypes; Polymake.Integer]
                 V = Polymake.Vector{Polymake.Integer}(jl_v) # local copy
                 @test setindex!(V, T(5), 1) isa Polymake.Vector{Polymake.Integer}
-                @test V[T(1)] isa Polymake.Polymake.IntegerAllocated
+                @test V[T(1)] isa Polymake.Polymake.Integer
                 @test V[T(1)] == 5
                 # testing the return value of brackets operator
                 @test V[2] = T(10) isa T
@@ -154,7 +154,7 @@ using Polymake.CxxWrap
 
             for T in [IntTypes; Polymake.Integer]
                 @test setindex!(V, T(5)//T(3), 1) isa Polymake.Vector{Polymake.Rational}
-                @test V[T(1)] isa Polymake.Polymake.RationalAllocated
+                @test V[T(1)] isa Polymake.Polymake.Rational
                 @test V[T(1)] == 5//3
                 # testing the return value of brackets operator
                 if T != Polymake.Integer

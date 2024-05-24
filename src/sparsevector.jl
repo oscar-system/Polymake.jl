@@ -33,7 +33,7 @@ Base.eltype(m::SparseVector{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(V::SparseVector, n::Base.Integer)
     @boundscheck checkbounds(V, n)
-    return _getindex(V, convert(Int64, n))
+    return _getindex(V, convert(Int64, n))[]
 end
 
 Base.@propagate_inbounds function Base.setindex!(V::SparseVector{T}, val, n::Base.Integer) where T

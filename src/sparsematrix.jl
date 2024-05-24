@@ -53,7 +53,7 @@ end
 
 Base.@propagate_inbounds function Base.getindex(M::SparseMatrix , i::Base.Integer, j::Base.Integer)
     @boundscheck checkbounds(M, i, j)
-    return _getindex(M, convert(Int64, i), convert(Int64, j))
+    return _getindex(M, convert(Int64, i), convert(Int64, j))[]
 end
 
 Base.@propagate_inbounds function Base.setindex!(M::SparseMatrix{T}, val, i::Base.Integer, j::Base.Integer) where T
