@@ -21,7 +21,7 @@ Base.eltype(v::Vector{T}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(V::Vector, n::Base.Integer)
     @boundscheck checkbounds(V, n)
-    return _getindex(V, convert(Int64, n))[]
+    return _getindex(V, convert(Int64, n))
 end
 
 Base.@propagate_inbounds function Base.setindex!(V::Vector{T}, val, n::Base.Integer) where T

@@ -3,7 +3,7 @@ function Map{String,String}()
 end
 
 function Base.getindex(M::Map{TK, TV}, key) where {TK, TV}
-   return convert(to_jl_type(TV), _getindex(M, convert(to_cxx_type(TK), key))[])
+    return convert(to_jl_type(TV), _getindex(M, convert(to_cxx_type(TK), key)))
 end
 
 function Base.setindex!(M::Map{TK, TV}, val, key) where {TK, TV}
