@@ -64,8 +64,11 @@ mutable struct oscar_number_dispatch_helper
     hash::Ptr{Cvoid}
     to_rational::Ptr{Cvoid}
     to_float::Ptr{Cvoid}
+    is_rational::Ptr{Cvoid}
+    to_ceil::Ptr{Cvoid}
+    to_floor::Ptr{Cvoid}
 end
-oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 22)...)
+oscar_number_dispatch_helper() = oscar_number_dispatch_helper(-1, repeat([C_NULL], 25)...)
 
 const _on_gc_refs = IdDict()
 
@@ -150,6 +153,14 @@ end
       @cfunction(_on_to_float, Float64, (Ref{ArgT},))
    end
 
+function _fieldelem_to_ceil(e::T) where T
+   return BigInt(ceil(e))
+end
+
+function _fieldelem_to_floor(e::T) where T
+   return BigInt(floor(e))
+end
+
 function _fieldelem_to_rational(e::T) where T
    Polymake._fieldelem_is_rational(e) || error("not a rational number")
    return Base.Rational{BigInt}(e)
@@ -174,6 +185,39 @@ function _fieldelem_is_rational(e::T) where T
    error("OscarNumber: cannot check is_rational, please define 'Polymake._fieldelem_is_rational(e::$T)::Bool'")
 end
 
+@generated _on_gen_is_rational(::Type{ArgT}) where ArgT =
+   quote
+      @cfunction(_fieldelem_is_rational, Bool, (Ref{ArgT},))
+   end
+
+function _on_to_ceil(e::ArgT)::Ptr{BigInt} where ArgT
+   i = try
+      _fieldelem_to_ceil(e)
+   catch e
+      return C_NULL
+   end
+   return pointer_from_objref(i)
+end
+
+@generated _on_gen_to_ceil(::Type{ArgT}) where ArgT =
+   quote
+      @cfunction(_on_to_ceil, Ptr{BigInt}, (Ref{ArgT},))
+   end
+
+function _on_to_floor(e::ArgT)::Ptr{BigInt} where ArgT
+   i = try
+      _fieldelem_to_floor(e)
+   catch e
+      return C_NULL
+   end
+   return pointer_from_objref(i)
+end
+
+@generated _on_gen_to_floor(::Type{ArgT}) where ArgT =
+   quote
+      @cfunction(_on_to_floor, Ptr{BigInt}, (Ref{ArgT},))
+   end
+
 function _on_hash(e::T) where T
    if !_fieldelem_is_rational(e)
       return hash(e)
@@ -183,6 +227,7 @@ function _on_hash(e::T) where T
       Polymake._hash_mpz(numerator(r)) - Polymake._hash_mpz(denominator(r))
    end
 end
+
 
 @generated _on_gen_hash(::Type{ArgT}) where ArgT =
    quote
@@ -307,6 +352,11 @@ function register_julia_element(e, p, t::Type)
    dispatch.cmp = _on_gen_cmp(t)
 
    dispatch.to_string = _on_gen_to_string(t)
+
+   dispatch.is_rational = _on_gen_is_rational(t)
+
+   dispatch.to_ceil = _on_gen_to_ceil(t)
+   dispatch.to_floor = _on_gen_to_floor(t)
    # later:
    # from_string::Ptr{Cvoid}
 
