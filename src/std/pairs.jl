@@ -8,7 +8,7 @@ Base.Pair(p::StdPair) = Pair(first(p), last(p))
 Base.Pair{S, T}(p::StdPair) where {S, T} = Pair{S, T}(first(p), last(p))
 
 Base.length(p::StdPair) = 2
-Base.eltype(p::StdPair{S,T}) where {S, T} = Union{S,T}
+Base.eltype(::Type{<:StdPair{S,T}}) where {S, T} = Union{S,T}
 Base.iterate(p::StdPair) = first(p), Val{:first}()
 Base.iterate(p::StdPair, ::Val{:first}) = last(p), Val{:last}()
 Base.iterate(p::StdPair, ::Val{:last}) = nothing

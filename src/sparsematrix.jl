@@ -38,7 +38,7 @@ SparseMatrix(mat::AbstractMatrix{T}) where T =
 
 Base.size(m::SparseMatrix) = (nrows(m), ncols(m))
 
-Base.eltype(m::SparseMatrix{T}) where T = to_jl_type(T)
+Base.eltype(::Type{<:SparseMatrix{T}}) where T = to_jl_type(T)
 
 function Base.vcat(M::Union{SparseMatrix,Matrix}...)
     all(==(ncols(first(M))), ncols.(M)) || throw(DimensionMismatch("matrices must have the same number of columns"))

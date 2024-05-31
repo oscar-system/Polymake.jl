@@ -34,7 +34,7 @@ Array(vec::AbstractVector) =
     Array{convert_to_pm_type(eltype(vec))}(vec)
 
 Base.size(a::Array) = (length(a),)
-Base.eltype(v::Array{T}) where T = to_jl_type(T)
+Base.eltype(v::Type{<:Array{T}}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function getindex(A::Array{T}, n::Base.Integer) where T
     @boundscheck checkbounds(A, n)

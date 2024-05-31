@@ -246,9 +246,9 @@ end
 # Iterator
 
 Base.IteratorSize(::Type{<:Cursor}) = Base.SizeUnknown()
-Base.eltype(::Cursor{T}) where T = T
+Base.eltype(::Type{Cursor{T}}) where T = T
 Base.IteratorSize(::Type{<:Collection}) = Base.SizeUnknown()
-Base.eltype(::Collection{T}) where T = T
+Base.eltype(::Type{Collection{T}}) where T = T
 
 # default iteration functions returning `Polymake.BigObject`s
 function Base.iterate(cursor::Polymake.Polydb.Cursor{Polymake.BigObject}, state::Nothing=nothing)

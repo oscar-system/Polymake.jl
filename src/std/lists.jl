@@ -1,8 +1,8 @@
-Base.eltype(::StdList{StdPair{S, T}}) where {S, T} = Pair{S,T}
+Base.eltype(::Type{<:StdList{<:StdPair{S, T}}}) where {S, T} = Pair{S,T}
 
 Base.push!(L::StdList{<:StdPair}, a::Pair) = push!(L, StdPair(a))
 
-Base.eltype(::StdList{T}) where T = T
+Base.eltype(::Type{<:StdList{T}}) where T = T
 
 function Base.iterate(L::StdList)
     isempty(L) &&  return nothing

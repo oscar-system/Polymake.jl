@@ -18,7 +18,7 @@ Matrix(mat::AbstractMatrix{T}) where T =
 
 Base.size(m::Matrix) = (nrows(m), ncols(m))
 
-Base.eltype(v::Matrix{T}) where T = to_jl_type(T)
+Base.eltype(v::Type{<:Matrix{T}}) where T = to_jl_type(T)
 
 function Base.vcat(M::Matrix...)
     all(==(ncols(first(M))), ncols.(M)) || throw(DimensionMismatch("matrices must have the same number of columns"))
