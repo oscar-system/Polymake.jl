@@ -25,7 +25,7 @@ end
 
 # Iterator
 
-Base.eltype(M::Map{S,T}) where {S,T} = Pair{to_jl_type(S), to_jl_type(T)}
+Base.eltype(::Type{<:Map{S,T}}) where {S,T} = Pair{to_jl_type(S), to_jl_type(T)}
 
 function Base.iterate(M::Map{S,T}) where {S,T}
     isempty(M) &&  return nothing

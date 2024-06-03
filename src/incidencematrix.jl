@@ -73,7 +73,7 @@ IncidenceMatrix(x...) = IncidenceMatrix{NonSymmetric}(x...)
 
 Base.size(m::IncidenceMatrix) = (nrows(m), ncols(m))
 
-Base.eltype(::IncidenceMatrix) = Bool
+Base.eltype(::Type{<:IncidenceMatrix}) = Bool
 
 Base.@propagate_inbounds function Base.getindex(M::IncidenceMatrix , i::Base.Integer, j::Base.Integer)
     @boundscheck checkbounds(M, i, j)

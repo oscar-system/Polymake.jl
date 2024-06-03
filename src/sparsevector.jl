@@ -29,7 +29,7 @@ SparseVector(vec::AbstractVector{T}) where T =
 
 Base.size(v::SparseVector) = (length(v),)
 
-Base.eltype(m::SparseVector{T}) where T = to_jl_type(T)
+Base.eltype(::Type{<:SparseVector{T}}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(V::SparseVector, n::Base.Integer)
     @boundscheck checkbounds(V, n)
@@ -83,7 +83,7 @@ end
 spzeros(::Type{Bool}, n::Base.Integer) = SparseVectorBool(n, Polymake.Set{to_cxx_type(Int64)}())
 
 Base.size(v::SparseVector{Bool}) = (v.l,)
-Base.eltype(::SparseVector{Bool}) = Bool
+Base.eltype(::Type{<:SparseVector{Bool}}) = Bool
 
 Base.@propagate_inbounds function Base.getindex(V::SparseVector{Bool}, n::Base.Integer)
     @boundscheck checkbounds(V, n)

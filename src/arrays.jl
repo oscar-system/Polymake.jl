@@ -3,10 +3,13 @@ const Array_suppT = Union{Int64, CxxWrap.CxxLong,
                         OscarNumber,
                         String, CxxWrap.StdString,
                         StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong},
+                        StdPair{Set{CxxWrap.CxxLong},CxxWrap.CxxLong},
+                        StdPair{Set{Int64},Int64},
                         StdList{StdPair{CxxWrap.CxxLong,CxxWrap.CxxLong}},
                         Set{Int64}, Set{CxxWrap.CxxLong},
                         Array{Int64}, Array{CxxWrap.CxxLong},
-                        Array{Integer}, Array{Rational}, Matrix{Integer}}
+                        Array{Integer}, Array{Rational}, Matrix{Integer},
+                        BasicDecoration}
 
 function Array{T}(::UndefInitializer, n::Base.Integer) where
     T <: Array_suppT
@@ -31,7 +34,7 @@ Array(vec::AbstractVector) =
     Array{convert_to_pm_type(eltype(vec))}(vec)
 
 Base.size(a::Array) = (length(a),)
-Base.eltype(v::Array{T}) where T = to_jl_type(T)
+Base.eltype(v::Type{<:Array{T}}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function getindex(A::Array{T}, n::Base.Integer) where T
     @boundscheck checkbounds(A, n)
@@ -53,3 +56,6 @@ function Base.append!(A::Array{T}, itr) where T
     end
     return A
 end
+
+Array(nm::NodeMap{Dir,T}) where {Dir, T} =
+   Polymake.call_function(:common, :nodemap_as_array, nm)::Array{T}

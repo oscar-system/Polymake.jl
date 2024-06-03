@@ -17,7 +17,7 @@ Vector(vec::AbstractVector{T}) where T = Vector{promote_to_pm_type(Vector, T)}(v
 
 Base.size(v::Vector) = (length(v),)
 
-Base.eltype(v::Vector{T}) where T = to_jl_type(T)
+Base.eltype(v::Type{<:Vector{T}}) where T = to_jl_type(T)
 
 Base.@propagate_inbounds function Base.getindex(V::Vector, n::Base.Integer)
     @boundscheck checkbounds(V, n)

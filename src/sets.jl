@@ -27,7 +27,7 @@ for (jlF, pmF) in (
     end
 end
 
-Base.eltype(::Set{T}) where T = to_jl_type(T)
+Base.eltype(::Type{<:Set{T}}) where T = to_jl_type(T)
 
 ### convert FROM polymake object
 
