@@ -247,7 +247,7 @@ function __init__()
                           !any(x->x.name in ["Oscar"], keys(Base.package_locks))
            mkpath(polymake_user_dir)
            # lock to avoid race-conditions when recompiling wrappers in multiple processes
-           Pidfile.mkpidlock("$(polymake_user_dir)/userdir.lock") do
+           Pidfile.mkpidlock("$(polymake_user_dir)/userdir.lock"; stale_age=60) do
                initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
            end
            if !show_banner
