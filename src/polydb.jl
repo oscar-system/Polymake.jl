@@ -171,6 +171,7 @@ end
       find_one(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict})
 
 Return one document from a collection `c` matching the criteria given by `d`.
+`T` can be chosen from `Polymake.BigObject` and `Mongoc.BSON`.
 Apply search options `opts`.
 # Examples
 ```julia-repl
@@ -186,17 +187,30 @@ julia> pm_object = Polymake.Polydb.find_one(collection, query, opts=opts);
 
 julia> typeof(pm_object)
 Polymake.LibPolymake.BigObjectAllocated
+
+julia> collection_bson = Polymake.Polydb.Collection{Mongoc.BSON}(collection);
+
+julia> pm_object = Polymake.Polydb.find_one(collection_bson, query, opts=opts);
+
+julia> typeof(pm_object)
+Mongoc.BSON
 ```
 """
-function Mongoc.find_one(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
+function Mongoc.find_one(c::Collection{Polymake.BigObject}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing)
    p = Mongoc.find_one(c.mcol, Mongoc.BSON(d); options=(isnothing(opts) ? nothing : Mongoc.BSON(opts)))
    return isnothing(p) ? nothing : parse_document(p)
+end
+
+function Mongoc.find_one(c::Collection{Mongoc.BSON}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing)
+   p = Mongoc.find_one(c.mcol, Mongoc.BSON(d); options=(isnothing(opts) ? nothing : Mongoc.BSON(opts)))
+   return isnothing(p) ? nothing : p
 end
 
 """
       find_one(c::Collection{T}, d::Pair...)
 
-Search a collection `c` for documents matching the criteria given by `d`.
+Return one document from a collection `c` matching the criteria given by `d`.
+`T` can be chosen from `Polymake.BigObject` and `Mongoc.BSON`.
 # Examples
 ```julia-repl
 julia> db = Polymake.Polydb.get_db();
@@ -207,11 +221,23 @@ julia> pm_object = Polymake.Polydb.find_one(collection, "DIM"=>3, "N_FACETS"=>5)
 
 julia> typeof(pm_object)
 Polymake.LibPolymake.BigObjectAllocated
+
+julia> collection_bson = Polymake.Polydb.Collection{Mongoc.BSON}(collection);
+
+julia> pm_object = Polymake.Polydb.find_one(collection_bson, "DIM"=>3, "N_FACETS"=>5);
+
+julia> typeof(pm_object)
+Mongoc.BSON
 ```
 """
-function Mongoc.find_one(c::Collection{T}, d::Pair...) where T
+function Mongoc.find_one(c::Collection{Polymake.BigObject}, d::Pair...)
    p = Mongoc.find_one(c.mcol, Mongoc.BSON(d...))
    return isnothing(p) ? nothing : parse_document(p)
+end
+
+function Mongoc.find_one(c::Collection{Mongoc.BSON}, d::Pair...)
+   p = Mongoc.find_one(c.mcol, Mongoc.BSON(d...))
+   return isnothing(p) ? nothing : p
 end
 
 """

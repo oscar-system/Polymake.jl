@@ -30,6 +30,8 @@ using Polymake.Polydb.Mongoc
         @test Polymake.Polydb.Collection{Polymake.BigObject}(collection_bson) isa Polymake.Polydb.Collection{Polymake.BigObject}
         constraints = _acp(["DIM" => 3, "N_VERTICES" => 8])
         query = Dict(constraints...)
+        opts_success  = Dict("skip"=>3)
+        opts_nothing  = Dict("skip"=>13)
         # Queries
         @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor
         @test Polymake.Polydb.find(collection_bo, query) isa Polymake.Polydb.Cursor{Polymake.BigObject}
@@ -45,6 +47,16 @@ using Polymake.Polydb.Mongoc
         results_bson = Polymake.Polydb.find(collection_bson, constraints...)
         @test Polymake.Polydb.Cursor{Polymake.BigObject}(results_bson) isa Polymake.Polydb.Cursor
         @test Polymake.Polydb.Cursor{Polymake.BigObject}(results_bson) isa Polymake.Polydb.Cursor{Polymake.BigObject}
+
+        @test Polymake.Polydb.find_one(collection_bo, query) isa Polymake.BigObject
+        @test Polymake.Polydb.find_one(collection_bo, query, opts=opts_success) isa Polymake.BigObject
+        @test isnothing(Polymake.Polydb.find_one(collection_bo, query, opts=opts_nothing))
+        @test Polymake.Polydb.find_one(collection_bo, constraints...) isa Polymake.BigObject
+
+        @test Polymake.Polydb.find_one(collection_bson, query) isa Mongoc.BSON
+        @test Polymake.Polydb.find_one(collection_bson, query, opts=opts_success) isa Mongoc.BSON
+        @test isnothing(Polymake.Polydb.find_one(collection_bson, query, opts=opts_nothing))
+        @test Polymake.Polydb.find_one(collection_bson, constraints...) isa Mongoc.BSON
 
         @test length(collection_bo, constraints...) == 7
         @test length(collection_bo, query) == 7
