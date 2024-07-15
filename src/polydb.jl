@@ -7,7 +7,7 @@ import NetworkOptions
 
 import Mongoc
 
-import Mongoc: find
+import Mongoc: find, find_one
 
 #Polymake.Polydb's types store information via
 # a corresponding Mongoc type variable
@@ -123,6 +123,7 @@ julia> length(collection, "DIM"=>3, "N_FACETS"=>5)
 function Base.length(c::Collection{T}, d::Pair...) where T
    return Base.length(c.mcol, Mongoc.BSON(d...))
 end
+
 """
       find(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict})
 
@@ -164,6 +165,53 @@ Polymake.Polydb.Cursor{Polymake.BigObject}
 """
 function Mongoc.find(c::Collection{T}, d::Pair...) where T
    return Cursor{T}(Mongoc.find(c.mcol, Mongoc.BSON(d...)))
+end
+
+"""
+      find_one(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict})
+
+Return one document from a collection `c` matching the criteria given by `d`.
+Apply search options `opts`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"];
+
+julia> query = Dict("DIM"=>5, "N_FACETS"=>8);
+
+julia> opts = Dict("skip"=>13);
+
+julia> pm_object = Polymake.Polydb.find_one(collection, query, opts=opts);
+
+julia> typeof(pm_object)
+Polymake.LibPolymake.BigObjectAllocated
+```
+"""
+function Mongoc.find_one(c::Collection{T}, d::Dict=Dict(); opts::Union{Nothing, Dict}=nothing) where T
+   p = Mongoc.find_one(c.mcol, Mongoc.BSON(d); options=(isnothing(opts) ? nothing : Mongoc.BSON(opts)))
+   return isnothing(p) ? nothing : parse_document(p)
+end
+
+"""
+      find_one(c::Collection{T}, d::Pair...)
+
+Search a collection `c` for documents matching the criteria given by `d`.
+# Examples
+```julia-repl
+julia> db = Polymake.Polydb.get_db();
+
+julia> collection = db["Polytopes.Lattice.SmoothReflexive"];
+
+julia> pm_object = Polymake.Polydb.find_one(collection, "DIM"=>3, "N_FACETS"=>5);
+
+julia> typeof(pm_object)
+Polymake.LibPolymake.BigObjectAllocated
+```
+"""
+function Mongoc.find_one(c::Collection{T}, d::Pair...) where T
+   p = Mongoc.find_one(c.mcol, Mongoc.BSON(d...))
+   return isnothing(p) ? nothing : parse_document(p)
 end
 
 """
