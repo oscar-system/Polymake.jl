@@ -69,6 +69,13 @@
         nm = Polymake.NodeMap{Polymake.Directed, Int64}(c.HASSE_DIAGRAM.ADJACENCY)
         Polymake._set_entry(nm, 0, 10)
         @test Polymake._get_entry(nm, 0) == 10
+
+        dec = c.HASSE_DIAGRAM.DECORATION
+        @test dec isa Polymake.NodeMap{Polymake.Directed, Polymake.BasicDecoration}
+        decc = copy(dec)
+        @test Polymake._get_entry(dec, 0) == Polymake.BasicDecoration(Polymake.Set(0:7), 4)
+        Polymake._set_entry(decc, 0, Polymake.BasicDecoration(Polymake.Set(0:2), 2))
+        @test Polymake._get_entry(decc, 0) == Polymake.BasicDecoration(Polymake.Set(0:2), 2)
     end
 
     @testset verbose=true "shortest_path_dijkstra" begin

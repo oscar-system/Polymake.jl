@@ -142,4 +142,12 @@
             @test last(p) isa Polymake.Array{Polymake.to_cxx_type(Int64)}
         end
     end
+    @testset verbose=true "Polymake.Array{Polymake.StdPair{Polymake.Set{Int64}, Int64}}" begin
+       a = Base.Array([(Set([1,2,3]),4),(Set([6,7,8]),9)])
+       pma = convert(Polymake.PolymakeType, a)
+       @test pma isa Polymake.Array
+       @test eltype(pma) <: Polymake.StdPair
+       @test first(first(pma)) isa Polymake.Set{Polymake.to_cxx_type(Int64)}
+       @test last(first(pma)) isa Polymake.to_cxx_type(Int64)
+    end
 end

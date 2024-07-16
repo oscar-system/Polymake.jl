@@ -23,6 +23,8 @@
         @test G isa Polymake.GraphAllocated{Polymake.Undirected}
         @test Polymake.bigobject("graph::Graph", ADJACENCY=G) isa Polymake.BigObject
 
+        @test Polymake.graph.PartiallyOrderedSet{Polymake.BasicDecoration}() isa Polymake.BigObject
+
         @test polytope.cube(3, 1//4, -1//4) isa Polymake.BigObject
 
         function test_pm_macro()
