@@ -23,6 +23,10 @@ convert(::Type{<:Polynomial{C,E}}, itr::Polynomial{C,E}) where {C,E} = itr
 convert(::Type{<:Polynomial{C1,E1}}, itr::Polynomial{C2,E2}) where {C1,C2,E1,E2} = Polynomial{C1,E1}(itr)
 
 convert(::Type{BasicDecoration}, p::StdPair) = BasicDecoration(first(p),last(p))
+Polymake.BasicDecoration(p::Pair{<:AbstractSet{<:Base.Integer},<:Base.Integer}) = BasicDecoration(convert(PolymakeType, first(p)), convert(PolymakeType,last(p)))
+Polymake.BasicDecoration(p::Tuple{<:AbstractSet{<:Base.Integer},<:Base.Integer}) = BasicDecoration(convert(PolymakeType, first(p)), convert(PolymakeType,last(p)))
+Polymake.BasicDecoration(s::Base.Set{<:Base.Integer}, i::Base.Integer) = BasicDecoration(Set(s), i)
+
 
 ###########  Converting to objects polymake understands  ###############
 
@@ -70,6 +74,7 @@ if Int64 != CxxWrap.CxxLong
 end
 Int64(r::Rational) = Int64(new_int_from_rational(r))
 
+const PmInt64 = to_cxx_type(Int64)
 
 ####################  Guessing the polymake type  ######################
 
@@ -104,13 +109,11 @@ convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Tuple = Polymake.Array{
 const DirType = Union{Directed, Undirected}
 convert_to_pm_type(::Type{<:Graph{T}}) where T<:DirType = Graph{T}
 
-convert_to_pm_type(::Type{<:EdgeMap{T,Int64}}) where T<:DirType = EdgeMap{T, Int64}
-EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Union{Int64, CxxWrap.CxxLong} = EdgeMap{Dir,to_cxx_type(T)}(g)
+convert_to_pm_type(::Type{<:EdgeMap{S,T}}) where S<:DirType where T = EdgeMap{S, convert_to_pm_type(T)}
+EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = EdgeMap{Dir,to_cxx_type(T)}(g)
 
-convert_to_pm_type(::Type{<:NodeMap{T,Int64}}) where T<:DirType = NodeMap{T, Int64}
-NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Union{Int64, CxxWrap.CxxLong} = NodeMap{Dir,to_cxx_type(T)}(g)
-convert_to_pm_type(::Type{<:NodeMap{T,<:Set{Int64}}}) where T<:DirType = NodeMap{T, Set{Int64}}
-NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Set{<:Union{Int64, CxxWrap.CxxLong}} = NodeMap{Dir,to_cxx_type(T)}(g)
+convert_to_pm_type(::Type{<:NodeMap{S,T}}) where S <: DirType where T = NodeMap{S, convert_to_pm_type(T)}
+NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = NodeMap{Dir,to_cxx_type(T)}(g)
 
 
 
@@ -131,8 +134,8 @@ for (pmT, jlT) in [(Integer, Base.Integer),
                    (OscarNumber, OscarNumber),
                    (QuadraticExtension{Rational}, QuadraticExtension{Rational})]
     @eval begin
-        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{to_cxx_type($pmT)}
-        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{to_cxx_type($pmT)}
+        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{convert_to_pm_type($pmT)}
+        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{convert_to_pm_type($pmT)}
     end
 end
 

@@ -1,6 +1,6 @@
 @testset verbose=true "converting" begin
-    @test Polymake.convert_to_pm_type(Base.Vector{Base.Int}) == Polymake.Vector{Polymake.to_cxx_type(Int64)}
-    @test Polymake.convert_to_pm_type(Base.Matrix{Base.Int}) == Polymake.Matrix{Polymake.to_cxx_type(Int64)}
+    @test Polymake.convert_to_pm_type(Base.Vector{Base.Int}) == Polymake.Vector{Int64}
+    @test Polymake.convert_to_pm_type(Base.Matrix{Base.Int}) == Polymake.Matrix{Int64}
     @test Polymake.convert_to_pm_type(Base.Vector{BigInt}) == Polymake.Vector{Polymake.Integer}
     @test Polymake.convert_to_pm_type(Base.Matrix{BigInt}) == Polymake.Matrix{Polymake.Integer}
     @test Polymake.convert_to_pm_type(Base.Matrix{Base.Rational{BigInt}}) == Polymake.Matrix{Polymake.Rational}
@@ -20,9 +20,9 @@
     @test Polymake.convert_to_pm_type(Tuple{Base.Set{Int64},Int64}) == Polymake.StdPair{Polymake.Set{Int64},Int64}
 
     y = Base.Vector{Base.Set{Int64}}([Base.Set([3,3]), Base.Set([3]), Base.Set([1,2])])
-    @test convert(Polymake.PolymakeType, y) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int)}}
+    @test convert(Polymake.PolymakeType, y) isa Polymake.Array{Polymake.Set{Polymake.PmInt64}}
     y = Base.Vector{Base.Set{Int64}}([Base.Set([3,3]), Base.Set([3]), Base.Set([1,2])])
-    @test convert(Polymake.PolymakeType, y) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int)}}
+    @test convert(Polymake.PolymakeType, y) isa Polymake.Array{Polymake.Set{Polymake.PmInt64}}
 
     @testset verbose=true "convert_to_pm_type(PolymakeType)" begin
         for T in [Polymake.Integer, Polymake.Rational, Polymake.Array, Polymake.IncidenceMatrix,
@@ -40,7 +40,7 @@
 
     @testset verbose=true "@convert_to" begin
         @test (@convert_to Integer 64) isa Polymake.Integer
-        @test (@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]) isa Polymake.Array{Polymake.Set{Polymake.to_cxx_type(Int64)}}
+        @test (@convert_to Array{Set{Int}} [Set([1, 2, 4, 5, 7, 8]), Set([1]), Set([6, 9])]) isa Polymake.Array{Polymake.Set{Polymake.PmInt64}}
         @test (@convert_to Vector{Float} [10, 11, 12]) isa Polymake.Vector{Float64}
         @test (@convert_to Matrix{Rational} [10/1 11/1 12/1]) isa Polymake.Matrix{Polymake.Rational}
         @test (@convert_to Polymake.Matrix{Polymake.Rational} [10/1 11/1 12/1]) isa Polymake.Matrix{Polymake.Rational}

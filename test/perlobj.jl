@@ -236,7 +236,7 @@
     @testset verbose=true "polymake MILP" begin
         p = @pm polytope.Polytope( INEQUALITIES=[1 1 -1; -1 0 1; 7 -1 -1] )
         intvar = Polymake.Set([0,1,2])
-        @test Polymake.convert(Polymake.PolymakeType, intvar) isa Polymake.Set{Polymake.to_cxx_type(Int64)}
+        @test Polymake.convert(Polymake.PolymakeType, intvar) isa Polymake.Set{Polymake.PmInt64}
 
         obj = [0,-1,-1]
 

@@ -64,7 +64,7 @@
         c = Polymake.polytope.cube(3)
         faces = c.HASSE_DIAGRAM.FACES
         @test faces isa Polymake.NodeMap
-        @test faces isa Polymake.NodeMap{Polymake.Directed, Polymake.Set{Polymake.to_cxx_type(Int64)}}
+        @test faces isa Polymake.NodeMap{Polymake.Directed, Polymake.Set{Polymake.PmInt64}}
         @test Polymake._get_entry(faces, 0) == Set([0,1,2,3,4,5,6,7])
         nm = Polymake.NodeMap{Polymake.Directed, Int64}(c.HASSE_DIAGRAM.ADJACENCY)
         Polymake._set_entry(nm, 0, 10)
@@ -73,9 +73,9 @@
         dec = c.HASSE_DIAGRAM.DECORATION
         @test dec isa Polymake.NodeMap{Polymake.Directed, Polymake.BasicDecoration}
         decc = copy(dec)
-        @test Polymake._get_entry(dec, 0) == Polymake.BasicDecoration(Polymake.Set(0:7), 4)
+        @test Polymake._get_entry(dec, 0) == Polymake.BasicDecoration(Set(0:7), 4)
         Polymake._set_entry(decc, 0, Polymake.BasicDecoration(Polymake.Set(0:2), 2))
-        @test Polymake._get_entry(decc, 0) == Polymake.BasicDecoration(Polymake.Set(0:2), 2)
+        @test Polymake._get_entry(decc, 0) == Polymake.BasicDecoration((Set(0:2), 2))
     end
 
     @testset verbose=true "shortest_path_dijkstra" begin
