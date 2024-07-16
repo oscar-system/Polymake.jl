@@ -53,6 +53,10 @@ to_cxx_type(::Type{<:Array{T}}) where T =
     Array{to_cxx_type(T)}
 to_cxx_type(::Type{<:Polynomial{S,T}}) where {S,T} =
     Polynomial{to_cxx_type(S), to_cxx_type(T)}
+to_cxx_type(::Type{<:Tuple{A,B}}) where {A,B} =
+    StdPair{to_cxx_type(A), to_cxx_type(B)}
+to_cxx_type(::Type{<:Pair{A,B}}) where {A,B} =
+    StdPair{to_cxx_type(A), to_cxx_type(B)}
 
 to_jl_type(::Type{T}) where T = T
 to_jl_type(::Type{CxxWrap.CxxBool}) = Bool
@@ -90,7 +94,8 @@ convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = Sparse
 convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}}) = IncidenceMatrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
-convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
+convert_to_pm_type(::Type{<:Union{Pair, StdPair}}) = StdPair
+convert_to_pm_type(::Type{<:Pair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Tuple{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Polynomial{<:Rational, <:Union{Int64, CxxWrap.CxxLong}}}) = Polynomial{Rational, CxxWrap.CxxLong}
 convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Tuple = Polymake.Array{convert_to_pm_type(T)}
