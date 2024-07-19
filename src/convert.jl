@@ -107,6 +107,7 @@ convert_to_pm_type(::Type{<:Pair{A,B}}) where {A,B} = StdPair{convert_to_pm_type
 convert_to_pm_type(::Type{<:Tuple{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Polynomial{<:Rational, <:Union{Int64, CxxWrap.CxxLong}}}) = Polynomial{Rational, CxxWrap.CxxLong}
 convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Tuple = Polymake.Array{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:BasicDecoration}) = BasicDecoration
 
 # Graph, EdgeMap, NodeMap
 const DirType = Union{Directed, Undirected}
