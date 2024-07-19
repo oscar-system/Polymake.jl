@@ -61,6 +61,8 @@ to_cxx_type(::Type{<:Tuple{A,B}}) where {A,B} =
     StdPair{to_cxx_type(A), to_cxx_type(B)}
 to_cxx_type(::Type{<:Pair{A,B}}) where {A,B} =
     StdPair{to_cxx_type(A), to_cxx_type(B)}
+to_cxx_type(::Type{<:StdPair{A,B}}) where {A,B} =
+    StdPair{to_cxx_type(A), to_cxx_type(B)}
 
 to_jl_type(::Type{T}) where T = T
 to_jl_type(::Type{CxxWrap.CxxBool}) = Bool
@@ -87,6 +89,7 @@ convert_to_pm_type(::Type{T}) where T <: TropicalNumber = T
 
 convert_to_pm_type(::Nothing) = Nothing
 convert_to_pm_type(::Type{Int32}) = Int64
+convert_to_pm_type(::Type{CxxWrap.CxxLong}) = CxxWrap.CxxLong
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
 convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
@@ -123,11 +126,12 @@ convert_to_pm_type(::Type{<:TropicalNumber{S,T}}) where S<:Union{Max,Min} where 
 # convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
 # specific converts for container types we wrap:
-convert_to_pm_type(::Type{<:Set{<:Base.Integer}}) = Set{Int64}
-convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
+#convert_to_pm_type(::Type{<:Set{<:Base.Integer}}) = Set{Int64}
+#convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
 
 for (pmT, jlT) in [(Integer, Base.Integer),
-                   (Int64, Union{Int32,Int64,CxxWrap.CxxLong}),
+                   (Int64, Union{Int32,Int64}),
+                   (CxxWrap.CxxLong, CxxWrap.CxxLong),
                    (Rational, Union{Base.Rational, Rational}),
                    (TropicalNumber{Max, Rational}, TropicalNumber{Max, Rational}),
                    (TropicalNumber{Min, Rational}, TropicalNumber{Min, Rational}),
@@ -136,6 +140,7 @@ for (pmT, jlT) in [(Integer, Base.Integer),
     @eval begin
         convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{convert_to_pm_type($pmT)}
         convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{convert_to_pm_type($pmT)}
+        convert_to_pm_type(::Type{<:AbstractSet{T}}) where T<:$jlT = Set{convert_to_pm_type($pmT)}
     end
 end
 

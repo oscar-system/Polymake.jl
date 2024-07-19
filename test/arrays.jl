@@ -148,6 +148,6 @@
        @test pma isa Polymake.Array
        @test eltype(pma) <: Polymake.StdPair
        @test first(first(pma)) isa Polymake.Set{Polymake.PmInt64}
-       @test last(first(pma)) isa Polymake.PmInt64
+       @test last(first(pma)) isa Union{Int64,Polymake.PmInt64}
     end
 end
