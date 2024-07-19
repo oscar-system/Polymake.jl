@@ -27,7 +27,7 @@ function Array{T}(vec::AbstractVector) where T
     return arr
 end
 
-function Array{T}(t::Tuple{Vararg{S}}) where T <: Array_suppT where S
+function Array{T}(t::Tuple) where T <: Array_suppT
    return Array{T}(collect(t))
 end
 
