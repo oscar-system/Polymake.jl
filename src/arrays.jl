@@ -27,6 +27,10 @@ function Array{T}(vec::AbstractVector) where T
     return arr
 end
 
+function Array{T}(t::Tuple) where T <: Array_suppT
+   return Array{T}(collect(t))
+end
+
 Array(n::Base.Integer, elt::T) where T =
     Array{convert_to_pm_type(T)}(n, elt)
 

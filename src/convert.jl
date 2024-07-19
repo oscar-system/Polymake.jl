@@ -7,7 +7,7 @@ for (pm_T, jl_T) in [
         (Array, AbstractVector),
         (Set, AbstractSet),
         (SparseMatrix, AbstractMatrix),
-        (SparseVector, AbstractVector)
+        (SparseVector, AbstractVector),
         ]
     @eval begin
         convert(::Type{$pm_T}, itr::$jl_T) = $pm_T(itr)
@@ -23,6 +23,10 @@ convert(::Type{<:Polynomial{C,E}}, itr::Polynomial{C,E}) where {C,E} = itr
 convert(::Type{<:Polynomial{C1,E1}}, itr::Polynomial{C2,E2}) where {C1,C2,E1,E2} = Polynomial{C1,E1}(itr)
 
 convert(::Type{BasicDecoration}, p::StdPair) = BasicDecoration(first(p),last(p))
+Polymake.BasicDecoration(p::Pair{<:AbstractSet{<:Base.Integer},<:Base.Integer}) = BasicDecoration(convert(PolymakeType, first(p)), convert(PolymakeType,last(p)))
+Polymake.BasicDecoration(p::Tuple{<:AbstractSet{<:Base.Integer},<:Base.Integer}) = BasicDecoration(convert(PolymakeType, first(p)), convert(PolymakeType,last(p)))
+Polymake.BasicDecoration(s::Base.Set{<:Base.Integer}, i::Base.Integer) = BasicDecoration(Set(s), i)
+
 
 ###########  Converting to objects polymake understands  ###############
 
@@ -32,6 +36,9 @@ convert(::Type{PolymakeType}, x::T) where T = convert(convert_to_pm_type(T), x)
 convert(::Type{PolymakeType}, v::Visual) = v.obj
 convert(::Type{PolymakeType}, ::Nothing) = call_function(PropertyValue, :common, :get_undef)
 convert(::Type{OptionSet}, dict) = OptionSet(dict)
+
+# long (>=3) uniform tuples need some extra treatment
+convert(::Type{PolymakeType}, x::Tuple{T,T,T,Vararg{T}}) where T = Polymake.Array(map(convert_to_pm_type(T), collect(x)))
 
 as_perl_array(t::SmallObject) = Polymake.call_function(PropertyValue, :common, :as_perl_array, t)
 as_perl_array_of_array(t::SmallObject) = Polymake.call_function(PropertyValue, :common, :as_perl_array_of_array, t)
@@ -53,6 +60,12 @@ to_cxx_type(::Type{<:Array{T}}) where T =
     Array{to_cxx_type(T)}
 to_cxx_type(::Type{<:Polynomial{S,T}}) where {S,T} =
     Polynomial{to_cxx_type(S), to_cxx_type(T)}
+to_cxx_type(::Type{<:Tuple{A,B}}) where {A,B} =
+    StdPair{to_cxx_type(A), to_cxx_type(B)}
+to_cxx_type(::Type{<:Pair{A,B}}) where {A,B} =
+    StdPair{to_cxx_type(A), to_cxx_type(B)}
+to_cxx_type(::Type{<:StdPair{A,B}}) where {A,B} =
+    StdPair{to_cxx_type(A), to_cxx_type(B)}
 
 to_jl_type(::Type{T}) where T = T
 to_jl_type(::Type{CxxWrap.CxxBool}) = Bool
@@ -66,6 +79,7 @@ if Int64 != CxxWrap.CxxLong
 end
 Int64(r::Rational) = Int64(new_int_from_rational(r))
 
+const PmInt64 = to_cxx_type(Int64)
 
 ####################  Guessing the polymake type  ######################
 
@@ -78,6 +92,7 @@ convert_to_pm_type(::Type{T}) where T <: TropicalNumber = T
 
 convert_to_pm_type(::Nothing) = Nothing
 convert_to_pm_type(::Type{Int32}) = Int64
+convert_to_pm_type(::Type{CxxWrap.CxxLong}) = CxxWrap.CxxLong
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
 convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
@@ -90,44 +105,45 @@ convert_to_pm_type(::Type{<:Union{AbstractSparseMatrix, SparseMatrix}}) = Sparse
 convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}}) = IncidenceMatrix
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
-convert_to_pm_type(::Type{<:Union{Pair, <:StdPair}}) = StdPair
+convert_to_pm_type(::Type{<:Union{Pair, StdPair}}) = StdPair
+convert_to_pm_type(::Type{<:Pair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
+convert_to_pm_type(::Type{<:StdPair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Tuple{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Polynomial{<:Rational, <:Union{Int64, CxxWrap.CxxLong}}}) = Polynomial{Rational, CxxWrap.CxxLong}
 convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Tuple = Polymake.Array{convert_to_pm_type(T)}
+convert_to_pm_type(::Type{<:BasicDecoration}) = BasicDecoration
+# only for 3 or more elements:
+convert_to_pm_type(::Type{<:Tuple{A,A,A,Vararg{A}}}) where A = Polymake.Array{convert_to_pm_type(A)}
 
 # Graph, EdgeMap, NodeMap
 const DirType = Union{Directed, Undirected}
 convert_to_pm_type(::Type{<:Graph{T}}) where T<:DirType = Graph{T}
 
-convert_to_pm_type(::Type{<:EdgeMap{T,Int64}}) where T<:DirType = EdgeMap{T, Int64}
-EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Union{Int64, CxxWrap.CxxLong} = EdgeMap{Dir,to_cxx_type(T)}(g)
+convert_to_pm_type(::Type{<:EdgeMap{S,T}}) where S<:DirType where T = EdgeMap{S, convert_to_pm_type(T)}
+EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = EdgeMap{Dir,to_cxx_type(T)}(g)
 
-convert_to_pm_type(::Type{<:NodeMap{T,Int64}}) where T<:DirType = NodeMap{T, Int64}
-NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Union{Int64, CxxWrap.CxxLong} = NodeMap{Dir,to_cxx_type(T)}(g)
-convert_to_pm_type(::Type{<:NodeMap{T,<:Set{Int64}}}) where T<:DirType = NodeMap{T, Set{Int64}}
-NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T<:Set{<:Union{Int64, CxxWrap.CxxLong}} = NodeMap{Dir,to_cxx_type(T)}(g)
+convert_to_pm_type(::Type{<:NodeMap{S,T}}) where S <: DirType where T = NodeMap{S, convert_to_pm_type(T)}
+NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = NodeMap{Dir,to_cxx_type(T)}(g)
 
 
 
 convert_to_pm_type(::Type{HomologyGroup{T}}) where T<:Integer = HomologyGroup{T}
 convert_to_pm_type(::Type{<:QuadraticExtension{T}}) where T<:Rational = QuadraticExtension{Rational}
 convert_to_pm_type(::Type{<:TropicalNumber{S,T}}) where S<:Union{Max,Min} where T<:Rational = TropicalNumber{S,Rational}
-# convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
-# specific converts for container types we wrap:
-convert_to_pm_type(::Type{<:Set{<:Base.Integer}}) = Set{Int64}
-convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
 
 for (pmT, jlT) in [(Integer, Base.Integer),
-                   (Int64, Union{Int32,Int64,CxxWrap.CxxLong}),
+                   (Int64, Union{Int32,Int64}),
+                   (CxxWrap.CxxLong, CxxWrap.CxxLong),
                    (Rational, Union{Base.Rational, Rational}),
                    (TropicalNumber{Max, Rational}, TropicalNumber{Max, Rational}),
                    (TropicalNumber{Min, Rational}, TropicalNumber{Min, Rational}),
                    (OscarNumber, OscarNumber),
                    (QuadraticExtension{Rational}, QuadraticExtension{Rational})]
     @eval begin
-        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{to_cxx_type($pmT)}
-        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{to_cxx_type($pmT)}
+        convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:$jlT = Matrix{convert_to_pm_type($pmT)}
+        convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:$jlT = Vector{convert_to_pm_type($pmT)}
+        convert_to_pm_type(::Type{<:AbstractSet{T}}) where T<:$jlT = Set{convert_to_pm_type($pmT)}
     end
 end
 

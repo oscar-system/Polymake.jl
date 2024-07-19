@@ -84,7 +84,7 @@
 
     @testset verbose=true "Polymake.Array{Polymake.Set{Int64}}" begin
         elt = Base.Set([1,2,3,4])
-        T = Polymake.Set{Polymake.to_cxx_type(Int64)}
+        T = Polymake.Set{Polymake.PmInt64}
 
         @test Polymake.Array{T}([elt, Base.Set(elt .% 3)]) isa Polymake.Array
         @test Polymake.Array{T}([elt, Base.Set(elt .% 3)]) isa Polymake.Array{T}
@@ -123,11 +123,11 @@
         c = Polymake.polytope.cube(2, 1, 0)
         PC = Polymake.polytope.PointConfiguration(POINTS=c.VERTICES)
         all = Polymake.polytope.topcom_all_triangulations(PC)
-        @test all isa Polymake.Array{Polymake.Set{Polymake.Set{Polymake.to_cxx_type(Int64)}}}
+        @test all isa Polymake.Array{Polymake.Set{Polymake.Set{Polymake.PmInt64}}}
         @test length(all) == 2
         @test size(all) == (2,)
         for triang in all
-            @test triang isa Polymake.Set{Polymake.Set{Polymake.to_cxx_type(Int64)}}
+            @test triang isa Polymake.Set{Polymake.Set{Polymake.PmInt64}}
         end
     end
 
@@ -135,11 +135,19 @@
         c = Polymake.polytope.cube(2, 1, 0)
         aut = Polymake.graph.automorphisms(c.VERTICES_IN_FACETS)
         @test length(aut) == 2
-        @test aut isa Polymake.Array{Polymake.StdPair{Polymake.Array{Polymake.to_cxx_type(Int64)}, Polymake.Array{Polymake.to_cxx_type(Int64)}}}
+        @test aut isa Polymake.Array{Polymake.StdPair{Polymake.Array{Polymake.PmInt64}, Polymake.Array{Polymake.PmInt64}}}
         for p in aut
-            @test p isa Polymake.StdPair{Polymake.Array{Polymake.to_cxx_type(Int64)}, Polymake.Array{Polymake.to_cxx_type(Int64)}}
-            @test first(p) isa Polymake.Array{Polymake.to_cxx_type(Int64)}
-            @test last(p) isa Polymake.Array{Polymake.to_cxx_type(Int64)}
+            @test p isa Polymake.StdPair{Polymake.Array{Polymake.PmInt64}, Polymake.Array{Polymake.PmInt64}}
+            @test first(p) isa Polymake.Array{Polymake.PmInt64}
+            @test last(p) isa Polymake.Array{Polymake.PmInt64}
         end
+    end
+    @testset verbose=true "Polymake.Array{Polymake.StdPair{Polymake.Set{Int64}, Int64}}" begin
+       a = Base.Array([(Set([1,2,3]),4),(Set([6,7,8]),9)])
+       pma = convert(Polymake.PolymakeType, a)
+       @test pma isa Polymake.Array
+       @test eltype(pma) <: Polymake.StdPair
+       @test first(first(pma)) isa Polymake.Set{Polymake.PmInt64}
+       @test last(first(pma)) isa Union{Int64,Polymake.PmInt64}
     end
 end
