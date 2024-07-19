@@ -7,7 +7,7 @@ for (pm_T, jl_T) in [
         (Array, AbstractVector),
         (Set, AbstractSet),
         (SparseMatrix, AbstractMatrix),
-        (SparseVector, AbstractVector)
+        (SparseVector, AbstractVector),
         ]
     @eval begin
         convert(::Type{$pm_T}, itr::$jl_T) = $pm_T(itr)
@@ -36,6 +36,9 @@ convert(::Type{PolymakeType}, x::T) where T = convert(convert_to_pm_type(T), x)
 convert(::Type{PolymakeType}, v::Visual) = v.obj
 convert(::Type{PolymakeType}, ::Nothing) = call_function(PropertyValue, :common, :get_undef)
 convert(::Type{OptionSet}, dict) = OptionSet(dict)
+
+# long (>=3) uniform tuples need some extra treatment
+convert(::Type{PolymakeType}, x::Tuple{T,T,T,Vararg{T}}) where T = Polymake.Array(map(convert_to_pm_type(T), collect(x)))
 
 as_perl_array(t::SmallObject) = Polymake.call_function(PropertyValue, :common, :as_perl_array, t)
 as_perl_array_of_array(t::SmallObject) = Polymake.call_function(PropertyValue, :common, :as_perl_array_of_array, t)
@@ -104,10 +107,13 @@ convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = Sparse
 convert_to_pm_type(::Type{<:Array}) = Array
 convert_to_pm_type(::Type{<:Union{Pair, StdPair}}) = StdPair
 convert_to_pm_type(::Type{<:Pair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
+convert_to_pm_type(::Type{<:StdPair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Tuple{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Polynomial{<:Rational, <:Union{Int64, CxxWrap.CxxLong}}}) = Polynomial{Rational, CxxWrap.CxxLong}
 convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Tuple = Polymake.Array{convert_to_pm_type(T)}
 convert_to_pm_type(::Type{<:BasicDecoration}) = BasicDecoration
+# only for 3 or more elements:
+convert_to_pm_type(::Type{<:Tuple{A,A,A,Vararg{A}}}) where A = Polymake.Array{convert_to_pm_type(A)}
 
 # Graph, EdgeMap, NodeMap
 const DirType = Union{Directed, Undirected}
@@ -124,11 +130,7 @@ NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = NodeMap{Dir,to_cxx_t
 convert_to_pm_type(::Type{HomologyGroup{T}}) where T<:Integer = HomologyGroup{T}
 convert_to_pm_type(::Type{<:QuadraticExtension{T}}) where T<:Rational = QuadraticExtension{Rational}
 convert_to_pm_type(::Type{<:TropicalNumber{S,T}}) where S<:Union{Max,Min} where T<:Rational = TropicalNumber{S,Rational}
-# convert_to_pm_type(::Type{<:Union{AbstractSet, Set}}) = Set
 
-# specific converts for container types we wrap:
-#convert_to_pm_type(::Type{<:Set{<:Base.Integer}}) = Set{Int64}
-#convert_to_pm_type(::Type{<:Base.AbstractSet{<:Base.Integer}}) = Set{Int64}
 
 for (pmT, jlT) in [(Integer, Base.Integer),
                    (Int64, Union{Int32,Int64}),
