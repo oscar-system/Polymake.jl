@@ -104,18 +104,9 @@ const _on_parent_by_id = Dict{Clong, Any}()
       @cfunction(Base.:-, Ref{ArgT}, (Ref{ArgT},))
    end
 
-function _on_abs_fallback(e::ArgT)::ArgT where ArgT
-   return Base.cmp(e,0) < 0 ? -e : deepcopy(e)
-end
 @generated function _on_gen_abs(::Type{ArgT}) where ArgT
-   if hasmethod(abs, (ArgT,))
-      return quote
-         @cfunction(Base.abs, Ref{ArgT}, (Ref{ArgT},))
-      end
-   else
-      return quote
-         @cfunction(_on_abs_fallback, Ref{ArgT}, (Ref{ArgT},))
-      end
+   return quote
+      @cfunction(Base.abs, Ref{ArgT}, (Ref{ArgT},))
    end
 end
 
