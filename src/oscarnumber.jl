@@ -26,7 +26,7 @@ Base.:/(x::OscarNumber, y::OscarNumber) = x // y
 convert(::Type{<:OscarNumber}, on::OscarNumber) = on
 
 function unwrap(on::OscarNumber)
-   if Polymake.isinf(on) != 0
+   if isinf(on)
       error("cannot unwrap OscarNumber containing infinity")
    elseif _uses_rational(on)
       return _get_rational(on)
