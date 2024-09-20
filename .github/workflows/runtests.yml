@@ -8,6 +8,9 @@ on:
    pull_request:
      branches:
        - master
+   schedule:
+       # Every day at 3:05 AM UTC
+       - cron: '5 3 * * *'
    workflow_dispatch:
 
 # needed to allow julia-actions/cache to delete old caches that it has created
