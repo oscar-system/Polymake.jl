@@ -111,3 +111,10 @@ jobs:
         run: |
           echo '${{ env.oscar_run_doctests }}'
           julia --color=yes --project=oscar-dev/project/ -e '${{ env.oscar_run_doctests }}'
+      - name: Archive wrappers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wrappers
+          path: |
+            ~/.julia/scratchspaces/d720cf60-89b5-51f5-aff5-213f193123e7/**/*.cpperl
