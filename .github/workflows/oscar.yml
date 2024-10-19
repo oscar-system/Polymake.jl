@@ -111,10 +111,14 @@ jobs:
         run: |
           echo '${{ env.oscar_run_doctests }}'
           julia --color=yes --project=oscar-dev/project/ -e '${{ env.oscar_run_doctests }}'
+      - name: "random id to make name unique"
+        if: always()
+        run: |
+          echo "OSCARCI_RUN_ID=$RANDOM >> $GITHUB_ENV"
       - name: Archive wrappers
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wrappers
+          name: "wrappers-${{ join(matrix.*.name) }}-${{ env.OSCARCI_RUN_ID }}"
           path: |
             ~/.julia/scratchspaces/d720cf60-89b5-51f5-aff5-213f193123e7/**/*.cpperl
