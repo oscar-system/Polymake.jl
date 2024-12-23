@@ -76,12 +76,12 @@ function give(obj::BigObject, prop::Union{Symbol,String})
             internal_give(obj, prop)
         end
     catch ex
-        ex isa ErrorException && throw(PolymakeError(ex.msg))
+        ex isa ErrorException && rethrow(PolymakeError(ex.msg))
         if (ex isa InterruptException)
             @warn """Interrupting polymake is not safe.
             SIGINT is disabled while waiting for polymake to finish its computations."""
         end
-        rethrow(ex)
+        rethrow()
     end
     return convert_from_property_value(return_obj)
 end
