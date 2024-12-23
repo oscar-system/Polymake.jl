@@ -101,48 +101,53 @@ end
 function run_polymake_repl(repl = Base.active_repl;
                      prompt = _get_prompt(),
                      name = :pm,
-                     key = '$')
-   mirepl = isdefined(repl,:mi) ? repl.mi : repl
-   # skip repl init if it is not fully loaded
-   isdefined(mirepl, :interface) && isdefined(mirepl.interface, :modes) || return nothing
-   main_mode = mirepl.interface.modes[1]
+                     key = '$',
+                     nothrow = false)
+   try
+      repl isa REPL.LineEditREPL || error("only minimal REPL active, cannot add REPL mode, check DEPOT_PATH for stdlib path")
+      mirepl = isdefined(repl,:mi) ? repl.mi : repl
+      # skip repl init if it is not fully loaded
+      isdefined(mirepl, :interface) && isdefined(mirepl.interface, :modes) || return nothing
+      main_mode = mirepl.interface.modes[1]
 
-   panel = CreatePolymakeREPL(; prompt=prompt, name=name, repl=repl)
-   global polymakerepl[] = panel
+      panel = CreatePolymakeREPL(; prompt=prompt, name=name, repl=repl)
+      global polymakerepl[] = panel
 
-    # Install this mode into the main mode
-    pm_keymap = Dict{Any,Any}(
-        key => function (s,args...)
-            if isempty(s) || position(LineEdit.buffer(s)) == 0
-                buf = copy(LineEdit.buffer(s))
-                LineEdit.transition(s, panel) do
-                    LineEdit.state(s, panel).input_buffer = buf
-                end
-            else
-                LineEdit.edit_insert(s,key)
-            end
-        end
-    )
-    main_mode.keymap_dict = LineEdit.keymap_merge(main_mode.keymap_dict, pm_keymap);
-    nothing
+      # Install this mode into the main mode
+      pm_keymap = Dict{Any,Any}(
+                                key => function (s,args...)
+                                   if isempty(s) || position(LineEdit.buffer(s)) == 0
+                                      buf = copy(LineEdit.buffer(s))
+                                      LineEdit.transition(s, panel) do
+                                         LineEdit.state(s, panel).input_buffer = buf
+                                      end
+                                   else
+                                      LineEdit.edit_insert(s,key)
+                                   end
+                                end
+                               )
+      main_mode.keymap_dict = LineEdit.keymap_merge(main_mode.keymap_dict, pm_keymap)
+   catch ex
+      if nothrow
+         # failing to initialize the repl should not be fatal during initialization
+         @warn ex
+      else
+         rethrow()
+      end
+   end
 end
 
 function try_init_polymake_repl()
-   try
-      if isdefined(Base, :active_repl)
-         if Base.active_repl isa REPL.LineEditREPL
-            run_polymake_repl()
-         end
-      else
-         atreplinit() do repl
-            if isinteractive() && repl isa REPL.LineEditREPL
-               run_polymake_repl(repl)
-            end
+   if isdefined(Base, :active_repl)
+      if Base.active_repl isa REPL.LineEditREPL
+         run_polymake_repl(nothrow=true)
+      end
+   else
+      atreplinit() do repl
+         if isinteractive() && repl isa REPL.LineEditREPL
+            run_polymake_repl(nothrow=true)
          end
       end
-   catch ex
-      # failing to initialize the repl should not be fatal during initialization
-      @warn ex
    end
 end
 
