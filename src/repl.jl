@@ -32,6 +32,10 @@ function shell_execute_print(s::String, panel::LineEdit.Prompt)
 
    if res[1]
       print(Base.stdout, res[2])
+      # make sure there is a newline in between if both are nonempty
+      if !isempty(res[2]) && !isempty(res[3]) && last(res[2]) != '\n'
+         println()
+      end
       print(Base.stderr, res[3])
       if !isempty(res[4])
           error(res[4])
