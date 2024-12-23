@@ -306,10 +306,7 @@ function __init__()
         set_julia_type("$(name)_OscarNumber", current_type)
     end
 
-
-    if isdefined(Base, :active_repl)
-        run_polymake_repl()
-    end
+    try_init_polymake_repl()
 
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         prepare_jupyter_kernel_for_visualization()
