@@ -2,7 +2,7 @@
 *.jl.*.cov
 *.jl.mem
 local
-Manifest.toml
+Manifest*.toml
 src/generated/json/*.json
 src/generated/*.jl
 .vscode
