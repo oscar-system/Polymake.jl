@@ -143,18 +143,19 @@ Base.show(io::IO, tp::MIME{Symbol("text/plain")}, M::IncidenceMatrix) =
 function Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, M::IncidenceMatrix)
     m,n = size(M)
     a,b = displaysize(io)
-    s = min(a - 5, size(M, 1))
-    print(io, "$m×$n IncidenceMatrix\n")
+    s = min(a - 5, m)
+    print(io, "$m×$n IncidenceMatrix")
     for i in 1:s
-        t = min(div(b, 2 + ndigits(size(M, 2))) - 1, length(row(M, i)))
+        println(io)
+        t = min(div(b, 2 + ndigits(n)) - 1, length(row(M, i)))
         print(io, "[")
         join(io, [c for c in row(M, i)][1:t], ", ")
         if (length(row(M,i)) > t)
             print(io, ", …")
         end
-        print(io, "]\n")
+        print(io, "]")
     end
     if (m > s)
-        print(io, "⁝")
+        print(io, "\n⁝")
     end
 end
