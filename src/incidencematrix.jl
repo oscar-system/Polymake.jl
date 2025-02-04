@@ -148,7 +148,7 @@ function Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, M::IncidenceMatr
     for i in 1:s
         println(io)
         t = min(div(b, 2 + ndigits(n)) - 1, length(row(M, i)))
-        print(io, "[")
+        print(io, " [")
         join(io, [c for c in row(M, i)][1:t], ", ")
         if (length(row(M,i)) > t)
             print(io, ", …")
@@ -156,6 +156,6 @@ function Base.show(io::IOContext, ::MIME{Symbol("text/plain")}, M::IncidenceMatr
         print(io, "]")
     end
     if (m > s)
-        print(io, "\n⁝")
+        print(io, "\n ⁝")
     end
 end
