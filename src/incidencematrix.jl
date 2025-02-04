@@ -11,6 +11,9 @@ end
 
 function IncidenceMatrix{NonSymmetric}(mat::AbstractMatrix)
     res = IncidenceMatrix{NonSymmetric}(undef, size(mat)...)
+    if eltype(mat) != Bool && any(x->!isone(x) && !iszero(x), mat)
+       throw(ArgumentError("matrix entries must be 0 or 1"))
+    end
     @inbounds res .= mat
     return res
 end
