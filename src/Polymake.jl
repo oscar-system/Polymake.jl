@@ -138,7 +138,7 @@ module LibOscarNumber
   using libpolymake_julia_jll
   using polymake_oscarnumber_jll
 
-  import ..LibPolymake: show_small_obj
+  import ..LibPolymake: show_small_obj, take
   import ..Polymake: libcxxwrap_build_version
 
   @wrapmodule(() -> joinpath(libpolymake_oscarnumber), :define_module_polymake_oscarnumber)
