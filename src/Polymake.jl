@@ -13,8 +13,8 @@ export @pm, @convert_to, visual
 # We need to import all functions which will be extended on the Cxx side
 # FIXME: check with imports of LibPolymake further down
 import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
-    append!, deepcopy_internal, delete!, numerator, denominator,
-    empty!, Float64, getindex, in, intersect, intersect!, isempty, isfinite,
+    append!, BigFloat, deepcopy_internal, delete!, numerator, denominator,
+    empty!, Float64, getindex, in, Int, Int64, intersect, intersect!, isempty, isfinite,
     length, numerator, push!, resize!,
     setdiff, setdiff!, setindex!, symdiff, symdiff!,
     union, union!
