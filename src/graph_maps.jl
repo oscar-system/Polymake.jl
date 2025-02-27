@@ -5,7 +5,7 @@ end
 
 function Base.setindex!(M::EdgeMap{T, TV}, val, i::Int, j::Int) where {T, TV}
   index = to_zero_based_indexing.([i, j])
-  _set_entry(M, index..., val)
+  _set_entry(M, index..., convert(to_cxx_type(TV), val))
   return val
 end
 
@@ -15,7 +15,7 @@ end
 
 function Base.setindex!(M::EdgeMap{TK, TV}, val, index::NTuple{2, Int}) where {TK, TV}
   index = to_zero_based_indexing.(index)
-  _set_entry(M, index..., val)
+  _set_entry(M, index..., convert(to_cxx_type(TV), val))
   return val
 end
 
@@ -23,7 +23,7 @@ function Base.getindex(M::NodeMap{TK, TV}, i::Int) where {TK, TV}
   return convert(to_jl_type(TV), _get_entry(M, to_zero_based_indexing(i)))
 end
 
-function Base.setindex!(M::NodeMap{TK, TV}, i::Int, val) where {TK, TV}
-  _set_entry(M, to_zero_based_indexing(i), val)
+function Base.setindex!(M::NodeMap{TK, TV}, val, i::Int) where {TK, TV}
+  _set_entry(M, to_zero_based_indexing(i), convert(to_cxx_type(TV), val))
   return val
 end
