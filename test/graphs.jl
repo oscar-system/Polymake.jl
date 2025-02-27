@@ -55,9 +55,9 @@
         end
         em = Polymake.EdgeMap{Polymake.Directed, Int64}(g)
         @test em isa Polymake.EdgeMap
-        em[0, 1] = 1
-        @test em[0, 1] == em[(0, 1)] == 1
-        @test em[1, 2] == 0
+        em[1, 2] = 1
+        @test em[1, 2] == em[(1, 2)] == 1
+        @test em[2, 3] == 0
     end
 
     @testset verbose=true "NodeMap" begin
@@ -65,17 +65,17 @@
         faces = c.HASSE_DIAGRAM.FACES
         @test faces isa Polymake.NodeMap
         @test faces isa Polymake.NodeMap{Polymake.Directed, Polymake.Set{Polymake.PmInt64}}
-        @test faces[0] == Set([0,1,2,3,4,5,6,7])
+        @test faces[1] == Set([0,1,2,3,4,5,6,7])
         nm = Polymake.NodeMap{Polymake.Directed, Int64}(c.HASSE_DIAGRAM.ADJACENCY)
-        nm[0] = 10
-        @test nm[0] == 10
+        nm[1] = 10
+        @test nm[1] == 10
 
         dec = c.HASSE_DIAGRAM.DECORATION
         @test dec isa Polymake.NodeMap{Polymake.Directed, Polymake.BasicDecoration}
         decc = copy(dec)
-        @test dec[0] == Polymake.BasicDecoration(Set(0:7), 4)
-        decc[0] = Polymake.BasicDecoration(Polymake.Set(0:2), 2)
-        @test decc[0] == Polymake.BasicDecoration((Set(0:2), 2))
+        @test dec[1] == Polymake.BasicDecoration(Set(0:7), 4)
+        decc[1] = Polymake.BasicDecoration(Polymake.Set(0:2), 2)
+        @test decc[1] == Polymake.BasicDecoration((Set(0:2), 2))
     end
 
     @testset verbose=true "shortest_path_dijkstra" begin
@@ -84,7 +84,7 @@
            Polymake._add_edge(g, i, (i+1)%5)
         end
         em = Polymake.EdgeMap{Polymake.Directed, Int64}(g)
-        em[0, 1] = 1
+        em[1, 2] = 1
         @test Polymake._shortest_path_dijkstra(g, em, 0, 1, true) == [0,1]
         @test Polymake._shortest_path_dijkstra(g, em, 0, 1, false) == [0,4,3,2,1]
     end
