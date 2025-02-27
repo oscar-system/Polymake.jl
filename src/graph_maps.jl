@@ -3,7 +3,7 @@ function Base.getindex(M::EdgeMap{TK, TV}, i::Int, j::Int) where {TK, TV}
   return convert(to_jl_type(TV), _get_entry(M, index...))
 end
 
-function Base.setindex!(M::EdgeMap{T, TV}, i::Int, j::Int, val) where {T, TV}
+function Base.setindex!(M::EdgeMap{T, TV}, val, i::Int, j::Int) where {T, TV}
   index = to_zero_based_indexing.([i, j])
   _set_entry(M, index..., val)
   return val
@@ -13,7 +13,7 @@ function Base.getindex(M::EdgeMap{TK, TV}, index::NTuple{2, Int}) where {TK, TV}
   return convert(to_jl_type(TV), _get_entry(M, to_zero_based_indexing.(index)...))
 end
 
-function Base.setindex!(M::EdgeMap{TK, TV}, index::NTuple{2, Int}, val) where {TK, TV}
+function Base.setindex!(M::EdgeMap{TK, TV}, val, index::NTuple{2, Int}) where {TK, TV}
   index = to_zero_based_indexing.(index)
   _set_entry(M, index..., val)
   return val
