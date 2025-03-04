@@ -26,6 +26,8 @@ Base.one(::Rational) = Rational(1)
 Base.zero(::Rational) = Rational(0)
 Base.zero(::Type{<:Rational}) = Rational(0)
 
+Base.hash(r::Rational, h::UInt) = hash(numerator(r), hash(denominator(r), h))
+
 import Base: ==, <, <=
 # These are operations we delegate to gmp
 for op in (:(==), :(<), :(<=))
