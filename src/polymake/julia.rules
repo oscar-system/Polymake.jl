@@ -108,6 +108,11 @@ function nodemap_as_array<Dir,Elem>(NodeMap<Dir,Elem>) {
    return new Array<Elem>($nm);
 }
 
+function permute_graph($$) {
+   my ($g, $p) = @_;
+   $g->permute_nodes($p);
+}
+
 function as_perl_array($) {
    return [@{$_[0]}];
 }
