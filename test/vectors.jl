@@ -33,6 +33,19 @@ using Polymake.CxxWrap
     end
     M = Polymake.OscarNumber(m)
     A2 = Polymake.OscarNumber(a2)
+
+    @testset "hashing" begin
+       vi = Polymake.Integer[1, 1, -7, 0, 0, -7]
+       vr = Polymake.Rational[vi..., 7//3, Polymake.Rational(7,3)]
+       vq = Vector{Polymake.QuadraticExtension{Polymake.Rational}}(vr)
+       push!(vq, Polymake.QuadraticExtension{Polymake.Rational}(1,2,3))
+       von = Polymake.OscarNumber[M, A2, A2*2-A2, M+0]
+
+       @test length(unique(vi)) == 3
+       @test length(unique(vr)) == 4
+       @test length(unique(vq)) == 5
+       @test length(unique(von)) == 2
+    end
     
     jl_v = [1,2,3]
     @testset verbose=true "Constructors/Converts" begin
