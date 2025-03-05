@@ -24,6 +24,8 @@ Base.one(::QuadraticExtension{T}) where T<:qe_suppT = QuadraticExtension{T}(1)
 
 generating_field_elements(qe::QuadraticExtension{T}) where T<:qe_suppT = (a = _a(qe), b = _b(qe),  r =_r(qe))
 
+Base.hash(qe::QuadraticExtension{T}, h::UInt) where T<:qe_suppT = Base.hash((_a(qe),_b(qe),_r(qe)), h)
+
 # we might need to split this up
 # if we should wrap `QuadraticExtension` with another scalar than `Rational`
 function Base.promote_rule(::Type{<:QuadraticExtension{T}},
