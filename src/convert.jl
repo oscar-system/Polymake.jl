@@ -95,6 +95,7 @@ convert_to_pm_type(::Type{Int32}) = Int64
 convert_to_pm_type(::Type{CxxWrap.CxxLong}) = CxxWrap.CxxLong
 convert_to_pm_type(::Type{<:AbstractFloat}) = Float64
 convert_to_pm_type(::Type{<:AbstractString}) = String
+convert_to_pm_type(::Type{<:CxxWrap.StdString}) = CxxWrap.StdString
 convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
 convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
 convert_to_pm_type(::Type{<:OscarNumber}) = OscarNumber
@@ -150,7 +151,7 @@ end
 convert_to_pm_type(::Type{<:AbstractMatrix{T}}) where T<:AbstractFloat =
     Matrix{convert_to_pm_type(T)}
 
-convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{String, AbstractSet} =
+convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Union{AbstractString, AbstractSet} =
     Array{convert_to_pm_type(T)}
 
 # this catches all Arrays of Arrays we have right now:
