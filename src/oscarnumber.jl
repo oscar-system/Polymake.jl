@@ -367,6 +367,7 @@ end
 (::Type{<:Rational})(on::OscarNumber) = convert(Rational, unwrap(on))
 Integer(on::OscarNumber) = convert(Integer, unwrap(on))
 Rational(on::OscarNumber) = convert(Rational, unwrap(on))
+Base.hash(on::OscarNumber, h::UInt) = hash(unwrap(on), h)
 
 # we don't support conversion for concrete types inside the OscarNumber here
 (::Type{<:QuadraticExtension{<:Rational}})(on::OscarNumber) = QuadraticExtension{Rational}(Rational(on))
