@@ -27,8 +27,17 @@
 
         @test polytope.cube(3, 1//4, -1//4) isa Polymake.BigObject
 
-        # make sure initial checks are run (via commit)
+        # make sure initial checks are run during construction (via commit)
         @test_throws ErrorException polytope.Polytope(POINTS=zeros(Int,0,3), INPUT_LINEALITY=zeros(Int,0,2))
+
+        # unless specifying no initial properties
+        empty = polytope.Polytope()
+        @test setproperty!(empty, :CONE_AMBIENT_DIM, 3) === 3
+        @test setproperty!(empty, :POINTS, zeros(Int,0,3)) isa Polymake.Matrix
+        @test setproperty!(empty, :INPUT_LINEALITY, zeros(Int,0,2)) isa Polymake.Matrix
+        # still needs to fail on first give call
+        @test_throws Polymake.PolymakeError Polymake.give(empty, "CONE_DIM")
+
 
         function test_pm_macro()
             P = @pm polytope.cube(3)
