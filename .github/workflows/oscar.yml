@@ -103,6 +103,9 @@ jobs:
       - name: "Remove Oscar/Aqua test"
         run: |
           rm -f oscar-dev/Oscar/test/Aqua.jl
+      - name: "disable threading for 1.11"
+        if: matrix.julia-version == '1.11'
+        run: echo "OMP_NUM_THREADS=1" >> $GITHUB_ENV
       - name: "Run tests"
         run: |
           echo '${{ env.oscar_run_tests }}'
