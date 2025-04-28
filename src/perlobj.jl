@@ -64,7 +64,9 @@ end
 
 function Base.setproperty!(obj::BigObject, prop::Symbol, val)
     @assert prop != :cpp_object
-    return take(obj, string(prop), convert(PolymakeType, val))
+    pmobj = convert(PolymakeType, val)
+    take(obj, string(prop), pmobj)
+    return pmobj
 end
 
 function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Cvoid})
