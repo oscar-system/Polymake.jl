@@ -2,7 +2,9 @@ function bigobject(fname::String; kwargsdata...)
     obj = BigObject(BigObjectType(fname))
     setproperties!(obj; kwargsdata...)
     # commit is needed to run initial checks
-    call_method(obj, :commit)
+    if length(kwargsdata) > 0
+       call_method(obj, :commit)
+    end
     return obj
 end
 
