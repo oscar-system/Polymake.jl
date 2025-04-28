@@ -27,6 +27,9 @@
 
         @test polytope.cube(3, 1//4, -1//4) isa Polymake.BigObject
 
+        # make sure initial checks are run (via commit)
+        @test_throws ErrorException polytope.Polytope(POINTS=zeros(Int,0,3), INPUT_LINEALITY=zeros(Int,0,2))
+
         function test_pm_macro()
             P = @pm polytope.cube(3)
             Pfl = @pm common.convert_to{Float}(P)
@@ -130,7 +133,7 @@
     @testset verbose=true "properties" begin
         test_polytope = @pm polytope.Polytope(POINTS=points_int)
         @test Polymake.list_properties(test_polytope) isa Polymake.Array
-        @test Polymake.list_properties(test_polytope) == ["POINTS"]
+        @test in("POINTS", Polymake.list_properties(test_polytope))
         @test test_polytope.F_VECTOR == [ 4, 4 ]
         let prli = Polymake.list_properties(test_polytope)
             @test "POINTS" in prli
