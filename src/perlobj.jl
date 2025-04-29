@@ -1,6 +1,10 @@
 function bigobject(fname::String; kwargsdata...)
     obj = BigObject(BigObjectType(fname))
     setproperties!(obj; kwargsdata...)
+    # commit is needed to run initial checks
+    if length(kwargsdata) > 0
+       call_method(obj, :commit)
+    end
     return obj
 end
 
@@ -60,7 +64,9 @@ end
 
 function Base.setproperty!(obj::BigObject, prop::Symbol, val)
     @assert prop != :cpp_object
-    return take(obj, string(prop), convert(PolymakeType, val))
+    pmobj = convert(PolymakeType, val)
+    take(obj, string(prop), pmobj)
+    return pmobj
 end
 
 function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Cvoid})
