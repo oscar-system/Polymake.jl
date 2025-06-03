@@ -28,7 +28,7 @@ polymake_oscarnumber_jll = "10f31823-b687-53e6-9f29-edb9d4da9f9f"
 [compat]
 AbstractAlgebra = "~0.40.8, ~0.41, ~0.42, ~0.43, ~0.44, ~0.45"
 BinaryWrappers = "~0.1.0"
-CxxWrap = "~0.14, ~0.16, ~0.17"
+CxxWrap = "~0.16, ~0.17"
 Downloads = "^1.4"
 JSON = "^0.20, ^0.21"
 Libdl = "^1.6"
