@@ -39,7 +39,10 @@ jobs:
           - '1.12-nightly'
           - 'nightly'
         os: ['ubuntu-latest']
-        cxxwrap: [ '' ]
+        cxxwrap: [ '0.16', '' ]
+        exclude:
+          - julia-version: 'nightly'
+            cxxwrap: '0.16'
 
       fail-fast: false
     # Service containers to run
@@ -86,9 +89,6 @@ jobs:
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v5
         with:
-          file: ./lcov.info
-          flags: unittests
-          name: codecov-umbrella
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -111,6 +111,9 @@ jobs:
           - os: 'macos-13' # x86_64
             julia-version: '1.6'
             cxxwrap: ''
+          - os: 'macos-14' # aarch64
+            julia-version: '1.10'
+            cxxwrap: '0.16'
       fail-fast: false
 
     steps:
@@ -134,8 +137,5 @@ jobs:
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v5
         with:
-          file: ./lcov.info
-          flags: unittests
-          name: codecov-umbrella
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
