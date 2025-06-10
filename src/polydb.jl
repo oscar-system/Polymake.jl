@@ -7,7 +7,7 @@ import NetworkOptions
 
 import Mongoc
 
-import Mongoc: find, find_one
+import Mongoc: find, find_one, ClientPool
 
 #Polymake.Polydb's types store information via
 # a corresponding Mongoc type variable
@@ -43,6 +43,22 @@ struct Cursor{T}
    mcursor::Mongoc.Cursor{Mongoc.Collection}
 end
 
+_connection_url() = get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(NetworkOptions.ca_roots_path())")
+
+"""
+      client_pool(max_size)
+
+Creates a client pool to manage multiple connections to PolyDB.
+
+```julia-repl
+julia> p = Polymake.Polydb.client_pool(2);
+
+julia> db = Polymake.Polydb.get_db(p);
+
+```
+"""
+client_pool(max_size) = ClientPool(_connection_url(), max_size=max_size)
+
 """
       get_db()
 
@@ -61,8 +77,13 @@ Polymake.Polydb.Database
 """
 function get_db()
    # we explicitly set the cacert file, otherwise we might get connection errors because the certificate cannot be validated
-   client = Mongoc.Client(get(ENV, "POLYDB_TEST_URI", "mongodb://polymake:database@db.polymake.org/?authSource=admin&ssl=true&sslCertificateAuthorityFile=$(NetworkOptions.ca_roots_path())"))
+   client = Mongoc.Client(_connection_url())
    return Database(client["polydb"])
+end
+
+function get_db(p::ClientPool)
+  client = Mongoc.Client(p)
+  return Database(client["polydb"])
 end
 
 """
