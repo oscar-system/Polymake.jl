@@ -27,7 +27,7 @@ jobs:
     - name: "Set up Julia"
       uses: julia-actions/setup-julia@v2
       with:
-        version: '~1.6.0-0'
+        version: '~1.10.0-0'
     - name: OscarDevTools - CI
       if: github.repository == 'oscar-system/OscarDevTools.jl'
       run: |
@@ -54,7 +54,7 @@ jobs:
     needs: generatematrix
     name: ${{ join(matrix.*.name) }} - ${{ matrix.os }}, julia ${{ matrix.julia-version}}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.julia-version == '1.11-nightly' }}
+    continue-on-error: ${{ matrix.julia-version == 'nightly' }}
     env:
       PR_NUMBER: ${{ github.event.number || 0 }}
       JULIA_PKG_SERVER: ""
