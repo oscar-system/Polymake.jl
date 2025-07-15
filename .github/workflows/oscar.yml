@@ -27,7 +27,7 @@ jobs:
     - name: "Set up Julia"
       uses: julia-actions/setup-julia@v2
       with:
-        version: '~1.6.0-0'
+        version: '~1.10.0-0'
     - name: OscarDevTools - CI
       if: github.repository == 'oscar-system/OscarDevTools.jl'
       run: |
@@ -54,7 +54,7 @@ jobs:
     needs: generatematrix
     name: ${{ join(matrix.*.name) }} - ${{ matrix.os }}, julia ${{ matrix.julia-version}}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.julia-version == '1.11-nightly' }}
+    continue-on-error: ${{ matrix.julia-version == 'nightly' }}
     env:
       PR_NUMBER: ${{ github.event.number || 0 }}
       JULIA_PKG_SERVER: ""
@@ -104,12 +104,6 @@ jobs:
       - name: "Remove Oscar/Aqua test"
         run: |
           rm -f oscar-dev/Oscar/test/Aqua.jl
-      - name: "disable threading for 1.11"
-        if: matrix.julia-version == '1.11'
-        run: echo "OMP_NUM_THREADS=1" >> $GITHUB_ENV
-      - name: "workaround libstdc++ issue for julia 1.6"
-        if: matrix.julia-version == '~1.6.0-0' && runner.os == 'Linux'
-        run: rm -f ${{ steps.setup-julia.outputs.julia-bindir }}/../lib/julia/libstdc++.so.6
       - name: "Run tests"
         run: |
           echo '${{ env.oscar_run_tests }}'
@@ -121,7 +115,8 @@ jobs:
       - name: Archive wrappers
         if: always()
         uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
-          name: "wrappers-${{ join(matrix.*.name) }} - ${{ matrix.os }} - julia ${{ matrix.julia-version}}"
+          name: "wrappers-${{ hashFiles('Project.toml', 'Manifest.toml') }}"
           path: |
             ~/.julia/scratchspaces/d720cf60-89b5-51f5-aff5-213f193123e7/**/*.cpperl

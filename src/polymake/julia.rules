@@ -133,6 +133,13 @@ function bigobject_prop_type($$) {
    return instanceof Core::BigObjectType($t) ? $t->pure_type->name : $t->name;
 }
 
+function call_method {
+   my $obj = shift;
+   my $meth = shift;
+   no strict 'refs';
+   return $obj->$meth(@_);
+}
+
 package Polymake::User;
 
 function get_shell_scalar($) {
