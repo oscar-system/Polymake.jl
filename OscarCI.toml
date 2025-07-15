@@ -1,8 +1,8 @@
 title = "metadata for oscar CI run"
 
 [env]
-os = [ "ubuntu-24.04" ]
-julia-version = [ "~1.10.0-0"]
+os = [ ["Linux","RPTU","normal-memory"] ]
+julia-version = [ "1.10"]
 # branches = [ "release", "<matching>" ]
 
 [pkgs]
@@ -18,19 +18,19 @@ julia-version = [ "~1.10.0-0"]
   Oscar = "<matching>"
   Polymake = ""
   julia-version = "1.11"
-  os = "ubuntu-latest"
+  os = ["Linux","RPTU","normal-memory"]
 
   [include.nightly12]
   Oscar = "<matching>"
   Polymake = ""
-  julia-version = "1.12-nightly"
-  os = "ubuntu-latest"
+  julia-version = "~1.12.0-0"
+  os = ["Linux","RPTU","normal-memory"]
 
   [include.nightly]
   Oscar = "<matching>"
   Polymake = ""
   julia-version = "nightly"
-  os = "ubuntu-latest"
+  os = ["Linux","RPTU","normal-memory"]
 
   [include.macaarch64]
   Oscar = "<matching>"
