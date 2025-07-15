@@ -32,7 +32,7 @@ using CxxWrap
 
 using BinaryWrappers
 using Scratch
-import Pidfile
+import FileWatching: Pidfile
 
 import Perl_jll
 import Ninja_jll
