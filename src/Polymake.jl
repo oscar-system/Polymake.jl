@@ -20,6 +20,7 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     union, union!
 import AbstractAlgebra: should_show_banner
 
+import Pkg
 import Downloads
 import JSON
 
