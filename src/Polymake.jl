@@ -21,7 +21,6 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
 import AbstractAlgebra: should_show_banner
 
 import Pkg # needed by `generate_deps_tree.jl` in the `libpolymake-julia` repo
-import Downloads
 import JSON
 
 using SparseArrays
@@ -184,17 +183,9 @@ function __init__()
     # to avoid conflicts between symlinks and directories we switch to a new depstree folder name
     polymake_deps_tree = @get_scratch!("$(scratch_key)_depstree_v2")
 
-    @static if isdefined(Downloads, :default_downloader!)
-      # work around long Downloads.jl timer
-      Downloads.default_downloader!(Downloads.Downloader(grace=0.01))
-    end
     # we run this on every init to make sure all artifacts still exist
     # (this code should be race condition free even with multiple processes)
     prepare_deps_tree(polymake_deps_tree)
-    @static if isdefined(Downloads, :default_downloader!)
-      # restore default
-      Downloads.default_downloader!()
-    end
 
     polymake_user_dir = @get_scratch!("$(scratch_key)_userdir")
 
