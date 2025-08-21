@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · Polymake.jl - Documentation</title><meta name="title" content="Examples · Polymake.jl - Documentation"/><meta property="og:title" content="Examples · Polymake.jl - Documentation"/><meta property="twitter:title" content="Examples · Polymake.jl - Documentation"/><meta name="description" content="Documentation for Polymake.jl - Documentation."/><meta property="og:description" content="Documentation for Polymake.jl - Documentation."/><meta property="twitter:description" content="Documentation for Polymake.jl - Documentation."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Polymake.jl - Documentation</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Polymake.jl</a></li><li><a class="tocitem" href="../getting_started/">Getting Started</a></li><li><a class="tocitem" href="../using_polymake_jl/">Using Polymake.jl</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Example-script"><span>Example script</span></a></li><li><a class="tocitem" href="#Polymake-syntax-translation"><span>Polymake syntax translation</span></a></li></ul></li><li><a class="tocitem" href="../shell/">Polymake REPL</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/oscar-system/Polymake.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/oscar-system/Polymake.jl/blob/master/docs/src/examples.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><p>In this section we just highlight various possible uses of <code>Polymake.jl</code>. Please refer to <a href="#polymake-syntax-translation">Polymake syntax translation</a> for more thorough treatment.</p><p><code>polymake</code> big objects (like <code>Polytope</code>, <code>Cone</code>, etc) constructors live within modules named after <code>polymake</code> applications, e.g.</p><pre><code class="language-julia hljs"># Call the Polytope constructor
+julia&gt; p = polytope.Polytope(POINTS=[1 -1 -1; 1 1 -1; 1 -1 1; 1 1 1; 1 0 0])
+type: Polytope&lt;Rational&gt;
+
+POINTS
+1 -1 -1
+1 1 -1
+1 -1 1
+1 1 1
+1 0 0
+</code></pre><p>Parameters to constructors can be passed as keyword arguments only. All the keys <em>must</em> be compatible with <code>polymake</code> input attribute names.</p><p>Properties of such objects can be accessed by the <code>.</code> syntax:</p><pre><code class="nohighlight hljs">julia&gt; p.INTERIOR_LATTICE_POINTS
+pm::Matrix&lt;pm::Integer&gt;
+1 0 0</code></pre><h2 id="Example-script"><a class="docs-heading-anchor" href="#Example-script">Example script</a><a id="Example-script-1"></a><a class="docs-heading-anchor-permalink" href="#Example-script" title="Permalink"></a></h2><p>The following script is modelled on the one from the <a href="https://polymake.org/doku.php/user_guide/tutorials/perl_intro">Using Perl within polymake</a> tutorial:</p><pre><code class="language-julia hljs">using Polymake
+
+str = read(&quot;points.demo&quot;, String)
+# eval/parse is a hack for Rational input, don&#39;t do this at home!
+matrix_str = &quot;[&quot;*replace(str, &quot;/&quot;=&gt;&quot;//&quot;)*&quot;]&quot;
+matrix = eval(Meta.parse(matrix_str))
+@show matrix
+
+p = polytope.Polytope(POINTS=matrix)
+
+@show p.FACETS # polymake matrix of polymake rationals
+@show polytope.dim(p) # Julia Int64
+# note that even in Polymake property DIM is &quot;fake&quot; -- it&#39;s actually a function
+@show p.VERTEX_SIZES # polymake array of ints
+@show p.VERTICES
+
+for (i, vsize) in enumerate(p.VERTEX_SIZES)
+  if vsize == polytope.dim(p)
+    println(&quot;$i : $(p.VERTICES[i,:])&quot;)
+    # $i will be shifted by one from the polymake version
+  end
+end
+
+simple_verts = [i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)] # Julia vector of Int64s
+
+special_points = p.VERTICES[simple_verts, :] # polymake Matrix of rationals
+@show special_points;</code></pre><p>The script included (i.e. in running REPL execute <code>include(&quot;example_script.jl&quot;);</code>) produces the following output:</p><pre><code class="nohighlight hljs">matrix = Rational{Int64}[1//1 0//1 0//1 0//1; 1//1 1//16 1//4 1//16; 1//1 3//8 1//4 1//32; 1//1 1//4 3//8 1//32; 1//1 1//16 1//16 1//4; 1//1 1//32 3//8 1//4; 1//1 1//4 1//16 1//16; 1//1 1//32 1//4 3//8; 1//1 3//8 1//32 1//4; 1//1 1//4 1//32 3//8]
+p.FACETS = pm::Matrix&lt;pm::Rational&gt;
+0 -1 20/7 8/7
+0 -1 20 -1
+0 20/7 -1 8/7
+0 20/7 8/7 -1
+0 20 -1 -1
+1 16/3 16/3 -20/3
+0 8/7 20/7 -1
+0 8/7 -1 20/7
+1 16/3 -20/3 16/3
+0 -1 -1 20
+0 -1 8/7 20/7
+1 -20/3 16/3 16/3
+1 -32/21 -32/21 -32/21
+
+(Polymake.Polytope).dim(p) = 3
+p.VERTEX_SIZES = pm::Array&lt;int&gt;
+9 3 4 4 3 4 3 4 4 4
+p.VERTICES = pm::Matrix&lt;pm::Rational&gt;
+1 0 0 0
+1 1/16 1/4 1/16
+1 3/8 1/4 1/32
+1 1/4 3/8 1/32
+1 1/16 1/16 1/4
+1 1/32 3/8 1/4
+1 1/4 1/16 1/16
+1 1/32 1/4 3/8
+1 3/8 1/32 1/4
+1 1/4 1/32 3/8
+
+2 : pm::Vector&lt;pm::Rational&gt;
+1 1/16 1/4 1/16
+5 : pm::Vector&lt;pm::Rational&gt;
+1 1/16 1/16 1/4
+7 : pm::Vector&lt;pm::Rational&gt;
+1 1/4 1/16 1/16
+special_points = pm::Matrix&lt;pm::Rational&gt;
+1 1/16 1/4 1/16
+1 1/16 1/16 1/4
+1 1/4 1/16 1/16
+
+</code></pre><p>As can be seen we show consecutive steps of computations: the input <code>matrix</code>, <code>FACETS</code>, then we ask for <code>VERTEX_SIZES</code>, which triggers the convex hull computation. Then we show vertices and print those corresponding to simple vertices. Finally we collect them in <code>special_points</code>.</p><p>Observe that a <code>polymake</code> matrix (<code>Polymake.Matrix</code>) implements julia abstract array interface: <code>p.VERTICES[2,:]</code> returns a <code>1</code>-dimensional slice (i.e. <code>Polymake.Vector</code>), while passing a set of indices (<code>p.VERTICES[special_points, :]</code>) returns a <code>2</code>-dimensional one.</p><h3 id="Notes:"><a class="docs-heading-anchor" href="#Notes:">Notes:</a><a id="Notes:-1"></a><a class="docs-heading-anchor-permalink" href="#Notes:" title="Permalink"></a></h3><p>The same minor (up to permutation of rows) could be obtained by using sets: either julia or polymake ones. However since by default one can not index arrays with sets, we need to collect them first:</p><pre><code class="language-julia hljs">simple_verts = Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)) # Julia set of Int64s
+
+simple_verts = Polymake.Set(i for (i, vsize) in enumerate(p.VERTEX_SIZES) if vsize == polytope.dim(p)) # polymake set of longs
+
+special_points = p.VERTICES[collect(simple_verts), :]</code></pre><h2 id="Polymake-syntax-translation"><a class="docs-heading-anchor" href="#Polymake-syntax-translation">Polymake syntax translation</a><a id="Polymake-syntax-translation-1"></a><a class="docs-heading-anchor-permalink" href="#Polymake-syntax-translation" title="Permalink"></a></h2><p>The following tables explain by example how to quickly translate <code>polymake</code> syntax to <code>Polymake.jl</code>.</p><h3 id="Variables"><a class="docs-heading-anchor" href="#Variables">Variables</a><a id="Variables-1"></a><a class="docs-heading-anchor-permalink" href="#Variables" title="Permalink"></a></h3><table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>$p</code> (reference to 'scalar' variable)
+    </td>
+    <td>
+      <code>p</code> (reference to any variable)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print $p;</code>
+    </td>
+    <td>
+      <code>print(p)</code> or <code>println(p)</code> or <code>@show p</code>, or just <code>p</code> in REPL
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$i=5; $j=6;</code>
+    </td>
+    <td>
+      <code>i,j = 5,6</code> or <code>i=5; j=6</code><br>
+      (<code>;</code> is needed for separation, can be used to suppress return value in REPL)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$s = $i + $j; print $s;</code>
+    </td>
+    <td>
+      <code>s = i + j</code>
+    </td>
+  </tr>
+</table><h3 id="Arrays"><a class="docs-heading-anchor" href="#Arrays">Arrays</a><a id="Arrays-1"></a><a class="docs-heading-anchor-permalink" href="#Arrays" title="Permalink"></a></h3><table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Linear containers with random access
+    </td>
+    <td>
+      Linear containers with random access + all the algebra attached
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>@A = ("a", "b", "c");</code>
+    </td>
+    <td>
+      <code>A = ["a", "b", "c"]</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$first = $A[0];</code>
+      <br>(<code>first</code> is equal to <code>a</code>)
+    </td>
+    <td>
+      <code>first = A[1]</code><br>(note the <code>1</code>-based indexing!)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>@A2 = (3,1,4,2);</code>
+    </td>
+    <td>
+      <code>A2 = [3,1,4,2]</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print sort(@A2);</code><br>(a copy of <code>A2</code> is sorted)
+    </td>
+    <td>
+      <code>println(sort(A2))</code><br>(to sort in place use <code>sort!(A2))</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$arr = new Array<Int>([3,2,5]);</code><br>(a <code>C++</code> object)
+    </td>
+    <td>
+      <code>arr = [3,2,5]</code><br>(the <code>Int</code> type is inferred)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$arr->[0] = 100;</code><br>(assignment)
+    </td>
+    <td>
+      <code>arr[1] = 100</code><br>(assignment; returns <code>100</code>)
+    </td>
+  </tr>
+</table><h3 id="Dictionaries/Hash-Tables"><a class="docs-heading-anchor" href="#Dictionaries/Hash-Tables">Dictionaries/Hash Tables</a><a id="Dictionaries/Hash-Tables-1"></a><a class="docs-heading-anchor-permalink" href="#Dictionaries/Hash-Tables" title="Permalink"></a></h3><table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>%h = ();</code>
+    </td>
+    <td>
+      <code>h = Dict()</code><br>it is <b>MUCH</b> better to provide types e.g.<br><code>h = Dict{String, Int}()</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$h{"zero"}=0; $h{"four"}=4;</code>
+    </td>
+    <td>
+      <code>h["zero"] = 0; h["four"] = 4</code><br>(call returns the value)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print keys %h;</code>
+    </td>
+    <td>
+      <code>@show keys(h)</code> (NOTE: order is not specified)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print join(", ",keys %hash);</code>
+    </td>
+    <td>
+      <code>join(keys(h), ", ")</code><br>(returns <code>String</code>)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>%hash=("one",1,"two",2);</code>
+    </td>
+    <td>
+      <code>Dict([("one",1), ("two",2)])</code><br>(will infer types)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>%hash=("one"=>1,"two"=>2);</code>
+    </td>
+    <td>
+      <code>Dict("one"=>1,"two"=>2)</code>
+    </td>
+  </tr>
+</table><h3 id="Sets"><a class="docs-heading-anchor" href="#Sets">Sets</a><a id="Sets-1"></a><a class="docs-heading-anchor-permalink" href="#Sets" title="Permalink"></a></h3><table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Balanced binary search trees
+    </td>
+    <td>
+      Hash table with no content
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$set=new Set<Int>(3,2,5,3);</code>
+    </td>
+    <td>
+      <code>set = Set{Int}([3,2,5,3])</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>print $set->size;</code>
+    </td>
+    <td>
+      <code>length(set)</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>@array_from_set=@$set</code>
+    </td>
+    <td>
+      <code>collect(set)</code><br>(NOTE: this creates a <code>Vector</code>, but order is NOT specified)
+    </td>
+  </tr>
+</table><h3 id="Matrices"><a class="docs-heading-anchor" href="#Matrices">Matrices</a><a id="Matrices-1"></a><a class="docs-heading-anchor-permalink" href="#Matrices" title="Permalink"></a></h3><table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>new Matrix<T></code><br>Container with algebraic operations
+    </td>
+    <td>
+      <code>Matrix{T} = Array{T, 2}</code><br>**Linear** container with available indexing by <code>2</code>-ples; all algebra attached
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$mat=new Matrix<Rational>([[2,1,4,0,0],[3,1,5,2,1],[1,0,4,0,6]]);</code><br><code>$row1=new Vector<Rational>([2,1,4,0,0]);</code><br><code>$row2=new Vector<Rational>([3,1,5,2,1]);</code><br><code>$row3=new Vector<Rational>([1,0,4,0,6]);</code><br><code>@matrix_rows=($row1,$row2,$row3);</code> (<code>Perl</code> object)<br><code>$matrix_from_array=new Matrix<Rational>(\@matrix_rows);</code> (<code>C++</code> object)
+    </td>
+    <td>
+      <code>mat = Rational{Int}[2 1 4 0 0; 3 1 5 2 1; 1 0 4 0 6];</code><br><code>row1 = Rational{Int}[2, 1, 4, 0, 0];</code><br><code>row2 = Rational{Int}[3, 1, 5, 2, 1];</code><br><code>row3 = Rational{Int}[1, 0, 4, 0, 6];</code><br><code>matrix_rows = hcat(row1', row2', row3')</code><br>(Julia stores matrices in <b>column major</b> format, so <code>'</code> i.e. transposition is needed)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$mat->row(1)->[1]=7; $mat->elem(1,2)=8;</code>
+    </td>
+    <td>
+      <code>mat[2,2] = 7; mat[2,3] = 8</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$unit_mat=4*unit_matrix<Rational>(3);</code>
+    </td>
+    <td>
+      <code>unit_mat = Diagonal([4//1 for i in 1:3])</code> or <code>UniformScaling(4//1)</code><br>depending on application; both require <code>using LinearAlgebra</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$dense=new Matrix<Rational>($unit_mat);</code><br><code>$m_rat=new Matrix<Rational>(3/5*unit_matrix<Rational>(5));</code><br><code>$m2=$mat/$m_rat;</code><br><code>$m_int=new Matrix<Int>(unit_matrix<Rational>(5));</code><br><code>$m3=$m_rat/$m_int;</code><br>(results in an error due to incompatible types)
+    </td>
+    <td>
+      <code>Array(unit_mat)</code><br><code>m_rat = Diagonal([3//5 for i in 1:5])</code><br><code>m2 = mat/m_rat</code><br><code>m_int = Diagonal([1 for i in 1:5])</code><br><code>m_rat/m_int</code><br>(succeeds due to <code>promote</code> happening in <code>/</code>)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>convert_to<Rational>($m_int)</code><br><code>$z_vec=zero_vector<Int>($m_int->rows)</code><br><code>$extended_matrix=($z_vec\|$m_int);</code><br>(adds <code>z_vec</code> as the first column, result is dense)
+    </td>
+    <td>
+      <code>convert(Diagonal{Rational{Int}}, m_int)</code><br><code>z_vec = zeros(Int, size(m_int, 1))</code><br><code>extended_matrix = hcat(z_vec, m_int)</code><br>(result is sparse)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$set=new Set<Int>(3,2,5);</code><br><code>$template_Ex=new Array<Set<Int>>((new Set<Int>(5,2,6)),$set)</code>
+    </td>
+    <td>
+      <code>set = Set([3,2,5]);</code><br> <code>template_Ex = [Set([5,2,6]), set]</code>
+    </td>
+  </tr>
+</table><h3 id="Big-objects-and-properties:"><a class="docs-heading-anchor" href="#Big-objects-and-properties:">Big objects &amp; properties:</a><a id="Big-objects-and-properties:-1"></a><a class="docs-heading-anchor-permalink" href="#Big-objects-and-properties:" title="Permalink"></a></h3><table>
+  <tr>
+    <th>
+      Polymake
+    </th>
+    <th>
+      Julia
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <code>$p=new Polytope<Rational>(POINTS=>cube(4)->VERTICES);</code>
+    </td>
+    <td>
+      <code>p = polytope.Polytope(POINTS=polytope.cube(4).VERTICES)</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$lp=new LinearProgram<Rational>(LINEAR_OBJECTIVE=>[0,1,1,1,1]);</code>
+    </td>
+    <td>
+      <code>lp = polytope.LinearProgram(LINEAR_OBJECTIVE=[0,1,1,1,1])</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$p->LP=$lp;</code><br><code>$p->LP->MAXIMAL_VALUE;</code>
+    </td>
+    <td>
+      <code>p.LP = lp</code><br><code>p.LP.MAXIMAL_VALUE</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$i = ($p->N_FACETS * $p->N_FACETS) * 15;</code>
+    </td>
+    <td>
+      <code>i = (p.N_FACETS * p.N_FACETS) * 15</code>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>$print p->DIM;</code>
+    </td>
+    <td>
+      <code>polytope.dim(p)</code><br><code>DIM</code> is actually a faux property, which hides a function beneath
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>application "topaz";</code><br><code>$p = new Polytope<Max, QuadraticExtension>(POINTS=>[[1,0,0], [1,1,0], [1,1,1]]);</code>
+    </td>
+    <td>
+      <code>p = @pm tropical.Polytope{Max, QuadraticExtension}(POINTS=[1 0 0; 1 1 0; 1 1 1])</code><br>more information on the @pm macro can be found<p>here: <a href="../using_polymake_jl/#Polymake.@pm"><code>@pm</code></a></p>    </td>
+  </tr>
+</table></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../using_polymake_jl/">« Using Polymake.jl</a><a class="docs-footer-nextpage" href="../shell/">Polymake REPL »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 21 August 2025 10:28">Thursday 21 August 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
