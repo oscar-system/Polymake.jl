@@ -27,3 +27,21 @@ function Base.setindex!(M::NodeMap{TK, TV}, val, i::Int) where {TK, TV}
   _set_entry(M, to_zero_based_indexing(i), convert(to_cxx_type(TV), val))
   return val
 end
+
+function NodeMap{D,V}(g::Graph{D}, d::AbstractDict{Int,VV}) where D<:DirType where V where VV
+   nm = NodeMap{D,V}(g)
+   for (k,v) in d
+      nm[k] = v
+   end
+   return nm
+end
+NodeMap(g::Graph{D}, d::AbstractDict{Int,V}) where D<:DirType where V = NodeMap{D,convert_to_pm_type(V)}(g, d)
+
+function EdgeMap{D,V}(g::Graph{D}, d::AbstractDict{E,VV}) where D<:DirType where V where VV where E<:Union{<:Pair{Int,Int},NTuple{2,Int}}
+   em = EdgeMap{D,V}(g)
+   for (k,v) in d
+      em[k] = v
+   end
+   return em
+end
+EdgeMap(g::Graph{D}, d::AbstractDict{E,V})  where D<:DirType where V where E<:Union{<:Pair{Int,Int},NTuple{2,Int}} = EdgeMap{D,convert_to_pm_type(V)}(g, d)

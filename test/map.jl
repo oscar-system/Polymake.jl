@@ -15,5 +15,10 @@
             @test eltype(M) == Pair{String,String}
             @test sort(collect(M)) == sort(["one" => "Eins", "zero" => "Null", "infinity" => "Unendlich"])
         end
+        d = Dict{String,Int}("Rat" => 6, "Rabbit" => 3, "Wolf" => 1, "Mouse" => 5)
+        M2 = Polymake.Map(d)
+        @test length(d) == 4
+        @test M2["Rat"] == 6
+        @test_throws ErrorException M2["Cat"]
     end
 end

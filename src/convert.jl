@@ -99,6 +99,7 @@ convert_to_pm_type(::Type{<:CxxWrap.StdString}) = CxxWrap.StdString
 convert_to_pm_type(::Type{<:Union{Base.Integer, Integer}}) = Integer
 convert_to_pm_type(::Type{<:Union{Base.Rational, Rational}}) = Rational
 convert_to_pm_type(::Type{<:OscarNumber}) = OscarNumber
+convert_to_pm_type(::Type{<:Map}) = Map
 convert_to_pm_type(::Type{<:NodeMap}) = NodeMap
 convert_to_pm_type(::Type{<:Union{AbstractVector, Vector}}) = Vector
 convert_to_pm_type(::Type{<:Union{AbstractMatrix, Matrix}}) = Matrix
@@ -107,6 +108,8 @@ convert_to_pm_type(::Type{<:AbstractSparseMatrix{<:Union{Bool, CxxWrap.CxxBool}}
 convert_to_pm_type(::Type{<:Union{AbstractSparseVector, SparseVector}}) = SparseVector
 convert_to_pm_type(::Type{<:Array}) = Array
 convert_to_pm_type(::Type{<:Union{Pair, StdPair}}) = StdPair
+convert_to_pm_type(::Type{<:Map{A,B}}) where {A,B} = Map{convert_to_pm_type(A),convert_to_pm_type(B)}
+convert_to_pm_type(::Type{<:AbstractDict{A,B}}) where {A,B} = Map{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Pair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:StdPair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Tuple{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
@@ -125,8 +128,6 @@ EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = EdgeMap{Dir,to_cxx_t
 
 convert_to_pm_type(::Type{<:NodeMap{S,T}}) where S <: DirType where T = NodeMap{S, convert_to_pm_type(T)}
 NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = NodeMap{Dir,to_cxx_type(T)}(g)
-
-
 
 convert_to_pm_type(::Type{HomologyGroup{T}}) where T<:Integer = HomologyGroup{T}
 convert_to_pm_type(::Type{<:QuadraticExtension{T}}) where T<:Rational = QuadraticExtension{Rational}
