@@ -1,7 +1,7 @@
 name = "Polymake"
 uuid = "d720cf60-89b5-51f5-aff5-213f193123e7"
 repo = "https://github.com/oscar-system/Polymake.jl.git"
-version = "0.13.0"
+version = "0.13.1"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -29,7 +29,7 @@ BinaryWrappers = "~0.1.0"
 CxxWrap = "~0.17"
 FileWatching = "^1.10"
 JSON = "^0.20, ^0.21"
-Mongoc = "~0.8.0, ~0.9.0"
+Mongoc = "~0.8.0, ~0.9.0, ~0.10.0"
 NetworkOptions = "1.2"
 Ninja_jll = "^1.11.1"
 Perl_jll = "^5.34.0"
