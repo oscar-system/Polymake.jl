@@ -23,11 +23,18 @@ libpolymake_julia_jll = "4d8266f6-2b3b-57e3-ad7a-d431eaaac945"
 polymake_jll = "7c209550-9012-526c-9264-55ba7a78ba2c"
 polymake_oscarnumber_jll = "10f31823-b687-53e6-9f29-edb9d4da9f9f"
 
+[weakdeps]
+Graphviz_jll = "3c863552-8265-54e4-a6dc-903eb78fde85"
+
+[extensions]
+GraphvizExt = "Graphviz_jll"
+
 [compat]
 AbstractAlgebra = "~0.45, ~0.46"
 BinaryWrappers = "~0.1.0"
 CxxWrap = "~0.17"
 FileWatching = "^1.10"
+Graphviz_jll = "2.50.0"
 JSON = "^0.20, ^0.21"
 Mongoc = "~0.8.0, ~0.9.0, ~0.10.0"
 NetworkOptions = "1.2"
