@@ -59,7 +59,7 @@
         @test em[1, 2] == em[(1, 2)] == 1
         @test em[2, 3] == 0
 
-        d = Dict{NTuple{2, Int}, QQFieldElem}( (5, 1) => 10, (6, 2) => 2, (7, 1) => 5, (7, 3) => 5, (7, 6) => 3, (6, 4) => 2)
+        d = Dict{NTuple{2, Int}, Base.Rational{Int64}}( (5, 1) => 10, (6, 2) => 2, (7, 1) => 5, (7, 3) => 5, (7, 6) => 3, (6, 4) => 2)
         g2 = Polymake.Graph{Polymake.Undirected}(7)
         for (i,j) in keys(d)
            Polymake._add_edge(g2, i-1, j-1)
