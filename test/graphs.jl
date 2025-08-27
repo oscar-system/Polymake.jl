@@ -58,6 +58,12 @@
         em[1, 2] = 1
         @test em[1, 2] == em[(1, 2)] == 1
         @test em[2, 3] == 0
+
+        em2 = Polymake.EdgeMap{Polymake.Directed, Rational}(g)
+        @test em2 isa Polymake.EdgeMap
+        em2[1, 2] = 1//2
+        @test em2[1, 2] == em2[(1, 2)] == 1//2
+        @test em2[2, 3] == 0
     end
 
     @testset verbose=true "NodeMap" begin

@@ -121,7 +121,7 @@ const DirType = Union{Directed, Undirected}
 convert_to_pm_type(::Type{<:Graph{T}}) where T<:DirType = Graph{T}
 
 convert_to_pm_type(::Type{<:EdgeMap{S,T}}) where S<:DirType where T = EdgeMap{S, convert_to_pm_type(T)}
-EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = EdgeMap{Dir,to_cxx_type(T)}(g)
+EdgeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = EdgeMap{Dir,convert_to_pm_type(T)}(g)
 
 convert_to_pm_type(::Type{<:NodeMap{S,T}}) where S <: DirType where T = NodeMap{S, convert_to_pm_type(T)}
 NodeMap{Dir, T}(g::Graph{Dir}) where Dir<:DirType where T = NodeMap{Dir,to_cxx_type(T)}(g)
