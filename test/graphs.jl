@@ -58,6 +58,16 @@
         em[1, 2] = 1
         @test em[1, 2] == em[(1, 2)] == 1
         @test em[2, 3] == 0
+
+        d = Dict{NTuple{2, Int}, Base.Rational{Int64}}( (5, 1) => 10, (6, 2) => 2, (7, 1) => 5, (7, 3) => 5, (7, 6) => 3, (6, 4) => 2)
+        g2 = Polymake.Graph{Polymake.Undirected}(7)
+        for (i,j) in keys(d)
+           Polymake._add_edge(g2, i-1, j-1)
+        end
+        em2 = Polymake.EdgeMap(g2, d)
+        @test em2[5, 1] == 10
+        @test em2[1, 5] == 10
+        @test Polymake.ne(g2) == 6
     end
 
     @testset verbose=true "NodeMap" begin
@@ -76,6 +86,12 @@
         @test dec[1] == Polymake.BasicDecoration(Set(0:7), 4)
         decc[1] = Polymake.BasicDecoration(Polymake.Set(0:2), 2)
         @test decc[1] == Polymake.BasicDecoration((Set(0:2), 2))
+
+
+        g = Polymake.Graph{Polymake.Undirected}(7)
+        nl = Dict(5 => "", 4 => "Rabbit", 6 => "Mouse", 7 => "Rat", 2 => "Wolf", 3 => "", 1 => "")
+        nm = Polymake.NodeMap(g, nl)
+        @test nm[4] == "Rabbit"
     end
 
     @testset verbose=true "shortest_path_dijkstra" begin

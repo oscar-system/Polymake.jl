@@ -1,7 +1,3 @@
-function Map{String,String}()
-    return Map{to_cxx_type(String),to_cxx_type(String)}()
-end
-
 function Base.getindex(M::Map{TK, TV}, key) where {TK, TV}
     return convert(to_jl_type(TV), _getindex(M, convert(to_cxx_type(TK), key)))
 end
@@ -45,3 +41,17 @@ function Base.iterate(M::Map{S,T}, state) where {S,T}
         return Pair{to_jl_type(S), to_jl_type(T)}(elt[1], elt[2]), state
     end
 end
+
+function Map{S,T}(d::AbstractDict) where {S,T}
+   m = Map{to_cxx_type(S),to_cxx_type(T)}()
+   for (k,v) in d
+      m[k] = v
+   end
+   return m
+end
+
+Map(d::AbstractDict{S,T}) where {S,T} = Map{convert_to_pm_type(S), convert_to_pm_type(T)}(d)
+
+Map{String,T}() where T = Map{to_cxx_type(String),T}()
+Map{S,String}() where S = Map{S,to_cxx_type(String)}()
+Map{String,String}() = Map{to_cxx_type(String),to_cxx_type(String)}()
