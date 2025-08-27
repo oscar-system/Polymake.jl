@@ -37,7 +37,12 @@ end
 
 function bigobject_prop_type(obj::BigObjectType, path::String)
    res = call_function(:common, :bigobject_prop_type, obj, path)
-   return String(res)
+   return res isa BigObjectType ? res : String(res)
+end
+
+function bigobject_prop_is_multiple(obj::BigObjectType, path::String)
+   res = call_function(:common, :is_multiple, obj, path)::Int
+   return res > 0
 end
 
 # polymake can either just give a reference or do a full copy.

@@ -130,8 +130,21 @@ function bigobject_prop_type($$) {
       $path = $elem;
    }
    my $t = $bot->lookup_property($path)->type;
-   return instanceof Core::BigObjectType($t) ? $t->pure_type->name : $t->name;
+   return instanceof Core::BigObjectType($t) ? $t : $t->name;
 }
+
+function is_multiple($$) {
+   my ($bot, $path) = @_;
+   while (my ($parent, $elem) = $path =~ /^([^\.]*)\.(.*)$/) {
+      my $prop = $bot->lookup_property($parent);
+      $bot = $prop->subobject_type();
+      return 0 unless defined($bot);
+      $path = $elem;
+   }
+   my $t = $bot->lookup_property($path);
+   return $t->flags & Property::Flags::is_multiple;
+}
+
 
 function call_method {
    my $obj = shift;
