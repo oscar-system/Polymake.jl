@@ -58,7 +58,7 @@ jobs:
       JULIA_PKG_SERVER: ""
       POLYDB_TEST_URI: "mongodb://admin:admin@localhost:27017/?authSource=admin"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v2
         with:
@@ -107,7 +107,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v2
         with:
