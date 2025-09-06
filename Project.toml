@@ -1,7 +1,7 @@
 name = "Polymake"
 uuid = "d720cf60-89b5-51f5-aff5-213f193123e7"
 repo = "https://github.com/oscar-system/Polymake.jl.git"
-version = "0.13.1"
+version = "0.13.2"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -30,7 +30,7 @@ Graphviz_jll = "3c863552-8265-54e4-a6dc-903eb78fde85"
 GraphvizExt = "Graphviz_jll"
 
 [compat]
-AbstractAlgebra = "~0.45, ~0.46"
+AbstractAlgebra = "~0.45, ~0.46, ~0.47"
 BinaryWrappers = "~0.1.0"
 CxxWrap = "~0.17"
 FileWatching = "^1.10"
