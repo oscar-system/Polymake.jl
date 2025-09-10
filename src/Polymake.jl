@@ -20,7 +20,6 @@ import Base: ==, <, <=, *, -, +, //, ^, div, rem, one, zero,
     union, union!
 import AbstractAlgebra: should_show_banner
 
-import Pkg # needed by `generate_deps_tree.jl` in the `libpolymake-julia` repo
 import JSON
 
 using SparseArrays
