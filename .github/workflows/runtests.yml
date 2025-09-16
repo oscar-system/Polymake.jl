@@ -104,6 +104,12 @@ jobs:
           - os: 'macos-13' # x86_64
             julia-version: '1.10'
             cxxwrap: ''
+          - os: 'ubuntu-24.04-arm'
+            julia-version: '1.11'
+            cxxwrap: ''
+          - os: 'ubuntu-24.04-arm'
+            julia-version: '1.10'
+            cxxwrap: ''
       fail-fast: false
 
     steps:
