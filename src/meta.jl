@@ -143,7 +143,7 @@ struct PolymakeObject <: PolymakeCallable
     jl_function::Symbol
     pm_name::String
     app_name::String
-    json::JSON.Object{String, Any}
+    json::AbstractDict{String, Any}
 
     PolymakeObject(pm_name::String, app_name::String) =
         PolymakeObject(Symbol(pm_name), pm_name, app_name)
@@ -151,7 +151,7 @@ struct PolymakeObject <: PolymakeCallable
     PolymakeObject(jl_name::Symbol, pm_name::String, app_name::String) =
         new(jl_name, pm_name, app_name)
 
-    PolymakeObject(jl_name::Symbol, pm_name::String, app_name::String, json_dict::JSON.Object{String, Any}) =
+    PolymakeObject(jl_name::Symbol, pm_name::String, app_name::String, json_dict::AbstractDict{String, Any}) =
         new(jl_name, pm_name, app_name, json_dict)
 end
 
@@ -164,7 +164,7 @@ end
 
 ########## constructors
 
-function PolymakeCallable(app_name::String, dict::JSON.Object{String, Any},
+function PolymakeCallable(app_name::String, dict::AbstractDict{String, Any},
     polymake_name=dict["name"], julia_name=Symbol(polymake_name))
 
     if haskey(dict, "method_of")
@@ -174,13 +174,13 @@ function PolymakeCallable(app_name::String, dict::JSON.Object{String, Any},
     end
 end
 
-function PolymakeObject(app_name::String, dict::JSON.Object{String, Any},
+function PolymakeObject(app_name::String, dict::AbstractDict{String, Any},
     polymake_name=dict["name"], julia_name=Symbol(polymake_name))
 
     return PolymakeObject(julia_name, polymake_name, app_name, dict)
 end
 
-function PolymakeApp(jl_module::Symbol, app_json::JSON.Object{String, Any})
+function PolymakeApp(jl_module::Symbol, app_json::AbstractDict{String, Any})
     app_name = app_json["app"]
 
     if haskey(app_json, "functions")
