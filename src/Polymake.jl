@@ -218,7 +218,7 @@ function __init__()
     polymake_extension_config = joinpath(polymake_deps_tree, "extensions.json")
     tmpfile = tempname(polymake_deps_tree; cleanup=false)
     open(tmpfile, "w") do file
-       JSON.print(file, Dict("Polymake::User::extensions" => extensionpaths))
+       JSON.json(file, Dict("Polymake::User::extensions" => extensionpaths))
     end
     Base.Filesystem.rename(tmpfile, polymake_extension_config)
 
