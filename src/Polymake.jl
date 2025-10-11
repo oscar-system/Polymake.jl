@@ -200,7 +200,7 @@ function __init__()
     installarch = joinpath(polymake_deps_tree, "lib", "polymake")
 
     extensions = [(polymake_oscarnumber_jll, "oscarnumber")]
-    extensionpaths = []
+    extensionpaths = String[]
 
     exttop = joinpath("share", "polymake", "ext")
     extarch = joinpath("lib", "polymake", "ext")
