@@ -23,7 +23,13 @@ julia-version = [ "1.10"]
   [include.nightly12]
   Oscar = "<matching>"
   Polymake = ""
-  julia-version = "~1.12.0-0"
+  julia-version = "1.12"
+  os = ["Linux","RPTU","normal-memory"]
+
+  [include.nightly13]
+  Oscar = "<matching>"
+  Polymake = ""
+  julia-version = "~1.13.0-0"
   os = ["Linux","RPTU","normal-memory"]
 
   [include.nightly]
