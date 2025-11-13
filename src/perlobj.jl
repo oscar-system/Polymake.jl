@@ -74,6 +74,12 @@ function Base.setproperty!(obj::BigObject, prop::Symbol, val)
     return pmobj
 end
 
+# Warning: this needs to use a transaction and skips some extra checks
+# this also allows it to run on "closed" objects
+function _take_graph_map(obj::BigObject, gkey::String, mkey::String, m::Union{<:NodeMap,<:EdgeMap})
+   Polymake.call_function(Nothing, :common, :take_graph_map, obj, gkey, mkey, m)
+end
+
 function Base.setproperty!(obj::BigObject, prop::Symbol, val::Ptr{Cvoid})
     @assert prop == :cpp_object
     return setfield!(obj, prop, val)
