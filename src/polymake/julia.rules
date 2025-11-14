@@ -108,6 +108,31 @@ function nodemap_as_array<Dir,Elem>(NodeMap<Dir,Elem>) {
    return new Array<Elem>($nm);
 }
 
+# Warning: this needs to use a transaction and skips some extra checks
+# this also allows it to run on "closed" objects
+function take_graph_map<Dir,Elem>($ $ $ EdgeMap<Dir,Elem>) {
+   my ($bigobj, $gkey, $mkey, $map) = @_;
+   my $g = $bigobj->give($gkey);
+   my $em = new EdgeMap<Dir,Elem>($g);
+   for (my $e=entire(edges($g)); $e; ++$e) {
+      $em->[$$e] = $map->[$$e];
+   }
+   $bigobj->begin_transaction;
+   $bigobj->take($mkey, $em);
+}
+
+function take_graph_map<Dir,Elem>($ $ $ NodeMap<Dir,Elem>) {
+   my ($bigobj, $gkey, $mkey, $map) = @_;
+   my $g = $bigobj->give($gkey);
+   my $nm = new NodeMap<Dir,Elem>($g);
+   foreach my $n (@{nodes($g)}) {
+      $nm->[$n] = $map->[$n];
+   }
+   $bigobj->begin_transaction;
+   $bigobj->take($mkey, $nm);
+}
+
+
 function permute_graph($$) {
    my ($g, $p) = @_;
    $g->permute_nodes($p);
