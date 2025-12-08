@@ -93,10 +93,13 @@ function CreatePolymakeREPL(; prompt = _get_prompt(), name = :pm, repl = Base.ac
    hp.mode_mapping[name] = panel
    panel.hist = hp
 
-   search_prompt, skeymap = LineEdit.setup_search_keymap(hp)
    mk = REPL.mode_keymap(main_mode)
 
-   b = Dict{Any,Any}[skeymap, mk, LineEdit.history_keymap, LineEdit.default_keymap, LineEdit.escape_defaults]
+   b = Dict{Any,Any}[mk, LineEdit.history_keymap, LineEdit.default_keymap, LineEdit.escape_defaults]
+   @static if VERSION < v"1.13.0-DEV.1373"
+      search_prompt, skeymap = LineEdit.setup_search_keymap(hp)
+      pushfirst!(b, skeymap)
+   end
    panel.keymap_dict = LineEdit.keymap(b)
 
    panel
