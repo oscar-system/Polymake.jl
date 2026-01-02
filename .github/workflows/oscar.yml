@@ -110,11 +110,15 @@ jobs:
         run: |
           echo '${{ env.oscar_run_doctests }}'
           julia --color=yes --project=oscar-dev/project/ -e '${{ env.oscar_run_doctests }}'
+      - name: "depotpath"
+        if: always()
+        id: depotpath
+        run: echo "depot=${JULIA_DEPOT_PATH:-$HOME/.julia}" >> $GITHUB_OUTPUT
       - name: Archive wrappers
         if: always()
         uses: actions/upload-artifact@v6
         continue-on-error: true
         with:
-          name: "wrappers-${{ hashFiles('Project.toml', 'Manifest.toml') }}"
+          name: wrappers-${{ join(matrix.os) }}-${{ matrix.julia-version }}-${{ hashFiles('oscar-dev/project/Manifest.toml') }}
           path: |
-            ~/.julia/scratchspaces/d720cf60-89b5-51f5-aff5-213f193123e7/**/*.cpperl
+            ${{ steps.depotpath.outputs.depot }}/scratchspaces/d720cf60-89b5-51f5-aff5-213f193123e7/**/*.cpperl
