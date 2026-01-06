@@ -43,7 +43,7 @@ translate_type_to_pm_string(T) = throw(DomainError(T, "$T has been passed as a t
     `Polymake.Meta.translate_type_to_pm_string`."))
 
 function get_polymake_app_name(mod::Symbol)
-    haskey(module_appname_dict, mod) || throw("Module '$mod' not registered in Polymake.jl. If polmake application is present add the name to Polymake.module_appname_dict.")
+    haskey(module_appname_dict, mod) || throw("Module '$mod' not registered in Polymake.jl. If polymake application is present add the name to Polymake.module_appname_dict.")
     polymake_app = module_appname_dict[mod]
     return polymake_app
 end
