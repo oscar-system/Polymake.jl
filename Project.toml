@@ -31,7 +31,7 @@ GraphvizExt = "Graphviz_jll"
 
 [compat]
 AbstractAlgebra = "~0.45, ~0.46, ~0.47"
-BinaryWrappers = "~0.1.0"
+BinaryWrappers = "~0.1.0, ~0.2.0"
 CxxWrap = "~0.17"
 FileWatching = "^1.10"
 Graphviz_jll = "2.50.0"
