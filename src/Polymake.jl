@@ -307,7 +307,6 @@ function __init__()
     # the data will be cleaned anyway once the iddict is cleared
     Base.atexit() do
         Polymake.oscarnumber_prepare_cleanup()
-        ccall(:jl_safe_printf, Cvoid, (Cstring, ), "cleanup: $(_count_run[]), $(_count_clean[]), $(_count_cleanobj[])\n")
     end
     _cleanup_hook[] = WeakRef(_cleanup_helper())
 
@@ -348,22 +347,15 @@ mutable struct _cleanup_helper
    end
 end
 
-const _count_run = Ref(0)
-const _count_clean = Ref(0)
-const _count_cleanobj = Ref(0)
-
 function _perlobj_finalizer(x)
-   global _count_run[] += 1
    # only run on main thread
    if Threads.threadid() != 1
       # keep self (partially) alive
       finalizer(_perlobj_finalizer, x)
       return nothing
    end
-   global _count_clean[] += 1
    while !isempty(_pm_cleanup_queue)
       # clean queued objects
-      global _count_cleanobj[] += 1
       o = popfirst!(_pm_cleanup_queue)
       invoke(CxxWrap.CxxWrapCore.delete, Tuple{Any}, o)
    end
