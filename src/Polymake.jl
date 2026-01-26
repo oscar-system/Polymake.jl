@@ -213,7 +213,9 @@ function __init__()
        push!(extensionpaths, target(exttop, dirname))
     end
 
-    polymake_extension_config = tempname() * "-extensions.json"
+    tempdir = tempname()
+    mkpath(tempdir)
+    polymake_extension_config = joinpath(tempdir, "extensions.json")
     open(polymake_extension_config, "w") do file
        JSON.print(file, Dict("Polymake::User::extensions" => extensionpaths))
     end
