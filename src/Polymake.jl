@@ -187,8 +187,6 @@ function __init__()
     # (this code should be race condition free even with multiple processes)
     prepare_deps_tree(polymake_deps_tree)
 
-    polymake_user_dir = @get_scratch!("$(scratch_key)_userdir")
-
     # check libpolymake_julia version with a plain ccall before initializing libcxxwrap and libpolymake
     checkversion()
 
@@ -231,16 +229,12 @@ function __init__()
        adjustenv["PERL5LIB"] = nothing
     end
 
-
     withenv(adjustenv...) do
        try
            show_banner = should_show_banner() &&
                           !any(x->x.name in ["Oscar"], keys(Base.package_locks))
-           mkpath(polymake_user_dir)
-           # lock to avoid race-conditions when recompiling wrappers in multiple processes
-           Pidfile.mkpidlock("$(polymake_user_dir)/userdir.lock"; stale_age=60) do
-               initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
-           end
+
+           initialize_polymake_with_dir("$(polymake_extension_config)", installtop, installarch, show_banner)
            if !show_banner
                shell_execute(raw"$Verbose::credits=\"0\";")
            end
