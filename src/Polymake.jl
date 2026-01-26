@@ -209,7 +209,7 @@ function __init__()
     mkpath(target(extarch))
 
     for (ext, dirname) in extensions
-       src(name...) = joinpath(ext.artifact_dir, name...)
+       src(name...) = joinpath(ext.find_artifact_dir(), name...)
        force_symlink(src(exttop, dirname), target(exttop, dirname))
        force_symlink(src(extarch, dirname), target(extarch, dirname))
        push!(extensionpaths, target(exttop, dirname))
@@ -308,6 +308,60 @@ function __init__()
     Base.atexit() do
         Polymake.oscarnumber_prepare_cleanup()
     end
+    _cleanup_hook[] = WeakRef(_cleanup_helper())
+
+    nothing
+end
+
+# these types involve perl objects and should only be touched (deleted)
+# on the main thread
+const pm_perl_types = Union{<:PropertyValue,
+                            <:OptionSet,
+                            <:BigObjectType,
+                            <:BigObject,
+                            <:Polymake.Array{<:BigObject},
+                            <:ListResult,
+                            <:ListResult_internal}
+
+const _pm_cleanup_queue = Base.IntrusiveLinkedListSynchronized{Base.LinkedListItem{pm_perl_types}}()
+
+# overriding the default delete method from cxxwrap
+# to make sure this only runs on the main thread
+# otherwise add it to a global queue
+function CxxWrap.CxxWrapCore.delete(o::pm_perl_types)
+   if Threads.threadid() == 1
+      invoke(CxxWrap.CxxWrapCore.delete, Tuple{Any}, o)
+   else
+      push!(_pm_cleanup_queue, Base.LinkedListItem{pm_perl_types}(o))
+   end
+end
+
+const _cleanup_hook = Ref{WeakRef}()
+
+# adapted from PythonCall.jl
+# kept alive only with a weakref to make sure it will stay
+# on the finalizer list
+mutable struct _cleanup_helper
+   function _cleanup_helper()
+      finalizer(_perlobj_finalizer, new())
+   end
+end
+
+function _perlobj_finalizer(x)
+   # only run on main thread
+   if Threads.threadid() != 1
+      # keep self (partially) alive
+      finalizer(_perlobj_finalizer, x)
+      return nothing
+   end
+   while !isempty(_pm_cleanup_queue)
+      # clean queued objects
+      o = popfirst!(_pm_cleanup_queue)
+      invoke(CxxWrap.CxxWrapCore.delete, Tuple{Any}, o)
+   end
+   # keep self (partially) alive
+   finalizer(_perlobj_finalizer, x)
+   nothing
 end
 
 include("setup_apps.jl")
