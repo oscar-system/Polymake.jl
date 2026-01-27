@@ -187,8 +187,6 @@ function __init__()
     # (this code should be race condition free even with multiple processes)
     prepare_deps_tree(polymake_deps_tree)
 
-    polymake_user_dir = @get_scratch!("$(scratch_key)_userdir")
-
     # check libpolymake_julia version with a plain ccall before initializing libcxxwrap and libpolymake
     checkversion()
 
@@ -215,12 +213,12 @@ function __init__()
        push!(extensionpaths, target(exttop, dirname))
     end
 
-    polymake_extension_config = joinpath(polymake_deps_tree, "extensions.json")
-    tmpfile = tempname(polymake_deps_tree; cleanup=false)
-    open(tmpfile, "w") do file
+    tempdir = tempname()
+    mkpath(tempdir)
+    polymake_extension_config = joinpath(tempdir, "extensions.json")
+    open(polymake_extension_config, "w") do file
        JSON.print(file, Dict("Polymake::User::extensions" => extensionpaths))
     end
-    Base.Filesystem.rename(tmpfile, polymake_extension_config)
 
     # Temporarily unset PERL5LIB during initialization
     # This variable can cause errors if the perl modules in this folder were not
@@ -231,16 +229,12 @@ function __init__()
        adjustenv["PERL5LIB"] = nothing
     end
 
-
     withenv(adjustenv...) do
        try
            show_banner = should_show_banner() &&
                           !any(x->x.name in ["Oscar"], keys(Base.package_locks))
-           mkpath(polymake_user_dir)
-           # lock to avoid race-conditions when recompiling wrappers in multiple processes
-           Pidfile.mkpidlock("$(polymake_user_dir)/userdir.lock"; stale_age=60) do
-               initialize_polymake_with_dir("$(polymake_extension_config);user=$(polymake_user_dir)", installtop, installarch, show_banner)
-           end
+
+           initialize_polymake_with_dir("$(polymake_extension_config)", installtop, installarch, show_banner)
            if !show_banner
                shell_execute(raw"$Verbose::credits=\"0\";")
            end
@@ -263,13 +257,6 @@ function __init__()
        # work around issue with lp2poly and looking up perl modules from different applications
        application("polytope")
        shell_execute("require LPparser;")
-
-       # workaround until next polymake release to make sure mcf does not get stuck
-       Polymake.shell_execute(raw"""
-                              if (application("graph")->configured->{"mcf.rules"} > 0) {
-                                $mcf = "$mcf -q" unless ($mcf =~ / -q/);
-                              }
-                              """)
 
        for app in call_function(:common, :startup_applications)
            application(app)
