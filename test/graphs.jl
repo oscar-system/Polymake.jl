@@ -104,5 +104,43 @@
         @test Polymake._shortest_path_dijkstra(g, em, 0, 1, true) == [0,1]
         @test Polymake._shortest_path_dijkstra(g, em, 0, 1, false) == [0,4,3,2,1]
     end
+    @testset verbose=true "graph isomorphism" begin
+        g = Polymake.Graph{Polymake.Directed}(7)
+        for i in 0:3
+           Polymake._add_edge(g, i, i+1)
+        end
+        Polymake._add_edge(g, 2, 5)
+        Polymake._add_edge(g, 2, 6)
+
+        gcf = Polymake._canonical_form(g)
+        @test Polymake._is_isomorphic(g, gcf)
+
+        perm = Polymake._canonical_perm(g, Polymake.Array{Int}(fill(1,7)))
+        gp = Polymake._permute_nodes(g, perm)
+        Polymake._permute_nodes!(g, perm)
+        for i in 0:6
+           for j in 0:6
+              @test Polymake._has_edge(gp, i, j) == Polymake._has_edge(gcf, i, j)
+              @test Polymake._has_edge(g, i, j) == Polymake._has_edge(gcf, i, j)
+           end
+        end
+
+        gs1 = Polymake.Graph{Polymake.Undirected}(3)
+        gs2 = Polymake.Graph{Polymake.Undirected}(3)
+        Polymake._add_edge(gs1, 0, 1)
+        Polymake._add_edge(gs2, 1, 2)
+
+        @test Polymake._is_isomorphic(gs1, gs2)
+        @test !Polymake._is_isomorphic_with_colors(gs1, Polymake.Array{Int}([1,2,3]), gs2, Polymake.Array{Int}([1,2,3]))
+        @test Polymake._is_isomorphic_with_colors(gs1, Polymake.Array{Int}([1,1,2]), gs2, Polymake.Array{Int}([2,1,1]))
+        @test Polymake._automorphisms(gs1) == [[1,0,2]]
+        @test Polymake._automorphisms(gs1, Polymake.Array{Int}([1,2,3])) == []
+
+        cubeg = Polymake.polytope.cross(2).GRAPH.ADJACENCY
+        crossg = Polymake.polytope.cube(2).GRAPH.ADJACENCY
+        @test Polymake._canonical_hash(cubeg, 42) == Polymake._canonical_hash(crossg, 42)
+        @test Polymake._canonical_hash(cubeg, Polymake.Array{Int}([1,1,1,1]), 42) == Polymake._canonical_hash(crossg, Polymake.Array{Int}([1,1,1,1]), 42)
+        @test Polymake._canonical_hash(cubeg, 42) != Polymake._canonical_hash(g, 42)
+    end
 end
 
