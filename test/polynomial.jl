@@ -219,7 +219,7 @@ end
         # the following line is only necessary if the tests are run with an active session of Polymake
         # because variable names are global for the specific typing; ["x"] is its default value
         Polymake.set_var_names(pfmin,["t"])
-        @test string(pfmin) == string("pm::PuiseuxFraction<pm::Min, pm::Rational, pm::Rational>\n(-3*t -7*t^2 -7/2*t^4)/(- 1 + t)")
+        @test string(pfmin) == string("(-3*t -7*t^2 -7/2*t^4)/(- 1 + t)")
         @test Polymake.cmp(pfmin,pfconst) == -1
         @test Polymake.cmp(pfmax,pfconstmax) == -1
         @test pfmin < pfconst
