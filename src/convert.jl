@@ -21,6 +21,8 @@ convert(::Type{Set{T}}, itr::AbstractArray) where T = Set{T}(itr)
 
 convert(::Type{<:Polynomial{C,E}}, itr::Polynomial{C,E}) where {C,E} = itr
 convert(::Type{<:Polynomial{C1,E1}}, itr::Polynomial{C2,E2}) where {C1,C2,E1,E2} = Polynomial{C1,E1}(itr)
+convert(::Type{<:UniPolynomial{C,E}}, itr::UniPolynomial{C,E}) where {C,E} = itr
+convert(::Type{<:UniPolynomial{C1,E1}}, itr::UniPolynomial{C2,E2}) where {C1,C2,E1,E2} = UniPolynomial{C1,E1}(itr)
 
 convert(::Type{BasicDecoration}, p::StdPair) = BasicDecoration(first(p),last(p))
 Polymake.BasicDecoration(p::Pair{<:AbstractSet{<:Base.Integer},<:Base.Integer}) = BasicDecoration(convert(PolymakeType, first(p)), convert(PolymakeType,last(p)))
@@ -58,8 +60,12 @@ to_cxx_type(::Type{<:AbstractSet{T}}) where T =
     Set{to_cxx_type(T)}
 to_cxx_type(::Type{<:Array{T}}) where T =
     Array{to_cxx_type(T)}
+to_cxx_type(::Type{<:UniPolynomial{S,T}}) where {S,T} =
+    UniPolynomial{to_cxx_type(S), to_cxx_type(T)}
 to_cxx_type(::Type{<:Polynomial{S,T}}) where {S,T} =
     Polynomial{to_cxx_type(S), to_cxx_type(T)}
+to_cxx_type(::Type{<:PuiseuxFraction{M,S,T}}) where {M, S,T} =
+    PuiseuxFraction{to_cxx_type(M), to_cxx_type(S), to_cxx_type(T)}
 to_cxx_type(::Type{<:Tuple{A,B}}) where {A,B} =
     StdPair{to_cxx_type(A), to_cxx_type(B)}
 to_cxx_type(::Type{<:Pair{A,B}}) where {A,B} =
@@ -114,6 +120,8 @@ convert_to_pm_type(::Type{<:Pair{A,B}}) where {A,B} = StdPair{convert_to_pm_type
 convert_to_pm_type(::Type{<:StdPair{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Tuple{A,B}}) where {A,B} = StdPair{convert_to_pm_type(A),convert_to_pm_type(B)}
 convert_to_pm_type(::Type{<:Polynomial{<:Rational, <:Union{Int64, CxxWrap.CxxLong}}}) = Polynomial{Rational, CxxWrap.CxxLong}
+convert_to_pm_type(::Type{<:UniPolynomial{<:Rational, <:Union{Int64, CxxWrap.CxxLong}}}) = UniPolynomial{Rational, CxxWrap.CxxLong}
+convert_to_pm_type(::Type{<:PuiseuxFraction{M, <:Rational, <:Rational}}) where M<:Union{Max,Min} = PuiseuxFraction{M, Rational, Rational}
 convert_to_pm_type(::Type{<:AbstractVector{T}}) where T<:Tuple = Polymake.Array{convert_to_pm_type(T)}
 convert_to_pm_type(::Type{<:BasicDecoration}) = BasicDecoration
 # only for 3 or more elements:
@@ -140,6 +148,8 @@ for (pmT, jlT) in [(Integer, Base.Integer),
                    (Rational, Union{Base.Rational, Rational}),
                    (TropicalNumber{Max, Rational}, TropicalNumber{Max, Rational}),
                    (TropicalNumber{Min, Rational}, TropicalNumber{Min, Rational}),
+                   (PuiseuxFraction{Max, Rational, Rational}, PuiseuxFraction{Max, Rational, Rational}),
+                   (PuiseuxFraction{Min, Rational, Rational}, PuiseuxFraction{Min, Rational, Rational}),
                    (OscarNumber, OscarNumber),
                    (QuadraticExtension{Rational}, QuadraticExtension{Rational})]
     @eval begin

@@ -1,7 +1,7 @@
 name = "Polymake"
 uuid = "d720cf60-89b5-51f5-aff5-213f193123e7"
 repo = "https://github.com/oscar-system/Polymake.jl.git"
-version = "0.13.8"
+version = "0.13.9"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -47,6 +47,6 @@ SparseArrays = "^1.10"
 TOPCOM_jll = "~0.17.8"
 julia = "^1.10"
 lib4ti2_jll = "^1.6.10"
-libpolymake_julia_jll = "~0.14.5"
+libpolymake_julia_jll = "~0.14.6"
 polymake_jll = "^400.1400.0"
-polymake_oscarnumber_jll = "~0.3.9"
+polymake_oscarnumber_jll = "~0.3.16"
