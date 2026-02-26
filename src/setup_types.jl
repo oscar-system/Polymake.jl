@@ -12,6 +12,8 @@ const SmallObject = Union{
     TropicalNumber,
     IncidenceMatrix,
     Polynomial,
+    UniPolynomial,
+    PuiseuxFraction,
     Map,
     Graph,
     HomologyGroup,
@@ -21,7 +23,7 @@ const SmallObject = Union{
     NodeMap,
     BasicDecoration,
 }
-const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, OscarNumber, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}, TropicalNumber{Polymake.Max, Polymake.Rational}, TropicalNumber{Polymake.Min, Polymake.Rational}}
+const VecOrMat_eltypes = Union{Int64, Integer, Rational, Float64, QuadraticExtension{Rational}, OscarNumber, CxxWrap.CxxLong, Polynomial{Rational, CxxWrap.CxxLong}, TropicalNumber{Polymake.Max, Polymake.Rational}, TropicalNumber{Polymake.Min, Polymake.Rational}, PuiseuxFraction{Polymake.Max, Polymake.Rational, Polymake.Rational}, PuiseuxFraction{Polymake.Min, Polymake.Rational, Polymake.Rational}}
 
 const TypeConversionFunctions = Dict(
     Symbol("Int") => to_int,
@@ -45,17 +47,4 @@ end
 fill_wrapped_types!(TypeConversionFunctions, get_type_names())
 fill_wrapped_types!(TypeConversionFunctions, get_type_names_oscarnumber())
 
-# libcxxwrap-julia prior to 0.8 mapped C++ copy to Base.deepcopy
-# now it is mapped to Base.copy
-# we make sure both really do a C++ copy for polymake types
-# whether this is deep or not cannot be enforced anyway
-#
-# relevant is the libcxxwrap version that is used at build-time
-# which is fixed to 0.8.0 for binarybuilder
-# and cxxwrap 0.10 with libcxxwrap 0.7 might still work
-
-if libcxxwrap_build_version() >= v"0.8.0"
-    Base.deepcopy_internal(x::T, dict::IdDict) where T<:SmallObject = Base.copy(x)
-else
-    Base.copy(x::T) where T<:SmallObject = Base.deepcopy(x)
-end
+Base.deepcopy_internal(x::T, dict::IdDict) where T<:SmallObject = Base.copy(x)
