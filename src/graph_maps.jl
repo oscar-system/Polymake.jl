@@ -1,3 +1,23 @@
+function Base.:(==)(a::Graph{D}, b::Graph{D}) where {D}
+   return a === b || _isequal(a, b)
+end
+
+function Base.:(==)(a::NodeMap{D,V}, b::NodeMap{D,V}) where {D, V}
+   return a === b || _isequal(a, b)
+end
+
+function Base.:(==)(a::EdgeMap{D,V}, b::EdgeMap{D,V}) where {D, V}
+   return a === b || _isequal(a, b)
+end
+
+function Base.hash(g::Graph, h::UInt)
+   return hash(_get_hash(g), h)
+end
+function Base.hash(m::Union{<:NodeMap,<:EdgeMap}, h::UInt)
+   return hash(_get_hash(m), h)
+end
+
+
 function Base.getindex(M::EdgeMap{TK, TV}, i::Int, j::Int) where {TK, TV}
   index = to_zero_based_indexing.([i, j])
   return convert(to_jl_type(TV), _get_entry(M, index...))
