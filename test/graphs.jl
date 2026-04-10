@@ -6,6 +6,12 @@
         eg = c.GRAPH.ADJACENCY
         @test Polymake.nv(eg) == 8
         @test Polymake.ne(eg) == 12
+        eg2 = copy(eg)
+        eg3 = Polymake.polytope.cube(3).GRAPH.ADJACENCY
+        @test eg == eg2
+        @test hash(eg) == hash(eg2)
+        Polymake._rem_vertex(eg2,2)
+        @test eg != eg2
         g = Polymake.Graph{Polymake.Directed}(5)
         @test Polymake.nv(g) == 5
         @test Polymake.ne(g) == 0
@@ -68,6 +74,10 @@
         @test em2[5, 1] == 10
         @test em2[1, 5] == 10
         @test Polymake.ne(g2) == 6
+        em3 = Polymake.EdgeMap(g2, d)
+        @test em3 == em2
+        @test hash(em2) == hash(em3)
+        @test em != em2
     end
 
     @testset verbose=true "NodeMap" begin
@@ -92,6 +102,9 @@
         nl = Dict(5 => "", 4 => "Rabbit", 6 => "Mouse", 7 => "Rat", 2 => "Wolf", 3 => "", 1 => "")
         nm = Polymake.NodeMap(g, nl)
         @test nm[4] == "Rabbit"
+        nm2 = Polymake.NodeMap(g, nl)
+        @test nm == nm2
+        @test hash(nm) == hash(nm2)
     end
 
     @testset verbose=true "shortest_path_dijkstra" begin
