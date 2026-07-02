@@ -58,7 +58,7 @@ jobs:
     env:
       POLYDB_TEST_URI: "mongodb://admin:admin@localhost:27017/?authSource=admin"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v3
         with:
@@ -106,7 +106,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v3
         with:
