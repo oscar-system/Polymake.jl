@@ -25,6 +25,7 @@ const short_test = haskey(ENV,"JULIA_PKGEVAL")
 struct MyInt x::Int end # needed in test/convert.jl
 
 include("Aqua.jl")
+include("ClosureBoxes.jl")
 
 function typename_variants(s::AbstractString)
    r = replace(s, ">>" => "> >")
