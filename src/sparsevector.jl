@@ -52,6 +52,8 @@ SparseArrays.nonzeroinds(vec::SparseVector) = Int[to_one_based_indexing(i) for i
 
 SparseArrays.nonzeros(vec::SparseVector{T}) where T = findnz(vec)[2]
 
+SparseArrays.nnz(vec::SparseVector) = length(Polymake._nzindices(vec))
+
 function Base.:*(s::Number, vec::SparseVector{T}) where T
     JT = to_jl_type(T)
     P = promote_to_pm_type(SparseVector, promote_type(JT, typeof(s)))

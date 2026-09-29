@@ -379,5 +379,7 @@ using Polymake.SparseArrays
         @test jv == pv
         @test SparseArrays.nonzeroinds(psv) == je
         @test SparseArrays.nonzeros(psv) == jv
+        @test SparseArrays.nnz(psv) == length(je)
+        @test SparseArrays.nnz(psv) == length(pe)
     end
 end
