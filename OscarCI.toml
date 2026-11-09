@@ -25,7 +25,6 @@ julia-version = [ "1.10"]
   Polymake = ""
   julia-version = "1.12"
   os = ["Linux","RPTU","normal-memory"]
-
   [include.113]
   Oscar = "<matching>"
   Polymake = ""
