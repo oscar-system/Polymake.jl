@@ -14,22 +14,16 @@ julia-version = [ "1.10"]
   test = true
 
 [include]
-  [include.111]
+  [include.113]
   Oscar = "<matching>"
   Polymake = ""
-  julia-version = "1.11"
+  julia-version = "1.13"
   os = ["Linux","RPTU","normal-memory"]
 
-  [include.112]
+  [include.nightly114]
   Oscar = "<matching>"
   Polymake = ""
-  julia-version = "1.12"
-  os = ["Linux","RPTU","normal-memory"]
-
-  [include.nightly13]
-  Oscar = "<matching>"
-  Polymake = ""
-  julia-version = "1.13-nightly"
+  julia-version = "1.14-nightly"
   os = ["Linux","RPTU","normal-memory"]
 
   [include.nightly]
@@ -47,5 +41,5 @@ julia-version = [ "1.10"]
   [include.macstable]
   Oscar = "<matching>"
   Polymake = ""
-  julia-version = "1.12"
+  julia-version = "1"
   os = "macos-15"
